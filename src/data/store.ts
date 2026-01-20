@@ -1,22 +1,23 @@
-// Informações da loja Foco Laser
+// Informações da loja Pincel de Luz
 export const storeInfo = {
-  name: 'Foco Laser',
-  tagline: 'Personalização em Acrílico e MDF',
-  email: 'contato@focolaser.com.br',
+  name: 'Pincel de Luz',
+  tagline: 'Personalizados',
+  fullName: 'Pincel de Luz Personalizados',
+  email: 'contato@pinceldeluz.com.br',
   phone: '(75) 99173-1938',
   whatsapp: '5575991731938',
   whatsappLink: 'https://wa.me/5575991731938',
   freeShippingMinimum: 199,
   installments: 12,
   social: {
-    instagram: 'https://instagram.com/focolaser',
-    facebook: 'https://facebook.com/focolaser',
-    youtube: 'https://youtube.com/@focolaser',
-    pinterest: 'https://pinterest.com/focolaser',
+    instagram: 'https://instagram.com/pinceldeluz',
+    facebook: 'https://facebook.com/pinceldeluz',
+    youtube: 'https://youtube.com/@pinceldeluz',
+    pinterest: 'https://pinterest.com/pinceldeluz',
   },
   address: {
     street: 'Feira de Santana',
-    city: 'Bahia',
+    city: 'Feira de Santana',
     state: 'BA',
     country: 'Brasil',
   },
