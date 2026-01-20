@@ -1,24 +1,29 @@
-// Informações da loja Pincel de Luz
+// Informações da loja Goat Comunicação Visual
 export const storeInfo = {
-  name: 'Pincel de Luz',
-  tagline: 'Personalizados',
-  fullName: 'Pincel de Luz Personalizados',
-  email: 'contato@pinceldeluz.com.br',
-  phone: '(75) 99173-1938',
-  whatsapp: '5575991731938',
-  whatsappLink: 'https://wa.me/5575991731938',
-  freeShippingMinimum: 199,
+  name: 'GOAT',
+  tagline: 'Comunicação Visual',
+  fullName: 'GOAT Comunicação Visual',
+  email: 'contato@goatcomunicacaovisual.com.br',
+  phone: '(11) 99999-9999',
+  whatsapp: '5511999999999',
+  whatsappLink: 'https://wa.me/5511999999999',
+  freeShippingMinimum: 159,
   installments: 12,
+  productionTime: '4 a 10 dias úteis',
+  warranty: '3 meses',
   social: {
-    instagram: 'https://instagram.com/pinceldeluz',
-    facebook: 'https://facebook.com/pinceldeluz',
-    youtube: 'https://youtube.com/@pinceldeluz',
-    pinterest: 'https://pinterest.com/pinceldeluz',
+    instagram: 'https://instagram.com/goatcomunicacaovisual',
+    facebook: 'https://facebook.com/goatcomunicacaovisual',
+    youtube: 'https://youtube.com/@goatcomunicacaovisual',
+    pinterest: 'https://pinterest.com/goatcomunicacaovisual',
+    tiktok: 'https://tiktok.com/@goatcomunicacaovisual',
   },
   address: {
-    street: 'Feira de Santana',
-    city: 'Feira de Santana',
-    state: 'BA',
+    street: 'Av. Paulista, 1000',
+    neighborhood: 'Bela Vista',
+    city: 'São Paulo',
+    state: 'SP',
+    zip: '01310-100',
     country: 'Brasil',
   },
   cnpj: '00.000.000/0001-00',
@@ -27,47 +32,61 @@ export const storeInfo = {
       { name: 'Sobre Nós', href: '/sobre' },
       { name: 'Política de Privacidade', href: '/privacidade' },
       { name: 'Termos de Uso', href: '/termos' },
+      { name: 'Garantia', href: '/garantia' },
     ],
     help: [
       { name: 'Trocas e Devoluções', href: '/trocas' },
       { name: 'Perguntas Frequentes', href: '/faq' },
       { name: 'Contato', href: '/contato' },
       { name: 'Rastreio', href: '/rastreio' },
+      { name: 'Como Personalizar', href: '/como-personalizar' },
     ],
-    payment: ['PIX', 'Boleto', 'Cartão de Crédito', 'Cartão de Débito'],
+    payment: ['PIX', 'Boleto', 'Cartão de Crédito em até 12x', 'Cartão de Débito'],
+  },
+  customizationOptions: {
+    backgroundColors: ['Branco', 'Preto', 'Transparente', 'Azul Royal', 'Rosa', 'Lilás', 'Verde', 'Vermelho'],
+    mirrorColors: ['Dourado', 'Prata', 'Rose Gold', 'Azul', 'Bronze', 'Vermelho', 'Verde', 'Lilás', 'Laranja', 'Preto'],
+    materials: ['Acrílico Cristal', 'Acrílico Espelhado', 'MDF', 'Acrílico com LED'],
+    finishes: ['Polido', 'Fosco', 'Brilhante'],
+    fixation: ['Fita Dupla Face (inclusa)', 'Prolongadores de Inox', 'Suporte de Mesa'],
   },
 };
+
+// Importar imagens dos heróis
+import heroQrcode from '@/assets/hero/hero-qrcode.jpg';
+import heroNeon from '@/assets/hero/hero-neon.jpg';
+import heroCrachas from '@/assets/hero/hero-crachas.jpg';
 
 export const heroSlides = [
   {
     id: 1,
-    title: 'Crachás de Identificação',
-    subtitle: 'Personalize com sua marca',
-    discount: '20% OFF',
-    cta: 'Aproveite agora',
-    href: '/categoria/broches',
-    image: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=1200&h=500&fit=crop',
+    title: 'Displays QR Code',
+    subtitle: 'Modernize seu estabelecimento com displays profissionais',
+    discount: 'ATÉ 25% OFF',
+    cta: 'Ver Produtos',
+    href: '/categoria/qr-code',
+    image: heroQrcode,
     badge: 'FRETE GRÁTIS',
   },
   {
     id: 2,
-    title: 'Displays QR Code',
-    subtitle: 'Modernize seu estabelecimento',
-    discount: 'ATÉ 25% OFF',
-    cta: 'Ver produtos',
-    href: '/categoria/qr-code',
-    image: 'https://images.unsplash.com/photo-1595079676339-1534801ad6cf?w=1200&h=500&fit=crop',
-    badge: 'LANÇAMENTO',
-  },
-  {
-    id: 3,
-    title: 'Letreiros em Neon LED',
-    subtitle: 'Ilumine sua decoração',
+    title: 'Letreiros Neon LED',
+    subtitle: 'Ilumine sua decoração com estilo único',
     discount: 'NOVIDADE',
     cta: 'Conhecer',
     href: '/categoria/letreiros',
-    image: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=1200&h=500&fit=crop',
+    image: heroNeon,
     badge: 'EXCLUSIVO',
+  },
+  {
+    id: 3,
+    title: 'Crachás Empresariais',
+    subtitle: 'Identificação profissional para sua equipe',
+    discount: '20% OFF',
+    cta: 'Aproveite',
+    href: '/categoria/broches',
+    image: heroCrachas,
+    badge: 'COMPRE E GANHE',
   },
 ];
 
@@ -75,7 +94,7 @@ export const benefits = [
   {
     icon: 'truck',
     title: 'Frete Grátis',
-    description: 'Acima de R$ 199',
+    description: 'Acima de R$ 159',
   },
   {
     icon: 'credit-card',
@@ -89,7 +108,14 @@ export const benefits = [
   },
   {
     icon: 'shield-check',
-    title: 'Site Seguro',
-    description: 'Compra protegida',
+    title: 'Garantia',
+    description: '3 meses de garantia',
   },
+];
+
+export const discountTiers = [
+  { quantity: 10, discount: 5 },
+  { quantity: 20, discount: 10 },
+  { quantity: 50, discount: 15 },
+  { quantity: 100, discount: 20 },
 ];
