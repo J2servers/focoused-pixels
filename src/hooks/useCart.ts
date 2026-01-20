@@ -1,18 +1,20 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Product } from '@/data/products';
 
-interface CartItem {
-  product: Product;
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
   quantity: number;
   size?: string;
 }
 
 interface CartState {
   items: CartItem[];
-  addItem: (product: Product, quantity?: number, size?: string) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
+  removeItem: (id: string, size?: string) => void;
+  updateQuantity: (id: string, size: string | undefined, quantity: number) => void;
   clearCart: () => void;
   itemCount: number;
   total: number;
@@ -25,13 +27,14 @@ export const useCart = create<CartState>()(
       itemCount: 0,
       total: 0,
 
-      addItem: (product, quantity = 1, size) => {
+      addItem: (newItem) => {
         set((state) => {
           const existingIndex = state.items.findIndex(
-            (item) => item.product.id === product.id && item.size === size
+            (item) => item.id === newItem.id && item.size === newItem.size
           );
 
           let newItems: CartItem[];
+          const quantity = newItem.quantity || 1;
 
           if (existingIndex > -1) {
             newItems = state.items.map((item, index) =>
@@ -40,12 +43,12 @@ export const useCart = create<CartState>()(
                 : item
             );
           } else {
-            newItems = [...state.items, { product, quantity, size }];
+            newItems = [...state.items, { ...newItem, quantity }];
           }
 
           const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
           const total = newItems.reduce(
-            (sum, item) => sum + item.product.price * item.quantity,
+            (sum, item) => sum + item.price * item.quantity,
             0
           );
 
@@ -53,14 +56,14 @@ export const useCart = create<CartState>()(
         });
       },
 
-      removeItem: (productId) => {
+      removeItem: (id, size) => {
         set((state) => {
           const newItems = state.items.filter(
-            (item) => item.product.id !== productId
+            (item) => !(item.id === id && item.size === size)
           );
           const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
           const total = newItems.reduce(
-            (sum, item) => sum + item.product.price * item.quantity,
+            (sum, item) => sum + item.price * item.quantity,
             0
           );
 
@@ -68,26 +71,26 @@ export const useCart = create<CartState>()(
         });
       },
 
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: (id, size, quantity) => {
         set((state) => {
           if (quantity <= 0) {
             const newItems = state.items.filter(
-              (item) => item.product.id !== productId
+              (item) => !(item.id === id && item.size === size)
             );
             const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
             const total = newItems.reduce(
-              (sum, item) => sum + item.product.price * item.quantity,
+              (sum, item) => sum + item.price * item.quantity,
               0
             );
             return { items: newItems, itemCount, total };
           }
 
           const newItems = state.items.map((item) =>
-            item.product.id === productId ? { ...item, quantity } : item
+            item.id === id && item.size === size ? { ...item, quantity } : item
           );
           const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
           const total = newItems.reduce(
-            (sum, item) => sum + item.product.price * item.quantity,
+            (sum, item) => sum + item.price * item.quantity,
             0
           );
 
@@ -100,7 +103,7 @@ export const useCart = create<CartState>()(
       },
     }),
     {
-      name: 'foco-laser-cart',
+      name: 'pincel-de-luz-cart',
     }
   )
 );

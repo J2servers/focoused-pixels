@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, User, ShoppingCart, Menu, X } from 'lucide-react';
+import { Search, User, ShoppingCart, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { categories } from '@/data/products';
 import { useCart } from '@/hooks/useCart';
+import logo from '@/assets/logo-pincel-de-luz.png';
 
 export function MainHeader() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,7 +21,7 @@ export function MainHeader() {
 
   return (
     <header className="bg-background border-b border-border sticky top-0 z-40">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           {/* Mobile Menu */}
           <Sheet>
@@ -65,15 +66,12 @@ export function MainHeader() {
           </Sheet>
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex items-center">
-              <span className="text-2xl md:text-3xl font-extrabold text-primary">
-                FOCO
-              </span>
-              <span className="text-2xl md:text-3xl font-extrabold text-primary/70">
-                LASER
-              </span>
-            </div>
+          <Link to="/" className="flex items-center">
+            <img 
+              src={logo} 
+              alt="Pincel de Luz - Personalizados" 
+              className="h-14 md:h-16 w-auto object-contain"
+            />
           </Link>
 
           {/* Search Bar - Desktop */}

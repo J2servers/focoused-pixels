@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { storeInfo } from '@/data/store';
 import { categories } from '@/data/products';
+import logo from '@/assets/logo-pincel-de-luz.png';
 
 export function Footer() {
   return (
@@ -35,9 +36,13 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Sobre */}
           <div>
-            <h4 className="font-bold text-lg mb-4 text-primary">
-              {storeInfo.name}
-            </h4>
+            <Link to="/" className="block mb-4">
+              <img 
+                src={logo} 
+                alt={storeInfo.fullName} 
+                className="h-16 w-auto object-contain"
+              />
+            </Link>
             <p className="text-sm text-muted-foreground mb-4">
               Especialistas em personalização a laser em acrílico e MDF. 
               Produtos únicos e exclusivos para você e sua empresa.
