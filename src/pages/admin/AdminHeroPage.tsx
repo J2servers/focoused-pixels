@@ -140,8 +140,9 @@ const AdminHeroPage = () => {
 
       setIsDialogOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao salvar slide');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao salvar slide';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -161,8 +162,9 @@ const AdminHeroPage = () => {
       toast.success('Slide excluído com sucesso!');
       setIsDeleteDialogOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao excluir slide');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao excluir slide';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }

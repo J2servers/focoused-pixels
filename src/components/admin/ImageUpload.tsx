@@ -61,9 +61,10 @@ export function ImageUpload({
 
       onChange(data.publicUrl);
       toast.success('Imagem enviada com sucesso!');
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      toast.error(error.message || 'Erro ao enviar imagem');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao enviar imagem';
+      console.error('Upload error:', message);
+      toast.error(message);
     } finally {
       setIsUploading(false);
     }
@@ -226,7 +227,8 @@ export function MultiImageUpload({
           .getPublicUrl(fileName);
 
         newUrls.push(data.publicUrl);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        console.error('Upload error:', error);
         toast.error(`Erro ao enviar ${file.name}`);
       }
     }

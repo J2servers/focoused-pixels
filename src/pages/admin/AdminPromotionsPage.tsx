@@ -155,8 +155,9 @@ const AdminPromotionsPage = () => {
 
       setIsDialogOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao salvar promoção');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao salvar promoção';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -176,8 +177,9 @@ const AdminPromotionsPage = () => {
       toast.success('Promoção excluída com sucesso!');
       setIsDeleteDialogOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao excluir promoção');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao excluir promoção';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }

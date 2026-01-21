@@ -39,13 +39,21 @@ export interface DbCategory {
   status: string | null;
 }
 
+// Helper to safely extract string array from attributes
+function getStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((v): v is string => typeof v === 'string');
+  }
+  return [];
+}
+
 // Convert DB product to frontend-compatible format
 export function mapDbProduct(p: DbProduct) {
   const discount = p.promotional_price && p.price > p.promotional_price
     ? Math.round(((p.price - p.promotional_price) / p.price) * 100)
     : undefined;
 
-  const attrs = p.attributes as Record<string, any> | null;
+  const attrs = p.attributes as Record<string, unknown> | null;
   return {
     id: p.id,
     name: p.name,
@@ -63,9 +71,9 @@ export function mapDbProduct(p: DbProduct) {
     reviews: 0,
     freeShipping: p.price >= 199,
     badge: p.is_featured ? 'lancamento' as const : (discount && discount >= 10 ? 'desconto' as const : undefined),
-    sizes: attrs?.sizes || [],
-    colors: attrs?.colors || [],
-    materials: attrs?.materials || [],
+    sizes: getStringArray(attrs?.sizes),
+    colors: getStringArray(attrs?.colors),
+    materials: getStringArray(attrs?.materials),
     customizable: true,
     minQuantity: 1,
     inStock: (p.stock || 0) > 0,

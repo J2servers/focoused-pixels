@@ -5,14 +5,17 @@ import { ptBR } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 
+import type { Json } from '@/integrations/supabase/types';
+
 interface AuditLog {
   id: string;
   user_id: string | null;
   action: string;
   table_name: string;
   record_id: string | null;
-  old_data: any;
-  new_data: any;
+  old_data: Json | null;
+  new_data: Json | null;
+  ip_address: string | null;
   created_at: string;
 }
 
@@ -29,7 +32,7 @@ const AdminLogsPage = () => {
         .order('created_at', { ascending: false })
         .limit(100);
 
-      if (data) setLogs(data);
+      if (data) setLogs(data as unknown as AuditLog[]);
       setIsLoading(false);
     };
 

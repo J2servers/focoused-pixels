@@ -217,7 +217,7 @@ const CategoryPage = () => {
         <div>
           <Label className="text-sm font-semibold mb-3 block">Subcategorias</Label>
           <ul className="space-y-2">
-            {category.subcategories.map((sub: any) => (
+            {category.subcategories.map((sub: { id: string; slug: string; name: string }) => (
               <li key={sub.id}>
                 <Link
                   to={`/categoria/${categorySlug}/${sub.slug}`}

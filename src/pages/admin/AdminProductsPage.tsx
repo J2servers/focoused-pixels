@@ -171,8 +171,9 @@ const AdminProductsPage = () => {
 
       setIsDialogOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao salvar produto');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao salvar produto';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -192,8 +193,9 @@ const AdminProductsPage = () => {
       toast.success('Produto excluído com sucesso!');
       setIsDeleteDialogOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao excluir produto');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao excluir produto';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }

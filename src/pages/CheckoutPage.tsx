@@ -167,6 +167,7 @@ const CheckoutPage = () => {
     setIsSubmitting(true);
 
     try {
+      // Build quote data with proper types
       const quoteData = {
         customer_name: formData.customerName,
         customer_email: formData.customerEmail,
@@ -175,7 +176,7 @@ const CheckoutPage = () => {
         customer_cnpj: formData.customerCnpj || null,
         delivery_address: formData.deliveryAddress || null,
         delivery_cep: formData.deliveryCep || null,
-        delivery_deadline: formData.deliveryDeadline?.toISOString() || null,
+        delivery_deadline: formData.deliveryDeadline?.toISOString().split('T')[0] || null,
         shipping_method: formData.shippingMethod || null,
         product_types: formData.productTypes,
         led_option: formData.ledOption || null,
@@ -190,7 +191,7 @@ const CheckoutPage = () => {
         material: formData.material || null,
         thickness: formData.thickness || null,
         border_finish: formData.borderFinish || null,
-        qr_code_links: formData.qrCodeLinks.filter(l => l.trim()) || null,
+        qr_code_links: formData.qrCodeLinks.filter(l => l.trim()),
         qr_code_type: formData.qrCodeType || null,
         reference_links: formData.referenceLinks || null,
         style_preference: formData.stylePreference || null,
@@ -203,20 +204,21 @@ const CheckoutPage = () => {
         want_whatsapp_confirmation: formData.wantWhatsappConfirmation,
         purpose: formData.purpose || null,
         additional_notes: formData.additionalNotes || null,
-        cart_items: items.length > 0 ? items as unknown as null : null,
+        cart_items: items.length > 0 ? JSON.parse(JSON.stringify(items)) : null,
         cart_total: total > 0 ? total : null,
-        status: 'pending',
+        status: 'pending' as const,
       };
 
-      const { error } = await (supabase.from('quotes') as any).insert(quoteData);
+      const { error } = await supabase.from('quotes').insert(quoteData);
 
       if (error) throw error;
 
       toast.success('Orçamento enviado com sucesso! Entraremos em contato em breve.');
       clearCart();
       navigate('/orcamento-enviado');
-    } catch (error) {
-      console.error('Error submitting quote:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      console.error('Error submitting quote:', errorMessage);
       toast.error('Erro ao enviar orçamento. Tente novamente.');
     } finally {
       setIsSubmitting(false);
