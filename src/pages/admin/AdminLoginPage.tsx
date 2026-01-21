@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { getErrorMessage, isAuthError } from '@/lib/auth-error';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -66,15 +67,15 @@ const AdminLoginPage = () => {
       const { error } = await signIn(data.email, data.password);
       
       if (error) {
-        if (error.message.includes('Invalid login credentials')) {
+        if (isAuthError(error, 'Invalid login credentials')) {
           toast.error('Email ou senha incorretos');
         } else {
-          toast.error(error.message);
+          toast.error(getErrorMessage(error));
         }
       } else {
         toast.success('Login realizado com sucesso!');
       }
-    } catch (error) {
+    } catch {
       toast.error('Erro ao fazer login. Tente novamente.');
     } finally {
       setIsSubmitting(false);
@@ -87,16 +88,16 @@ const AdminLoginPage = () => {
       const { error } = await signUp(data.email, data.password, data.fullName);
       
       if (error) {
-        if (error.message.includes('User already registered')) {
+        if (isAuthError(error, 'User already registered')) {
           toast.error('Este email já está cadastrado');
         } else {
-          toast.error(error.message);
+          toast.error(getErrorMessage(error));
         }
       } else {
         toast.success('Cadastro realizado com sucesso! Aguarde a aprovação de um administrador para acessar o painel.');
         setShowSignupForm(false);
       }
-    } catch (error) {
+    } catch {
       toast.error('Erro ao fazer cadastro. Tente novamente.');
     } finally {
       setIsSubmitting(false);
@@ -109,12 +110,12 @@ const AdminLoginPage = () => {
       const { error } = await resetPassword(data.email);
       
       if (error) {
-        toast.error(error.message);
+        toast.error(getErrorMessage(error));
       } else {
         toast.success('Email de recuperação enviado! Verifique sua caixa de entrada.');
         setShowResetForm(false);
       }
-    } catch (error) {
+    } catch {
       toast.error('Erro ao enviar email. Tente novamente.');
     } finally {
       setIsSubmitting(false);
