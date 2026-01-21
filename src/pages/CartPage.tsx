@@ -5,7 +5,7 @@ import { NavigationBar } from '@/components/layout/NavigationBar';
 import { Footer } from '@/components/layout/Footer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { Button } from '@/components/ui/button';
-import { Trash2, Minus, Plus, MessageCircle, ShoppingBag } from 'lucide-react';
+import { Trash2, Minus, Plus, MessageCircle, ShoppingBag, FileText } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { storeInfo } from '@/data/store';
 
@@ -180,17 +180,28 @@ const CartPage = () => {
                     ou em até {storeInfo.installments}x de R$ {(total / storeInfo.installments).toFixed(2)} sem juros
                   </p>
 
+                  <Link to="/checkout">
+                    <Button 
+                      size="lg" 
+                      className="w-full font-bold"
+                    >
+                      <FileText className="h-5 w-5 mr-2" />
+                      Solicitar Orçamento
+                    </Button>
+                  </Link>
+
                   <Button 
                     onClick={handleCheckoutWhatsApp}
                     size="lg" 
-                    className="w-full font-bold"
+                    variant="outline"
+                    className="w-full font-bold border-success text-success hover:bg-success hover:text-success-foreground"
                   >
                     <MessageCircle className="h-5 w-5 mr-2" />
-                    Finalizar via WhatsApp
+                    Comprar via WhatsApp
                   </Button>
 
-                  <Link to="/" className="block mt-3">
-                    <Button variant="outline" className="w-full">
+                  <Link to="/" className="block">
+                    <Button variant="ghost" className="w-full text-muted-foreground">
                       Continuar comprando
                     </Button>
                   </Link>
