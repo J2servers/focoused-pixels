@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { 
   Package, 
   FolderTree, 
@@ -11,7 +13,9 @@ import {
   ArrowUpRight,
   Clock,
   Eye,
-  BarChart3
+  BarChart3,
+  Wallet,
+  Calendar
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -24,6 +28,12 @@ import {
   ProductRankingCard,
   TaxInfoCard,
 } from '@/components/admin/dashboard';
+import {
+  CashFlowSummaryCards,
+  CashTransactionsTable,
+  StockControlCard,
+  FiscalControlCard,
+} from '@/components/admin/cashflow';
 
 interface DashboardStats {
   totalProducts: number;
@@ -42,6 +52,16 @@ const AdminDashboardPage = () => {
     totalQuotes: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Filtros de data para o caixa
+  const [cashStartDate, setCashStartDate] = useState(() => {
+    const date = new Date();
+    date.setDate(1); // Primeiro dia do mês
+    return date.toISOString().split('T')[0];
+  });
+  const [cashEndDate, setCashEndDate] = useState(() => {
+    return new Date().toISOString().split('T')[0];
+  });
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -203,8 +223,12 @@ const AdminDashboardPage = () => {
         </div>
 
         {/* Tabs para Catálogo vs Financeiro */}
-        <Tabs defaultValue="catalog" className="space-y-6">
+        <Tabs defaultValue="cashflow" className="space-y-6">
           <TabsList className="bg-muted/50">
+            <TabsTrigger value="cashflow" className="gap-2">
+              <Wallet className="h-4 w-4" />
+              Caixa
+            </TabsTrigger>
             <TabsTrigger value="catalog" className="gap-2">
               <Package className="h-4 w-4" />
               Catálogo
@@ -214,6 +238,55 @@ const AdminDashboardPage = () => {
               Financeiro
             </TabsTrigger>
           </TabsList>
+
+          {/* Tab Caixa */}
+          <TabsContent value="cashflow" className="space-y-6">
+            {/* Filtro de Período */}
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Período:</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="startDate" className="text-sm text-muted-foreground">De</Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={cashStartDate}
+                      onChange={(e) => setCashStartDate(e.target.value)}
+                      className="w-auto"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="endDate" className="text-sm text-muted-foreground">Até</Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      value={cashEndDate}
+                      onChange={(e) => setCashEndDate(e.target.value)}
+                      className="w-auto"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Summary Cards */}
+            <CashFlowSummaryCards startDate={cashStartDate} endDate={cashEndDate} />
+
+            {/* Grid com Estoque e Fiscal */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <CashTransactionsTable startDate={cashStartDate} endDate={cashEndDate} />
+              </div>
+              <div className="space-y-6">
+                <StockControlCard />
+                <FiscalControlCard />
+              </div>
+            </div>
+          </TabsContent>
 
           {/* Tab Catálogo */}
           <TabsContent value="catalog" className="space-y-6">
