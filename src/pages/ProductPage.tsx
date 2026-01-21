@@ -6,9 +6,10 @@ import { NavigationBar } from '@/components/layout/NavigationBar';
 import { Footer } from '@/components/layout/Footer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Star, Truck } from 'lucide-react';
-import { getProductBySlug, categories } from '@/data/products';
+import { useProductBySlug, useCategoryBySlug } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { storeInfo, discountTiers } from '@/data/store';
 import { toast } from 'sonner';
@@ -25,11 +26,37 @@ import { ProductReviews } from '@/components/reviews';
 
 const ProductPage = () => {
   const { productSlug } = useParams();
-  const product = getProductBySlug(productSlug || '');
+  const { data: product, isLoading } = useProductBySlug(productSlug);
+  const { data: category } = useCategoryBySlug(product?.category);
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <TopBar />
+        <MainHeader />
+        <NavigationBar />
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-6">
+            <Skeleton className="h-6 w-64 mb-6" />
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+              <Skeleton className="aspect-square rounded-lg" />
+              <div className="space-y-4">
+                <Skeleton className="h-8 w-3/4" />
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="h-10 w-1/3" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -48,8 +75,6 @@ const ProductPage = () => {
     );
   }
 
-  const category = categories.find(c => c.slug === product.category);
-  const subcategory = category?.subcategories?.find(s => s.slug === product.subcategory);
   const images = product.images?.length ? product.images : [product.image];
 
   // Calcular desconto por quantidade
@@ -107,16 +132,6 @@ const ProductPage = () => {
                   <BreadcrumbItem>
                     <BreadcrumbLink href={`/categoria/${category.slug}`}>
                       {category.name}
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                </>
-              )}
-              {subcategory && (
-                <>
-                  <BreadcrumbItem>
-                    <BreadcrumbLink href={`/categoria/${category?.slug}/${subcategory.slug}`}>
-                      {subcategory.name}
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />

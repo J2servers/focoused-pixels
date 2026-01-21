@@ -13,13 +13,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { Skeleton } from '@/components/ui/skeleton';
 import { SlidersHorizontal, ChevronRight } from 'lucide-react';
-import { 
-  categories, 
-  getProductsByCategory, 
-  getProductsBySubcategory, 
-  Product 
-} from '@/data/products';
+import { useProductsByCategory, useCategoryBySlug, useCategories } from '@/hooks/useProducts';
 
 type SortOption = 'relevance' | 'price-asc' | 'price-desc' | 'name-asc' | 'newest';
 
@@ -32,25 +28,20 @@ const CategoryPage = () => {
   const [showOnlyInStock, setShowOnlyInStock] = useState(false);
   const [showOnlyFreeShipping, setShowOnlyFreeShipping] = useState(false);
 
-  // Find current category and subcategory
-  const category = categories.find(c => c.slug === categorySlug);
-  const subcategory = category?.subcategories?.find(s => s.slug === subcategorySlug);
+  // Fetch data from Supabase
+  const { data: category, isLoading: categoryLoading } = useCategoryBySlug(subcategorySlug || categorySlug);
+  const { data: allCategories = [] } = useCategories();
+  const { data: baseProducts = [], isLoading: productsLoading } = useProductsByCategory(subcategorySlug || categorySlug);
 
-  // Get products
-  const baseProducts = useMemo(() => {
-    if (subcategorySlug) {
-      return getProductsBySubcategory(subcategorySlug);
-    }
-    if (categorySlug) {
-      return getProductsByCategory(categorySlug);
-    }
-    return [];
-  }, [categorySlug, subcategorySlug]);
+  // Find parent category if viewing subcategory
+  const parentCategory = subcategorySlug && categorySlug 
+    ? allCategories.find(c => c.slug === categorySlug) 
+    : null;
 
   // Get available sizes from products
   const availableSizes = useMemo(() => {
     const sizes = new Set<string>();
-    baseProducts.forEach(p => p.sizes?.forEach(s => sizes.add(s)));
+    baseProducts.forEach(p => p.sizes?.forEach((s: string) => sizes.add(s)));
     return Array.from(sizes).sort();
   }, [baseProducts]);
 
@@ -69,7 +60,7 @@ const CategoryPage = () => {
     // Size filter
     if (selectedSizes.length > 0) {
       result = result.filter(p => 
-        p.sizes?.some(size => selectedSizes.includes(size))
+        p.sizes?.some((size: string) => selectedSizes.includes(size))
       );
     }
 
@@ -95,7 +86,6 @@ const CategoryPage = () => {
         result.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'newest':
-        // Assuming newer products have higher IDs or badge 'lancamento'
         result.sort((a, b) => {
           if (a.badge === 'lancamento' && b.badge !== 'lancamento') return -1;
           if (b.badge === 'lancamento' && a.badge !== 'lancamento') return 1;
@@ -103,7 +93,6 @@ const CategoryPage = () => {
         });
         break;
       default:
-        // relevance - keep original order or sort by rating
         result.sort((a, b) => b.rating - a.rating);
     }
 
@@ -128,7 +117,9 @@ const CategoryPage = () => {
 
   const hasActiveFilters = priceMin || priceMax || selectedSizes.length > 0 || showOnlyInStock || showOnlyFreeShipping;
 
-  if (!category) {
+  const isLoading = categoryLoading || productsLoading;
+
+  if (!isLoading && !category) {
     return (
       <div className="min-h-screen flex flex-col">
         <TopBar />
@@ -222,11 +213,11 @@ const CategoryPage = () => {
       )}
 
       {/* Subcategories */}
-      {category.subcategories && category.subcategories.length > 0 && !subcategorySlug && (
+      {category?.subcategories && category.subcategories.length > 0 && !subcategorySlug && (
         <div>
           <Label className="text-sm font-semibold mb-3 block">Subcategorias</Label>
           <ul className="space-y-2">
-            {category.subcategories.map((sub) => (
+            {category.subcategories.map((sub: any) => (
               <li key={sub.id}>
                 <Link
                   to={`/categoria/${categorySlug}/${sub.slug}`}
@@ -258,21 +249,21 @@ const CategoryPage = () => {
                 <BreadcrumbLink href="/">Home</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              {subcategory ? (
+              {parentCategory ? (
                 <>
                   <BreadcrumbItem>
                     <BreadcrumbLink href={`/categoria/${categorySlug}`}>
-                      {category.name}
+                      {parentCategory.name}
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>{subcategory.name}</BreadcrumbPage>
+                    <BreadcrumbPage>{category?.name}</BreadcrumbPage>
                   </BreadcrumbItem>
                 </>
               ) : (
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{category.name}</BreadcrumbPage>
+                  <BreadcrumbPage>{category?.name || 'Carregando...'}</BreadcrumbPage>
                 </BreadcrumbItem>
               )}
             </BreadcrumbList>
@@ -281,12 +272,21 @@ const CategoryPage = () => {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold">
-                {subcategory?.name || category.name}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                {filteredProducts.length} {filteredProducts.length === 1 ? 'produto' : 'produtos'} encontrados
-              </p>
+              {isLoading ? (
+                <>
+                  <Skeleton className="h-8 w-48 mb-2" />
+                  <Skeleton className="h-5 w-32" />
+                </>
+              ) : (
+                <>
+                  <h1 className="text-2xl md:text-3xl font-bold">
+                    {category?.name}
+                  </h1>
+                  <p className="text-muted-foreground mt-1">
+                    {filteredProducts.length} {filteredProducts.length === 1 ? 'produto' : 'produtos'} encontrados
+                  </p>
+                </>
+              )}
             </div>
 
             <div className="flex items-center gap-3">
@@ -340,7 +340,13 @@ const CategoryPage = () => {
 
             {/* Products Grid */}
             <div className="flex-1">
-              {filteredProducts.length === 0 ? (
+              {isLoading ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+                  {[...Array(8)].map((_, i) => (
+                    <Skeleton key={i} className="aspect-square rounded-lg" />
+                  ))}
+                </div>
+              ) : filteredProducts.length === 0 ? (
                 <div className="text-center py-16">
                   <p className="text-lg text-muted-foreground mb-4">
                     Nenhum produto encontrado com os filtros selecionados.
