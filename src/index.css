@@ -4,11 +4,12 @@
 
 /* Goat Comunicação Visual Design System */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
 
 @layer base {
   :root {
     /* Goat Brand Colors */
-    --background: 0 0% 100%;
+    --background: 214 31.8182% 91.3725%;
     --foreground: 270 10% 15%;
 
     --card: 0 0% 100%;
