@@ -163,6 +163,39 @@ export type Database = {
         }
         Relationships: []
       }
+      company_tax_settings: {
+        Row: {
+          cnae_primary: string | null
+          cnae_secondary: string[] | null
+          cnpj: string | null
+          id: string
+          simples_anexo: string | null
+          simples_faixa: number | null
+          tax_regime: string | null
+          updated_at: string
+        }
+        Insert: {
+          cnae_primary?: string | null
+          cnae_secondary?: string[] | null
+          cnpj?: string | null
+          id?: string
+          simples_anexo?: string | null
+          simples_faixa?: number | null
+          tax_regime?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cnae_primary?: string | null
+          cnae_secondary?: string[] | null
+          cnpj?: string | null
+          id?: string
+          simples_anexo?: string | null
+          simples_faixa?: number | null
+          tax_regime?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hero_slides: {
         Row: {
           created_at: string
@@ -256,10 +289,141 @@ export type Database = {
         }
         Relationships: []
       }
+      order_items: {
+        Row: {
+          cost_labor: number | null
+          cost_material: number | null
+          cost_shipping: number | null
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string | null
+          product_name: string
+          product_sku: string | null
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          cost_labor?: number | null
+          cost_material?: number | null
+          cost_shipping?: number | null
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id?: string | null
+          product_name: string
+          product_sku?: string | null
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Update: {
+          cost_labor?: number | null
+          cost_material?: number | null
+          cost_shipping?: number | null
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string | null
+          product_name?: string
+          product_sku?: string | null
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          discount: number | null
+          id: string
+          items: Json
+          notes: string | null
+          order_number: string
+          order_status: string | null
+          payment_method: string | null
+          payment_status: string | null
+          quote_id: string | null
+          shipping_cost: number | null
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          discount?: number | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          order_number: string
+          order_status?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          quote_id?: string | null
+          shipping_cost?: number | null
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          discount?: number | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          order_number?: string
+          order_status?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          quote_id?: string | null
+          shipping_cost?: number | null
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           attributes: Json | null
           category_id: string | null
+          cost_labor: number | null
+          cost_material: number | null
+          cost_shipping: number | null
           cover_image: string | null
           created_at: string
           deleted_at: string | null
@@ -267,6 +431,7 @@ export type Database = {
           gallery_images: string[] | null
           id: string
           is_featured: boolean | null
+          min_stock: number | null
           name: string
           price: number
           promotional_price: number | null
@@ -281,6 +446,9 @@ export type Database = {
         Insert: {
           attributes?: Json | null
           category_id?: string | null
+          cost_labor?: number | null
+          cost_material?: number | null
+          cost_shipping?: number | null
           cover_image?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -288,6 +456,7 @@ export type Database = {
           gallery_images?: string[] | null
           id?: string
           is_featured?: boolean | null
+          min_stock?: number | null
           name: string
           price: number
           promotional_price?: number | null
@@ -302,6 +471,9 @@ export type Database = {
         Update: {
           attributes?: Json | null
           category_id?: string | null
+          cost_labor?: number | null
+          cost_material?: number | null
+          cost_shipping?: number | null
           cover_image?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -309,6 +481,7 @@ export type Database = {
           gallery_images?: string[] | null
           id?: string
           is_featured?: boolean | null
+          min_stock?: number | null
           name?: string
           price?: number
           promotional_price?: number | null

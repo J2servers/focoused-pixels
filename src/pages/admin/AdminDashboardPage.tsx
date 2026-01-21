@@ -9,13 +9,21 @@ import {
   TrendingUp, 
   ShoppingCart,
   ArrowUpRight,
-  ArrowDownRight,
+  Clock,
   Eye,
-  Clock
+  BarChart3
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  LowStockAlert,
+  ProductMarginTable,
+  FinancialSummaryCards,
+  ProductRankingCard,
+  TaxInfoCard,
+} from '@/components/admin/dashboard';
 
 interface DashboardStats {
   totalProducts: number;
@@ -194,91 +202,124 @@ const AdminDashboardPage = () => {
           ))}
         </div>
 
-        {/* Quick Actions */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              Ações Rápidas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {quickActions.map((action) => (
-                <Link 
-                  key={action.title}
-                  to={action.href} 
-                  className="group flex flex-col items-center gap-3 p-5 rounded-xl border border-border/50 bg-card hover:border-primary/30 hover:shadow-md transition-all duration-200"
-                >
-                  <div className={cn(
-                    "p-3 rounded-xl transition-transform group-hover:scale-110",
-                    action.color
-                  )}>
-                    <action.icon className="h-6 w-6" />
+        {/* Tabs para Catálogo vs Financeiro */}
+        <Tabs defaultValue="catalog" className="space-y-6">
+          <TabsList className="bg-muted/50">
+            <TabsTrigger value="catalog" className="gap-2">
+              <Package className="h-4 w-4" />
+              Catálogo
+            </TabsTrigger>
+            <TabsTrigger value="financial" className="gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Financeiro
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Tab Catálogo */}
+          <TabsContent value="catalog" className="space-y-6">
+            {/* Quick Actions */}
+            <Card className="border-0 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  Ações Rápidas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {quickActions.map((action) => (
+                    <Link 
+                      key={action.title}
+                      to={action.href} 
+                      className="group flex flex-col items-center gap-3 p-5 rounded-xl border border-border/50 bg-card hover:border-primary/30 hover:shadow-md transition-all duration-200"
+                    >
+                      <div className={cn(
+                        "p-3 rounded-xl transition-transform group-hover:scale-110",
+                        action.color
+                      )}>
+                        <action.icon className="h-6 w-6" />
+                      </div>
+                      <span className="text-sm font-semibold text-foreground">{action.title}</span>
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Activity & Tips Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg">Atividade Recente</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[
+                      { action: 'Novo orçamento recebido', time: 'há 5 minutos', icon: ShoppingCart, color: 'text-purple-500 bg-purple-500/10' },
+                      { action: 'Produto atualizado', time: 'há 1 hora', icon: Package, color: 'text-blue-500 bg-blue-500/10' },
+                      { action: 'Nova avaliação pendente', time: 'há 2 horas', icon: Star, color: 'text-amber-500 bg-amber-500/10' },
+                      { action: 'Promoção iniciada', time: 'há 3 horas', icon: Percent, color: 'text-orange-500 bg-orange-500/10' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className={cn("p-2 rounded-lg", item.color)}>
+                          <item.icon className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{item.action}</p>
+                          <p className="text-xs text-muted-foreground">{item.time}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <span className="text-sm font-semibold text-foreground">{action.title}</span>
-                </Link>
-              ))}
+                </CardContent>
+              </Card>
+
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg">Dicas do Sistema</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
+                      <h4 className="font-semibold text-blue-900 text-sm">📦 Otimize suas imagens</h4>
+                      <p className="text-xs text-blue-700 mt-1">
+                        Use imagens em formato WebP para melhor performance e SEO.
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100">
+                      <h4 className="font-semibold text-emerald-900 text-sm">⭐ Responda avaliações</h4>
+                      <p className="text-xs text-emerald-700 mt-1">
+                        Clientes que recebem respostas têm 70% mais chance de comprar novamente.
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100">
+                      <h4 className="font-semibold text-amber-900 text-sm">🏷️ Promoções sazonais</h4>
+                      <p className="text-xs text-amber-700 mt-1">
+                        Configure promoções com antecedência para datas especiais.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
+          </TabsContent>
 
-        {/* Activity Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">Atividade Recente</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  { action: 'Novo orçamento recebido', time: 'há 5 minutos', icon: ShoppingCart, color: 'text-purple-500 bg-purple-500/10' },
-                  { action: 'Produto atualizado', time: 'há 1 hora', icon: Package, color: 'text-blue-500 bg-blue-500/10' },
-                  { action: 'Nova avaliação pendente', time: 'há 2 horas', icon: Star, color: 'text-amber-500 bg-amber-500/10' },
-                  { action: 'Promoção iniciada', time: 'há 3 horas', icon: Percent, color: 'text-orange-500 bg-orange-500/10' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className={cn("p-2 rounded-lg", item.color)}>
-                      <item.icon className="h-4 w-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{item.action}</p>
-                      <p className="text-xs text-muted-foreground">{item.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Tab Financeiro */}
+          <TabsContent value="financial" className="space-y-6">
+            {/* Financial Summary Cards */}
+            <FinancialSummaryCards />
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">Dicas do Sistema</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
-                  <h4 className="font-semibold text-blue-900 text-sm">📦 Otimize suas imagens</h4>
-                  <p className="text-xs text-blue-700 mt-1">
-                    Use imagens em formato WebP para melhor performance e SEO.
-                  </p>
-                </div>
-                <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100">
-                  <h4 className="font-semibold text-emerald-900 text-sm">⭐ Responda avaliações</h4>
-                  <p className="text-xs text-emerald-700 mt-1">
-                    Clientes que recebem respostas têm 70% mais chance de comprar novamente.
-                  </p>
-                </div>
-                <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100">
-                  <h4 className="font-semibold text-amber-900 text-sm">🏷️ Promoções sazonais</h4>
-                  <p className="text-xs text-amber-700 mt-1">
-                    Configure promoções com antecedência para datas especiais.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            {/* Estoque e Ranking */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <LowStockAlert />
+              <ProductRankingCard />
+              <TaxInfoCard />
+            </div>
+
+            {/* Margem de Lucro */}
+            <ProductMarginTable />
+          </TabsContent>
+        </Tabs>
       </div>
     </AdminLayout>
   );

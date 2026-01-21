@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AdminLayout, DataTable, Column, ImageUpload, MultiImageUpload } from '@/components/admin';
+import { FormFieldInfo } from '@/components/admin/FormFieldInfo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -11,7 +12,6 @@ import {
   DialogDescription
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -19,6 +19,7 @@ import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { Separator } from '@/components/ui/separator';
 
 interface Product {
   id: string;
@@ -35,6 +36,10 @@ interface Product {
   category_id: string | null;
   is_featured: boolean;
   created_at: string;
+  cost_material?: number | null;
+  cost_labor?: number | null;
+  cost_shipping?: number | null;
+  min_stock?: number | null;
 }
 
 interface Category {
@@ -65,6 +70,10 @@ const AdminProductsPage = () => {
     is_featured: false,
     cover_image: '' as string | null,
     gallery_images: [] as string[],
+    cost_material: '',
+    cost_labor: '',
+    cost_shipping: '',
+    min_stock: '5',
   });
 
   const fetchData = async () => {
@@ -107,6 +116,10 @@ const AdminProductsPage = () => {
       is_featured: false,
       cover_image: null,
       gallery_images: [],
+      cost_material: '',
+      cost_labor: '',
+      cost_shipping: '',
+      min_stock: '5',
     });
     setIsDialogOpen(true);
   };
@@ -126,6 +139,10 @@ const AdminProductsPage = () => {
       is_featured: product.is_featured,
       cover_image: product.cover_image || null,
       gallery_images: product.gallery_images || [],
+      cost_material: product.cost_material?.toString() || '',
+      cost_labor: product.cost_labor?.toString() || '',
+      cost_shipping: product.cost_shipping?.toString() || '',
+      min_stock: product.min_stock?.toString() || '5',
     });
     setIsDialogOpen(true);
   };
@@ -152,6 +169,10 @@ const AdminProductsPage = () => {
       is_featured: formData.is_featured,
       cover_image: formData.cover_image || null,
       gallery_images: formData.gallery_images.length > 0 ? formData.gallery_images : null,
+      cost_material: formData.cost_material ? parseFloat(formData.cost_material) : 0,
+      cost_labor: formData.cost_labor ? parseFloat(formData.cost_labor) : 0,
+      cost_shipping: formData.cost_shipping ? parseFloat(formData.cost_shipping) : 0,
+      min_stock: parseInt(formData.min_stock) || 5,
     };
 
     try {
@@ -281,18 +302,36 @@ const AdminProductsPage = () => {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-6 py-4">
+            {/* Seção: Informações Básicas */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                📋 Informações Básicas
+              </h3>
+              <p className="text-xs text-muted-foreground">Dados principais que identificam o produto</p>
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nome *</Label>
+                <FormFieldInfo 
+                  label="Nome do Produto" 
+                  description="Título principal que identifica o produto"
+                  showsIn="Listagem, página do produto, carrinho e busca"
+                  required
+                />
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Ex: Letreiro Neon LED Personalizado"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
+                <FormFieldInfo 
+                  label="Slug (URL)" 
+                  description="Identificador único para a URL do produto. Gerado automaticamente a partir do nome."
+                  showsIn="URL da página do produto (ex: /produto/letreiro-neon-led)"
+                />
                 <Input
                   id="slug"
                   value={formData.slug}
@@ -303,60 +342,203 @@ const AdminProductsPage = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="short_description">Descrição Curta</Label>
+              <FormFieldInfo 
+                label="Descrição Curta" 
+                description="Resumo do produto em 1-2 frases. Destaque os principais benefícios."
+                showsIn="Card do produto na listagem e busca do Google"
+              />
               <Textarea
                 id="short_description"
                 value={formData.short_description}
                 onChange={(e) => setFormData({ ...formData, short_description: e.target.value })}
+                placeholder="Ex: Letreiro em LED neon flexível, totalmente personalizável com sua logo ou frase."
+                rows={3}
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <Separator />
+
+            {/* Seção: Preços e Estoque */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                💰 Preços e Estoque
+              </h3>
+              <p className="text-xs text-muted-foreground">Valores de venda e controle de disponibilidade</p>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Preço *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                <FormFieldInfo 
+                  label="Preço de Venda" 
+                  description="Valor base do produto que o cliente irá pagar"
+                  showsIn="Card do produto, página do produto e carrinho"
+                  required
                 />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    className="pl-9"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    placeholder="0,00"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="promotional_price">Preço Promocional</Label>
-                <Input
-                  id="promotional_price"
-                  type="number"
-                  step="0.01"
-                  value={formData.promotional_price}
-                  onChange={(e) => setFormData({ ...formData, promotional_price: e.target.value })}
+                <FormFieldInfo 
+                  label="Preço Promocional" 
+                  description="Valor com desconto. Se preenchido, o preço normal aparece riscado."
+                  showsIn="Card do produto (badge de desconto) e página do produto"
                 />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                  <Input
+                    id="promotional_price"
+                    type="number"
+                    step="0.01"
+                    className="pl-9"
+                    value={formData.promotional_price}
+                    onChange={(e) => setFormData({ ...formData, promotional_price: e.target.value })}
+                    placeholder="0,00"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="stock">Estoque</Label>
+                <FormFieldInfo 
+                  label="Estoque Atual" 
+                  description="Quantidade disponível para venda. Zerado = produto indisponível."
+                  showsIn="Interno - usado para alertas de estoque baixo"
+                />
                 <Input
                   id="stock"
                   type="number"
                   value={formData.stock}
                   onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <FormFieldInfo 
+                  label="Estoque Mínimo" 
+                  description="Alerta quando o estoque ficar abaixo deste valor no dashboard"
+                  showsIn="Dashboard administrativo (alertas)"
+                />
+                <Input
+                  id="min_stock"
+                  type="number"
+                  value={formData.min_stock}
+                  onChange={(e) => setFormData({ ...formData, min_stock: e.target.value })}
+                  placeholder="5"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <Separator />
+
+            {/* Seção: Custos (para cálculo de margem) */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                📊 Custos do Produto
+              </h3>
+              <p className="text-xs text-muted-foreground">Informações internas para cálculo de margem de lucro (não visíveis ao cliente)</p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="sku">SKU</Label>
+                <FormFieldInfo 
+                  label="Custo de Material" 
+                  description="Valor gasto em matéria-prima (acrílico, MDF, LED, etc)"
+                  showsIn="Interno - relatório de margem no dashboard"
+                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                  <Input
+                    id="cost_material"
+                    type="number"
+                    step="0.01"
+                    className="pl-9"
+                    value={formData.cost_material}
+                    onChange={(e) => setFormData({ ...formData, cost_material: e.target.value })}
+                    placeholder="0,00"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <FormFieldInfo 
+                  label="Custo de Mão de Obra" 
+                  description="Valor estimado de produção/montagem por unidade"
+                  showsIn="Interno - relatório de margem no dashboard"
+                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                  <Input
+                    id="cost_labor"
+                    type="number"
+                    step="0.01"
+                    className="pl-9"
+                    value={formData.cost_labor}
+                    onChange={(e) => setFormData({ ...formData, cost_labor: e.target.value })}
+                    placeholder="0,00"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <FormFieldInfo 
+                  label="Custo de Frete/Embalagem" 
+                  description="Valor médio de envio e embalagem por unidade"
+                  showsIn="Interno - relatório de margem no dashboard"
+                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                  <Input
+                    id="cost_shipping"
+                    type="number"
+                    step="0.01"
+                    className="pl-9"
+                    value={formData.cost_shipping}
+                    onChange={(e) => setFormData({ ...formData, cost_shipping: e.target.value })}
+                    placeholder="0,00"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Seção: Organização */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                🏷️ Organização e Visibilidade
+              </h3>
+              <p className="text-xs text-muted-foreground">Classificação e controle de exibição do produto</p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <FormFieldInfo 
+                  label="Código SKU" 
+                  description="Código interno de identificação do produto (opcional)"
+                  showsIn="Interno - controle de estoque e pedidos"
+                />
                 <Input
                   id="sku"
                   value={formData.sku}
                   onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                  placeholder="Ex: LET-NEON-001"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="category">Categoria</Label>
+                <FormFieldInfo 
+                  label="Categoria" 
+                  description="Agrupa o produto para navegação e filtros"
+                  showsIn="Menu de categorias, filtros e página de categoria"
+                />
                 <Select value={formData.category_id} onValueChange={(v) => setFormData({ ...formData, category_id: v })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione" />
+                    <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map(cat => (
@@ -365,37 +547,56 @@ const AdminProductsPage = () => {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <FormFieldInfo 
+                  label="Status" 
+                  description="Rascunho: não visível. Ativo: visível para clientes. Inativo: oculto temporariamente."
+                  showsIn="Controla se o produto aparece no site"
+                />
                 <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Rascunho</SelectItem>
-                    <SelectItem value="active">Ativo</SelectItem>
-                    <SelectItem value="inactive">Inativo</SelectItem>
+                    <SelectItem value="draft">📝 Rascunho</SelectItem>
+                    <SelectItem value="active">✅ Ativo</SelectItem>
+                    <SelectItem value="inactive">⏸️ Inativo</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
+            <Separator />
+
+            {/* Seção: Imagens */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                🖼️ Imagens do Produto
+              </h3>
+              <p className="text-xs text-muted-foreground">Fotos que serão exibidas aos clientes (recomendado: fundo branco, 800x800px mínimo)</p>
+            </div>
+
             <div className="space-y-2">
-              <Label>Imagem de Capa</Label>
+              <FormFieldInfo 
+                label="Imagem Principal" 
+                description="Foto principal exibida em destaque. Use imagem de alta qualidade."
+                showsIn="Card do produto, busca, carrinho e compartilhamentos"
+              />
               <ImageUpload
                 value={formData.cover_image}
                 onChange={(url) => setFormData({ ...formData, cover_image: url })}
                 folder="products"
                 aspectRatio="aspect-square"
-                placeholder="Arraste a imagem de capa do produto"
+                placeholder="Arraste ou clique para enviar a imagem principal"
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Galeria de Imagens</Label>
+              <FormFieldInfo 
+                label="Galeria de Imagens" 
+                description="Fotos adicionais mostrando detalhes, ângulos diferentes ou aplicações"
+                showsIn="Página do produto (carrossel de imagens)"
+              />
               <MultiImageUpload
                 value={formData.gallery_images}
                 onChange={(urls) => setFormData({ ...formData, gallery_images: urls })}
@@ -404,13 +605,22 @@ const AdminProductsPage = () => {
               />
             </div>
 
-            <div className="flex items-center gap-2">
+            <Separator />
+
+            {/* Seção: Destaque */}
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50 border">
               <Switch
                 id="is_featured"
                 checked={formData.is_featured}
                 onCheckedChange={(v) => setFormData({ ...formData, is_featured: v })}
               />
-              <Label htmlFor="is_featured">Produto em destaque</Label>
+              <div>
+                <FormFieldInfo 
+                  label="Produto em Destaque" 
+                  description="Produtos em destaque aparecem na página inicial e seções especiais"
+                  showsIn="Seção 'Destaques' na home e banners promocionais"
+                />
+              </div>
             </div>
           </div>
 
