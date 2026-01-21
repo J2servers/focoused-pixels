@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import CategoryPage from "./pages/CategoryPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
@@ -54,6 +56,8 @@ const App = () => (
             <Route path="/privacidade" element={<PrivacyPage />} />
             <Route path="/termos" element={<TermsPage />} />
             <Route path="/faq" element={<FAQPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/cadastro" element={<RegisterPage />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLoginPage />} />
