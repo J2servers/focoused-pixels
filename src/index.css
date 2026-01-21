@@ -194,4 +194,19 @@
   .admin-card-hover:hover {
     @apply shadow-lg -translate-y-0.5;
   }
+
+  /* Mobile Carousel Glow Effect */
+  .shadow-glow {
+    box-shadow: 0 0 12px 2px hsl(var(--primary) / 0.5);
+  }
+
+  /* Smooth Mobile Scrolling */
+  .mobile-carousel-container {
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: y mandatory;
+  }
+
+  .mobile-carousel-item {
+    scroll-snap-align: center;
+  }
 }

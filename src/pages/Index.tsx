@@ -6,6 +6,7 @@ import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { CookieBanner } from '@/components/CookieBanner';
 import { ProductCard } from '@/components/ProductCard';
+import { MobileVerticalCarousel } from '@/components/mobile/MobileVerticalCarousel';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronLeft, ChevronRight, Truck, CreditCard, MessageCircle, ShieldCheck } from 'lucide-react';
@@ -15,6 +16,7 @@ import { benefits } from '@/data/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FadeInView } from '@/components/animations';
 import { useProducts, useCategories, useHeroSlides } from '@/hooks/useProducts';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const benefitIcons: Record<string, React.ReactNode> = {
   'truck': <Truck className="h-8 w-8" />,
@@ -25,6 +27,7 @@ const benefitIcons: Record<string, React.ReactNode> = {
 
 const Index = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const isMobile = useIsMobile();
   
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
@@ -51,7 +54,7 @@ const Index = () => {
     return products.filter(p => {
       const productCategory = categories.find(c => c.slug === p.category);
       return productCategory && allCategoryIds.includes(productCategory.id);
-    }).slice(0, 4);
+    }).slice(0, 8); // Get more products for mobile carousel
   };
 
   return (
@@ -215,21 +218,33 @@ const Index = () => {
             if (categoryProducts.length === 0) return null;
 
             return (
-              <section key={category.id} className="py-12">
+              <section key={category.id} className="py-8 md:py-12">
                 <div className="container mx-auto px-4">
-                  <FadeInView delay={0.1}>
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-bold uppercase tracking-wide">{category.name}</h2>
-                      <Link to={`/categoria/${category.slug}`}>
-                        <Button variant="outline" size="sm">Ver todos</Button>
-                      </Link>
-                    </div>
-                  </FadeInView>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-                    {categoryProducts.map((product, index) => (
-                      <ProductCard key={product.id} product={product} index={index} />
-                    ))}
-                  </div>
+                  {/* Mobile: Vertical Carousel */}
+                  {isMobile ? (
+                    <MobileVerticalCarousel
+                      products={categoryProducts}
+                      categoryName={category.name}
+                      categorySlug={category.slug}
+                    />
+                  ) : (
+                    /* Desktop: Grid Layout */
+                    <>
+                      <FadeInView delay={0.1}>
+                        <div className="flex items-center justify-between mb-6">
+                          <h2 className="text-2xl font-bold uppercase tracking-wide">{category.name}</h2>
+                          <Link to={`/categoria/${category.slug}`}>
+                            <Button variant="outline" size="sm">Ver todos</Button>
+                          </Link>
+                        </div>
+                      </FadeInView>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+                        {categoryProducts.slice(0, 4).map((product, index) => (
+                          <ProductCard key={product.id} product={product} index={index} />
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </section>
             );
