@@ -9,3 +9,4 @@ export { default as AdminCompanyPage } from './AdminCompanyPage';
 export { default as AdminUsersPage } from './AdminUsersPage';
 export { default as AdminLogsPage } from './AdminLogsPage';
 export { default as AdminSettingsPage } from './AdminSettingsPage';
+export { default as AdminLeadsPage } from './AdminLeadsPage';

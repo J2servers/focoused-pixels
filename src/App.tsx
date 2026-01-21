@@ -32,6 +32,7 @@ import {
   AdminUsersPage,
   AdminLogsPage,
   AdminSettingsPage,
+  AdminLeadsPage,
 } from "./pages/admin";
 
 const queryClient = new QueryClient();
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/admin/promocoes" element={<AdminPromotionsPage />} />
             <Route path="/admin/hero" element={<AdminHeroPage />} />
             <Route path="/admin/avaliacoes" element={<AdminReviewsPage />} />
+            <Route path="/admin/leads" element={<AdminLeadsPage />} />
             <Route path="/admin/empresa" element={<AdminCompanyPage />} />
             <Route path="/admin/usuarios" element={<AdminUsersPage />} />
             <Route path="/admin/logs" element={<AdminLogsPage />} />

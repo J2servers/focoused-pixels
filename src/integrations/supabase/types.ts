@@ -214,6 +214,48 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_subscribed: boolean | null
+          name: string
+          phone: string | null
+          source: string
+          subscribed_at: string | null
+          tags: string[] | null
+          unsubscribed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_subscribed?: boolean | null
+          name: string
+          phone?: string | null
+          source?: string
+          subscribed_at?: string | null
+          tags?: string[] | null
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_subscribed?: boolean | null
+          name?: string
+          phone?: string | null
+          source?: string
+          subscribed_at?: string | null
+          tags?: string[] | null
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           attributes: Json | null

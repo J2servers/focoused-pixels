@@ -3,6 +3,7 @@ import { MainHeader } from '@/components/layout/MainHeader';
 import { NavigationBar } from '@/components/layout/NavigationBar';
 import { Footer } from '@/components/layout/Footer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
+import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Card, CardContent } from '@/components/ui/card';
 import { storeInfo } from '@/data/store';
 import { Target, Eye, Heart, Award, Users, Lightbulb } from 'lucide-react';
@@ -205,6 +206,7 @@ const AboutPage = () => {
 
       <Footer />
       <WhatsAppButton />
+      <AIChatWidget />
     </div>
   );
 };

@@ -27,6 +27,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useSubscribeLead } from '@/hooks/useLeads';
 import { toast } from 'sonner';
 import logoGoat from '@/assets/logo-goat.png';
 import { getErrorMessage, isAuthError } from '@/lib/auth-error';
@@ -71,6 +72,7 @@ const benefits = [
 const LoginPage = () => {
   const navigate = useNavigate();
   const { user, isLoading, signIn, signUp, signInWithGoogle, resetPassword } = useAuthContext();
+  const subscribeLead = useSubscribeLead();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -133,9 +135,22 @@ const LoginPage = () => {
         } else if (isAuthError(error, 'Password')) {
           toast.error('A senha não atende aos requisitos de segurança.');
         } else {
-          toast.error('Erro ao criar conta. Tente novamente.');
+        toast.error('Erro ao criar conta. Tente novamente.');
         }
       } else {
+        // Save as lead for marketing
+        try {
+          await subscribeLead.mutateAsync({
+            name: data.fullName,
+            email: data.email,
+            source: 'signup',
+            tags: ['cadastro', 'cliente'],
+          });
+        } catch {
+          // Lead save is not critical
+          console.log('Lead already exists or failed to save');
+        }
+        
         toast.success('Conta criada com sucesso! Bem-vindo à GOAT! 🐐');
         navigate('/');
       }
