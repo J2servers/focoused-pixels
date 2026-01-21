@@ -47,8 +47,16 @@ export const AdminLayout = ({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--admin-bg))]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+            <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-white" />
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground font-medium">Carregando...</p>
+        </div>
       </div>
     );
   }
@@ -58,12 +66,14 @@ export const AdminLayout = ({
   }
 
   return (
-    <div className="min-h-screen flex bg-muted/30">
+    <div className="min-h-screen flex bg-[hsl(var(--admin-bg))]">
       <AdminSidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <AdminHeader title={title} />
         <main className="flex-1 overflow-y-auto p-6">
-          {children}
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>

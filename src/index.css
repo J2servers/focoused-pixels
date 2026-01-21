@@ -2,12 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Foco Laser Design System */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+/* Goat Comunicação Visual Design System */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* Foco Laser Brand Colors */
+    /* Goat Brand Colors */
     --background: 0 0% 100%;
     --foreground: 270 10% 15%;
 
@@ -17,7 +17,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 270 10% 15%;
 
-    /* Primary - Roxo Vibrante Foco Laser */
+    /* Primary - Roxo Vibrante Goat */
     --primary: 280 70% 43%;
     --primary-foreground: 0 0% 100%;
 
@@ -41,13 +41,26 @@
 
     --radius: 0.5rem;
 
-    /* Custom Foco Laser tokens */
+    /* Custom Goat tokens */
     --purple-dark: 280 80% 35%;
     --purple-light: 280 60% 92%;
     --gold: 45 100% 50%;
     --gold-dark: 40 90% 45%;
     --success: 142 76% 36%;
     --whatsapp: 142 70% 45%;
+
+    /* Admin Panel Tokens */
+    --admin-bg: 220 20% 97%;
+    --admin-sidebar: 230 25% 15%;
+    --admin-sidebar-hover: 230 25% 20%;
+    --admin-sidebar-active: 280 70% 50%;
+    --admin-header: 0 0% 100%;
+    --admin-card: 0 0% 100%;
+    --admin-accent-blue: 217 91% 60%;
+    --admin-accent-green: 142 71% 45%;
+    --admin-accent-orange: 24 95% 53%;
+    --admin-accent-purple: 280 70% 55%;
+    --admin-accent-pink: 330 81% 60%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -87,6 +100,13 @@
     --border: 270 20% 20%;
     --input: 270 20% 20%;
     --ring: 280 70% 55%;
+
+    --admin-bg: 230 25% 10%;
+    --admin-sidebar: 230 30% 8%;
+    --admin-sidebar-hover: 230 25% 15%;
+    --admin-sidebar-active: 280 70% 50%;
+    --admin-header: 230 25% 12%;
+    --admin-card: 230 25% 14%;
 
     --sidebar-background: 270 20% 10%;
     --sidebar-foreground: 0 0% 98%;
@@ -129,5 +149,48 @@
 
   .shadow-product-hover {
     box-shadow: 0 8px 30px -4px hsl(280 70% 43% / 0.15);
+  }
+
+  /* Admin Panel Utilities */
+  .admin-gradient-sidebar {
+    background: linear-gradient(180deg, hsl(230 25% 15%) 0%, hsl(230 30% 12%) 100%);
+  }
+
+  .admin-stat-card {
+    @apply relative overflow-hidden;
+  }
+
+  .admin-stat-card::before {
+    content: '';
+    @apply absolute top-0 right-0 w-24 h-24 rounded-full opacity-10;
+    transform: translate(30%, -30%);
+  }
+
+  .admin-stat-blue::before {
+    background: hsl(217 91% 60%);
+  }
+
+  .admin-stat-green::before {
+    background: hsl(142 71% 45%);
+  }
+
+  .admin-stat-orange::before {
+    background: hsl(24 95% 53%);
+  }
+
+  .admin-stat-purple::before {
+    background: hsl(280 70% 55%);
+  }
+
+  .admin-stat-pink::before {
+    background: hsl(330 81% 60%);
+  }
+
+  .admin-card-hover {
+    @apply transition-all duration-200;
+  }
+
+  .admin-card-hover:hover {
+    @apply shadow-lg -translate-y-0.5;
   }
 }
