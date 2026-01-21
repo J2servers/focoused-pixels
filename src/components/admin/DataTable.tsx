@@ -10,13 +10,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Card } from '@/components/ui/card';
 import { 
   ChevronLeft, 
   ChevronRight, 
   ChevronsLeft, 
   ChevronsRight,
   Search,
-  Loader2
+  Loader2,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -118,12 +122,21 @@ export function DataTable<T>({
   const allSelected = paginatedData.length > 0 && 
     paginatedData.every(item => selectedItems.includes(getItemId(item)));
 
+  const getSortIcon = (column: string) => {
+    if (sortColumn !== column) {
+      return <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground/50" />;
+    }
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="h-3.5 w-3.5 text-primary" />
+      : <ArrowDown className="h-3.5 w-3.5 text-primary" />;
+  };
+
   return (
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         {searchable && (
-          <div className="relative w-full sm:w-72">
+          <div className="relative w-full sm:w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -133,7 +146,7 @@ export function DataTable<T>({
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              className="pl-9"
+              className="pl-10 h-10 bg-card border-border/50 focus-visible:ring-1 focus-visible:ring-primary/50"
             />
           </div>
         )}
@@ -141,15 +154,16 @@ export function DataTable<T>({
       </div>
 
       {/* Table */}
-      <div className="border border-border rounded-lg overflow-hidden">
+      <Card className="border-0 shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
+            <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/50">
               {selectable && (
                 <TableHead className="w-12">
                   <Checkbox
                     checked={allSelected}
                     onCheckedChange={handleSelectAll}
+                    className="border-muted-foreground/30"
                   />
                 </TableHead>
               )}
@@ -157,18 +171,15 @@ export function DataTable<T>({
                 <TableHead
                   key={column.key}
                   className={cn(
-                    column.sortable && 'cursor-pointer hover:text-foreground',
+                    "text-xs font-semibold uppercase tracking-wider text-muted-foreground",
+                    column.sortable && 'cursor-pointer hover:text-foreground transition-colors select-none',
                     column.className
                   )}
                   onClick={() => column.sortable && handleSort(column.key)}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     {column.header}
-                    {sortColumn === column.key && (
-                      <span className="text-xs">
-                        {sortDirection === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
+                    {column.sortable && getSortIcon(column.key)}
                   </div>
                 </TableHead>
               ))}
@@ -179,18 +190,31 @@ export function DataTable<T>({
               <TableRow>
                 <TableCell 
                   colSpan={columns.length + (selectable ? 1 : 0)} 
-                  className="h-32 text-center"
+                  className="h-40"
                 >
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <div className="relative">
+                      <div className="absolute inset-0 rounded-full bg-primary/10 animate-ping" />
+                      <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
+                        <Loader2 className="h-5 w-5 animate-spin text-white" />
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Carregando dados...</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : paginatedData.length === 0 ? (
               <TableRow>
                 <TableCell 
                   colSpan={columns.length + (selectable ? 1 : 0)} 
-                  className="h-32 text-center text-muted-foreground"
+                  className="h-40"
                 >
-                  {emptyMessage}
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                      <Search className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
@@ -202,8 +226,10 @@ export function DataTable<T>({
                   <TableRow
                     key={id}
                     className={cn(
-                      onRowClick && 'cursor-pointer hover:bg-muted/50',
-                      isSelected && 'bg-primary/5'
+                      "border-b border-border/30 transition-colors",
+                      onRowClick && 'cursor-pointer',
+                      isSelected && 'bg-primary/5',
+                      !isSelected && 'hover:bg-muted/30'
                     )}
                     onClick={() => onRowClick?.(item)}
                   >
@@ -214,11 +240,12 @@ export function DataTable<T>({
                           onCheckedChange={(checked) => 
                             handleSelectItem(id, checked as boolean)
                           }
+                          className="border-muted-foreground/30"
                         />
                       </TableCell>
                     )}
                     {columns.map(column => (
-                      <TableCell key={column.key} className={column.className}>
+                      <TableCell key={column.key} className={cn("py-3.5", column.className)}>
                         {column.render
                           ? column.render(item)
                           : (item as any)[column.key]}
@@ -230,49 +257,79 @@ export function DataTable<T>({
             )}
           </TableBody>
         </Table>
-      </div>
+      </Card>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pt-2">
           <p className="text-sm text-muted-foreground">
-            Mostrando {((currentPage - 1) * pageSize) + 1} a{' '}
-            {Math.min(currentPage * pageSize, sortedData.length)} de{' '}
-            {sortedData.length} registros
+            <span className="font-medium text-foreground">{((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, sortedData.length)}</span>
+            {' '}de{' '}
+            <span className="font-medium text-foreground">{sortedData.length}</span> registros
           </p>
           <div className="flex items-center gap-1">
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
+              className="h-8 w-8"
             >
               <ChevronsLeft className="h-4 w-4" />
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
+              className="h-8 w-8"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="px-4 text-sm">
-              Página {currentPage} de {totalPages}
-            </span>
+            <div className="flex items-center gap-1 px-2">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum: number;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "ghost"}
+                    size="icon"
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={cn(
+                      "h-8 w-8 text-sm",
+                      currentPage === pageNum && "bg-primary text-primary-foreground shadow-sm"
+                    )}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+            </div>
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
+              className="h-8 w-8"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
+              className="h-8 w-8"
             >
               <ChevronsRight className="h-4 w-4" />
             </Button>
