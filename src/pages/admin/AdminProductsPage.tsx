@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AdminLayout, DataTable, Column } from '@/components/admin';
+import { AdminLayout, DataTable, Column, ImageUpload, MultiImageUpload } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -31,6 +31,7 @@ interface Product {
   sku: string | null;
   status: string;
   cover_image: string | null;
+  gallery_images: string[] | null;
   category_id: string | null;
   is_featured: boolean;
   created_at: string;
@@ -62,7 +63,8 @@ const AdminProductsPage = () => {
     status: 'draft',
     category_id: '',
     is_featured: false,
-    cover_image: '',
+    cover_image: '' as string | null,
+    gallery_images: [] as string[],
   });
 
   const fetchData = async () => {
@@ -103,7 +105,8 @@ const AdminProductsPage = () => {
       status: 'draft',
       category_id: '',
       is_featured: false,
-      cover_image: '',
+      cover_image: null,
+      gallery_images: [],
     });
     setIsDialogOpen(true);
   };
@@ -121,7 +124,8 @@ const AdminProductsPage = () => {
       status: product.status,
       category_id: product.category_id || '',
       is_featured: product.is_featured,
-      cover_image: product.cover_image || '',
+      cover_image: product.cover_image || null,
+      gallery_images: product.gallery_images || [],
     });
     setIsDialogOpen(true);
   };
@@ -147,6 +151,7 @@ const AdminProductsPage = () => {
       category_id: formData.category_id || null,
       is_featured: formData.is_featured,
       cover_image: formData.cover_image || null,
+      gallery_images: formData.gallery_images.length > 0 ? formData.gallery_images : null,
     };
 
     try {
@@ -374,15 +379,27 @@ const AdminProductsPage = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="cover_image">URL da Imagem</Label>
-                <Input
-                  id="cover_image"
-                  value={formData.cover_image}
-                  onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
-                  placeholder="https://..."
-                />
-              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Imagem de Capa</Label>
+              <ImageUpload
+                value={formData.cover_image}
+                onChange={(url) => setFormData({ ...formData, cover_image: url })}
+                folder="products"
+                aspectRatio="aspect-square"
+                placeholder="Arraste a imagem de capa do produto"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Galeria de Imagens</Label>
+              <MultiImageUpload
+                value={formData.gallery_images}
+                onChange={(urls) => setFormData({ ...formData, gallery_images: urls })}
+                folder="products"
+                maxImages={6}
+              />
             </div>
 
             <div className="flex items-center gap-2">

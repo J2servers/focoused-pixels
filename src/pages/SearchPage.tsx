@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { TopBar } from '@/components/layout/TopBar';
 import { MainHeader } from '@/components/layout/MainHeader';
@@ -7,13 +6,14 @@ import { Footer } from '@/components/layout/Footer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Search } from 'lucide-react';
-import { searchProducts } from '@/data/products';
+import { useSearchProducts } from '@/hooks/useProducts';
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const results = searchProducts(query);
+  const { data: results = [], isLoading } = useSearchProducts(query);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -27,12 +27,20 @@ const SearchPage = () => {
             <h1 className="text-2xl md:text-3xl font-bold mb-2">
               Resultados para "{query}"
             </h1>
-            <p className="text-muted-foreground">
-              {results.length} {results.length === 1 ? 'produto encontrado' : 'produtos encontrados'}
-            </p>
+            {!isLoading && (
+              <p className="text-muted-foreground">
+                {results.length} {results.length === 1 ? 'produto encontrado' : 'produtos encontrados'}
+              </p>
+            )}
           </div>
 
-          {results.length === 0 ? (
+          {isLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="aspect-square rounded-lg" />
+              ))}
+            </div>
+          ) : results.length === 0 ? (
             <div className="text-center py-16">
               <Search className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
               <h2 className="text-xl font-semibold mb-2">Nenhum produto encontrado</h2>

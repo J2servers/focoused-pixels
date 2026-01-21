@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AdminLayout, DataTable, Column } from '@/components/admin';
+import { AdminLayout, DataTable, Column, ImageUpload } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -17,8 +17,6 @@ import { Plus, Pencil, Trash2, Loader2, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
 interface HeroSlide {
   id: string;
@@ -51,8 +49,8 @@ const AdminHeroPage = () => {
     subtitle: '',
     cta_text: '',
     cta_link: '',
-    desktop_image: '',
-    mobile_image: '',
+    desktop_image: '' as string | null,
+    mobile_image: '' as string | null,
     display_order: '0',
     status: 'active',
     theme: 'dark',
@@ -295,29 +293,24 @@ const AdminHeroPage = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="desktop_image">Imagem Desktop (URL) *</Label>
-              <Input
-                id="desktop_image"
+              <Label>Imagem Desktop *</Label>
+              <ImageUpload
                 value={formData.desktop_image}
-                onChange={(e) => setFormData({ ...formData, desktop_image: e.target.value })}
-                placeholder="https://..."
+                onChange={(url) => setFormData({ ...formData, desktop_image: url })}
+                folder="hero"
+                aspectRatio="aspect-[16/9]"
+                placeholder="Arraste a imagem desktop (1920x600)"
               />
-              {formData.desktop_image && (
-                <img 
-                  src={formData.desktop_image} 
-                  alt="Preview" 
-                  className="w-full h-32 object-cover rounded-lg mt-2"
-                />
-              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="mobile_image">Imagem Mobile (URL)</Label>
-              <Input
-                id="mobile_image"
+              <Label>Imagem Mobile</Label>
+              <ImageUpload
                 value={formData.mobile_image}
-                onChange={(e) => setFormData({ ...formData, mobile_image: e.target.value })}
-                placeholder="https://..."
+                onChange={(url) => setFormData({ ...formData, mobile_image: url })}
+                folder="hero"
+                aspectRatio="aspect-[9/16]"
+                placeholder="Arraste a imagem mobile (opcional)"
               />
             </div>
 
