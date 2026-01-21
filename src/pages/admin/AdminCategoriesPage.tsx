@@ -138,8 +138,9 @@ const AdminCategoriesPage = () => {
 
       setIsDialogOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao salvar categoria');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao salvar categoria';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -159,8 +160,9 @@ const AdminCategoriesPage = () => {
       toast.success('Categoria excluída com sucesso!');
       setIsDeleteDialogOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao excluir categoria');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao excluir categoria';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }

@@ -67,8 +67,9 @@ const AdminReviewsPage = () => {
       if (error) throw error;
       toast.success('Avaliação aprovada!');
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao aprovar avaliação');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao aprovar avaliação';
+      toast.error(message);
     } finally {
       setIsProcessing(false);
     }
@@ -85,8 +86,9 @@ const AdminReviewsPage = () => {
       if (error) throw error;
       toast.success('Avaliação rejeitada!');
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao rejeitar avaliação');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao rejeitar avaliação';
+      toast.error(message);
     } finally {
       setIsProcessing(false);
     }
@@ -106,8 +108,9 @@ const AdminReviewsPage = () => {
       toast.success('Avaliação excluída!');
       setIsDeleteDialogOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao excluir avaliação');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao excluir avaliação';
+      toast.error(message);
     } finally {
       setIsProcessing(false);
     }

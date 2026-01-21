@@ -118,8 +118,9 @@ const AdminCompanyPage = () => {
       }
 
       toast.success('Informações salvas com sucesso!');
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao salvar');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao salvar';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }

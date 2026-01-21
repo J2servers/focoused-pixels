@@ -34,8 +34,9 @@ const AdminSettingsPage = () => {
       
       toast.success('Senha alterada com sucesso!');
       setPasswords({ newPassword: '', confirmPassword: '' });
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao alterar senha');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao alterar senha';
+      toast.error(message);
     } finally {
       setIsChangingPassword(false);
     }

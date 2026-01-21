@@ -128,12 +128,13 @@ const AdminUsersPage = () => {
       setIsDialogOpen(false);
       setFormData({ email: '', password: '', full_name: '', role: 'support' });
       fetchData();
-    } catch (error: any) {
-      console.error('Error creating user:', error);
-      if (error.message.includes('already registered')) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '';
+      console.error('Error creating user:', errorMessage);
+      if (errorMessage.includes('already registered')) {
         toast.error('Este email já está cadastrado');
       } else {
-        toast.error(error.message || 'Erro ao criar usuário');
+        toast.error(errorMessage || 'Erro ao criar usuário');
       }
     } finally {
       setIsSaving(false);
@@ -154,8 +155,9 @@ const AdminUsersPage = () => {
       toast.success('Acesso removido com sucesso!');
       setIsDeleteDialogOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao remover acesso');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao remover acesso';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
