@@ -19,6 +19,7 @@ import {
   ProductQuantityCalculator,
   ProductWhatsAppQuote,
   ProductSpecifications,
+  RelatedProducts,
 } from '@/components/product';
 
 const ProductPage = () => {
@@ -231,6 +232,9 @@ const ProductPage = () => {
           <div className="mt-12 max-w-3xl">
             <ProductSpecifications product={product} />
           </div>
+
+          {/* Related Products */}
+          <RelatedProducts product={product} limit={4} />
         </div>
       </main>
 
