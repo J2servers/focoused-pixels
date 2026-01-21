@@ -1,0 +1,11 @@
+export { default as AdminLoginPage } from './AdminLoginPage';
+export { default as AdminDashboardPage } from './AdminDashboardPage';
+export { default as AdminProductsPage } from './AdminProductsPage';
+export { default as AdminCategoriesPage } from './AdminCategoriesPage';
+export { default as AdminPromotionsPage } from './AdminPromotionsPage';
+export { default as AdminHeroPage } from './AdminHeroPage';
+export { default as AdminReviewsPage } from './AdminReviewsPage';
+export { default as AdminCompanyPage } from './AdminCompanyPage';
+export { default as AdminUsersPage } from './AdminUsersPage';
+export { default as AdminLogsPage } from './AdminLogsPage';
+export { default as AdminSettingsPage } from './AdminSettingsPage';
