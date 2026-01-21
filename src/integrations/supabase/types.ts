@@ -14,7 +14,138 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      quotes: {
+        Row: {
+          accept_warranty: boolean | null
+          additional_notes: string | null
+          border_finish: string | null
+          broche_style: string | null
+          cart_items: Json | null
+          cart_total: number | null
+          created_at: string
+          custom_text: string | null
+          customer_cnpj: string | null
+          customer_company: string | null
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          delivery_address: string | null
+          delivery_cep: string | null
+          delivery_deadline: string | null
+          dimensions: string | null
+          id: string
+          led_option: string | null
+          logo_url: string | null
+          material: string | null
+          max_budget: number | null
+          other_product_description: string | null
+          payment_method: string | null
+          preferred_colors: string | null
+          product_types: string[]
+          purpose: string | null
+          qr_code_count: number | null
+          qr_code_links: string[] | null
+          qr_code_type: string | null
+          quantity: number
+          reference_links: string | null
+          request_prototype: boolean | null
+          request_volume_discount: boolean | null
+          shipping_method: string | null
+          status: string | null
+          style_preference: string | null
+          thickness: string | null
+          updated_at: string
+          visual_notes: string | null
+          want_whatsapp_confirmation: boolean | null
+        }
+        Insert: {
+          accept_warranty?: boolean | null
+          additional_notes?: string | null
+          border_finish?: string | null
+          broche_style?: string | null
+          cart_items?: Json | null
+          cart_total?: number | null
+          created_at?: string
+          custom_text?: string | null
+          customer_cnpj?: string | null
+          customer_company?: string | null
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          delivery_address?: string | null
+          delivery_cep?: string | null
+          delivery_deadline?: string | null
+          dimensions?: string | null
+          id?: string
+          led_option?: string | null
+          logo_url?: string | null
+          material?: string | null
+          max_budget?: number | null
+          other_product_description?: string | null
+          payment_method?: string | null
+          preferred_colors?: string | null
+          product_types: string[]
+          purpose?: string | null
+          qr_code_count?: number | null
+          qr_code_links?: string[] | null
+          qr_code_type?: string | null
+          quantity?: number
+          reference_links?: string | null
+          request_prototype?: boolean | null
+          request_volume_discount?: boolean | null
+          shipping_method?: string | null
+          status?: string | null
+          style_preference?: string | null
+          thickness?: string | null
+          updated_at?: string
+          visual_notes?: string | null
+          want_whatsapp_confirmation?: boolean | null
+        }
+        Update: {
+          accept_warranty?: boolean | null
+          additional_notes?: string | null
+          border_finish?: string | null
+          broche_style?: string | null
+          cart_items?: Json | null
+          cart_total?: number | null
+          created_at?: string
+          custom_text?: string | null
+          customer_cnpj?: string | null
+          customer_company?: string | null
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          delivery_address?: string | null
+          delivery_cep?: string | null
+          delivery_deadline?: string | null
+          dimensions?: string | null
+          id?: string
+          led_option?: string | null
+          logo_url?: string | null
+          material?: string | null
+          max_budget?: number | null
+          other_product_description?: string | null
+          payment_method?: string | null
+          preferred_colors?: string | null
+          product_types?: string[]
+          purpose?: string | null
+          qr_code_count?: number | null
+          qr_code_links?: string[] | null
+          qr_code_type?: string | null
+          quantity?: number
+          reference_links?: string | null
+          request_prototype?: boolean | null
+          request_volume_discount?: boolean | null
+          shipping_method?: string | null
+          status?: string | null
+          style_preference?: string | null
+          thickness?: string | null
+          updated_at?: string
+          visual_notes?: string | null
+          want_whatsapp_confirmation?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
