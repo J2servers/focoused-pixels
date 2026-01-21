@@ -15,11 +15,12 @@ interface AuthContextType {
   profile: Profile | null;
   role: AppRole | null;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ data: any; error: any }>;
-  signOut: () => Promise<{ error: any }>;
-  resetPassword: (email: string) => Promise<{ error: any }>;
-  updatePassword: (newPassword: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: unknown }>;
+  signUp: (email: string, password: string, fullName: string) => Promise<{ data: unknown; error: unknown }>;
+  signOut: () => Promise<{ error: unknown }>;
+  signInWithGoogle: () => Promise<{ error: unknown }>;
+  resetPassword: (email: string) => Promise<{ error: unknown }>;
+  updatePassword: (newPassword: string) => Promise<{ error: unknown }>;
   hasRole: (role: AppRole) => boolean;
   canEdit: () => boolean;
   isAdmin: () => boolean;

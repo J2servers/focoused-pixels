@@ -135,6 +135,16 @@ export const useAuth = () => {
     return { error };
   };
 
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      },
+    });
+    return { error };
+  };
+
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/admin/reset-password`,
@@ -169,6 +179,7 @@ export const useAuth = () => {
     signIn,
     signUp,
     signOut,
+    signInWithGoogle,
     resetPassword,
     updatePassword,
     hasRole,
