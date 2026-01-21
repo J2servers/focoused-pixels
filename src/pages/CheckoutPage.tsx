@@ -4,6 +4,7 @@ import { MainHeader } from '@/components/layout/MainHeader';
 import { NavigationBar } from '@/components/layout/NavigationBar';
 import { Footer } from '@/components/layout/Footer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
+import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -18,6 +19,7 @@ import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { useSubscribeLead } from '@/hooks/useLeads';
 
 export interface QuoteFormData {
   // Customer info
@@ -122,6 +124,7 @@ const CheckoutPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { items, total, clearCart } = useCart();
   const navigate = useNavigate();
+  const subscribeLead = useSubscribeLead();
 
   const updateFormData = (updates: Partial<QuoteFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -212,6 +215,20 @@ const CheckoutPage = () => {
       const { error } = await supabase.from('quotes').insert(quoteData);
 
       if (error) throw error;
+
+      // Save lead for marketing
+      try {
+        await subscribeLead.mutateAsync({
+          name: formData.customerName,
+          email: formData.customerEmail,
+          phone: formData.customerPhone || undefined,
+          source: 'checkout',
+          tags: ['orcamento', ...formData.productTypes],
+        });
+      } catch {
+        // Lead save is not critical, just log
+        console.log('Lead already exists or failed to save');
+      }
 
       toast.success('Orçamento enviado com sucesso! Entraremos em contato em breve.');
       clearCart();
@@ -356,6 +373,7 @@ const CheckoutPage = () => {
 
       <Footer />
       <WhatsAppButton />
+      <AIChatWidget />
     </div>
   );
 };

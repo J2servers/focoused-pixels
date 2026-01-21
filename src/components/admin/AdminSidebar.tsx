@@ -12,7 +12,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  UserPlus
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ const menuItems = [
   { title: 'Promoções', url: '/admin/promocoes', icon: Percent },
   { title: 'Banner Hero', url: '/admin/hero', icon: Image },
   { title: 'Avaliações', url: '/admin/avaliacoes', icon: Star },
+  { title: 'Leads', url: '/admin/leads', icon: UserPlus },
   { title: 'Empresa', url: '/admin/empresa', icon: Building2 },
   { title: 'Usuários', url: '/admin/usuarios', icon: Users, adminOnly: true },
   { title: 'Logs', url: '/admin/logs', icon: FileText },
