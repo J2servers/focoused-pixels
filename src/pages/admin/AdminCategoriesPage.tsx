@@ -268,12 +268,12 @@ const AdminCategoriesPage = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="parent_id">Categoria Pai</Label>
-                <Select value={formData.parent_id} onValueChange={(v) => setFormData({ ...formData, parent_id: v })}>
+                <Select value={formData.parent_id || 'none'} onValueChange={(v) => setFormData({ ...formData, parent_id: v === 'none' ? '' : v })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Nenhuma" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Nenhuma</SelectItem>
+                    <SelectItem value="none">Nenhuma</SelectItem>
                     {categories
                       .filter(c => c.id !== selectedCategory?.id)
                       .map(cat => (
