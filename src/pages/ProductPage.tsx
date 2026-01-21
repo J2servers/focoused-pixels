@@ -21,6 +21,7 @@ import {
   ProductSpecifications,
   RelatedProducts,
 } from '@/components/product';
+import { ProductReviews } from '@/components/reviews';
 
 const ProductPage = () => {
   const { productSlug } = useParams();
@@ -232,6 +233,12 @@ const ProductPage = () => {
           <div className="mt-12 max-w-3xl">
             <ProductSpecifications product={product} />
           </div>
+
+          {/* Product Reviews */}
+          <ProductReviews 
+            productSlug={product.slug} 
+            productName={product.name} 
+          />
 
           {/* Related Products */}
           <RelatedProducts product={product} limit={4} />
