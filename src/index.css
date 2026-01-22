@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Goat Comunicação Visual Design System */
+/* Pincel de Luz Personalizados Design System */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 @import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
 
 @layer base {
   :root {
-    /* Goat Brand Colors */
+    /* Pincel de Luz Brand Colors */
     --background: 214 31.8182% 91.3725%;
     --foreground: 270 10% 15%;
 
@@ -18,7 +18,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 270 10% 15%;
 
-    /* Primary - Roxo Vibrante Goat */
+    /* Primary - Roxo Vibrante Pincel de Luz */
     --primary: 280 70% 43%;
     --primary-foreground: 0 0% 100%;
 
@@ -42,7 +42,7 @@
 
     --radius: 0.5rem;
 
-    /* Custom Goat tokens */
+    /* Custom Pincel de Luz tokens */
     --purple-dark: 280 80% 35%;
     --purple-light: 280 60% 92%;
     --gold: 45 100% 50%;

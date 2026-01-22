@@ -151,7 +151,7 @@ const LoginPage = () => {
           console.log('Lead already exists or failed to save');
         }
         
-        toast.success('Conta criada com sucesso! Bem-vindo à GOAT! 🐐');
+        toast.success('Conta criada com sucesso! Bem-vindo à Pincel de Luz! ✨');
         navigate('/');
       }
     } catch {
