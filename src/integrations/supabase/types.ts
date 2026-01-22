@@ -151,17 +151,24 @@ export type Database = {
           copyright_text: string | null
           email: string | null
           footer_logo: string | null
+          free_shipping_message: string | null
+          free_shipping_minimum: number | null
+          header_logo: string | null
           id: string
+          installments: number | null
           phone: string | null
           privacy_policy: string | null
+          production_time: string | null
           returns_policy: string | null
           social_facebook: string | null
           social_instagram: string | null
           social_linkedin: string | null
+          social_pinterest: string | null
           social_tiktok: string | null
           social_youtube: string | null
           terms_of_service: string | null
           updated_at: string
+          warranty: string | null
           whatsapp: string | null
         }
         Insert: {
@@ -172,17 +179,24 @@ export type Database = {
           copyright_text?: string | null
           email?: string | null
           footer_logo?: string | null
+          free_shipping_message?: string | null
+          free_shipping_minimum?: number | null
+          header_logo?: string | null
           id?: string
+          installments?: number | null
           phone?: string | null
           privacy_policy?: string | null
+          production_time?: string | null
           returns_policy?: string | null
           social_facebook?: string | null
           social_instagram?: string | null
           social_linkedin?: string | null
+          social_pinterest?: string | null
           social_tiktok?: string | null
           social_youtube?: string | null
           terms_of_service?: string | null
           updated_at?: string
+          warranty?: string | null
           whatsapp?: string | null
         }
         Update: {
@@ -193,17 +207,24 @@ export type Database = {
           copyright_text?: string | null
           email?: string | null
           footer_logo?: string | null
+          free_shipping_message?: string | null
+          free_shipping_minimum?: number | null
+          header_logo?: string | null
           id?: string
+          installments?: number | null
           phone?: string | null
           privacy_policy?: string | null
+          production_time?: string | null
           returns_policy?: string | null
           social_facebook?: string | null
           social_instagram?: string | null
           social_linkedin?: string | null
+          social_pinterest?: string | null
           social_tiktok?: string | null
           social_youtube?: string | null
           terms_of_service?: string | null
           updated_at?: string
+          warranty?: string | null
           whatsapp?: string | null
         }
         Relationships: []

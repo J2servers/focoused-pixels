@@ -1,42 +1,20 @@
 import { useState, useEffect } from 'react';
-import { AdminLayout } from '@/components/admin';
+import { AdminLayout, ImageUpload } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, Save, Building2, Phone, Globe, FileText } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Loader2, Save, Building2, Phone, Globe, FileText, Image, Truck, Settings } from 'lucide-react';
+import { useCompanyInfo, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/contexts/AuthContext';
 
-interface CompanyInfo {
-  id: string;
-  company_name: string;
-  cnpj: string | null;
-  address: string | null;
-  phone: string | null;
-  whatsapp: string | null;
-  email: string | null;
-  business_hours: string | null;
-  social_instagram: string | null;
-  social_facebook: string | null;
-  social_tiktok: string | null;
-  social_youtube: string | null;
-  social_linkedin: string | null;
-  copyright_text: string | null;
-  privacy_policy: string | null;
-  terms_of_service: string | null;
-  returns_policy: string | null;
-  footer_logo: string | null;
-}
-
 const AdminCompanyPage = () => {
   const { canEdit } = useAuthContext();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [companyId, setCompanyId] = useState<string | null>(null);
+  const { data: companyInfo, isLoading } = useCompanyInfo();
+  const updateCompany = useUpdateCompanyInfo();
 
   const [formData, setFormData] = useState<Omit<CompanyInfo, 'id'>>({
     company_name: '',
@@ -51,48 +29,50 @@ const AdminCompanyPage = () => {
     social_tiktok: '',
     social_youtube: '',
     social_linkedin: '',
+    social_pinterest: '',
     copyright_text: '',
     privacy_policy: '',
     terms_of_service: '',
     returns_policy: '',
     footer_logo: '',
+    header_logo: '',
+    free_shipping_minimum: 159,
+    free_shipping_message: 'Frete grátis em compras acima de R$ 159',
+    installments: 12,
+    production_time: '4 a 10 dias úteis',
+    warranty: '3 meses',
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      const { data } = await supabase
-        .from('company_info')
-        .select('*')
-        .single();
-
-      if (data) {
-        setCompanyId(data.id);
-        setFormData({
-          company_name: data.company_name || '',
-          cnpj: data.cnpj || '',
-          address: data.address || '',
-          phone: data.phone || '',
-          whatsapp: data.whatsapp || '',
-          email: data.email || '',
-          business_hours: data.business_hours || '',
-          social_instagram: data.social_instagram || '',
-          social_facebook: data.social_facebook || '',
-          social_tiktok: data.social_tiktok || '',
-          social_youtube: data.social_youtube || '',
-          social_linkedin: data.social_linkedin || '',
-          copyright_text: data.copyright_text || '',
-          privacy_policy: data.privacy_policy || '',
-          terms_of_service: data.terms_of_service || '',
-          returns_policy: data.returns_policy || '',
-          footer_logo: data.footer_logo || '',
-        });
-      }
-      setIsLoading(false);
-    };
-
-    fetchData();
-  }, []);
+    if (companyInfo) {
+      setFormData({
+        company_name: companyInfo.company_name || '',
+        cnpj: companyInfo.cnpj || '',
+        address: companyInfo.address || '',
+        phone: companyInfo.phone || '',
+        whatsapp: companyInfo.whatsapp || '',
+        email: companyInfo.email || '',
+        business_hours: companyInfo.business_hours || '',
+        social_instagram: companyInfo.social_instagram || '',
+        social_facebook: companyInfo.social_facebook || '',
+        social_tiktok: companyInfo.social_tiktok || '',
+        social_youtube: companyInfo.social_youtube || '',
+        social_linkedin: companyInfo.social_linkedin || '',
+        social_pinterest: companyInfo.social_pinterest || '',
+        copyright_text: companyInfo.copyright_text || '',
+        privacy_policy: companyInfo.privacy_policy || '',
+        terms_of_service: companyInfo.terms_of_service || '',
+        returns_policy: companyInfo.returns_policy || '',
+        footer_logo: companyInfo.footer_logo || '',
+        header_logo: companyInfo.header_logo || '',
+        free_shipping_minimum: companyInfo.free_shipping_minimum || 159,
+        free_shipping_message: companyInfo.free_shipping_message || '',
+        installments: companyInfo.installments || 12,
+        production_time: companyInfo.production_time || '',
+        warranty: companyInfo.warranty || '',
+      });
+    }
+  }, [companyInfo]);
 
   const handleSave = async () => {
     if (!formData.company_name) {
@@ -100,29 +80,15 @@ const AdminCompanyPage = () => {
       return;
     }
 
-    setIsSaving(true);
     try {
-      if (companyId) {
-        const { error } = await supabase
-          .from('company_info')
-          .update(formData)
-          .eq('id', companyId);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('company_info')
-          .insert(formData);
-
-        if (error) throw error;
-      }
-
+      await updateCompany.mutateAsync({
+        id: companyInfo?.id || null,
+        data: formData,
+      });
       toast.success('Informações salvas com sucesso!');
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao salvar';
       toast.error(message);
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -137,8 +103,124 @@ const AdminCompanyPage = () => {
   }
 
   return (
-    <AdminLayout title="Informações da Empresa" requireEditor>
+    <AdminLayout title="Configurações do Site" requireEditor>
       <div className="max-w-4xl space-y-6">
+        {/* Logos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Image className="h-5 w-5" />
+              Logotipos
+            </CardTitle>
+            <CardDescription>Logos exibidos no cabeçalho e rodapé do site</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label>Logo do Cabeçalho (Header)</Label>
+                <ImageUpload
+                  value={formData.header_logo || ''}
+                  onChange={(url) => setFormData({ ...formData, header_logo: url || '' })}
+                  folder="logos"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Exibido no topo de todas as páginas
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>Logo do Rodapé (Footer)</Label>
+                <ImageUpload
+                  value={formData.footer_logo || ''}
+                  onChange={(url) => setFormData({ ...formData, footer_logo: url || '' })}
+                  folder="logos"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Exibido no rodapé de todas as páginas
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Free Shipping Bar */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Truck className="h-5 w-5" />
+              Barra de Frete Grátis
+            </CardTitle>
+            <CardDescription>Configurações da barra superior do site</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="free_shipping_minimum">Valor Mínimo para Frete Grátis (R$)</Label>
+                <Input
+                  id="free_shipping_minimum"
+                  type="number"
+                  value={formData.free_shipping_minimum || ''}
+                  onChange={(e) => setFormData({ ...formData, free_shipping_minimum: Number(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="free_shipping_message">Mensagem da Barra Superior</Label>
+                <Input
+                  id="free_shipping_message"
+                  value={formData.free_shipping_message || ''}
+                  onChange={(e) => setFormData({ ...formData, free_shipping_message: e.target.value })}
+                  placeholder="Ex: Frete grátis em compras acima de R$ 159"
+                />
+              </div>
+            </div>
+            <div className="p-3 bg-primary text-primary-foreground rounded-md text-center text-sm">
+              <span className="mr-2">🚚</span>
+              {formData.free_shipping_message || `Frete grátis em compras acima de R$ ${formData.free_shipping_minimum}`}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Store Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Configurações da Loja
+            </CardTitle>
+            <CardDescription>Parcelamento, prazos e garantias</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="installments">Parcelamento (nº de vezes)</Label>
+                <Input
+                  id="installments"
+                  type="number"
+                  value={formData.installments || ''}
+                  onChange={(e) => setFormData({ ...formData, installments: Number(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="production_time">Prazo de Produção</Label>
+                <Input
+                  id="production_time"
+                  value={formData.production_time || ''}
+                  onChange={(e) => setFormData({ ...formData, production_time: e.target.value })}
+                  placeholder="4 a 10 dias úteis"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="warranty">Garantia</Label>
+                <Input
+                  id="warranty"
+                  value={formData.warranty || ''}
+                  onChange={(e) => setFormData({ ...formData, warranty: e.target.value })}
+                  placeholder="3 meses"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Basic Info */}
         <Card>
           <CardHeader>
@@ -196,6 +278,7 @@ const AdminCompanyPage = () => {
               <Phone className="h-5 w-5" />
               Contato
             </CardTitle>
+            <CardDescription>Números de telefone e email para "Fale Conosco"</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
@@ -205,14 +288,16 @@ const AdminCompanyPage = () => {
                   id="phone"
                   value={formData.phone || ''}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="(11) 99999-9999"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="whatsapp">WhatsApp</Label>
+                <Label htmlFor="whatsapp">WhatsApp (somente números)</Label>
                 <Input
                   id="whatsapp"
                   value={formData.whatsapp || ''}
                   onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                  placeholder="5511999999999"
                 />
               </div>
               <div className="space-y-2">
@@ -235,6 +320,7 @@ const AdminCompanyPage = () => {
               <Globe className="h-5 w-5" />
               Redes Sociais
             </CardTitle>
+            <CardDescription>Links exibidos na barra superior e rodapé</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -257,19 +343,27 @@ const AdminCompanyPage = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="social_tiktok">TikTok</Label>
-                <Input
-                  id="social_tiktok"
-                  value={formData.social_tiktok || ''}
-                  onChange={(e) => setFormData({ ...formData, social_tiktok: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="social_youtube">YouTube</Label>
                 <Input
                   id="social_youtube"
                   value={formData.social_youtube || ''}
                   onChange={(e) => setFormData({ ...formData, social_youtube: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="social_pinterest">Pinterest</Label>
+                <Input
+                  id="social_pinterest"
+                  value={formData.social_pinterest || ''}
+                  onChange={(e) => setFormData({ ...formData, social_pinterest: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="social_tiktok">TikTok</Label>
+                <Input
+                  id="social_tiktok"
+                  value={formData.social_tiktok || ''}
+                  onChange={(e) => setFormData({ ...formData, social_tiktok: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
@@ -289,28 +383,17 @@ const AdminCompanyPage = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Rodapé
+              Rodapé e Políticas
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="footer_logo">URL do Logo do Rodapé</Label>
-                <Input
-                  id="footer_logo"
-                  value={formData.footer_logo || ''}
-                  onChange={(e) => setFormData({ ...formData, footer_logo: e.target.value })}
-                  placeholder="https://..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="copyright_text">Texto de Copyright</Label>
-                <Input
-                  id="copyright_text"
-                  value={formData.copyright_text || ''}
-                  onChange={(e) => setFormData({ ...formData, copyright_text: e.target.value })}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="copyright_text">Texto de Copyright</Label>
+              <Input
+                id="copyright_text"
+                value={formData.copyright_text || ''}
+                onChange={(e) => setFormData({ ...formData, copyright_text: e.target.value })}
+              />
             </div>
 
             <Separator />
@@ -349,8 +432,8 @@ const AdminCompanyPage = () => {
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={isSaving || !canEdit()} size="lg">
-            {isSaving ? (
+          <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} size="lg">
+            {updateCompany.isPending ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
               <Save className="h-4 w-4 mr-2" />
