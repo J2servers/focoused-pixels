@@ -162,7 +162,7 @@ export function DynamicFooter() {
       {/* Bottom Bar */}
       <div className="border-t border-border py-4">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
-          <p>{company?.copyright_text || `© ${new Date().getFullYear()} ${company?.company_name || 'GOAT Comunicação Visual'}. Todos os direitos reservados.`}</p>
+          <p>{company?.copyright_text || `© ${new Date().getFullYear()} ${company?.company_name || 'Pincel de Luz Personalizados'}. Todos os direitos reservados.`}</p>
           {company?.cnpj && <p>CNPJ: {company.cnpj}</p>}
         </div>
       </div>

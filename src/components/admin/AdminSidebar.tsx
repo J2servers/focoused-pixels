@@ -106,8 +106,8 @@ export const AdminSidebar = () => {
               <Sparkles className="h-5 w-5 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className="text-white font-bold text-sm tracking-wide">GOAT</span>
-              <span className="text-slate-500 text-[10px] font-medium uppercase tracking-wider">Admin Panel</span>
+              <span className="text-white font-bold text-sm tracking-wide">Pincel de Luz</span>
+              <span className="text-slate-500 text-[10px] font-medium uppercase tracking-wider">Admin</span>
             </div>
           </div>
         )}

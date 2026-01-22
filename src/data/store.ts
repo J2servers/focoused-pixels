@@ -1,9 +1,9 @@
-// Informações da loja Goat Comunicação Visual
+// Informações da loja Pincel de Luz Personalizados
 export const storeInfo = {
-  name: 'GOAT',
-  tagline: 'Comunicação Visual',
-  fullName: 'GOAT Comunicação Visual',
-  email: 'contato@goatcomunicacaovisual.com.br',
+  name: 'Pincel de Luz',
+  tagline: 'Personalizados',
+  fullName: 'Pincel de Luz Personalizados',
+  email: 'contato@pinceldluz.com.br',
   phone: '(11) 99999-9999',
   whatsapp: '5511999999999',
   whatsappLink: 'https://wa.me/5511999999999',
@@ -12,11 +12,11 @@ export const storeInfo = {
   productionTime: '4 a 10 dias úteis',
   warranty: '3 meses',
   social: {
-    instagram: 'https://instagram.com/goatcomunicacaovisual',
-    facebook: 'https://facebook.com/goatcomunicacaovisual',
-    youtube: 'https://youtube.com/@goatcomunicacaovisual',
-    pinterest: 'https://pinterest.com/goatcomunicacaovisual',
-    tiktok: 'https://tiktok.com/@goatcomunicacaovisual',
+    instagram: 'https://instagram.com/pinceldluz',
+    facebook: 'https://facebook.com/pinceldluz',
+    youtube: 'https://youtube.com/@pinceldluz',
+    pinterest: 'https://pinterest.com/pinceldluz',
+    tiktok: 'https://tiktok.com/@pinceldluz',
   },
   address: {
     street: 'Av. Paulista, 1000',

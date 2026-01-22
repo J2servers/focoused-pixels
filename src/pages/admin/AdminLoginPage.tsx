@@ -145,7 +145,7 @@ const AdminLoginPage = () => {
             <Sparkles className="h-7 w-7 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-4">
-            GOAT Admin
+            Pincel de Luz Admin
           </h1>
           <p className="text-lg text-slate-400 max-w-md leading-relaxed">
             Gerencie seu catálogo de produtos, promoções e muito mais em um só lugar.

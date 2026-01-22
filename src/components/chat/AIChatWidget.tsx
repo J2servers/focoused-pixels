@@ -18,7 +18,7 @@ export function AIChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Olá! 👋 Sou a assistente virtual da GOAT Comunicação Visual. Como posso ajudar você hoje? Precisa de informações sobre produtos, personalização ou orçamentos?'
+      content: 'Olá! 👋 Sou a assistente virtual da Pincel de Luz. Como posso ajudar você hoje? Precisa de informações sobre produtos, personalização ou orçamentos?'
     }
   ]);
   const [input, setInput] = useState('');
@@ -167,7 +167,7 @@ export function AIChatWidget() {
                   <Bot className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm">Assistente GOAT</h3>
+                  <h3 className="font-semibold text-sm">Assistente Pincel de Luz</h3>
                   <p className="text-xs text-primary-foreground/80">Online • Responde na hora</p>
                 </div>
               </div>

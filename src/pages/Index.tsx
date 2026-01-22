@@ -1,4 +1,12 @@
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
+import { 
+  MobileHeader, 
+  MobileBottomNav, 
+  MobileHeroCarousel, 
+  MobileCategoryGrid, 
+  MobileProductSection,
+  MobileFloatingContact 
+} from '@/components/mobile';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { CookieBanner } from '@/components/CookieBanner';
@@ -12,6 +20,7 @@ import { benefits } from '@/data/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FadeInView } from '@/components/animations';
 import { useProducts, useCategories, useHeroSlides } from '@/hooks/useProducts';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const benefitIcons: Record<string, React.ReactNode> = {
   'truck': <Truck className="h-8 w-8" />,
@@ -22,6 +31,7 @@ const benefitIcons: Record<string, React.ReactNode> = {
 
 const Index = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const isMobile = useIsMobile();
   
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
@@ -51,6 +61,62 @@ const Index = () => {
     }).slice(0, 4);
   };
 
+  // Mobile Version
+  if (isMobile) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background pb-16">
+        <MobileHeader />
+        
+        <main className="flex-1">
+          <MobileHeroCarousel />
+          <MobileCategoryGrid />
+          
+          {productsLoading ? (
+            <div className="px-4 py-4">
+              <Skeleton className="h-6 w-32 mb-3" />
+              <div className="grid grid-cols-2 gap-3">
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} className="aspect-square rounded-2xl" />
+                ))}
+              </div>
+            </div>
+          ) : (
+            parentCategories.map((category) => {
+              const categoryProducts = getProductsByCategory(category.id);
+              if (categoryProducts.length === 0) return null;
+
+              return (
+                <MobileProductSection
+                  key={category.id}
+                  title={category.name}
+                  products={categoryProducts}
+                  categorySlug={category.slug}
+                />
+              );
+            })
+          )}
+
+          {!productsLoading && products.length === 0 && (
+            <div className="py-12 px-4 text-center">
+              <h2 className="text-lg font-bold mb-2">Catálogo em construção</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Em breve teremos produtos disponíveis.
+              </p>
+              <Link to="/sobre">
+                <Button size="sm">Saiba mais</Button>
+              </Link>
+            </div>
+          )}
+        </main>
+
+        <MobileBottomNav />
+        <MobileFloatingContact />
+        <CookieBanner />
+      </div>
+    );
+  }
+
+  // Desktop Version
   return (
     <div className="min-h-screen flex flex-col">
       <DynamicTopBar />
@@ -164,7 +230,7 @@ const Index = () => {
           ) : (
             <div className="w-full h-full bg-gradient-to-r from-primary to-primary/70 flex items-center justify-center">
               <div className="text-white text-center">
-                <h2 className="text-3xl font-bold mb-2">Goat Comunicação Visual</h2>
+                <h2 className="text-3xl font-bold mb-2">Pincel de Luz Personalizados</h2>
                 <p className="text-lg opacity-90">Produtos personalizados de alta qualidade</p>
               </div>
             </div>

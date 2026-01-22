@@ -31,20 +31,20 @@ export interface CompanyInfo {
 
 // Default fallback values when no data is in the database
 const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
-  company_name: 'GOAT Comunicação Visual',
+  company_name: 'Pincel de Luz Personalizados',
   cnpj: '00.000.000/0001-00',
   address: 'Av. Paulista, 1000 - Bela Vista, São Paulo - SP',
   phone: '(11) 99999-9999',
   whatsapp: '5511999999999',
-  email: 'contato@goatcomunicacaovisual.com.br',
+  email: 'contato@pinceldluz.com.br',
   business_hours: 'Seg-Sex 9h às 18h',
-  social_instagram: 'https://instagram.com/goatcomunicacaovisual',
-  social_facebook: 'https://facebook.com/goatcomunicacaovisual',
-  social_tiktok: 'https://tiktok.com/@goatcomunicacaovisual',
-  social_youtube: 'https://youtube.com/@goatcomunicacaovisual',
+  social_instagram: 'https://instagram.com/pinceldluz',
+  social_facebook: 'https://facebook.com/pinceldluz',
+  social_tiktok: 'https://tiktok.com/@pinceldluz',
+  social_youtube: 'https://youtube.com/@pinceldluz',
   social_linkedin: null,
-  social_pinterest: 'https://pinterest.com/goatcomunicacaovisual',
-  copyright_text: '© 2025 GOAT Comunicação Visual. Todos os direitos reservados.',
+  social_pinterest: 'https://pinterest.com/pinceldluz',
+  copyright_text: '© 2025 Pincel de Luz Personalizados. Todos os direitos reservados.',
   privacy_policy: null,
   terms_of_service: null,
   returns_policy: null,
@@ -90,7 +90,7 @@ export function useUpdateCompanyInfo() {
   return useMutation({
     mutationFn: async ({ id, data }: { id: string | null; data: Partial<CompanyInfo> }) => {
       // Ensure company_name is present for insert operations
-      const insertData = { company_name: data.company_name || 'GOAT Comunicação Visual', ...data };
+      const insertData = { company_name: data.company_name || 'Pincel de Luz Personalizados', ...data };
       
       if (id) {
         const { error } = await supabase
