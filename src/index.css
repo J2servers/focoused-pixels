@@ -136,6 +136,15 @@
 }
 
 @layer utilities {
+  /* Safe area support for mobile devices */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
   .text-gradient-purple {
     @apply bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent;
   }
@@ -193,5 +202,20 @@
 
   .admin-card-hover:hover {
     @apply shadow-lg -translate-y-0.5;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Touch optimizations */
+  .touch-manipulation {
+    touch-action: manipulation;
   }
 }
