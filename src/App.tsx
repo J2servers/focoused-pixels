@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { MobileBottomNav, FloatingContactButton } from "@/components/mobile";
 import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -17,6 +18,8 @@ import AboutPage from "./pages/AboutPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import FAQPage from "./pages/FAQPage";
+import TrackingPage from "./pages/TrackingPage";
+import MobileCategoriesRoute from "./pages/MobileCategoriesRoute";
 import NotFound from "./pages/NotFound";
 
 // Admin Pages
@@ -57,6 +60,8 @@ const App = () => (
             <Route path="/privacidade" element={<PrivacyPage />} />
             <Route path="/termos" element={<TermsPage />} />
             <Route path="/faq" element={<FAQPage />} />
+            <Route path="/rastreio" element={<TrackingPage />} />
+            <Route path="/categorias" element={<MobileCategoriesRoute />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/cadastro" element={<RegisterPage />} />
             
@@ -77,6 +82,10 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          
+          {/* Global Mobile Components */}
+          <MobileBottomNav />
+          <FloatingContactButton />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
