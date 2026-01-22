@@ -1,4 +1,5 @@
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
+import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { CookieBanner } from '@/components/CookieBanner';
 import { ProductCard } from '@/components/ProductCard';
@@ -11,8 +12,6 @@ import { benefits } from '@/data/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FadeInView } from '@/components/animations';
 import { useProducts, useCategories, useHeroSlides } from '@/hooks/useProducts';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { MobileHeader } from '@/components/mobile/MobileHeader';
 
 const benefitIcons: Record<string, React.ReactNode> = {
   'truck': <Truck className="h-8 w-8" />,
@@ -23,7 +22,6 @@ const benefitIcons: Record<string, React.ReactNode> = {
 
 const Index = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const isMobile = useIsMobile();
   
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
@@ -54,20 +52,14 @@ const Index = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col ${isMobile ? 'pb-16' : ''}`}>
-      {isMobile ? (
-        <MobileHeader />
-      ) : (
-        <>
-          <DynamicTopBar />
-          <DynamicMainHeader />
-          <NavigationBar />
-        </>
-      )}
+    <div className="min-h-screen flex flex-col">
+      <DynamicTopBar />
+      <DynamicMainHeader />
+      <NavigationBar />
 
-      <main className={`flex-1 ${isMobile ? 'pt-14' : ''}`}>
+      <main className="flex-1">
         {/* Hero Carousel */}
-        <section className={`relative overflow-hidden bg-gradient-purple ${isMobile ? 'h-[200px]' : 'h-[300px] sm:h-[400px] lg:h-[500px]'}`}>
+        <section className="relative h-[300px] sm:h-[400px] lg:h-[500px] overflow-hidden bg-gradient-purple">
           {slidesLoading ? (
             <Skeleton className="w-full h-full" />
           ) : heroSlides.length > 0 ? (
@@ -85,7 +77,7 @@ const Index = () => {
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/60" />
                       <motion.img
-                        src={isMobile && slide.mobile_image ? slide.mobile_image : slide.desktop_image}
+                        src={slide.desktop_image}
                         alt={slide.title || 'Banner'}
                         className="w-full h-full object-cover"
                         initial={{ scale: 1.2 }}
@@ -100,12 +92,12 @@ const Index = () => {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3, duration: 0.5 }}
-                                className={`font-extrabold mb-2 ${isMobile ? 'text-xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}
+                                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-2"
                               >
                                 {slide.title}
                               </motion.h2>
                             )}
-                            {slide.subtitle && !isMobile && (
+                            {slide.subtitle && (
                               <motion.p 
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -122,7 +114,7 @@ const Index = () => {
                                 transition={{ delay: 0.6, duration: 0.5 }}
                               >
                                 <Link to={slide.cta_link}>
-                                  <Button size={isMobile ? 'sm' : 'lg'} variant="secondary" className="font-bold">
+                                  <Button size="lg" variant="secondary" className="font-bold text-lg">
                                     {slide.cta_text}
                                   </Button>
                                 </Link>
@@ -135,7 +127,7 @@ const Index = () => {
                   )
                 ))}
               </AnimatePresence>
-              {heroSlides.length > 1 && !isMobile && (
+              {heroSlides.length > 1 && (
                 <>
                   <motion.button
                     onClick={prevSlide}
@@ -153,55 +145,47 @@ const Index = () => {
                   >
                     <ChevronRight className="h-6 w-6 text-white" />
                   </motion.button>
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {heroSlides.map((_, index) => (
+                      <motion.button
+                        key={index}
+                        onClick={() => setCurrentSlide(index)}
+                        whileHover={{ scale: 1.2 }}
+                        whileTap={{ scale: 0.9 }}
+                        className={`w-3 h-3 rounded-full transition-colors ${
+                          index === currentSlide ? 'bg-white' : 'bg-white/50'
+                        }`}
+                      />
+                    ))}
+                  </div>
                 </>
-              )}
-              {heroSlides.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  {heroSlides.map((_, index) => (
-                    <motion.button
-                      key={index}
-                      onClick={() => setCurrentSlide(index)}
-                      whileHover={{ scale: 1.2 }}
-                      whileTap={{ scale: 0.9 }}
-                      className={`rounded-full transition-colors ${isMobile ? 'w-2 h-2' : 'w-3 h-3'} ${
-                        index === currentSlide ? 'bg-white' : 'bg-white/50'
-                      }`}
-                    />
-                  ))}
-                </div>
               )}
             </>
           ) : (
             <div className="w-full h-full bg-gradient-to-r from-primary to-primary/70 flex items-center justify-center">
               <div className="text-white text-center">
-                <h2 className={`font-bold mb-2 ${isMobile ? 'text-xl' : 'text-3xl'}`}>Goat Comunicação Visual</h2>
-                <p className={`opacity-90 ${isMobile ? 'text-sm' : 'text-lg'}`}>Produtos personalizados de alta qualidade</p>
+                <h2 className="text-3xl font-bold mb-2">Goat Comunicação Visual</h2>
+                <p className="text-lg opacity-90">Produtos personalizados de alta qualidade</p>
               </div>
             </div>
           )}
         </section>
 
-        {/* Benefits - Horizontal scroll on mobile */}
-        <section className={`border-b border-border ${isMobile ? 'py-4' : 'py-8'}`}>
-          <div className={isMobile ? 'overflow-x-auto scrollbar-hide' : 'container mx-auto px-4'}>
-            <div className={isMobile ? 'flex gap-4 px-4 min-w-max' : 'grid grid-cols-2 lg:grid-cols-4 gap-6'}>
+        {/* Benefits */}
+        <section className="py-8 border-b border-border">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {benefits.map((benefit, index) => (
                 <FadeInView key={benefit.title} delay={index * 0.1} direction="up">
                   <motion.div 
-                    className={`flex items-center gap-3 ${isMobile ? 'bg-card rounded-lg p-3 min-w-[180px]' : 'justify-center'}`}
+                    className="flex items-center gap-3 justify-center"
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                   >
-                    <div className={`text-primary ${isMobile ? 'shrink-0' : ''}`}>
-                      {isMobile ? (
-                        <div className="h-6 w-6">{benefitIcons[benefit.icon]}</div>
-                      ) : (
-                        benefitIcons[benefit.icon]
-                      )}
-                    </div>
+                    <div className="text-primary">{benefitIcons[benefit.icon]}</div>
                     <div>
-                      <p className={`font-bold ${isMobile ? 'text-xs' : 'text-sm'}`}>{benefit.title}</p>
-                      <p className={`text-muted-foreground ${isMobile ? 'text-[10px]' : 'text-xs'}`}>{benefit.description}</p>
+                      <p className="font-bold text-sm">{benefit.title}</p>
+                      <p className="text-xs text-muted-foreground">{benefit.description}</p>
                     </div>
                   </motion.div>
                 </FadeInView>
@@ -212,10 +196,10 @@ const Index = () => {
 
         {/* Product Sections by Category */}
         {productsLoading || categoriesLoading ? (
-          <section className={isMobile ? 'py-6 px-4' : 'py-12'}>
-            <div className={isMobile ? '' : 'container mx-auto px-4'}>
+          <section className="py-12">
+            <div className="container mx-auto px-4">
               <Skeleton className="h-8 w-48 mb-6" />
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
                 {[...Array(4)].map((_, i) => (
                   <Skeleton key={i} className="aspect-square rounded-lg" />
                 ))}
@@ -228,17 +212,17 @@ const Index = () => {
             if (categoryProducts.length === 0) return null;
 
             return (
-              <section key={category.id} className={isMobile ? 'py-6' : 'py-12'}>
-                <div className={isMobile ? 'px-4' : 'container mx-auto px-4'}>
+              <section key={category.id} className="py-12">
+                <div className="container mx-auto px-4">
                   <FadeInView delay={0.1}>
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className={`font-bold uppercase tracking-wide ${isMobile ? 'text-lg' : 'text-2xl'}`}>{category.name}</h2>
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-bold uppercase tracking-wide">{category.name}</h2>
                       <Link to={`/categoria/${category.slug}`}>
-                        <Button variant="outline" size="sm" className={isMobile ? 'text-xs px-2 py-1 h-7' : ''}>Ver todos</Button>
+                        <Button variant="outline" size="sm">Ver todos</Button>
                       </Link>
                     </div>
                   </FadeInView>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
                     {categoryProducts.map((product, index) => (
                       <ProductCard key={product.id} product={product} index={index} />
                     ))}
@@ -265,7 +249,8 @@ const Index = () => {
         )}
       </main>
 
-      {!isMobile && <DynamicFooter />}
+      <DynamicFooter />
+      <WhatsAppButton />
       <AIChatWidget />
       <CookieBanner />
     </div>
