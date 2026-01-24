@@ -1,8 +1,17 @@
+/**
+ * CheckoutPage - Página de checkout/orçamento
+ * 
+ * CONFIGURAÇÕES USADAS (Admin > Configurações > Checkout):
+ * - min_order_value: Valor mínimo para finalizar pedido
+ * - require_phone_on_checkout: Exigir telefone (validação)
+ * - checkout_success_message: Usado na página de sucesso
+ * 
+ * CONFIGURAÇÕES USADAS (Admin > Configurações > Descontos):
+ * - quantity_discount_10/20/50/100: Desconto por quantidade
+ */
+
 import { useState } from 'react';
-import { TopBar } from '@/components/layout/TopBar';
-import { MainHeader } from '@/components/layout/MainHeader';
-import { NavigationBar } from '@/components/layout/NavigationBar';
-import { Footer } from '@/components/layout/Footer';
+import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,11 +24,12 @@ import { CheckoutStepSpecifications } from '@/components/checkout/CheckoutStepSp
 import { CheckoutStepCommercial } from '@/components/checkout/CheckoutStepCommercial';
 import { CheckoutStepReview } from '@/components/checkout/CheckoutStepReview';
 import { CheckoutCartSummary } from '@/components/checkout/CheckoutCartSummary';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useSubscribeLead } from '@/hooks/useLeads';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 export interface QuoteFormData {
   // Customer info
@@ -246,8 +256,8 @@ const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <TopBar />
-      <MainHeader />
+      <DynamicTopBar />
+      <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1">
@@ -371,7 +381,7 @@ const CheckoutPage = () => {
         </div>
       </main>
 
-      <Footer />
+      <DynamicFooter />
       <WhatsAppButton />
       <AIChatWidget />
     </div>

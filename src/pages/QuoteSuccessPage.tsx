@@ -1,18 +1,31 @@
+/**
+ * QuoteSuccessPage - Página de sucesso após envio de orçamento
+ * 
+ * CONFIGURAÇÕES USADAS (Admin > Configurações > Checkout):
+ * - checkout_success_message: Mensagem personalizada de sucesso
+ * 
+ * CONFIGURAÇÕES USADAS (Admin > Empresa > Contato):
+ * - whatsapp: Número do WhatsApp para link de contato
+ */
+
 import { Link } from 'react-router-dom';
-import { TopBar } from '@/components/layout/TopBar';
-import { MainHeader } from '@/components/layout/MainHeader';
-import { NavigationBar } from '@/components/layout/NavigationBar';
-import { Footer } from '@/components/layout/Footer';
+import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, Home, MessageCircle, Clock } from 'lucide-react';
-import { storeInfo } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 const QuoteSuccessPage = () => {
+  const { checkoutSuccessMessage, whatsapp, whatsappMessageTemplate } = useSiteSettings();
+
+  const whatsappLink = whatsapp 
+    ? `https://wa.me/${whatsapp}?text=${encodeURIComponent('Olá! Acabei de enviar um orçamento pelo site e gostaria de mais informações.')}`
+    : '#';
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <TopBar />
-      <MainHeader />
+      <DynamicTopBar />
+      <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1 flex items-center justify-center p-4">
@@ -27,7 +40,7 @@ const QuoteSuccessPage = () => {
                 Orçamento Enviado com Sucesso!
               </h1>
               <p className="text-muted-foreground">
-                Recebemos sua solicitação e entraremos em contato em breve.
+                {checkoutSuccessMessage}
               </p>
             </div>
 
@@ -50,22 +63,24 @@ const QuoteSuccessPage = () => {
                 </Button>
               </Link>
 
-              <a
-                href={`https://wa.me/${storeInfo.whatsapp.replace(/\D/g, '')}?text=Olá! Acabei de enviar um orçamento pelo site e gostaria de mais informações.`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button variant="outline" className="w-full" size="lg">
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Falar no WhatsApp
-                </Button>
-              </a>
+              {whatsapp && (
+                <a
+                  href={whatsappLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline" className="w-full" size="lg">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Falar no WhatsApp
+                  </Button>
+                </a>
+              )}
             </div>
           </CardContent>
         </Card>
       </main>
 
-      <Footer />
+      <DynamicFooter />
     </div>
   );
 };

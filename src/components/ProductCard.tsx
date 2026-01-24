@@ -1,11 +1,20 @@
+/**
+ * ProductCard - Card de exibição de produto
+ * 
+ * CONFIGURAÇÕES USADAS (Admin > Configurações > Layout):
+ * - show_product_ratings: Exibir/ocultar estrelas de avaliação
+ * - show_product_stock: Exibir quantidade em estoque
+ */
+
 import { Link } from 'react-router-dom';
-import { Star, Truck, ShoppingCart } from 'lucide-react';
+import { Star, Truck, ShoppingCart, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Product } from '@/data/products';
 import { useCart } from '@/hooks/useCart';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 interface ProductCardProps {
   product: Product;
@@ -14,6 +23,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addItem } = useCart();
+  const { showProductRatings, showProductStock } = useSiteSettings();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -65,21 +75,31 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         </motion.div>
 
         <div className="p-4">
-          {/* Rating */}
-          <div className="flex items-center gap-1 mb-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-accent text-accent' : 'text-muted'}`}
-              />
-            ))}
-            <span className="text-xs text-muted-foreground ml-1">({product.reviews})</span>
-          </div>
+          {/* Rating - Controlled by show_product_ratings setting */}
+          {showProductRatings && (
+            <div className="flex items-center gap-1 mb-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-accent text-accent' : 'text-muted'}`}
+                />
+              ))}
+              <span className="text-xs text-muted-foreground ml-1">({product.reviews})</span>
+            </div>
+          )}
 
           {/* Name */}
           <h3 className="font-semibold text-sm line-clamp-2 mb-2 group-hover:text-primary transition-colors">
             {product.name}
           </h3>
+
+          {/* Stock - Controlled by show_product_stock setting */}
+          {showProductStock && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
+              <Package className="h-3 w-3" />
+              <span>{product.inStock ? 'Em estoque' : 'Sem estoque'}</span>
+            </div>
+          )}
 
           {/* Price */}
           <div className="mb-3">
