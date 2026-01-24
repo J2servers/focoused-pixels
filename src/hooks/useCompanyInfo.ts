@@ -27,6 +27,70 @@ export interface CompanyInfo {
   installments: number | null;
   production_time: string | null;
   warranty: string | null;
+  // SEO & Metadata
+  seo_title: string | null;
+  seo_description: string | null;
+  seo_keywords: string | null;
+  og_image: string | null;
+  favicon_url: string | null;
+  // Appearance
+  primary_color: string | null;
+  secondary_color: string | null;
+  accent_color: string | null;
+  dark_mode_enabled: boolean | null;
+  custom_css: string | null;
+  // Layout & UX
+  products_per_page: number | null;
+  show_product_ratings: boolean | null;
+  show_product_stock: boolean | null;
+  enable_wishlist: boolean | null;
+  enable_compare_products: boolean | null;
+  show_recently_viewed: boolean | null;
+  // Checkout & Cart
+  min_order_value: number | null;
+  max_order_value: number | null;
+  abandoned_cart_reminder_hours: number | null;
+  enable_guest_checkout: boolean | null;
+  require_phone_on_checkout: boolean | null;
+  checkout_success_message: string | null;
+  // Notifications & Alerts
+  low_stock_threshold: number | null;
+  enable_stock_alerts: boolean | null;
+  enable_order_notifications: boolean | null;
+  notification_email: string | null;
+  // AI Assistant
+  ai_assistant_enabled: boolean | null;
+  ai_assistant_name: string | null;
+  ai_assistant_greeting: string | null;
+  ai_assistant_avatar: string | null;
+  // Discounts & Promotions
+  quantity_discount_10: number | null;
+  quantity_discount_20: number | null;
+  quantity_discount_50: number | null;
+  quantity_discount_100: number | null;
+  enable_coupon_codes: boolean | null;
+  // Shipping
+  shipping_origin_cep: string | null;
+  shipping_calculation_method: string | null;
+  fixed_shipping_value: number | null;
+  express_shipping_multiplier: number | null;
+  // Maintenance & Status
+  maintenance_mode: boolean | null;
+  maintenance_message: string | null;
+  store_status: string | null;
+  store_closed_message: string | null;
+  // Legal & Compliance
+  cookie_consent_enabled: boolean | null;
+  cookie_consent_message: string | null;
+  lgpd_contact_email: string | null;
+  // Analytics & Tracking
+  google_analytics_id: string | null;
+  facebook_pixel_id: string | null;
+  google_tag_manager_id: string | null;
+  // Integrations
+  whatsapp_message_template: string | null;
+  enable_reviews_auto_approve: boolean | null;
+  reviews_min_rating_to_show: number | null;
 }
 
 // Default fallback values when no data is in the database
@@ -55,6 +119,70 @@ const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
   installments: 12,
   production_time: '4 a 10 dias úteis',
   warranty: '3 meses',
+  // SEO & Metadata
+  seo_title: 'Pincel de Luz Personalizados',
+  seo_description: 'Produtos personalizados em acrílico, MDF e LED. Letreiros, displays, crachás e muito mais.',
+  seo_keywords: 'acrílico personalizado, letreiro neon, display qr code, crachás personalizados',
+  og_image: null,
+  favicon_url: null,
+  // Appearance
+  primary_color: '#7c3aed',
+  secondary_color: '#10b981',
+  accent_color: '#f59e0b',
+  dark_mode_enabled: true,
+  custom_css: null,
+  // Layout & UX
+  products_per_page: 12,
+  show_product_ratings: true,
+  show_product_stock: false,
+  enable_wishlist: true,
+  enable_compare_products: false,
+  show_recently_viewed: true,
+  // Checkout & Cart
+  min_order_value: 0,
+  max_order_value: null,
+  abandoned_cart_reminder_hours: 24,
+  enable_guest_checkout: true,
+  require_phone_on_checkout: true,
+  checkout_success_message: 'Seu orçamento foi enviado com sucesso! Entraremos em contato em breve.',
+  // Notifications & Alerts
+  low_stock_threshold: 5,
+  enable_stock_alerts: true,
+  enable_order_notifications: true,
+  notification_email: null,
+  // AI Assistant
+  ai_assistant_enabled: true,
+  ai_assistant_name: 'Luna',
+  ai_assistant_greeting: 'Olá! Sou a Luna, assistente virtual da Pincel de Luz. Como posso ajudar?',
+  ai_assistant_avatar: null,
+  // Discounts & Promotions
+  quantity_discount_10: 5,
+  quantity_discount_20: 10,
+  quantity_discount_50: 15,
+  quantity_discount_100: 20,
+  enable_coupon_codes: true,
+  // Shipping
+  shipping_origin_cep: null,
+  shipping_calculation_method: 'fixed',
+  fixed_shipping_value: 15,
+  express_shipping_multiplier: 2,
+  // Maintenance & Status
+  maintenance_mode: false,
+  maintenance_message: 'Estamos em manutenção. Voltamos em breve!',
+  store_status: 'open',
+  store_closed_message: 'Nossa loja está temporariamente fechada.',
+  // Legal & Compliance
+  cookie_consent_enabled: true,
+  cookie_consent_message: 'Utilizamos cookies para melhorar sua experiência.',
+  lgpd_contact_email: null,
+  // Analytics & Tracking
+  google_analytics_id: null,
+  facebook_pixel_id: null,
+  google_tag_manager_id: null,
+  // Integrations
+  whatsapp_message_template: 'Olá! Gostaria de saber mais sobre os produtos da Pincel de Luz.',
+  enable_reviews_auto_approve: false,
+  reviews_min_rating_to_show: 1,
 };
 
 export function useCompanyInfo() {
@@ -64,9 +192,9 @@ export function useCompanyInfo() {
       const { data, error } = await supabase
         .from('company_info')
         .select('*')
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error fetching company info:', error);
       }
 

@@ -144,88 +144,244 @@ export type Database = {
       }
       company_info: {
         Row: {
+          abandoned_cart_reminder_hours: number | null
+          accent_color: string | null
           address: string | null
+          ai_assistant_avatar: string | null
+          ai_assistant_enabled: boolean | null
+          ai_assistant_greeting: string | null
+          ai_assistant_name: string | null
           business_hours: string | null
+          checkout_success_message: string | null
           cnpj: string | null
           company_name: string
+          cookie_consent_enabled: boolean | null
+          cookie_consent_message: string | null
           copyright_text: string | null
+          custom_css: string | null
+          dark_mode_enabled: boolean | null
           email: string | null
+          enable_compare_products: boolean | null
+          enable_coupon_codes: boolean | null
+          enable_guest_checkout: boolean | null
+          enable_order_notifications: boolean | null
+          enable_reviews_auto_approve: boolean | null
+          enable_stock_alerts: boolean | null
+          enable_wishlist: boolean | null
+          express_shipping_multiplier: number | null
+          facebook_pixel_id: string | null
+          favicon_url: string | null
+          fixed_shipping_value: number | null
           footer_logo: string | null
           free_shipping_message: string | null
           free_shipping_minimum: number | null
+          google_analytics_id: string | null
+          google_tag_manager_id: string | null
           header_logo: string | null
           id: string
           installments: number | null
+          lgpd_contact_email: string | null
+          low_stock_threshold: number | null
+          maintenance_message: string | null
+          maintenance_mode: boolean | null
+          max_order_value: number | null
+          min_order_value: number | null
+          notification_email: string | null
+          og_image: string | null
           phone: string | null
+          primary_color: string | null
           privacy_policy: string | null
           production_time: string | null
+          products_per_page: number | null
+          quantity_discount_10: number | null
+          quantity_discount_100: number | null
+          quantity_discount_20: number | null
+          quantity_discount_50: number | null
+          require_phone_on_checkout: boolean | null
           returns_policy: string | null
+          reviews_min_rating_to_show: number | null
+          secondary_color: string | null
+          seo_description: string | null
+          seo_keywords: string | null
+          seo_title: string | null
+          shipping_calculation_method: string | null
+          shipping_origin_cep: string | null
+          show_product_ratings: boolean | null
+          show_product_stock: boolean | null
+          show_recently_viewed: boolean | null
           social_facebook: string | null
           social_instagram: string | null
           social_linkedin: string | null
           social_pinterest: string | null
           social_tiktok: string | null
           social_youtube: string | null
+          store_closed_message: string | null
+          store_status: string | null
           terms_of_service: string | null
           updated_at: string
           warranty: string | null
           whatsapp: string | null
+          whatsapp_message_template: string | null
         }
         Insert: {
+          abandoned_cart_reminder_hours?: number | null
+          accent_color?: string | null
           address?: string | null
+          ai_assistant_avatar?: string | null
+          ai_assistant_enabled?: boolean | null
+          ai_assistant_greeting?: string | null
+          ai_assistant_name?: string | null
           business_hours?: string | null
+          checkout_success_message?: string | null
           cnpj?: string | null
           company_name: string
+          cookie_consent_enabled?: boolean | null
+          cookie_consent_message?: string | null
           copyright_text?: string | null
+          custom_css?: string | null
+          dark_mode_enabled?: boolean | null
           email?: string | null
+          enable_compare_products?: boolean | null
+          enable_coupon_codes?: boolean | null
+          enable_guest_checkout?: boolean | null
+          enable_order_notifications?: boolean | null
+          enable_reviews_auto_approve?: boolean | null
+          enable_stock_alerts?: boolean | null
+          enable_wishlist?: boolean | null
+          express_shipping_multiplier?: number | null
+          facebook_pixel_id?: string | null
+          favicon_url?: string | null
+          fixed_shipping_value?: number | null
           footer_logo?: string | null
           free_shipping_message?: string | null
           free_shipping_minimum?: number | null
+          google_analytics_id?: string | null
+          google_tag_manager_id?: string | null
           header_logo?: string | null
           id?: string
           installments?: number | null
+          lgpd_contact_email?: string | null
+          low_stock_threshold?: number | null
+          maintenance_message?: string | null
+          maintenance_mode?: boolean | null
+          max_order_value?: number | null
+          min_order_value?: number | null
+          notification_email?: string | null
+          og_image?: string | null
           phone?: string | null
+          primary_color?: string | null
           privacy_policy?: string | null
           production_time?: string | null
+          products_per_page?: number | null
+          quantity_discount_10?: number | null
+          quantity_discount_100?: number | null
+          quantity_discount_20?: number | null
+          quantity_discount_50?: number | null
+          require_phone_on_checkout?: boolean | null
           returns_policy?: string | null
+          reviews_min_rating_to_show?: number | null
+          secondary_color?: string | null
+          seo_description?: string | null
+          seo_keywords?: string | null
+          seo_title?: string | null
+          shipping_calculation_method?: string | null
+          shipping_origin_cep?: string | null
+          show_product_ratings?: boolean | null
+          show_product_stock?: boolean | null
+          show_recently_viewed?: boolean | null
           social_facebook?: string | null
           social_instagram?: string | null
           social_linkedin?: string | null
           social_pinterest?: string | null
           social_tiktok?: string | null
           social_youtube?: string | null
+          store_closed_message?: string | null
+          store_status?: string | null
           terms_of_service?: string | null
           updated_at?: string
           warranty?: string | null
           whatsapp?: string | null
+          whatsapp_message_template?: string | null
         }
         Update: {
+          abandoned_cart_reminder_hours?: number | null
+          accent_color?: string | null
           address?: string | null
+          ai_assistant_avatar?: string | null
+          ai_assistant_enabled?: boolean | null
+          ai_assistant_greeting?: string | null
+          ai_assistant_name?: string | null
           business_hours?: string | null
+          checkout_success_message?: string | null
           cnpj?: string | null
           company_name?: string
+          cookie_consent_enabled?: boolean | null
+          cookie_consent_message?: string | null
           copyright_text?: string | null
+          custom_css?: string | null
+          dark_mode_enabled?: boolean | null
           email?: string | null
+          enable_compare_products?: boolean | null
+          enable_coupon_codes?: boolean | null
+          enable_guest_checkout?: boolean | null
+          enable_order_notifications?: boolean | null
+          enable_reviews_auto_approve?: boolean | null
+          enable_stock_alerts?: boolean | null
+          enable_wishlist?: boolean | null
+          express_shipping_multiplier?: number | null
+          facebook_pixel_id?: string | null
+          favicon_url?: string | null
+          fixed_shipping_value?: number | null
           footer_logo?: string | null
           free_shipping_message?: string | null
           free_shipping_minimum?: number | null
+          google_analytics_id?: string | null
+          google_tag_manager_id?: string | null
           header_logo?: string | null
           id?: string
           installments?: number | null
+          lgpd_contact_email?: string | null
+          low_stock_threshold?: number | null
+          maintenance_message?: string | null
+          maintenance_mode?: boolean | null
+          max_order_value?: number | null
+          min_order_value?: number | null
+          notification_email?: string | null
+          og_image?: string | null
           phone?: string | null
+          primary_color?: string | null
           privacy_policy?: string | null
           production_time?: string | null
+          products_per_page?: number | null
+          quantity_discount_10?: number | null
+          quantity_discount_100?: number | null
+          quantity_discount_20?: number | null
+          quantity_discount_50?: number | null
+          require_phone_on_checkout?: boolean | null
           returns_policy?: string | null
+          reviews_min_rating_to_show?: number | null
+          secondary_color?: string | null
+          seo_description?: string | null
+          seo_keywords?: string | null
+          seo_title?: string | null
+          shipping_calculation_method?: string | null
+          shipping_origin_cep?: string | null
+          show_product_ratings?: boolean | null
+          show_product_stock?: boolean | null
+          show_recently_viewed?: boolean | null
           social_facebook?: string | null
           social_instagram?: string | null
           social_linkedin?: string | null
           social_pinterest?: string | null
           social_tiktok?: string | null
           social_youtube?: string | null
+          store_closed_message?: string | null
+          store_status?: string | null
           terms_of_service?: string | null
           updated_at?: string
           warranty?: string | null
           whatsapp?: string | null
+          whatsapp_message_template?: string | null
         }
         Relationships: []
       }
