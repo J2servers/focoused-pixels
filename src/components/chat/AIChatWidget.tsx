@@ -1,3 +1,13 @@
+/**
+ * AIChatWidget - Assistente virtual com IA
+ * 
+ * CONFIGURAÇÕES USADAS (Admin > Configurações > IA):
+ * - ai_assistant_enabled: Mostrar/ocultar o chatbot
+ * - ai_assistant_name: Nome exibido no header do chat
+ * - ai_assistant_greeting: Primeira mensagem do assistente
+ * - ai_assistant_avatar: Avatar personalizado (ou usa ícone padrão)
+ */
+
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
@@ -5,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -14,17 +25,27 @@ interface Message {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
 
 export function AIChatWidget() {
+  const { 
+    aiAssistantEnabled, 
+    aiAssistantName, 
+    aiAssistantGreeting,
+    aiAssistantAvatar,
+    companyName 
+  } = useSiteSettings();
+
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: 'Olá! 👋 Sou a assistente virtual da Pincel de Luz. Como posso ajudar você hoje? Precisa de informações sobre produtos, personalização ou orçamentos?'
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize greeting message from settings
+  useEffect(() => {
+    if (aiAssistantGreeting && messages.length === 0) {
+      setMessages([{ role: 'assistant', content: aiAssistantGreeting }]);
+    }
+  }, [aiAssistantGreeting, messages.length]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -37,6 +58,9 @@ export function AIChatWidget() {
       inputRef.current.focus();
     }
   }, [isOpen]);
+
+  // Don't render if disabled in settings
+  if (!aiAssistantEnabled) return null;
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -145,7 +169,7 @@ export function AIChatWidget() {
             aria-label="Abrir assistente virtual"
           >
             <Sparkles className="h-5 w-5" />
-            <span className="hidden sm:inline font-medium">Assistente IA</span>
+            <span className="hidden sm:inline font-medium">{aiAssistantName}</span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -163,11 +187,15 @@ export function AIChatWidget() {
             {/* Header */}
             <div className="bg-primary text-primary-foreground px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                  <Bot className="h-5 w-5" />
+                <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center overflow-hidden">
+                  {aiAssistantAvatar ? (
+                    <img src={aiAssistantAvatar} alt={aiAssistantName} className="w-full h-full object-cover" />
+                  ) : (
+                    <Bot className="h-5 w-5" />
+                  )}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm">Assistente Pincel de Luz</h3>
+                  <h3 className="font-semibold text-sm">{aiAssistantName} • {companyName}</h3>
                   <p className="text-xs text-primary-foreground/80">Online • Responde na hora</p>
                 </div>
               </div>
@@ -195,8 +223,12 @@ export function AIChatWidget() {
                     )}
                   >
                     {message.role === 'assistant' && (
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <Bot className="h-4 w-4 text-primary" />
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {aiAssistantAvatar ? (
+                          <img src={aiAssistantAvatar} alt={aiAssistantName} className="w-full h-full object-cover" />
+                        ) : (
+                          <Bot className="h-4 w-4 text-primary" />
+                        )}
                       </div>
                     )}
                     <div

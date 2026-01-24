@@ -1,11 +1,30 @@
+/**
+ * WhatsAppButton - Botão flutuante do WhatsApp
+ * 
+ * CONFIGURAÇÕES USADAS (Admin > Configurações > IA > WhatsApp):
+ * - whatsapp_message_template: Mensagem pré-preenchida ao clicar
+ * 
+ * CONFIGURAÇÕES USADAS (Admin > Empresa > Contato):
+ * - whatsapp: Número do WhatsApp para contato
+ */
+
 import { MessageCircle } from 'lucide-react';
-import { storeInfo } from '@/data/store';
 import { motion } from 'framer-motion';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 export function WhatsAppButton() {
+  const { whatsapp, whatsappMessageTemplate } = useSiteSettings();
+
+  // Build WhatsApp URL with custom message
+  const whatsappLink = whatsapp 
+    ? `https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappMessageTemplate)}`
+    : '#';
+
+  if (!whatsapp) return null;
+
   return (
     <motion.a
-      href={storeInfo.whatsappLink}
+      href={whatsappLink}
       target="_blank"
       rel="noopener noreferrer"
       initial={{ scale: 0, opacity: 0 }}
