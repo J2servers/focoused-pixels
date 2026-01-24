@@ -16,7 +16,7 @@ const AdminCompanyPage = () => {
   const { data: companyInfo, isLoading } = useCompanyInfo();
   const updateCompany = useUpdateCompanyInfo();
 
-  const [formData, setFormData] = useState<Omit<CompanyInfo, 'id'>>({
+  const [formData, setFormData] = useState<Partial<CompanyInfo>>({
     company_name: '',
     cnpj: '',
     address: '',
