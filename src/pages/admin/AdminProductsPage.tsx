@@ -228,13 +228,20 @@ const AdminProductsPage = () => {
       header: 'Imagem',
       className: 'w-16',
       render: (product) => (
-        <div className="w-12 h-12 rounded-lg bg-muted overflow-hidden">
+        <div className="w-12 h-12 rounded-lg bg-muted overflow-hidden flex items-center justify-center">
           {product.cover_image ? (
-            <img src={product.cover_image} alt={product.name} className="w-full h-full object-cover" />
+            <img 
+              src={product.cover_image} 
+              alt={product.name} 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.parentElement!.innerHTML = '<span class="text-muted-foreground text-xs">Erro</span>';
+              }}
+            />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-              Sem
-            </div>
+            <span className="text-muted-foreground text-xs">Sem</span>
           )}
         </div>
       ),
