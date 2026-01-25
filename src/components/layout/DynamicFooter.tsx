@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 import { categories } from '@/data/products';
-import logoGoat from '@/assets/logo-goat.png';
+import logoPincelDeLuz from '@/assets/logo-pincel-de-luz.png';
 
 export function DynamicFooter() {
   const { data: company } = useCompanyInfo();
 
-  const footerLogo = company?.footer_logo || logoGoat;
+  const footerLogo = company?.footer_logo || logoPincelDeLuz;
 
   const institutionalLinks = [
     { name: 'Sobre Nós', href: '/sobre' },
