@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/s
 import { useCart } from '@/hooks/useCart';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 import { categories } from '@/data/products';
-import logoGoat from '@/assets/logo-goat.png';
+import logoPincelDeLuz from '@/assets/logo-pincel-de-luz.png';
 
 export function DynamicMainHeader() {
   const navigate = useNavigate();
@@ -22,8 +22,8 @@ export function DynamicMainHeader() {
     }
   };
 
-  // Use custom logo from database or fallback to default
-  const headerLogo = company?.header_logo || logoGoat;
+  // Use custom logo from database or fallback to Pincel de Luz logo
+  const headerLogo = company?.header_logo || logoPincelDeLuz;
 
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
