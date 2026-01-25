@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AdminLayout, DataTable, Column } from '@/components/admin';
+import { AdminLayout, DataTable, Column, ImageUpload } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -175,6 +175,29 @@ const AdminCategoriesPage = () => {
   };
 
   const columns: Column<Category>[] = [
+    {
+      key: 'image_url',
+      header: 'Imagem',
+      className: 'w-16',
+      render: (cat) => (
+        <div className="w-12 h-12 rounded-lg bg-muted overflow-hidden flex items-center justify-center">
+          {cat.image_url ? (
+            <img 
+              src={cat.image_url} 
+              alt={cat.name} 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.parentElement!.innerHTML = '<span class="text-muted-foreground text-xs">Erro</span>';
+              }}
+            />
+          ) : (
+            <ImageIcon className="w-5 h-5 text-muted-foreground" />
+          )}
+        </div>
+      ),
+    },
     { key: 'name', header: 'Nome', sortable: true },
     { key: 'slug', header: 'Slug' },
     { 
@@ -295,28 +318,27 @@ const AdminCategoriesPage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Ativa</SelectItem>
-                    <SelectItem value="inactive">Inativa</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="image_url">URL da Imagem</Label>
-                <Input
-                  id="image_url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  placeholder="https://..."
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Ativa</SelectItem>
+                  <SelectItem value="inactive">Inativa</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Imagem da Categoria</Label>
+              <ImageUpload
+                value={formData.image_url}
+                onChange={(url) => setFormData({ ...formData, image_url: url || '' })}
+                folder="categories"
+                aspectRatio="aspect-square"
+              />
             </div>
           </div>
 
