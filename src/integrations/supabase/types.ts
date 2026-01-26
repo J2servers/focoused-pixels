@@ -151,6 +151,10 @@ export type Database = {
           ai_assistant_enabled: boolean | null
           ai_assistant_greeting: string | null
           ai_assistant_name: string | null
+          asaas_api_key: string | null
+          asaas_enabled: boolean | null
+          asaas_sandbox: boolean | null
+          boleto_extra_days: number | null
           business_hours: string | null
           checkout_success_message: string | null
           cnpj: string | null
@@ -160,6 +164,11 @@ export type Database = {
           copyright_text: string | null
           custom_css: string | null
           dark_mode_enabled: boolean | null
+          efi_client_id: string | null
+          efi_client_secret: string | null
+          efi_enabled: boolean | null
+          efi_pix_key: string | null
+          efi_sandbox: boolean | null
           email: string | null
           enable_compare_products: boolean | null
           enable_coupon_codes: boolean | null
@@ -184,11 +193,24 @@ export type Database = {
           low_stock_threshold: number | null
           maintenance_message: string | null
           maintenance_mode: boolean | null
+          max_installments: number | null
           max_order_value: number | null
+          mercadopago_access_token: string | null
+          mercadopago_enabled: boolean | null
+          mercadopago_public_key: string | null
+          mercadopago_sandbox: boolean | null
+          min_installment_value: number | null
           min_order_value: number | null
           notification_email: string | null
           og_image: string | null
+          pagseguro_email: string | null
+          pagseguro_enabled: boolean | null
+          pagseguro_sandbox: boolean | null
+          pagseguro_token: string | null
+          payment_gateway_primary: string | null
+          payment_methods_enabled: string[] | null
           phone: string | null
+          pix_discount_percent: number | null
           primary_color: string | null
           privacy_policy: string | null
           production_time: string | null
@@ -217,6 +239,10 @@ export type Database = {
           social_youtube: string | null
           store_closed_message: string | null
           store_status: string | null
+          stripe_enabled: boolean | null
+          stripe_public_key: string | null
+          stripe_sandbox: boolean | null
+          stripe_secret_key: string | null
           terms_of_service: string | null
           updated_at: string
           warranty: string | null
@@ -231,6 +257,10 @@ export type Database = {
           ai_assistant_enabled?: boolean | null
           ai_assistant_greeting?: string | null
           ai_assistant_name?: string | null
+          asaas_api_key?: string | null
+          asaas_enabled?: boolean | null
+          asaas_sandbox?: boolean | null
+          boleto_extra_days?: number | null
           business_hours?: string | null
           checkout_success_message?: string | null
           cnpj?: string | null
@@ -240,6 +270,11 @@ export type Database = {
           copyright_text?: string | null
           custom_css?: string | null
           dark_mode_enabled?: boolean | null
+          efi_client_id?: string | null
+          efi_client_secret?: string | null
+          efi_enabled?: boolean | null
+          efi_pix_key?: string | null
+          efi_sandbox?: boolean | null
           email?: string | null
           enable_compare_products?: boolean | null
           enable_coupon_codes?: boolean | null
@@ -264,11 +299,24 @@ export type Database = {
           low_stock_threshold?: number | null
           maintenance_message?: string | null
           maintenance_mode?: boolean | null
+          max_installments?: number | null
           max_order_value?: number | null
+          mercadopago_access_token?: string | null
+          mercadopago_enabled?: boolean | null
+          mercadopago_public_key?: string | null
+          mercadopago_sandbox?: boolean | null
+          min_installment_value?: number | null
           min_order_value?: number | null
           notification_email?: string | null
           og_image?: string | null
+          pagseguro_email?: string | null
+          pagseguro_enabled?: boolean | null
+          pagseguro_sandbox?: boolean | null
+          pagseguro_token?: string | null
+          payment_gateway_primary?: string | null
+          payment_methods_enabled?: string[] | null
           phone?: string | null
+          pix_discount_percent?: number | null
           primary_color?: string | null
           privacy_policy?: string | null
           production_time?: string | null
@@ -297,6 +345,10 @@ export type Database = {
           social_youtube?: string | null
           store_closed_message?: string | null
           store_status?: string | null
+          stripe_enabled?: boolean | null
+          stripe_public_key?: string | null
+          stripe_sandbox?: boolean | null
+          stripe_secret_key?: string | null
           terms_of_service?: string | null
           updated_at?: string
           warranty?: string | null
@@ -311,6 +363,10 @@ export type Database = {
           ai_assistant_enabled?: boolean | null
           ai_assistant_greeting?: string | null
           ai_assistant_name?: string | null
+          asaas_api_key?: string | null
+          asaas_enabled?: boolean | null
+          asaas_sandbox?: boolean | null
+          boleto_extra_days?: number | null
           business_hours?: string | null
           checkout_success_message?: string | null
           cnpj?: string | null
@@ -320,6 +376,11 @@ export type Database = {
           copyright_text?: string | null
           custom_css?: string | null
           dark_mode_enabled?: boolean | null
+          efi_client_id?: string | null
+          efi_client_secret?: string | null
+          efi_enabled?: boolean | null
+          efi_pix_key?: string | null
+          efi_sandbox?: boolean | null
           email?: string | null
           enable_compare_products?: boolean | null
           enable_coupon_codes?: boolean | null
@@ -344,11 +405,24 @@ export type Database = {
           low_stock_threshold?: number | null
           maintenance_message?: string | null
           maintenance_mode?: boolean | null
+          max_installments?: number | null
           max_order_value?: number | null
+          mercadopago_access_token?: string | null
+          mercadopago_enabled?: boolean | null
+          mercadopago_public_key?: string | null
+          mercadopago_sandbox?: boolean | null
+          min_installment_value?: number | null
           min_order_value?: number | null
           notification_email?: string | null
           og_image?: string | null
+          pagseguro_email?: string | null
+          pagseguro_enabled?: boolean | null
+          pagseguro_sandbox?: boolean | null
+          pagseguro_token?: string | null
+          payment_gateway_primary?: string | null
+          payment_methods_enabled?: string[] | null
           phone?: string | null
+          pix_discount_percent?: number | null
           primary_color?: string | null
           privacy_policy?: string | null
           production_time?: string | null
@@ -377,6 +451,10 @@ export type Database = {
           social_youtube?: string | null
           store_closed_message?: string | null
           store_status?: string | null
+          stripe_enabled?: boolean | null
+          stripe_public_key?: string | null
+          stripe_sandbox?: boolean | null
+          stripe_secret_key?: string | null
           terms_of_service?: string | null
           updated_at?: string
           warranty?: string | null
