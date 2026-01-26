@@ -13,17 +13,24 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCompanyInfo, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
+import { useTestMercadoPago, useTestEfiBank, useTestStripe } from '@/hooks/usePaymentGateway';
 import { toast } from 'sonner';
 import { 
   Loader2, Save, User, Lock, Search, Palette, ShoppingCart, 
   Bell, Bot, Truck, AlertTriangle, Shield, CreditCard,
-  Eye, MessageSquare, Cookie, Wallet, QrCode, Building2, Landmark
+  Eye, MessageSquare, Cookie, Wallet, QrCode, Building2, Landmark,
+  CheckCircle2, XCircle, Zap
 } from 'lucide-react';
 
 const AdminSettingsPage = () => {
   const { profile, updatePassword, canEdit } = useAuthContext();
   const { data: companyInfo, isLoading: isLoadingCompany } = useCompanyInfo();
   const updateCompany = useUpdateCompanyInfo();
+  
+  // Payment gateway test mutations
+  const testMercadoPago = useTestMercadoPago();
+  const testEfiBank = useTestEfiBank();
+  const testStripe = useTestStripe();
   
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwords, setPasswords] = useState({
@@ -346,6 +353,38 @@ const AdminSettingsPage = () => {
                       />
                     </div>
                   </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      Salve as configurações antes de testar a conexão
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          const result = await testMercadoPago.mutateAsync();
+                          if (result.success) {
+                            toast.success('Mercado Pago conectado com sucesso!', {
+                              description: `Conta: ${result.account?.email || 'Verificada'}`,
+                            });
+                          } else {
+                            toast.error('Falha na conexão', { description: result.message });
+                          }
+                        } catch (error) {
+                          toast.error('Erro ao testar conexão');
+                        }
+                      }}
+                      disabled={testMercadoPago.isPending || !settings.mercadopago_access_token}
+                    >
+                      {testMercadoPago.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Zap className="h-4 w-4 mr-2" />
+                      )}
+                      Testar Conexão
+                    </Button>
+                  </div>
                 </CardContent>
               )}
             </Card>
@@ -411,6 +450,38 @@ const AdminSettingsPage = () => {
                       placeholder="email@empresa.com ou CNPJ"
                     />
                     <p className="text-xs text-muted-foreground">Chave PIX cadastrada na EFI</p>
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      Salve as configurações antes de testar a conexão
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          const result = await testEfiBank.mutateAsync();
+                          if (result.success) {
+                            toast.success('EFI Bank conectado com sucesso!', {
+                              description: result.sandbox ? 'Modo Sandbox' : 'Modo Produção',
+                            });
+                          } else {
+                            toast.error('Falha na conexão', { description: result.message });
+                          }
+                        } catch (error) {
+                          toast.error('Erro ao testar conexão');
+                        }
+                      }}
+                      disabled={testEfiBank.isPending || !settings.efi_client_id || !settings.efi_client_secret}
+                    >
+                      {testEfiBank.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Zap className="h-4 w-4 mr-2" />
+                      )}
+                      Testar Conexão
+                    </Button>
                   </div>
                 </CardContent>
               )}
@@ -524,6 +595,38 @@ const AdminSettingsPage = () => {
                         placeholder="sk_test_xxxxx..."
                       />
                     </div>
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      Salve as configurações antes de testar a conexão
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          const result = await testStripe.mutateAsync();
+                          if (result.success) {
+                            toast.success('Stripe conectado com sucesso!', {
+                              description: `Conta: ${result.account?.email || 'Verificada'}`,
+                            });
+                          } else {
+                            toast.error('Falha na conexão', { description: result.message });
+                          }
+                        } catch (error) {
+                          toast.error('Erro ao testar conexão');
+                        }
+                      }}
+                      disabled={testStripe.isPending || !settings.stripe_secret_key}
+                    >
+                      {testStripe.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Zap className="h-4 w-4 mr-2" />
+                      )}
+                      Testar Conexão
+                    </Button>
                   </div>
                 </CardContent>
               )}
