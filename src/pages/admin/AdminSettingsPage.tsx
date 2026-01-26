@@ -10,13 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCompanyInfo, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
 import { toast } from 'sonner';
 import { 
-  Loader2, Save, User, Lock, Search, Palette, Layout, ShoppingCart, 
-  Bell, Bot, Percent, Truck, AlertTriangle, Shield, BarChart3, 
-  Plug, Eye, MessageSquare, Cookie, Mail
+  Loader2, Save, User, Lock, Search, Palette, ShoppingCart, 
+  Bell, Bot, Truck, AlertTriangle, Shield, CreditCard,
+  Eye, MessageSquare, Cookie, Wallet, QrCode, Building2, Landmark
 } from 'lucide-react';
 
 const AdminSettingsPage = () => {
@@ -81,6 +82,15 @@ const AdminSettingsPage = () => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
+  const togglePaymentMethod = (method: string) => {
+    const current = settings.payment_methods_enabled || ['pix', 'credit_card', 'boleto'];
+    if (current.includes(method)) {
+      updateSetting('payment_methods_enabled', current.filter(m => m !== method));
+    } else {
+      updateSetting('payment_methods_enabled', [...current, method]);
+    }
+  };
+
   if (isLoadingCompany) {
     return (
       <AdminLayout title="Configurações">
@@ -116,11 +126,19 @@ const AdminSettingsPage = () => {
           </Button>
         </div>
 
-        <Tabs defaultValue="account" className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 h-auto p-2">
-            <TabsTrigger value="account" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Conta</span>
+        <Tabs defaultValue="payments" className="space-y-6">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 h-auto p-2">
+            <TabsTrigger value="payments" className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              <span className="hidden sm:inline">Pagamentos</span>
+            </TabsTrigger>
+            <TabsTrigger value="checkout" className="flex items-center gap-2">
+              <ShoppingCart className="h-4 w-4" />
+              <span className="hidden sm:inline">Checkout</span>
+            </TabsTrigger>
+            <TabsTrigger value="shipping" className="flex items-center gap-2">
+              <Truck className="h-4 w-4" />
+              <span className="hidden sm:inline">Frete</span>
             </TabsTrigger>
             <TabsTrigger value="seo" className="flex items-center gap-2">
               <Search className="h-4 w-4" />
@@ -130,32 +148,16 @@ const AdminSettingsPage = () => {
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">Aparência</span>
             </TabsTrigger>
-            <TabsTrigger value="layout" className="flex items-center gap-2">
-              <Layout className="h-4 w-4" />
-              <span className="hidden sm:inline">Layout</span>
-            </TabsTrigger>
-            <TabsTrigger value="checkout" className="flex items-center gap-2">
-              <ShoppingCart className="h-4 w-4" />
-              <span className="hidden sm:inline">Checkout</span>
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">Alertas</span>
-            </TabsTrigger>
           </TabsList>
 
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 h-auto p-2">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 h-auto p-2">
             <TabsTrigger value="ai" className="flex items-center gap-2">
               <Bot className="h-4 w-4" />
               <span className="hidden sm:inline">IA</span>
             </TabsTrigger>
-            <TabsTrigger value="discounts" className="flex items-center gap-2">
-              <Percent className="h-4 w-4" />
-              <span className="hidden sm:inline">Descontos</span>
-            </TabsTrigger>
-            <TabsTrigger value="shipping" className="flex items-center gap-2">
-              <Truck className="h-4 w-4" />
-              <span className="hidden sm:inline">Frete</span>
+            <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              <span className="hidden sm:inline">Alertas</span>
             </TabsTrigger>
             <TabsTrigger value="maintenance" className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
@@ -165,66 +167,599 @@ const AdminSettingsPage = () => {
               <Shield className="h-4 w-4" />
               <span className="hidden sm:inline">LGPD</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Analytics</span>
+            <TabsTrigger value="account" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">Conta</span>
             </TabsTrigger>
           </TabsList>
 
-          {/* Account Tab */}
-          <TabsContent value="account" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    Meu Perfil
-                  </CardTitle>
-                  <CardDescription>Informações da sua conta</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Nome</Label>
-                    <Input value={profile?.full_name || ''} disabled />
+          {/* Payments Tab */}
+          <TabsContent value="payments" className="space-y-6">
+            {/* Payment Methods */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wallet className="h-5 w-5" />
+                  Métodos de Pagamento
+                </CardTitle>
+                <CardDescription>
+                  Configure quais formas de pagamento estarão disponíveis
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
+                    <Checkbox
+                      id="pix"
+                      checked={(settings.payment_methods_enabled || []).includes('pix')}
+                      onCheckedChange={() => togglePaymentMethod('pix')}
+                    />
+                    <div className="flex items-center gap-2">
+                      <QrCode className="h-5 w-5 text-emerald-500" />
+                      <Label htmlFor="pix" className="font-medium cursor-pointer">PIX</Label>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
+                    <Checkbox
+                      id="credit_card"
+                      checked={(settings.payment_methods_enabled || []).includes('credit_card')}
+                      onCheckedChange={() => togglePaymentMethod('credit_card')}
+                    />
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-5 w-5 text-blue-500" />
+                      <Label htmlFor="credit_card" className="font-medium cursor-pointer">Cartão de Crédito</Label>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
+                    <Checkbox
+                      id="boleto"
+                      checked={(settings.payment_methods_enabled || []).includes('boleto')}
+                      onCheckedChange={() => togglePaymentMethod('boleto')}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-5 w-5 text-orange-500" />
+                      <Label htmlFor="boleto" className="font-medium cursor-pointer">Boleto Bancário</Label>
+                    </div>
+                  </div>
+                </div>
+                <Separator />
+                <div className="grid gap-4 md:grid-cols-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="pix_discount">Desconto PIX (%)</Label>
+                    <Input
+                      id="pix_discount"
+                      type="number"
+                      value={settings.pix_discount_percent || 5}
+                      onChange={(e) => updateSetting('pix_discount_percent', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="boleto_days">Dias extras Boleto</Label>
+                    <Input
+                      id="boleto_days"
+                      type="number"
+                      value={settings.boleto_extra_days || 3}
+                      onChange={(e) => updateSetting('boleto_extra_days', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="max_installments">Máx. Parcelas</Label>
+                    <Input
+                      id="max_installments"
+                      type="number"
+                      value={settings.max_installments || 12}
+                      onChange={(e) => updateSetting('max_installments', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="min_installment">Parcela Mín. (R$)</Label>
+                    <Input
+                      id="min_installment"
+                      type="number"
+                      value={settings.min_installment_value || 50}
+                      onChange={(e) => updateSetting('min_installment_value', Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Lock className="h-5 w-5" />
-                    Alterar Senha
-                  </CardTitle>
-                  <CardDescription>Atualize sua senha de acesso</CardDescription>
-                </CardHeader>
+            {/* Gateway Principal */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Landmark className="h-5 w-5" />
+                  Gateway Principal
+                </CardTitle>
+                <CardDescription>
+                  Selecione qual gateway será usado para processar pagamentos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Select
+                  value={settings.payment_gateway_primary || 'mercadopago'}
+                  onValueChange={(value) => updateSetting('payment_gateway_primary', value)}
+                >
+                  <SelectTrigger className="w-full md:w-80">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mercadopago">Mercado Pago</SelectItem>
+                    <SelectItem value="efi">EFI Bank (Gerencianet)</SelectItem>
+                    <SelectItem value="pagseguro">PagSeguro</SelectItem>
+                    <SelectItem value="stripe">Stripe</SelectItem>
+                    <SelectItem value="asaas">Asaas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+
+            {/* Mercado Pago */}
+            <Card className={settings.mercadopago_enabled ? 'border-emerald-500/50' : ''}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#009ee3] flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">MP</span>
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Mercado Pago</CardTitle>
+                      <CardDescription>Gateway mais popular do Brasil</CardDescription>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={settings.mercadopago_enabled ?? false}
+                    onCheckedChange={(checked) => updateSetting('mercadopago_enabled', checked)}
+                  />
+                </div>
+              </CardHeader>
+              {settings.mercadopago_enabled && (
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="newPassword">Nova Senha</Label>
-                    <Input
-                      id="newPassword"
-                      type="password"
-                      value={passwords.newPassword}
-                      onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
-                      placeholder="Mínimo 6 caracteres"
+                  <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
+                    <div className="space-y-0.5">
+                      <Label>Modo Sandbox (Testes)</Label>
+                      <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
+                    </div>
+                    <Switch
+                      checked={settings.mercadopago_sandbox ?? true}
+                      onCheckedChange={(checked) => updateSetting('mercadopago_sandbox', checked)}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={passwords.confirmPassword}
-                      onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
-                    />
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="mp_public_key">Public Key</Label>
+                      <Input
+                        id="mp_public_key"
+                        value={settings.mercadopago_public_key || ''}
+                        onChange={(e) => updateSetting('mercadopago_public_key', e.target.value)}
+                        placeholder="APP_USR-xxxx..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="mp_access_token">Access Token</Label>
+                      <Input
+                        id="mp_access_token"
+                        type="password"
+                        value={settings.mercadopago_access_token || ''}
+                        onChange={(e) => updateSetting('mercadopago_access_token', e.target.value)}
+                        placeholder="APP_USR-xxxx..."
+                      />
+                    </div>
                   </div>
-                  <Button onClick={handleChangePassword} disabled={isChangingPassword}>
-                    {isChangingPassword && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                    Alterar Senha
-                  </Button>
                 </CardContent>
-              </Card>
-            </div>
+              )}
+            </Card>
+
+            {/* EFI Bank */}
+            <Card className={settings.efi_enabled ? 'border-emerald-500/50' : ''}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#00b4e6] flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">EFI</span>
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">EFI Bank (Gerencianet)</CardTitle>
+                      <CardDescription>PIX instantâneo e boletos</CardDescription>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={settings.efi_enabled ?? false}
+                    onCheckedChange={(checked) => updateSetting('efi_enabled', checked)}
+                  />
+                </div>
+              </CardHeader>
+              {settings.efi_enabled && (
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
+                    <div className="space-y-0.5">
+                      <Label>Modo Sandbox (Testes)</Label>
+                      <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
+                    </div>
+                    <Switch
+                      checked={settings.efi_sandbox ?? true}
+                      onCheckedChange={(checked) => updateSetting('efi_sandbox', checked)}
+                    />
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="efi_client_id">Client ID</Label>
+                      <Input
+                        id="efi_client_id"
+                        value={settings.efi_client_id || ''}
+                        onChange={(e) => updateSetting('efi_client_id', e.target.value)}
+                        placeholder="Client_Id_xxxxx..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="efi_client_secret">Client Secret</Label>
+                      <Input
+                        id="efi_client_secret"
+                        type="password"
+                        value={settings.efi_client_secret || ''}
+                        onChange={(e) => updateSetting('efi_client_secret', e.target.value)}
+                        placeholder="Client_Secret_xxxxx..."
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="efi_pix_key">Chave PIX</Label>
+                    <Input
+                      id="efi_pix_key"
+                      value={settings.efi_pix_key || ''}
+                      onChange={(e) => updateSetting('efi_pix_key', e.target.value)}
+                      placeholder="email@empresa.com ou CNPJ"
+                    />
+                    <p className="text-xs text-muted-foreground">Chave PIX cadastrada na EFI</p>
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+
+            {/* PagSeguro */}
+            <Card className={settings.pagseguro_enabled ? 'border-emerald-500/50' : ''}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#ffc107] flex items-center justify-center">
+                      <span className="text-black font-bold text-sm">PS</span>
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">PagSeguro</CardTitle>
+                      <CardDescription>Solução completa do UOL</CardDescription>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={settings.pagseguro_enabled ?? false}
+                    onCheckedChange={(checked) => updateSetting('pagseguro_enabled', checked)}
+                  />
+                </div>
+              </CardHeader>
+              {settings.pagseguro_enabled && (
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
+                    <div className="space-y-0.5">
+                      <Label>Modo Sandbox (Testes)</Label>
+                      <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
+                    </div>
+                    <Switch
+                      checked={settings.pagseguro_sandbox ?? true}
+                      onCheckedChange={(checked) => updateSetting('pagseguro_sandbox', checked)}
+                    />
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="ps_email">Email da Conta</Label>
+                      <Input
+                        id="ps_email"
+                        type="email"
+                        value={settings.pagseguro_email || ''}
+                        onChange={(e) => updateSetting('pagseguro_email', e.target.value)}
+                        placeholder="email@empresa.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="ps_token">Token</Label>
+                      <Input
+                        id="ps_token"
+                        type="password"
+                        value={settings.pagseguro_token || ''}
+                        onChange={(e) => updateSetting('pagseguro_token', e.target.value)}
+                        placeholder="xxxxx-xxxxx-xxxxx..."
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+
+            {/* Stripe */}
+            <Card className={settings.stripe_enabled ? 'border-emerald-500/50' : ''}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#635bff] flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">S</span>
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Stripe</CardTitle>
+                      <CardDescription>Gateway internacional</CardDescription>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={settings.stripe_enabled ?? false}
+                    onCheckedChange={(checked) => updateSetting('stripe_enabled', checked)}
+                  />
+                </div>
+              </CardHeader>
+              {settings.stripe_enabled && (
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
+                    <div className="space-y-0.5">
+                      <Label>Modo Sandbox (Testes)</Label>
+                      <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
+                    </div>
+                    <Switch
+                      checked={settings.stripe_sandbox ?? true}
+                      onCheckedChange={(checked) => updateSetting('stripe_sandbox', checked)}
+                    />
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="stripe_pk">Publishable Key</Label>
+                      <Input
+                        id="stripe_pk"
+                        value={settings.stripe_public_key || ''}
+                        onChange={(e) => updateSetting('stripe_public_key', e.target.value)}
+                        placeholder="pk_test_xxxxx..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="stripe_sk">Secret Key</Label>
+                      <Input
+                        id="stripe_sk"
+                        type="password"
+                        value={settings.stripe_secret_key || ''}
+                        onChange={(e) => updateSetting('stripe_secret_key', e.target.value)}
+                        placeholder="sk_test_xxxxx..."
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+
+            {/* Asaas */}
+            <Card className={settings.asaas_enabled ? 'border-emerald-500/50' : ''}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#0d6efd] flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">A</span>
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Asaas</CardTitle>
+                      <CardDescription>Cobranças e assinaturas</CardDescription>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={settings.asaas_enabled ?? false}
+                    onCheckedChange={(checked) => updateSetting('asaas_enabled', checked)}
+                  />
+                </div>
+              </CardHeader>
+              {settings.asaas_enabled && (
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
+                    <div className="space-y-0.5">
+                      <Label>Modo Sandbox (Testes)</Label>
+                      <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
+                    </div>
+                    <Switch
+                      checked={settings.asaas_sandbox ?? true}
+                      onCheckedChange={(checked) => updateSetting('asaas_sandbox', checked)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="asaas_key">API Key</Label>
+                    <Input
+                      id="asaas_key"
+                      type="password"
+                      value={settings.asaas_api_key || ''}
+                      onChange={(e) => updateSetting('asaas_api_key', e.target.value)}
+                      placeholder="$aact_xxxxx..."
+                    />
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+          </TabsContent>
+
+          {/* Checkout Tab */}
+          <TabsContent value="checkout" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  Carrinho e Checkout
+                </CardTitle>
+                <CardDescription>
+                  Configure regras de compra e checkout
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="min_order_value">Pedido Mínimo (R$)</Label>
+                    <Input
+                      id="min_order_value"
+                      type="number"
+                      value={settings.min_order_value || 0}
+                      onChange={(e) => updateSetting('min_order_value', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="max_order_value">Pedido Máximo (R$)</Label>
+                    <Input
+                      id="max_order_value"
+                      type="number"
+                      value={settings.max_order_value || ''}
+                      onChange={(e) => updateSetting('max_order_value', e.target.value ? Number(e.target.value) : null)}
+                      placeholder="Sem limite"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="abandoned_cart">Lembrete Carrinho (horas)</Label>
+                    <Input
+                      id="abandoned_cart"
+                      type="number"
+                      value={settings.abandoned_cart_reminder_hours || 24}
+                      onChange={(e) => updateSetting('abandoned_cart_reminder_hours', Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+                <Separator />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Checkout como Visitante</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Permitir compras sem login
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.enable_guest_checkout ?? true}
+                      onCheckedChange={(checked) => updateSetting('enable_guest_checkout', checked)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Telefone Obrigatório</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Exigir telefone no checkout
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.require_phone_on_checkout ?? true}
+                      onCheckedChange={(checked) => updateSetting('require_phone_on_checkout', checked)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Cupons de Desconto</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Permitir uso de códigos promocionais
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.enable_coupon_codes ?? true}
+                      onCheckedChange={(checked) => updateSetting('enable_coupon_codes', checked)}
+                    />
+                  </div>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                  <Label htmlFor="checkout_success_message">Mensagem de Sucesso</Label>
+                  <Textarea
+                    id="checkout_success_message"
+                    value={settings.checkout_success_message || ''}
+                    onChange={(e) => updateSetting('checkout_success_message', e.target.value)}
+                    placeholder="Mensagem exibida após envio do orçamento"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Shipping Tab */}
+          <TabsContent value="shipping" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Truck className="h-5 w-5" />
+                  Configurações de Frete
+                </CardTitle>
+                <CardDescription>
+                  Configure cálculo e valores de frete
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="shipping_origin_cep">CEP de Origem</Label>
+                    <Input
+                      id="shipping_origin_cep"
+                      value={settings.shipping_origin_cep || ''}
+                      onChange={(e) => updateSetting('shipping_origin_cep', e.target.value)}
+                      placeholder="00000-000"
+                      maxLength={9}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="shipping_method">Método de Cálculo</Label>
+                    <Select
+                      value={settings.shipping_calculation_method || 'fixed'}
+                      onValueChange={(value) => updateSetting('shipping_calculation_method', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="fixed">Valor Fixo</SelectItem>
+                        <SelectItem value="weight">Por Peso</SelectItem>
+                        <SelectItem value="distance">Por Distância</SelectItem>
+                        <SelectItem value="free">Sempre Grátis</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="fixed_shipping">Valor Fixo do Frete (R$)</Label>
+                    <Input
+                      id="fixed_shipping"
+                      type="number"
+                      value={settings.fixed_shipping_value || 15}
+                      onChange={(e) => updateSetting('fixed_shipping_value', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="express_multiplier">Multiplicador Frete Expresso</Label>
+                    <Input
+                      id="express_multiplier"
+                      type="number"
+                      step="0.1"
+                      value={settings.express_shipping_multiplier || 2}
+                      onChange={(e) => updateSetting('express_shipping_multiplier', Number(e.target.value))}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Ex: 2 = frete expresso custa 2x o normal
+                    </p>
+                  </div>
+                </div>
+                <Separator />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="free_shipping_min">Frete Grátis Acima de (R$)</Label>
+                    <Input
+                      id="free_shipping_min"
+                      type="number"
+                      value={settings.free_shipping_minimum || 159}
+                      onChange={(e) => updateSetting('free_shipping_minimum', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="free_shipping_msg">Mensagem Frete Grátis</Label>
+                    <Input
+                      id="free_shipping_msg"
+                      value={settings.free_shipping_message || ''}
+                      onChange={(e) => updateSetting('free_shipping_message', e.target.value)}
+                      placeholder="Frete grátis em compras acima de R$ 159"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* SEO Tab */}
@@ -303,6 +838,39 @@ const AdminSettingsPage = () => {
                     </p>
                   </div>
                 </div>
+                <Separator />
+                <div className="space-y-4">
+                  <h4 className="font-medium">Analytics e Rastreamento</h4>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="ga_id">Google Analytics ID</Label>
+                      <Input
+                        id="ga_id"
+                        value={settings.google_analytics_id || ''}
+                        onChange={(e) => updateSetting('google_analytics_id', e.target.value)}
+                        placeholder="G-XXXXXXXXXX"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="gtm_id">Google Tag Manager</Label>
+                      <Input
+                        id="gtm_id"
+                        value={settings.google_tag_manager_id || ''}
+                        onChange={(e) => updateSetting('google_tag_manager_id', e.target.value)}
+                        placeholder="GTM-XXXXXXX"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="fb_pixel">Facebook Pixel</Label>
+                      <Input
+                        id="fb_pixel"
+                        value={settings.facebook_pixel_id || ''}
+                        onChange={(e) => updateSetting('facebook_pixel_id', e.target.value)}
+                        placeholder="XXXXXXXXXXXXXXX"
+                      />
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -374,71 +942,19 @@ const AdminSettingsPage = () => {
                   </div>
                 </div>
                 <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Modo Escuro</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Habilitar alternância para modo escuro
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.dark_mode_enabled ?? true}
-                    onCheckedChange={(checked) => updateSetting('dark_mode_enabled', checked)}
-                  />
-                </div>
-                <Separator />
-                <div className="space-y-2">
-                  <Label htmlFor="custom_css">CSS Personalizado</Label>
-                  <Textarea
-                    id="custom_css"
-                    value={settings.custom_css || ''}
-                    onChange={(e) => updateSetting('custom_css', e.target.value)}
-                    placeholder="/* Adicione seu CSS customizado aqui */"
-                    className="font-mono text-sm min-h-[150px]"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    CSS avançado para personalização adicional
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Layout Tab */}
-          <TabsContent value="layout" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Layout className="h-5 w-5" />
-                  Layout e Exibição
-                </CardTitle>
-                <CardDescription>
-                  Configure como os produtos são exibidos
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="products_per_page">Produtos por Página</Label>
-                    <Select
-                      value={String(settings.products_per_page || 12)}
-                      onValueChange={(value) => updateSetting('products_per_page', Number(value))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="8">8 produtos</SelectItem>
-                        <SelectItem value="12">12 produtos</SelectItem>
-                        <SelectItem value="16">16 produtos</SelectItem>
-                        <SelectItem value="24">24 produtos</SelectItem>
-                        <SelectItem value="48">48 produtos</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <Separator />
                 <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Modo Escuro</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Habilitar alternância para modo escuro
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.dark_mode_enabled ?? true}
+                      onCheckedChange={(checked) => updateSetting('dark_mode_enabled', checked)}
+                    />
+                  </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label className="flex items-center gap-2">
@@ -466,197 +982,17 @@ const AdminSettingsPage = () => {
                       onCheckedChange={(checked) => updateSetting('show_product_stock', checked)}
                     />
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Lista de Desejos</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Permitir salvar produtos favoritos
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.enable_wishlist ?? true}
-                      onCheckedChange={(checked) => updateSetting('enable_wishlist', checked)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Comparar Produtos</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Permitir comparação entre produtos
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.enable_compare_products ?? false}
-                      onCheckedChange={(checked) => updateSetting('enable_compare_products', checked)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Vistos Recentemente</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Mostrar produtos visualizados recentemente
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.show_recently_viewed ?? true}
-                      onCheckedChange={(checked) => updateSetting('show_recently_viewed', checked)}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Checkout Tab */}
-          <TabsContent value="checkout" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5" />
-                  Carrinho e Checkout
-                </CardTitle>
-                <CardDescription>
-                  Configure regras de compra e checkout
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="min_order_value">Pedido Mínimo (R$)</Label>
-                    <Input
-                      id="min_order_value"
-                      type="number"
-                      value={settings.min_order_value || 0}
-                      onChange={(e) => updateSetting('min_order_value', Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="max_order_value">Pedido Máximo (R$)</Label>
-                    <Input
-                      id="max_order_value"
-                      type="number"
-                      value={settings.max_order_value || ''}
-                      onChange={(e) => updateSetting('max_order_value', e.target.value ? Number(e.target.value) : null)}
-                      placeholder="Sem limite"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="abandoned_cart">Lembrete Carrinho (horas)</Label>
-                    <Input
-                      id="abandoned_cart"
-                      type="number"
-                      value={settings.abandoned_cart_reminder_hours || 24}
-                      onChange={(e) => updateSetting('abandoned_cart_reminder_hours', Number(e.target.value))}
-                    />
-                  </div>
-                </div>
-                <Separator />
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Checkout como Visitante</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Permitir compras sem login
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.enable_guest_checkout ?? true}
-                      onCheckedChange={(checked) => updateSetting('enable_guest_checkout', checked)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Telefone Obrigatório</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Exigir telefone no checkout
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.require_phone_on_checkout ?? true}
-                      onCheckedChange={(checked) => updateSetting('require_phone_on_checkout', checked)}
-                    />
-                  </div>
                 </div>
                 <Separator />
                 <div className="space-y-2">
-                  <Label htmlFor="checkout_success_message">Mensagem de Sucesso</Label>
+                  <Label htmlFor="custom_css">CSS Personalizado</Label>
                   <Textarea
-                    id="checkout_success_message"
-                    value={settings.checkout_success_message || ''}
-                    onChange={(e) => updateSetting('checkout_success_message', e.target.value)}
-                    placeholder="Mensagem exibida após envio do orçamento"
+                    id="custom_css"
+                    value={settings.custom_css || ''}
+                    onChange={(e) => updateSetting('custom_css', e.target.value)}
+                    placeholder="/* Adicione seu CSS customizado aqui */"
+                    className="font-mono text-sm min-h-[150px]"
                   />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Notifications Tab */}
-          <TabsContent value="notifications" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="h-5 w-5" />
-                  Notificações e Alertas
-                </CardTitle>
-                <CardDescription>
-                  Configure alertas do sistema
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="low_stock_threshold">Limite Estoque Baixo</Label>
-                    <Input
-                      id="low_stock_threshold"
-                      type="number"
-                      value={settings.low_stock_threshold || 5}
-                      onChange={(e) => updateSetting('low_stock_threshold', Number(e.target.value))}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Alertar quando estoque ficar abaixo deste valor
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="notification_email">Email para Notificações</Label>
-                    <Input
-                      id="notification_email"
-                      type="email"
-                      value={settings.notification_email || ''}
-                      onChange={(e) => updateSetting('notification_email', e.target.value)}
-                      placeholder="admin@empresa.com"
-                    />
-                  </div>
-                </div>
-                <Separator />
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label className="flex items-center gap-2">
-                        <Mail className="h-4 w-4" />
-                        Alertas de Estoque
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        Notificar quando produtos estiverem com estoque baixo
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.enable_stock_alerts ?? true}
-                      onCheckedChange={(checked) => updateSetting('enable_stock_alerts', checked)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Notificações de Pedidos</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Receber email a cada novo pedido/orçamento
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.enable_order_notifications ?? true}
-                      onCheckedChange={(checked) => updateSetting('enable_order_notifications', checked)}
-                    />
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -744,182 +1080,68 @@ const AdminSettingsPage = () => {
             </Card>
           </TabsContent>
 
-          {/* Discounts Tab */}
-          <TabsContent value="discounts" className="space-y-6">
+          {/* Notifications Tab */}
+          <TabsContent value="notifications" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Percent className="h-5 w-5" />
-                  Descontos por Quantidade
+                  <Bell className="h-5 w-5" />
+                  Notificações e Alertas
                 </CardTitle>
                 <CardDescription>
-                  Configure descontos progressivos
+                  Configure alertas do sistema
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-4">
+                <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="discount_10">10+ unidades (%)</Label>
+                    <Label htmlFor="low_stock_threshold">Limite Estoque Baixo</Label>
                     <Input
-                      id="discount_10"
+                      id="low_stock_threshold"
                       type="number"
-                      value={settings.quantity_discount_10 || 5}
-                      onChange={(e) => updateSetting('quantity_discount_10', Number(e.target.value))}
+                      value={settings.low_stock_threshold || 5}
+                      onChange={(e) => updateSetting('low_stock_threshold', Number(e.target.value))}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Alertar quando estoque ficar abaixo deste valor
+                    </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="discount_20">20+ unidades (%)</Label>
+                    <Label htmlFor="notification_email">Email para Notificações</Label>
                     <Input
-                      id="discount_20"
-                      type="number"
-                      value={settings.quantity_discount_20 || 10}
-                      onChange={(e) => updateSetting('quantity_discount_20', Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="discount_50">50+ unidades (%)</Label>
-                    <Input
-                      id="discount_50"
-                      type="number"
-                      value={settings.quantity_discount_50 || 15}
-                      onChange={(e) => updateSetting('quantity_discount_50', Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="discount_100">100+ unidades (%)</Label>
-                    <Input
-                      id="discount_100"
-                      type="number"
-                      value={settings.quantity_discount_100 || 20}
-                      onChange={(e) => updateSetting('quantity_discount_100', Number(e.target.value))}
+                      id="notification_email"
+                      type="email"
+                      value={settings.notification_email || ''}
+                      onChange={(e) => updateSetting('notification_email', e.target.value)}
+                      placeholder="admin@empresa.com"
                     />
                   </div>
                 </div>
                 <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Cupons de Desconto</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Permitir uso de códigos promocionais
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.enable_coupon_codes ?? true}
-                    onCheckedChange={(checked) => updateSetting('enable_coupon_codes', checked)}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Eye className="h-5 w-5" />
-                  Avaliações
-                </CardTitle>
-                <CardDescription>
-                  Configure exibição de avaliações
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Aprovar Automaticamente</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Publicar avaliações sem moderação
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.enable_reviews_auto_approve ?? false}
-                    onCheckedChange={(checked) => updateSetting('enable_reviews_auto_approve', checked)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="min_rating">Nota Mínima para Exibir</Label>
-                  <Select
-                    value={String(settings.reviews_min_rating_to_show || 1)}
-                    onValueChange={(value) => updateSetting('reviews_min_rating_to_show', Number(value))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 estrela (todas)</SelectItem>
-                      <SelectItem value="2">2+ estrelas</SelectItem>
-                      <SelectItem value="3">3+ estrelas</SelectItem>
-                      <SelectItem value="4">4+ estrelas</SelectItem>
-                      <SelectItem value="5">Apenas 5 estrelas</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Shipping Tab */}
-          <TabsContent value="shipping" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Truck className="h-5 w-5" />
-                  Configurações de Frete
-                </CardTitle>
-                <CardDescription>
-                  Configure cálculo e valores de frete
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="shipping_origin_cep">CEP de Origem</Label>
-                    <Input
-                      id="shipping_origin_cep"
-                      value={settings.shipping_origin_cep || ''}
-                      onChange={(e) => updateSetting('shipping_origin_cep', e.target.value)}
-                      placeholder="00000-000"
-                      maxLength={9}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Alertas de Estoque</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Notificar quando produtos estiverem com estoque baixo
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.enable_stock_alerts ?? true}
+                      onCheckedChange={(checked) => updateSetting('enable_stock_alerts', checked)}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="shipping_method">Método de Cálculo</Label>
-                    <Select
-                      value={settings.shipping_calculation_method || 'fixed'}
-                      onValueChange={(value) => updateSetting('shipping_calculation_method', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="fixed">Valor Fixo</SelectItem>
-                        <SelectItem value="weight">Por Peso</SelectItem>
-                        <SelectItem value="distance">Por Distância</SelectItem>
-                        <SelectItem value="free">Sempre Grátis</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="fixed_shipping">Valor Fixo do Frete (R$)</Label>
-                    <Input
-                      id="fixed_shipping"
-                      type="number"
-                      value={settings.fixed_shipping_value || 15}
-                      onChange={(e) => updateSetting('fixed_shipping_value', Number(e.target.value))}
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Notificações de Pedidos</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Receber email a cada novo pedido/orçamento
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.enable_order_notifications ?? true}
+                      onCheckedChange={(checked) => updateSetting('enable_order_notifications', checked)}
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="express_multiplier">Multiplicador Frete Expresso</Label>
-                    <Input
-                      id="express_multiplier"
-                      type="number"
-                      step="0.1"
-                      value={settings.express_shipping_multiplier || 2}
-                      onChange={(e) => updateSetting('express_shipping_multiplier', Number(e.target.value))}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Ex: 2 = frete expresso custa 2x o normal
-                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -968,10 +1190,7 @@ const AdminSettingsPage = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Plug className="h-5 w-5" />
-                  Status da Loja
-                </CardTitle>
+                <CardTitle>Status da Loja</CardTitle>
                 <CardDescription>
                   Configure o status de funcionamento
                 </CardDescription>
@@ -1059,48 +1278,60 @@ const AdminSettingsPage = () => {
             </Card>
           </TabsContent>
 
-          {/* Analytics Tab */}
-          <TabsContent value="analytics" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
-                  Rastreamento e Analytics
-                </CardTitle>
-                <CardDescription>
-                  Configure integrações com ferramentas de análise
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="ga_id">Google Analytics ID</Label>
-                  <Input
-                    id="ga_id"
-                    value={settings.google_analytics_id || ''}
-                    onChange={(e) => updateSetting('google_analytics_id', e.target.value)}
-                    placeholder="G-XXXXXXXXXX ou UA-XXXXXXXX-X"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="gtm_id">Google Tag Manager ID</Label>
-                  <Input
-                    id="gtm_id"
-                    value={settings.google_tag_manager_id || ''}
-                    onChange={(e) => updateSetting('google_tag_manager_id', e.target.value)}
-                    placeholder="GTM-XXXXXXX"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="fb_pixel">Facebook Pixel ID</Label>
-                  <Input
-                    id="fb_pixel"
-                    value={settings.facebook_pixel_id || ''}
-                    onChange={(e) => updateSetting('facebook_pixel_id', e.target.value)}
-                    placeholder="XXXXXXXXXXXXXXX"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+          {/* Account Tab */}
+          <TabsContent value="account" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    Meu Perfil
+                  </CardTitle>
+                  <CardDescription>Informações da sua conta</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Nome</Label>
+                    <Input value={profile?.full_name || ''} disabled />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lock className="h-5 w-5" />
+                    Alterar Senha
+                  </CardTitle>
+                  <CardDescription>Atualize sua senha de acesso</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">Nova Senha</Label>
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      value={passwords.newPassword}
+                      onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+                      placeholder="Mínimo 6 caracteres"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={passwords.confirmPassword}
+                      onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
+                    />
+                  </div>
+                  <Button onClick={handleChangePassword} disabled={isChangingPassword}>
+                    {isChangingPassword && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                    Alterar Senha
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
