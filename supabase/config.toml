@@ -2,3 +2,15 @@ project_id = "uhjamkueajhzsvcefgtp"
 
 [functions.ai-assistant]
 verify_jwt = false
+
+[functions.payment-mercadopago]
+verify_jwt = false
+
+[functions.payment-efi]
+verify_jwt = false
+
+[functions.payment-stripe]
+verify_jwt = false
+
+[functions.payment-webhook]
+verify_jwt = false
