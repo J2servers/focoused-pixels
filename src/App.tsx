@@ -20,6 +20,12 @@ import TermsPage from "./pages/TermsPage";
 import FAQPage from "./pages/FAQPage";
 import NotFound from "./pages/NotFound";
 
+// Payment Pages
+import PaymentPage from "./pages/PaymentPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PaymentErrorPage from "./pages/PaymentErrorPage";
+import PaymentPendingPage from "./pages/PaymentPendingPage";
+
 // Admin Pages
 import {
   AdminLoginPage,
@@ -56,13 +62,19 @@ const App = () => (
               <Route path="/busca" element={<SearchPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/orcamento-enviado" element={<QuoteSuccessPage />} />
+              
+              {/* Payment Routes */}
+              <Route path="/pagamento" element={<PaymentPage />} />
+              <Route path="/pagamento/sucesso" element={<PaymentSuccessPage />} />
+              <Route path="/pagamento/erro" element={<PaymentErrorPage />} />
+              <Route path="/pagamento/pendente" element={<PaymentPendingPage />} />
+              
               <Route path="/sobre" element={<AboutPage />} />
               <Route path="/privacidade" element={<PrivacyPage />} />
               <Route path="/termos" element={<TermsPage />} />
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/cadastro" element={<RegisterPage />} />
-              
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLoginPage />} />
               <Route path="/admin" element={<AdminDashboardPage />} />
