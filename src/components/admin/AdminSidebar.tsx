@@ -20,7 +20,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useState } from 'react';
-import logoGoat from '@/assets/logo-goat.png';
 import {
   Tooltip,
   TooltipContent,
@@ -59,13 +58,17 @@ export const AdminSidebar = () => {
       <NavLink
         to={item.url}
         className={cn(
-          "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200",
+          "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group/item",
           isActive 
-            ? "bg-gradient-to-r from-primary to-purple-600 text-white shadow-lg shadow-primary/25" 
-            : "text-slate-400 hover:bg-white/5 hover:text-white"
+            ? "bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-purple))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]" 
+            : "text-[hsl(var(--admin-text-muted))] hover:bg-[hsl(var(--admin-sidebar-hover))] hover:text-white"
         )}
       >
-        <item.icon className={cn("h-5 w-5 shrink-0", isActive && "drop-shadow-sm")} />
+        <item.icon className={cn(
+          "h-5 w-5 shrink-0 transition-transform duration-300", 
+          isActive && "drop-shadow-[0_0_8px_hsl(var(--admin-glow))]",
+          !isActive && "group-hover/item:scale-110"
+        )} />
         {!collapsed && (
           <span className="text-sm font-medium tracking-wide">{item.title}</span>
         )}
@@ -78,7 +81,7 @@ export const AdminSidebar = () => {
           <TooltipTrigger asChild>
             {content}
           </TooltipTrigger>
-          <TooltipContent side="right" className="font-medium">
+          <TooltipContent side="right" className="font-medium bg-[hsl(var(--admin-card))] text-white border-[hsl(var(--admin-card-border))]">
             {item.title}
           </TooltipContent>
         </Tooltip>
@@ -91,23 +94,23 @@ export const AdminSidebar = () => {
   return (
     <aside 
       className={cn(
-        "h-screen admin-gradient-sidebar flex flex-col transition-all duration-300 border-r border-white/5",
+        "h-screen admin-gradient-sidebar flex flex-col transition-all duration-300 border-r border-[hsl(var(--admin-card-border)/0.5)]",
         collapsed ? "w-[72px]" : "w-64"
       )}
     >
       {/* Logo */}
       <div className={cn(
-        "h-16 flex items-center border-b border-white/10",
+        "h-16 flex items-center border-b border-[hsl(var(--admin-card-border)/0.5)]",
         collapsed ? "justify-center px-2" : "justify-between px-4"
       )}>
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
-              <Sparkles className="h-5 w-5 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] animate-pulse">
+              <Sparkles className="h-5 w-5 text-white drop-shadow-[0_0_6px_white]" />
             </div>
             <div className="flex flex-col">
-              <span className="text-white font-bold text-sm tracking-wide">Pincel de Luz</span>
-              <span className="text-slate-500 text-[10px] font-medium uppercase tracking-wider">Admin</span>
+              <span className="admin-gradient-text font-bold text-sm tracking-wide">Pincel de Luz</span>
+              <span className="text-[hsl(var(--admin-text-muted))] text-[10px] font-semibold uppercase tracking-widest">Admin Panel</span>
             </div>
           </div>
         )}
@@ -115,7 +118,7 @@ export const AdminSidebar = () => {
           variant="ghost" 
           size="icon"
           onClick={() => setCollapsed(!collapsed)}
-          className="shrink-0 text-slate-400 hover:text-white hover:bg-white/5 h-8 w-8"
+          className="shrink-0 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))] h-8 w-8"
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
@@ -123,7 +126,7 @@ export const AdminSidebar = () => {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 px-3">
-        <ul className="space-y-1">
+        <ul className="space-y-1.5">
           {filteredItems.map((item) => {
             const isActive = item.end 
               ? location.pathname === item.url
@@ -139,18 +142,18 @@ export const AdminSidebar = () => {
       </nav>
 
       {/* User Info */}
-      <div className="border-t border-white/10 p-4">
+      <div className="border-t border-[hsl(var(--admin-card-border)/0.5)] p-4">
         {!collapsed && (
           <div className="mb-3 px-1">
             <p className="text-sm font-semibold text-white truncate">
               {profile?.full_name || 'Usuário'}
             </p>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-2 mt-1.5">
               <span className={cn(
-                "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
-                role === 'admin' && "bg-primary/20 text-primary",
-                role === 'editor' && "bg-blue-500/20 text-blue-400",
-                role === 'support' && "bg-green-500/20 text-green-400",
+                "text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full",
+                role === 'admin' && "bg-gradient-to-r from-[hsl(var(--admin-accent-purple)/0.3)] to-[hsl(var(--admin-accent-pink)/0.3)] text-[hsl(var(--admin-accent-pink))] border border-[hsl(var(--admin-accent-pink)/0.3)]",
+                role === 'editor' && "bg-[hsl(var(--admin-accent-blue)/0.2)] text-[hsl(var(--admin-accent-blue))] border border-[hsl(var(--admin-accent-blue)/0.3)]",
+                role === 'support' && "bg-[hsl(var(--admin-accent-green)/0.2)] text-[hsl(var(--admin-accent-green))] border border-[hsl(var(--admin-accent-green)/0.3)]",
               )}>
                 {role || 'Sem função'}
               </span>
@@ -164,18 +167,20 @@ export const AdminSidebar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={handleLogout}
-                className="w-full text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                className="w-full text-[hsl(var(--admin-text-muted))] hover:text-red-400 hover:bg-red-500/10"
               >
                 <LogOut className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right">Sair</TooltipContent>
+            <TooltipContent side="right" className="bg-[hsl(var(--admin-card))] text-white border-[hsl(var(--admin-card-border))]">
+              Sair
+            </TooltipContent>
           </Tooltip>
         ) : (
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="w-full justify-start text-slate-400 hover:text-red-400 hover:bg-red-500/10 gap-2"
+            className="w-full justify-start text-[hsl(var(--admin-text-muted))] hover:text-red-400 hover:bg-red-500/10 gap-2 transition-colors"
           >
             <LogOut className="h-4 w-4" />
             <span>Sair</span>

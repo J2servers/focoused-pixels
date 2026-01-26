@@ -246,7 +246,9 @@ export function useCompanyInfo() {
       const { data, error } = await supabase
         .from('company_info')
         .select('*')
-        .maybeSingle();
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
 
       if (error) {
         console.error('Error fetching company info:', error);

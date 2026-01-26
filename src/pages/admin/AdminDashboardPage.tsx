@@ -155,7 +155,7 @@ const AdminDashboardPage = () => {
     <AdminLayout title="Dashboard">
       <div className="space-y-6">
         {/* Welcome Banner */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-purple-600 to-purple-700 p-6 text-white">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] p-6 text-white shadow-2xl shadow-[hsl(var(--admin-accent-purple)/0.3)]">
           <div className="relative z-10">
             <h2 className="text-2xl font-bold">Bem-vindo ao Painel Administrativo</h2>
             <p className="mt-1 text-white/80 max-w-xl">
@@ -163,8 +163,9 @@ const AdminDashboardPage = () => {
             </p>
           </div>
           <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5" />
-          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10" />
-          <div className="absolute -right-5 bottom-0 h-24 w-24 rounded-full bg-white/10" />
+          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-xl" />
+          <div className="absolute -right-5 bottom-0 h-24 w-24 rounded-full bg-white/10 blur-lg" />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
         </div>
 
         {/* Stats Grid */}
@@ -175,21 +176,21 @@ const AdminDashboardPage = () => {
               to={stat.href}
               className="group"
             >
-              <Card className="h-full overflow-hidden border-0 shadow-sm hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
+              <Card className="h-full overflow-hidden border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-1 group-hover:border-[hsl(var(--admin-accent-purple)/0.3)] admin-glow-border">
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between">
                     <div className={cn(
-                      "p-2.5 rounded-xl bg-gradient-to-br",
+                      "p-2.5 rounded-xl bg-gradient-to-br shadow-lg",
                       stat.color
                     )}>
-                      <stat.icon className="h-5 w-5 text-white" />
+                      <stat.icon className="h-5 w-5 text-white drop-shadow-sm" />
                     </div>
                     {stat.trendUp !== null && (
                       <div className={cn(
                         "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full",
                         stat.trendUp 
-                          ? "bg-emerald-100 text-emerald-700" 
-                          : "bg-amber-100 text-amber-700"
+                          ? "bg-[hsl(var(--admin-accent-green)/0.15)] text-[hsl(var(--admin-accent-green))]" 
+                          : "bg-[hsl(var(--admin-accent-orange)/0.15)] text-[hsl(var(--admin-accent-orange))]"
                       )}>
                         {stat.trendUp ? (
                           <ArrowUpRight className="h-3 w-3" />
@@ -200,21 +201,21 @@ const AdminDashboardPage = () => {
                       </div>
                     )}
                     {stat.trendUp === null && (
-                      <div className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-primary/10 text-primary">
+                      <div className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-[hsl(var(--admin-accent-purple)/0.15)] text-[hsl(var(--admin-accent-purple))]">
                         <Eye className="h-3 w-3" />
                         {stat.trend}
                       </div>
                     )}
                   </div>
                   <div className="mt-4">
-                    <p className="text-2xl font-bold text-foreground">
+                    <p className="text-2xl font-bold text-white">
                       {isLoading ? (
-                        <span className="inline-block w-12 h-7 bg-muted animate-pulse rounded" />
+                        <span className="inline-block w-12 h-7 bg-[hsl(var(--admin-sidebar))] animate-pulse rounded" />
                       ) : (
                         stat.value
                       )}
                     </p>
-                    <p className="text-sm text-muted-foreground mt-0.5">{stat.title}</p>
+                    <p className="text-sm text-[hsl(var(--admin-text-muted))] mt-0.5">{stat.title}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -224,16 +225,16 @@ const AdminDashboardPage = () => {
 
         {/* Tabs para Catálogo vs Financeiro */}
         <Tabs defaultValue="cashflow" className="space-y-6">
-          <TabsList className="bg-muted/50">
-            <TabsTrigger value="cashflow" className="gap-2">
+          <TabsList className="bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))]">
+            <TabsTrigger value="cashflow" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <Wallet className="h-4 w-4" />
               Caixa
             </TabsTrigger>
-            <TabsTrigger value="catalog" className="gap-2">
+            <TabsTrigger value="catalog" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <Package className="h-4 w-4" />
               Catálogo
             </TabsTrigger>
-            <TabsTrigger value="financial" className="gap-2">
+            <TabsTrigger value="financial" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <BarChart3 className="h-4 w-4" />
               Financeiro
             </TabsTrigger>
@@ -242,31 +243,31 @@ const AdminDashboardPage = () => {
           {/* Tab Caixa */}
           <TabsContent value="cashflow" className="space-y-6">
             {/* Filtro de Período */}
-            <Card className="border-0 shadow-sm">
+            <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
               <CardContent className="p-4">
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Período:</span>
+                    <Calendar className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />
+                    <span className="text-sm font-medium text-white">Período:</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="startDate" className="text-sm text-muted-foreground">De</Label>
+                    <Label htmlFor="startDate" className="text-sm text-[hsl(var(--admin-text-muted))]">De</Label>
                     <Input
                       id="startDate"
                       type="date"
                       value={cashStartDate}
                       onChange={(e) => setCashStartDate(e.target.value)}
-                      className="w-auto"
+                      className="w-auto bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white"
                     />
                   </div>
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="endDate" className="text-sm text-muted-foreground">Até</Label>
+                    <Label htmlFor="endDate" className="text-sm text-[hsl(var(--admin-text-muted))]">Até</Label>
                     <Input
                       id="endDate"
                       type="date"
                       value={cashEndDate}
                       onChange={(e) => setCashEndDate(e.target.value)}
-                      className="w-auto"
+                      className="w-auto bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white"
                     />
                   </div>
                 </div>
@@ -291,10 +292,10 @@ const AdminDashboardPage = () => {
           {/* Tab Catálogo */}
           <TabsContent value="catalog" className="space-y-6">
             {/* Quick Actions */}
-            <Card className="border-0 shadow-sm">
+            <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
               <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <TrendingUp className="h-5 w-5 text-primary" />
+                <CardTitle className="flex items-center gap-2 text-lg text-white">
+                  <TrendingUp className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
                   Ações Rápidas
                 </CardTitle>
               </CardHeader>
@@ -304,15 +305,15 @@ const AdminDashboardPage = () => {
                     <Link 
                       key={action.title}
                       to={action.href} 
-                      className="group flex flex-col items-center gap-3 p-5 rounded-xl border border-border/50 bg-card hover:border-primary/30 hover:shadow-md transition-all duration-200"
+                      className="group flex flex-col items-center gap-3 p-5 rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-sidebar))] hover:border-[hsl(var(--admin-accent-purple)/0.5)] hover:shadow-lg hover:shadow-[hsl(var(--admin-accent-purple)/0.1)] transition-all duration-300"
                     >
                       <div className={cn(
-                        "p-3 rounded-xl transition-transform group-hover:scale-110",
+                        "p-3 rounded-xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg",
                         action.color
                       )}>
                         <action.icon className="h-6 w-6" />
                       </div>
-                      <span className="text-sm font-semibold text-foreground">{action.title}</span>
+                      <span className="text-sm font-semibold text-white">{action.title}</span>
                     </Link>
                   ))}
                 </div>
@@ -321,25 +322,25 @@ const AdminDashboardPage = () => {
 
             {/* Activity & Tips Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-0 shadow-sm">
+              <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-lg">Atividade Recente</CardTitle>
+                  <CardTitle className="text-lg text-white">Atividade Recente</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {[
-                      { action: 'Novo orçamento recebido', time: 'há 5 minutos', icon: ShoppingCart, color: 'text-purple-500 bg-purple-500/10' },
-                      { action: 'Produto atualizado', time: 'há 1 hora', icon: Package, color: 'text-blue-500 bg-blue-500/10' },
-                      { action: 'Nova avaliação pendente', time: 'há 2 horas', icon: Star, color: 'text-amber-500 bg-amber-500/10' },
-                      { action: 'Promoção iniciada', time: 'há 3 horas', icon: Percent, color: 'text-orange-500 bg-orange-500/10' },
+                      { action: 'Novo orçamento recebido', time: 'há 5 minutos', icon: ShoppingCart, color: 'text-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.15)]' },
+                      { action: 'Produto atualizado', time: 'há 1 hora', icon: Package, color: 'text-[hsl(var(--admin-accent-blue))] bg-[hsl(var(--admin-accent-blue)/0.15)]' },
+                      { action: 'Nova avaliação pendente', time: 'há 2 horas', icon: Star, color: 'text-[hsl(var(--admin-accent-orange))] bg-[hsl(var(--admin-accent-orange)/0.15)]' },
+                      { action: 'Promoção iniciada', time: 'há 3 horas', icon: Percent, color: 'text-[hsl(var(--admin-accent-pink))] bg-[hsl(var(--admin-accent-pink)/0.15)]' },
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <div key={i} className="flex items-center gap-4 p-3 rounded-lg hover:bg-[hsl(var(--admin-sidebar-hover))] transition-colors">
                         <div className={cn("p-2 rounded-lg", item.color)}>
                           <item.icon className="h-4 w-4" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{item.action}</p>
-                          <p className="text-xs text-muted-foreground">{item.time}</p>
+                          <p className="text-sm font-medium text-white truncate">{item.action}</p>
+                          <p className="text-xs text-[hsl(var(--admin-text-muted))]">{item.time}</p>
                         </div>
                       </div>
                     ))}
@@ -347,27 +348,27 @@ const AdminDashboardPage = () => {
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-sm">
+              <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-lg">Dicas do Sistema</CardTitle>
+                  <CardTitle className="text-lg text-white">Dicas do Sistema</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
-                      <h4 className="font-semibold text-blue-900 text-sm">📦 Otimize suas imagens</h4>
-                      <p className="text-xs text-blue-700 mt-1">
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-[hsl(var(--admin-accent-blue)/0.1)] to-[hsl(var(--admin-accent-cyan)/0.1)] border border-[hsl(var(--admin-accent-blue)/0.2)]">
+                      <h4 className="font-semibold text-[hsl(var(--admin-accent-blue))] text-sm">📦 Otimize suas imagens</h4>
+                      <p className="text-xs text-[hsl(var(--admin-text-muted))] mt-1">
                         Use imagens em formato WebP para melhor performance e SEO.
                       </p>
                     </div>
-                    <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100">
-                      <h4 className="font-semibold text-emerald-900 text-sm">⭐ Responda avaliações</h4>
-                      <p className="text-xs text-emerald-700 mt-1">
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-[hsl(var(--admin-accent-green)/0.1)] to-[hsl(var(--admin-accent-cyan)/0.1)] border border-[hsl(var(--admin-accent-green)/0.2)]">
+                      <h4 className="font-semibold text-[hsl(var(--admin-accent-green))] text-sm">⭐ Responda avaliações</h4>
+                      <p className="text-xs text-[hsl(var(--admin-text-muted))] mt-1">
                         Clientes que recebem respostas têm 70% mais chance de comprar novamente.
                       </p>
                     </div>
-                    <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100">
-                      <h4 className="font-semibold text-amber-900 text-sm">🏷️ Promoções sazonais</h4>
-                      <p className="text-xs text-amber-700 mt-1">
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-[hsl(var(--admin-accent-orange)/0.1)] to-[hsl(var(--admin-accent-pink)/0.1)] border border-[hsl(var(--admin-accent-orange)/0.2)]">
+                      <h4 className="font-semibold text-[hsl(var(--admin-accent-orange))] text-sm">🏷️ Promoções sazonais</h4>
+                      <p className="text-xs text-[hsl(var(--admin-text-muted))] mt-1">
                         Configure promoções com antecedência para datas especiais.
                       </p>
                     </div>
