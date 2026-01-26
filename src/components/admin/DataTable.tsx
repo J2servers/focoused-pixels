@@ -137,7 +137,7 @@ export function DataTable<T>({
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         {searchable && (
           <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
             <Input
               type="search"
               placeholder={searchPlaceholder}
@@ -146,7 +146,7 @@ export function DataTable<T>({
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              className="pl-10 h-10 bg-card border-border/50 focus-visible:ring-1 focus-visible:ring-primary/50"
+              className="pl-10 h-10 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-1 focus-visible:ring-[hsl(var(--admin-accent-purple))]"
             />
           </div>
         )}
@@ -154,16 +154,16 @@ export function DataTable<T>({
       </div>
 
       {/* Table */}
-      <Card className="border-0 shadow-sm overflow-hidden">
+      <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/50">
+            <TableRow className="bg-[hsl(var(--admin-sidebar))] hover:bg-[hsl(var(--admin-sidebar))] border-b border-[hsl(var(--admin-card-border))]">
               {selectable && (
                 <TableHead className="w-12">
                   <Checkbox
                     checked={allSelected}
                     onCheckedChange={handleSelectAll}
-                    className="border-muted-foreground/30"
+                    className="border-[hsl(var(--admin-text-muted))]"
                   />
                 </TableHead>
               )}
@@ -171,8 +171,8 @@ export function DataTable<T>({
                 <TableHead
                   key={column.key}
                   className={cn(
-                    "text-xs font-semibold uppercase tracking-wider text-muted-foreground",
-                    column.sortable && 'cursor-pointer hover:text-foreground transition-colors select-none',
+                    "text-xs font-semibold uppercase tracking-wider text-[hsl(var(--admin-text-muted))]",
+                    column.sortable && 'cursor-pointer hover:text-white transition-colors select-none',
                     column.className
                   )}
                   onClick={() => column.sortable && handleSort(column.key)}
@@ -187,33 +187,33 @@ export function DataTable<T>({
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
+              <TableRow className="hover:bg-transparent">
                 <TableCell 
                   colSpan={columns.length + (selectable ? 1 : 0)} 
                   className="h-40"
                 >
                   <div className="flex flex-col items-center justify-center gap-3">
                     <div className="relative">
-                      <div className="absolute inset-0 rounded-full bg-primary/10 animate-ping" />
-                      <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
+                      <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-purple)/0.3)] animate-ping" />
+                      <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]">
                         <Loader2 className="h-5 w-5 animate-spin text-white" />
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">Carregando dados...</p>
+                    <p className="text-sm text-[hsl(var(--admin-text-muted))]">Carregando dados...</p>
                   </div>
                 </TableCell>
               </TableRow>
             ) : paginatedData.length === 0 ? (
-              <TableRow>
+              <TableRow className="hover:bg-transparent">
                 <TableCell 
                   colSpan={columns.length + (selectable ? 1 : 0)} 
                   className="h-40"
                 >
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                      <Search className="h-5 w-5 text-muted-foreground" />
+                    <div className="w-12 h-12 rounded-full bg-[hsl(var(--admin-sidebar))] flex items-center justify-center">
+                      <Search className="h-5 w-5 text-[hsl(var(--admin-text-muted))]" />
                     </div>
-                    <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+                    <p className="text-sm text-[hsl(var(--admin-text-muted))]">{emptyMessage}</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -226,10 +226,10 @@ export function DataTable<T>({
                   <TableRow
                     key={id}
                     className={cn(
-                      "border-b border-border/30 transition-colors",
+                      "border-b border-[hsl(var(--admin-card-border)/0.5)] transition-colors",
                       onRowClick && 'cursor-pointer',
-                      isSelected && 'bg-primary/5',
-                      !isSelected && 'hover:bg-muted/30'
+                      isSelected && 'bg-[hsl(var(--admin-accent-purple)/0.1)]',
+                      !isSelected && 'hover:bg-[hsl(var(--admin-sidebar-hover))]'
                     )}
                     onClick={() => onRowClick?.(item)}
                   >
@@ -240,12 +240,12 @@ export function DataTable<T>({
                           onCheckedChange={(checked) => 
                             handleSelectItem(id, checked as boolean)
                           }
-                          className="border-muted-foreground/30"
+                          className="border-[hsl(var(--admin-text-muted))]"
                         />
                       </TableCell>
                     )}
                     {columns.map(column => (
-                      <TableCell key={column.key} className={cn("py-3.5", column.className)}>
+                      <TableCell key={column.key} className={cn("py-3.5 text-white", column.className)}>
                         {column.render
                           ? column.render(item)
                           : (item as any)[column.key]}
@@ -262,10 +262,10 @@ export function DataTable<T>({
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between pt-2">
-          <p className="text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">{((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, sortedData.length)}</span>
+          <p className="text-sm text-[hsl(var(--admin-text-muted))]">
+            <span className="font-medium text-white">{((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, sortedData.length)}</span>
             {' '}de{' '}
-            <span className="font-medium text-foreground">{sortedData.length}</span> registros
+            <span className="font-medium text-white">{sortedData.length}</span> registros
           </p>
           <div className="flex items-center gap-1">
             <Button
@@ -273,7 +273,7 @@ export function DataTable<T>({
               size="icon"
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
-              className="h-8 w-8"
+              className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
             >
               <ChevronsLeft className="h-4 w-4" />
             </Button>
@@ -282,7 +282,7 @@ export function DataTable<T>({
               size="icon"
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="h-8 w-8"
+              className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -307,7 +307,9 @@ export function DataTable<T>({
                     onClick={() => setCurrentPage(pageNum)}
                     className={cn(
                       "h-8 w-8 text-sm",
-                      currentPage === pageNum && "bg-primary text-primary-foreground shadow-sm"
+                      currentPage === pageNum 
+                        ? "bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]" 
+                        : "text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
                     )}
                   >
                     {pageNum}
@@ -320,7 +322,7 @@ export function DataTable<T>({
               size="icon"
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="h-8 w-8"
+              className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -329,7 +331,7 @@ export function DataTable<T>({
               size="icon"
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
-              className="h-8 w-8"
+              className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
             >
               <ChevronsRight className="h-4 w-4" />
             </Button>

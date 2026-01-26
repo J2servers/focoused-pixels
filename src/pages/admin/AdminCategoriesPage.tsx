@@ -245,7 +245,7 @@ const AdminCategoriesPage = () => {
         isLoading={isLoading}
         searchPlaceholder="Buscar categorias..."
         actions={
-          <Button onClick={openCreateDialog} disabled={!canEdit()}>
+          <Button onClick={openCreateDialog} disabled={!canEdit()} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)] hover:shadow-xl">
             <Plus className="h-4 w-4 mr-2" />
             Nova Categoria
           </Button>
@@ -254,85 +254,89 @@ const AdminCategoriesPage = () => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-white">
               {selectedCategory ? 'Editar Categoria' : 'Nova Categoria'}
             </DialogTitle>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome *</Label>
+              <Label htmlFor="name" className="text-white">Nome *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))]"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="slug">Slug</Label>
+              <Label htmlFor="slug" className="text-white">Slug</Label>
               <Input
                 id="slug"
                 value={formData.slug}
                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                 placeholder="gerado-automaticamente"
+                className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))]"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Descrição</Label>
+              <Label htmlFor="description" className="text-white">Descrição</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))]"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="parent_id">Categoria Pai</Label>
+                <Label htmlFor="parent_id" className="text-white">Categoria Pai</Label>
                 <Select value={formData.parent_id || 'none'} onValueChange={(v) => setFormData({ ...formData, parent_id: v === 'none' ? '' : v })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white">
                     <SelectValue placeholder="Nenhuma" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Nenhuma</SelectItem>
+                  <SelectContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+                    <SelectItem value="none" className="text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Nenhuma</SelectItem>
                     {categories
                       .filter(c => c.id !== selectedCategory?.id)
                       .map(cat => (
-                        <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                        <SelectItem key={cat.id} value={cat.id} className="text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">{cat.name}</SelectItem>
                       ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="display_order">Ordem</Label>
+                <Label htmlFor="display_order" className="text-white">Ordem</Label>
                 <Input
                   id="display_order"
                   type="number"
                   value={formData.display_order}
                   onChange={(e) => setFormData({ ...formData, display_order: e.target.value })}
+                  className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status" className="text-white">Status</Label>
               <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Ativa</SelectItem>
-                  <SelectItem value="inactive">Inativa</SelectItem>
+                <SelectContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+                  <SelectItem value="active" className="text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Ativa</SelectItem>
+                  <SelectItem value="inactive" className="text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Inativa</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Imagem da Categoria</Label>
+              <Label className="text-white">Imagem da Categoria</Label>
               <ImageUpload
                 value={formData.image_url}
                 onChange={(url) => setFormData({ ...formData, image_url: url || '' })}
@@ -343,10 +347,10 @@ const AdminCategoriesPage = () => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">
               Cancelar
             </Button>
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Salvar
             </Button>
@@ -356,16 +360,16 @@ const AdminCategoriesPage = () => {
 
       {/* Delete Confirmation */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
           <DialogHeader>
-            <DialogTitle>Confirmar exclusão</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
+            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">
               Tem certeza que deseja excluir a categoria "{selectedCategory?.name}"? 
               Esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">
               Cancelar
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isSaving}>
