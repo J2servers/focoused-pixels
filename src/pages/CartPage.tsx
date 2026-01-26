@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { TopBar } from '@/components/layout/TopBar';
 import { MainHeader } from '@/components/layout/MainHeader';
 import { NavigationBar } from '@/components/layout/NavigationBar';
@@ -6,12 +6,13 @@ import { Footer } from '@/components/layout/Footer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Button } from '@/components/ui/button';
-import { Trash2, Minus, Plus, MessageCircle, ShoppingBag, FileText } from 'lucide-react';
+import { Trash2, Minus, Plus, MessageCircle, ShoppingBag, FileText, CreditCard } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { storeInfo } from '@/data/store';
 
 const CartPage = () => {
   const { items, removeItem, updateQuantity, total, clearCart, itemCount } = useCart();
+  const navigate = useNavigate();
 
   const handleCheckoutWhatsApp = () => {
     if (items.length === 0) return;
@@ -23,6 +24,21 @@ const CartPage = () => {
     const message = `Olá! Gostaria de finalizar meu pedido:\n\n${itemsList}\n\n*Total: R$ ${total.toFixed(2)}*\n\nPoderia me ajudar?`;
     
     window.open(`${storeInfo.whatsappLink}?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
+  const handlePayNow = () => {
+    // Store payment data in session for the payment page
+    const paymentData = {
+      orderId: `cart-${Date.now()}`,
+      amount: total,
+      customerName: '',
+      customerEmail: '',
+      customerCpf: '',
+      customerPhone: '',
+      description: `Carrinho com ${itemCount} ${itemCount === 1 ? 'item' : 'itens'}`,
+    };
+    sessionStorage.setItem('pending_payment', JSON.stringify(paymentData));
+    navigate('/pagamento');
   };
 
   const freeShippingRemaining = storeInfo.freeShippingMinimum - total;
@@ -192,10 +208,30 @@ const CartPage = () => {
                   </Link>
 
                   <Button 
+                    onClick={handlePayNow}
+                    size="lg" 
+                    className="w-full font-bold bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    <CreditCard className="h-5 w-5 mr-2" />
+                    Pagar Agora
+                  </Button>
+
+                  <Link to="/checkout">
+                    <Button 
+                      size="lg" 
+                      variant="outline"
+                      className="w-full font-bold"
+                    >
+                      <FileText className="h-5 w-5 mr-2" />
+                      Solicitar Orçamento
+                    </Button>
+                  </Link>
+
+                  <Button 
                     onClick={handleCheckoutWhatsApp}
                     size="lg" 
-                    variant="outline"
-                    className="w-full font-bold border-success text-success hover:bg-success hover:text-success-foreground"
+                    variant="ghost"
+                    className="w-full font-bold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                   >
                     <MessageCircle className="h-5 w-5 mr-2" />
                     Comprar via WhatsApp

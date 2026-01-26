@@ -160,6 +160,7 @@ export function useSiteSettings() {
     // Integrations
     whatsappMessageTemplate: settings?.whatsapp_message_template || 'Olá! Gostaria de saber mais sobre os produtos.',
     whatsapp: settings?.whatsapp || '',
+    email: settings?.email || '',
     freeShippingMinimum: settings?.free_shipping_minimum || 159,
     
     // Store info

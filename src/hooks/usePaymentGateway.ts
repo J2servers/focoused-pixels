@@ -9,14 +9,23 @@ interface PaymentItem {
 }
 
 interface MercadoPagoPaymentRequest {
-  action: 'create_preference' | 'create_pix' | 'check_status' | 'test_connection';
+  action: 'create_preference' | 'create_pix' | 'create_boleto' | 'create_card_payment' | 'check_status' | 'test_connection' | 'get_installments' | 'get_payment_methods';
   orderId?: string;
   amount?: number;
   description?: string;
   payerEmail?: string;
   payerName?: string;
+  payerCpf?: string;
+  payerPhone?: string;
   paymentId?: string;
   items?: PaymentItem[];
+  // Card payment specific
+  token?: string;
+  installments?: number;
+  issuerId?: string;
+  paymentMethodId?: string;
+  // For installments
+  bin?: string;
 }
 
 interface EfiPaymentRequest {
@@ -117,6 +126,64 @@ export function useCreateMercadoPagoPix() {
         description,
         payerEmail,
         payerName,
+      });
+    },
+  });
+}
+
+export function useCreateMercadoPagoBoleto() {
+  const mutation = useMercadoPago();
+  
+  return useMutation({
+    mutationFn: async ({ orderId, amount, description, payerEmail, payerName, payerCpf }: {
+      orderId: string;
+      amount: number;
+      description?: string;
+      payerEmail: string;
+      payerName: string;
+      payerCpf: string;
+    }) => {
+      return mutation.mutateAsync({
+        action: 'create_boleto',
+        orderId,
+        amount,
+        description,
+        payerEmail,
+        payerName,
+        payerCpf,
+      });
+    },
+  });
+}
+
+export function useCreateMercadoPagoCardPayment() {
+  const mutation = useMercadoPago();
+  
+  return useMutation({
+    mutationFn: async ({ orderId, amount, description, payerEmail, payerName, payerCpf, token, installments, paymentMethodId, issuerId }: {
+      orderId: string;
+      amount: number;
+      description?: string;
+      payerEmail: string;
+      payerName?: string;
+      payerCpf?: string;
+      token: string;
+      installments: number;
+      paymentMethodId: string;
+      issuerId?: string;
+    }) => {
+      return mutation.mutateAsync({
+        action: 'create_card_payment',
+        orderId,
+        amount,
+        description,
+        payerEmail,
+        payerName,
+        payerCpf,
+        token,
+        installments,
+        paymentMethodId,
+        issuerId,
       });
     },
   });
