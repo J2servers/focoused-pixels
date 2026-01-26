@@ -36,7 +36,9 @@ async function getPaymentConfig(supabaseClient: any): Promise<StripeConfig> {
   const { data, error } = await supabaseClient
     .from("company_info")
     .select("stripe_enabled, stripe_public_key, stripe_secret_key, stripe_sandbox")
-    .maybeSingle();
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .single();
 
   if (error) throw new Error("Failed to get payment config: " + error.message);
   

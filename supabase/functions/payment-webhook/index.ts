@@ -49,7 +49,9 @@ serve(async (req) => {
         const { data: config } = await supabase
           .from("company_info")
           .select("mercadopago_access_token")
-          .maybeSingle();
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .single();
 
         if (config?.mercadopago_access_token) {
           const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
