@@ -202,7 +202,7 @@ const AdminReviewsPage = () => {
   return (
     <AdminLayout title="Avaliações" requireEditor>
       <div className="mb-4">
-        <Badge variant="secondary" className="text-sm">
+        <Badge variant="secondary" className="text-sm bg-[hsl(var(--admin-accent-orange)/0.2)] text-[hsl(var(--admin-accent-orange))] border border-[hsl(var(--admin-accent-orange)/0.3)]">
           {pendingCount} avaliações pendentes de moderação
         </Badge>
       </div>
@@ -216,52 +216,52 @@ const AdminReviewsPage = () => {
 
       {/* View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
           <DialogHeader>
-            <DialogTitle>Detalhes da Avaliação</DialogTitle>
+            <DialogTitle className="text-white">Detalhes da Avaliação</DialogTitle>
           </DialogHeader>
 
           {selectedReview && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Produto</p>
-                  <p className="font-medium">{selectedReview.product_slug}</p>
+                  <p className="text-sm text-[hsl(var(--admin-text-muted))]">Produto</p>
+                  <p className="font-medium text-white">{selectedReview.product_slug}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Cliente</p>
-                  <p className="font-medium">{selectedReview.customer_name}</p>
-                  <p className="text-sm text-muted-foreground">{selectedReview.customer_email}</p>
+                  <p className="text-sm text-[hsl(var(--admin-text-muted))]">Cliente</p>
+                  <p className="font-medium text-white">{selectedReview.customer_name}</p>
+                  <p className="text-sm text-[hsl(var(--admin-text-muted))]">{selectedReview.customer_email}</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Avaliação</p>
+                <p className="text-sm text-[hsl(var(--admin-text-muted))] mb-1">Avaliação</p>
                 <ReviewStars rating={selectedReview.rating} size="md" />
               </div>
 
               {selectedReview.title && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Título</p>
-                  <p className="font-medium">{selectedReview.title}</p>
+                  <p className="text-sm text-[hsl(var(--admin-text-muted))]">Título</p>
+                  <p className="font-medium text-white">{selectedReview.title}</p>
                 </div>
               )}
 
               <div>
-                <p className="text-sm text-muted-foreground">Comentário</p>
-                <p className="mt-1">{selectedReview.comment}</p>
+                <p className="text-sm text-[hsl(var(--admin-text-muted))]">Comentário</p>
+                <p className="mt-1 text-white">{selectedReview.comment}</p>
               </div>
 
               {selectedReview.images && selectedReview.images.length > 0 && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-2">Imagens</p>
+                  <p className="text-sm text-[hsl(var(--admin-text-muted))] mb-2">Imagens</p>
                   <div className="flex gap-2 flex-wrap">
                     {selectedReview.images.map((img, i) => (
                       <img 
                         key={i} 
                         src={img} 
                         alt={`Imagem ${i + 1}`}
-                        className="w-24 h-24 object-cover rounded-lg border"
+                        className="w-24 h-24 object-cover rounded-lg border border-[hsl(var(--admin-card-border))]"
                       />
                     ))}
                   </div>
@@ -269,22 +269,22 @@ const AdminReviewsPage = () => {
               )}
 
               <div className="flex items-center gap-4">
-                <Badge variant={selectedReview.is_approved ? 'default' : 'secondary'}>
+                <Badge variant={selectedReview.is_approved ? 'default' : 'secondary'} className={selectedReview.is_approved ? "bg-[hsl(var(--admin-accent-green))] text-white" : "bg-[hsl(var(--admin-accent-orange)/0.2)] text-[hsl(var(--admin-accent-orange))]"}>
                   {selectedReview.is_approved ? 'Aprovada' : 'Pendente'}
                 </Badge>
                 {selectedReview.is_verified_purchase && (
-                  <Badge variant="outline">Compra Verificada</Badge>
+                  <Badge variant="outline" className="border-[hsl(var(--admin-accent-blue))] text-[hsl(var(--admin-accent-blue))]">Compra Verificada</Badge>
                 )}
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">
               Fechar
             </Button>
             {selectedReview && !selectedReview.is_approved && (
-              <Button onClick={() => { handleApprove(selectedReview); setIsViewDialogOpen(false); }}>
+              <Button onClick={() => { handleApprove(selectedReview); setIsViewDialogOpen(false); }} className="bg-gradient-to-r from-[hsl(var(--admin-accent-green))] to-emerald-600 text-white">
                 Aprovar
               </Button>
             )}
@@ -294,15 +294,15 @@ const AdminReviewsPage = () => {
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
           <DialogHeader>
-            <DialogTitle>Confirmar exclusão</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
+            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">
               Tem certeza que deseja excluir esta avaliação? Esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">
               Cancelar
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isProcessing}>

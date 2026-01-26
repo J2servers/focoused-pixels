@@ -293,7 +293,7 @@ const AdminProductsPage = () => {
         isLoading={isLoading}
         searchPlaceholder="Buscar produtos..."
         actions={
-          <Button onClick={openCreateDialog} disabled={!canEdit()}>
+          <Button onClick={openCreateDialog} disabled={!canEdit()} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)] hover:shadow-xl">
             <Plus className="h-4 w-4 mr-2" />
             Novo Produto
           </Button>
@@ -302,9 +302,9 @@ const AdminProductsPage = () => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-white">
               {selectedProduct ? 'Editar Produto' : 'Novo Produto'}
             </DialogTitle>
           </DialogHeader>
@@ -312,10 +312,10 @@ const AdminProductsPage = () => {
           <div className="grid gap-6 py-4">
             {/* Seção: Informações Básicas */}
             <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                 📋 Informações Básicas
               </h3>
-              <p className="text-xs text-muted-foreground">Dados principais que identificam o produto</p>
+              <p className="text-xs text-[hsl(var(--admin-text-muted))]">Dados principais que identificam o produto</p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">

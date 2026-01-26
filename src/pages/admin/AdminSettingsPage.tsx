@@ -114,8 +114,8 @@ const AdminSettingsPage = () => {
         {/* Save Button - Fixed at top */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Central de Configurações</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-lg font-semibold text-white">Central de Configurações</h2>
+            <p className="text-sm text-[hsl(var(--admin-text-muted))]">
               Gerencie todas as configurações do site em um só lugar
             </p>
           </div>
@@ -123,6 +123,7 @@ const AdminSettingsPage = () => {
             onClick={handleSaveSettings} 
             disabled={updateCompany.isPending || !canEdit()}
             size="lg"
+            className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)] hover:shadow-xl"
           >
             {updateCompany.isPending ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -134,47 +135,47 @@ const AdminSettingsPage = () => {
         </div>
 
         <Tabs defaultValue="payments" className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 h-auto p-2">
-            <TabsTrigger value="payments" className="flex items-center gap-2">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 h-auto p-2 bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))]">
+            <TabsTrigger value="payments" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <CreditCard className="h-4 w-4" />
               <span className="hidden sm:inline">Pagamentos</span>
             </TabsTrigger>
-            <TabsTrigger value="checkout" className="flex items-center gap-2">
+            <TabsTrigger value="checkout" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <ShoppingCart className="h-4 w-4" />
               <span className="hidden sm:inline">Checkout</span>
             </TabsTrigger>
-            <TabsTrigger value="shipping" className="flex items-center gap-2">
+            <TabsTrigger value="shipping" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <Truck className="h-4 w-4" />
               <span className="hidden sm:inline">Frete</span>
             </TabsTrigger>
-            <TabsTrigger value="seo" className="flex items-center gap-2">
+            <TabsTrigger value="seo" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <Search className="h-4 w-4" />
               <span className="hidden sm:inline">SEO</span>
             </TabsTrigger>
-            <TabsTrigger value="appearance" className="flex items-center gap-2">
+            <TabsTrigger value="appearance" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">Aparência</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 h-auto p-2">
-            <TabsTrigger value="ai" className="flex items-center gap-2">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 h-auto p-2 bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))]">
+            <TabsTrigger value="ai" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <Bot className="h-4 w-4" />
               <span className="hidden sm:inline">IA</span>
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
+            <TabsTrigger value="notifications" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <Bell className="h-4 w-4" />
               <span className="hidden sm:inline">Alertas</span>
             </TabsTrigger>
-            <TabsTrigger value="maintenance" className="flex items-center gap-2">
+            <TabsTrigger value="maintenance" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <AlertTriangle className="h-4 w-4" />
               <span className="hidden sm:inline">Manutenção</span>
             </TabsTrigger>
-            <TabsTrigger value="legal" className="flex items-center gap-2">
+            <TabsTrigger value="legal" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <Shield className="h-4 w-4" />
               <span className="hidden sm:inline">LGPD</span>
             </TabsTrigger>
-            <TabsTrigger value="account" className="flex items-center gap-2">
+            <TabsTrigger value="account" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">Conta</span>
             </TabsTrigger>
