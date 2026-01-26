@@ -50,12 +50,13 @@ export const AdminLayout = ({
       <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--admin-bg))]">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-            <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
-              <Loader2 className="h-6 w-6 animate-spin text-white" />
+            <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-purple)/0.3)] animate-ping" />
+            <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-pink)/0.2)] animate-pulse delay-75" />
+            <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]">
+              <Loader2 className="h-7 w-7 animate-spin text-white" />
             </div>
           </div>
-          <p className="text-sm text-muted-foreground font-medium">Carregando...</p>
+          <p className="text-sm text-[hsl(var(--admin-text-muted))] font-medium">Carregando...</p>
         </div>
       </div>
     );
@@ -66,7 +67,7 @@ export const AdminLayout = ({
   }
 
   return (
-    <div className="min-h-screen flex bg-[hsl(var(--admin-bg))]">
+    <div className="min-h-screen flex admin-dark bg-[hsl(var(--admin-bg))]">
       <AdminSidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <AdminHeader title={title} />

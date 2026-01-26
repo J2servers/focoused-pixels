@@ -50,18 +50,23 @@
     --success: 142 76% 36%;
     --whatsapp: 142 70% 45%;
 
-    /* Admin Panel Tokens */
-    --admin-bg: 220 20% 97%;
-    --admin-sidebar: 230 25% 15%;
-    --admin-sidebar-hover: 230 25% 20%;
-    --admin-sidebar-active: 280 70% 50%;
-    --admin-header: 0 0% 100%;
-    --admin-card: 0 0% 100%;
-    --admin-accent-blue: 217 91% 60%;
-    --admin-accent-green: 142 71% 45%;
-    --admin-accent-orange: 24 95% 53%;
-    --admin-accent-purple: 280 70% 55%;
-    --admin-accent-pink: 330 81% 60%;
+    /* Admin Panel Tokens - Vivid Dark Theme */
+    --admin-bg: 250 25% 8%;
+    --admin-sidebar: 255 30% 6%;
+    --admin-sidebar-hover: 255 30% 12%;
+    --admin-sidebar-active: 280 85% 55%;
+    --admin-header: 250 25% 10%;
+    --admin-card: 250 25% 12%;
+    --admin-card-border: 255 20% 18%;
+    --admin-accent-blue: 210 100% 60%;
+    --admin-accent-green: 160 100% 45%;
+    --admin-accent-orange: 30 100% 55%;
+    --admin-accent-purple: 280 90% 60%;
+    --admin-accent-pink: 340 100% 65%;
+    --admin-accent-cyan: 185 100% 50%;
+    --admin-text: 0 0% 98%;
+    --admin-text-muted: 250 15% 60%;
+    --admin-glow: 280 100% 65%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -102,13 +107,22 @@
     --input: 270 20% 20%;
     --ring: 280 70% 55%;
 
-    --admin-bg: 230 25% 10%;
-    --admin-sidebar: 230 30% 8%;
-    --admin-sidebar-hover: 230 25% 15%;
-    --admin-sidebar-active: 280 70% 50%;
-    --admin-header: 230 25% 12%;
-    --admin-card: 230 25% 14%;
-
+    --admin-bg: 250 25% 8%;
+    --admin-sidebar: 255 30% 6%;
+    --admin-sidebar-hover: 255 30% 12%;
+    --admin-sidebar-active: 280 85% 55%;
+    --admin-header: 250 25% 10%;
+    --admin-card: 250 25% 12%;
+    --admin-card-border: 255 20% 18%;
+    --admin-accent-blue: 210 100% 60%;
+    --admin-accent-green: 160 100% 45%;
+    --admin-accent-orange: 30 100% 55%;
+    --admin-accent-purple: 280 90% 60%;
+    --admin-accent-pink: 340 100% 65%;
+    --admin-accent-cyan: 185 100% 50%;
+    --admin-text: 0 0% 98%;
+    --admin-text-muted: 250 15% 60%;
+    --admin-glow: 280 100% 65%;
     --sidebar-background: 270 20% 10%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 280 70% 55%;
@@ -152,46 +166,103 @@
     box-shadow: 0 8px 30px -4px hsl(280 70% 43% / 0.15);
   }
 
-  /* Admin Panel Utilities */
+  /* Admin Panel Utilities - Vivid Dark Theme */
   .admin-gradient-sidebar {
-    background: linear-gradient(180deg, hsl(230 25% 15%) 0%, hsl(230 30% 12%) 100%);
+    background: linear-gradient(180deg, hsl(255 30% 6%) 0%, hsl(260 35% 4%) 100%);
+  }
+
+  .admin-dark {
+    --background: var(--admin-bg);
+    --foreground: var(--admin-text);
+    --card: var(--admin-card);
+    --card-foreground: var(--admin-text);
+    --muted: 250 20% 15%;
+    --muted-foreground: var(--admin-text-muted);
+    --border: var(--admin-card-border);
+    --input: 250 20% 15%;
   }
 
   .admin-stat-card {
     @apply relative overflow-hidden;
+    background: linear-gradient(135deg, hsl(var(--admin-card)) 0%, hsl(250 25% 14%) 100%);
+    border: 1px solid hsl(var(--admin-card-border));
   }
 
   .admin-stat-card::before {
     content: '';
-    @apply absolute top-0 right-0 w-24 h-24 rounded-full opacity-10;
+    @apply absolute top-0 right-0 w-32 h-32 rounded-full opacity-20;
     transform: translate(30%, -30%);
+    filter: blur(20px);
   }
 
   .admin-stat-blue::before {
-    background: hsl(217 91% 60%);
+    background: hsl(210 100% 60%);
   }
 
   .admin-stat-green::before {
-    background: hsl(142 71% 45%);
+    background: hsl(160 100% 45%);
   }
 
   .admin-stat-orange::before {
-    background: hsl(24 95% 53%);
+    background: hsl(30 100% 55%);
   }
 
   .admin-stat-purple::before {
-    background: hsl(280 70% 55%);
+    background: hsl(280 90% 60%);
   }
 
   .admin-stat-pink::before {
-    background: hsl(330 81% 60%);
+    background: hsl(340 100% 65%);
+  }
+
+  .admin-stat-cyan::before {
+    background: hsl(185 100% 50%);
   }
 
   .admin-card-hover {
-    @apply transition-all duration-200;
+    @apply transition-all duration-300;
+    border: 1px solid hsl(var(--admin-card-border));
   }
 
   .admin-card-hover:hover {
-    @apply shadow-lg -translate-y-0.5;
+    @apply shadow-2xl -translate-y-1;
+    box-shadow: 0 20px 40px -15px hsl(280 100% 50% / 0.15);
+    border-color: hsl(280 80% 50% / 0.3);
+  }
+
+  .admin-glow-border {
+    position: relative;
+  }
+
+  .admin-glow-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(280 90% 60%) 0%, hsl(340 100% 65%) 50%, hsl(210 100% 60%) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .admin-glow-border:hover::before {
+    opacity: 1;
+  }
+
+  .admin-gradient-text {
+    background: linear-gradient(135deg, hsl(280 90% 65%) 0%, hsl(340 100% 70%) 50%, hsl(210 100% 65%) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .admin-glass {
+    background: hsl(var(--admin-card) / 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--admin-card-border) / 0.5);
   }
 }
