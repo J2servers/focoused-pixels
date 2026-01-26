@@ -31,7 +31,9 @@ async function getPaymentConfig(supabaseClient: any): Promise<EfiConfig> {
   const { data, error } = await supabaseClient
     .from("company_info")
     .select("efi_enabled, efi_client_id, efi_client_secret, efi_sandbox, efi_pix_key")
-    .maybeSingle();
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .single();
 
   if (error) throw new Error("Failed to get payment config: " + error.message);
   

@@ -64,7 +64,9 @@ async function getPaymentConfig(supabaseClient: any): Promise<MercadoPagoConfig>
       min_installment_value,
       boleto_extra_days
     `)
-    .maybeSingle();
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .single();
 
   if (error) throw new Error("Failed to get payment config: " + error.message);
   
