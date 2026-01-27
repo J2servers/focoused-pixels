@@ -18,6 +18,7 @@ import AboutPage from "./pages/AboutPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import FAQPage from "./pages/FAQPage";
+import TrackingPage from "./pages/TrackingPage";
 import NotFound from "./pages/NotFound";
 
 // Payment Pages
@@ -73,6 +74,7 @@ const App = () => (
               <Route path="/privacidade" element={<PrivacyPage />} />
               <Route path="/termos" element={<TermsPage />} />
               <Route path="/faq" element={<FAQPage />} />
+              <Route path="/rastreio" element={<TrackingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/cadastro" element={<RegisterPage />} />
               {/* Admin Routes */}
