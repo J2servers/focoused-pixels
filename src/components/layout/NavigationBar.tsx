@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
-import { categories } from '@/data/products';
+import { useCategories } from '@/hooks/useProducts';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,13 +8,40 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useMemo } from 'react';
 
 export function NavigationBar() {
+  const { data: categories = [], isLoading } = useCategories();
+
+  // Build hierarchy: parent categories with their subcategories
+  const categoryTree = useMemo(() => {
+    const parentCategories = categories.filter(c => !c.parent_id);
+    return parentCategories.map(parent => ({
+      ...parent,
+      subcategories: categories.filter(c => c.parent_id === parent.id)
+    }));
+  }, [categories]);
+
+  if (isLoading) {
+    return (
+      <nav className="bg-background border-b border-border hidden lg:block">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-2 h-12">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-8 w-24" />
+            ))}
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
   return (
     <nav className="bg-background border-b border-border hidden lg:block">
       <div className="container mx-auto px-4">
         <div className="flex items-center flex-wrap">
-          {categories.map((category) => (
+          {categoryTree.map((category) => (
             <div key={category.id} className="relative">
               {category.subcategories && category.subcategories.length > 0 ? (
                 <DropdownMenu>

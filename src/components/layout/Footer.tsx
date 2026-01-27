@@ -2,11 +2,21 @@ import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Youtube, Mail, Phone, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { storeInfo } from '@/data/store';
-import { categories } from '@/data/products';
+import { useCategories } from '@/hooks/useProducts';
 import logo from '@/assets/logo-pincel-de-luz.png';
+import { useMemo } from 'react';
 
 export function Footer() {
+  const { data: categories = [], isLoading } = useCategories();
+
+  // Filter only parent categories for the footer
+  const parentCategories = useMemo(() => 
+    categories.filter(c => !c.parent_id).slice(0, 6), 
+    [categories]
+  );
+
   return (
     <footer className="bg-muted mt-16">
       {/* Newsletter */}
@@ -79,16 +89,24 @@ export function Footer() {
           <div>
             <h4 className="font-bold text-lg mb-4">Categorias</h4>
             <ul className="space-y-2">
-              {categories.slice(0, 6).map((category) => (
-                <li key={category.id}>
-                  <Link 
-                    to={`/categoria/${category.slug}`}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {category.name}
-                  </Link>
-                </li>
-              ))}
+              {isLoading ? (
+                [...Array(6)].map((_, i) => (
+                  <li key={i}>
+                    <Skeleton className="h-5 w-24" />
+                  </li>
+                ))
+              ) : (
+                parentCategories.map((category) => (
+                  <li key={category.id}>
+                    <Link 
+                      to={`/categoria/${category.slug}`}
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {category.name}
+                    </Link>
+                  </li>
+                ))
+              )}
             </ul>
           </div>
 

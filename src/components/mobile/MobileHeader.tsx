@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, X, Bell, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
+import { useCategories } from '@/hooks/useProducts';
 import logoPincel from '@/assets/logo-pincel-de-luz.png';
 import {
   Sheet,
@@ -13,13 +15,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { categories } from '@/data/products';
 
 export function MobileHeader() {
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { data: company } = useCompanyInfo();
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+
+  // Filter only parent categories for the mobile menu
+  const parentCategories = useMemo(() => 
+    categories.filter(c => !c.parent_id), 
+    [categories]
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,15 +53,21 @@ export function MobileHeader() {
               <SheetTitle className="text-left">Menu</SheetTitle>
             </SheetHeader>
             <nav className="p-4 space-y-1">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  to={`/categoria/${cat.slug}`}
-                  className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-secondary transition-colors"
-                >
-                  <span className="font-medium">{cat.name}</span>
-                </Link>
-              ))}
+              {categoriesLoading ? (
+                [...Array(6)].map((_, i) => (
+                  <Skeleton key={i} className="h-12 w-full rounded-lg" />
+                ))
+              ) : (
+                parentCategories.map((cat) => (
+                  <Link
+                    key={cat.id}
+                    to={`/categoria/${cat.slug}`}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-secondary transition-colors"
+                  >
+                    <span className="font-medium">{cat.name}</span>
+                  </Link>
+                ))
+              )}
               <div className="pt-4 border-t mt-4">
                 <Link
                   to="/sobre"

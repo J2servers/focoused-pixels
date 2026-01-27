@@ -2,12 +2,21 @@ import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Youtube, Mail, Phone, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
-import { categories } from '@/data/products';
+import { useCategories } from '@/hooks/useProducts';
 import logoPincelDeLuz from '@/assets/logo-pincel-de-luz.png';
+import { useMemo } from 'react';
 
 export function DynamicFooter() {
   const { data: company } = useCompanyInfo();
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+
+  // Filter only parent categories for the footer
+  const parentCategories = useMemo(() => 
+    categories.filter(c => !c.parent_id).slice(0, 6), 
+    [categories]
+  );
 
   const footerLogo = company?.footer_logo || logoPincelDeLuz;
 
@@ -89,13 +98,21 @@ export function DynamicFooter() {
           <div>
             <h4 className="font-bold mb-4">Categorias</h4>
             <ul className="space-y-2 text-sm">
-              {categories.slice(0, 6).map((category) => (
-                <li key={category.id}>
-                  <Link to={`/categoria/${category.slug}`} className="text-muted-foreground hover:text-primary transition-colors">
-                    {category.name}
-                  </Link>
-                </li>
-              ))}
+              {categoriesLoading ? (
+                [...Array(6)].map((_, i) => (
+                  <li key={i}>
+                    <Skeleton className="h-5 w-24" />
+                  </li>
+                ))
+              ) : (
+                parentCategories.map((category) => (
+                  <li key={category.id}>
+                    <Link to={`/categoria/${category.slug}`} className="text-muted-foreground hover:text-primary transition-colors">
+                      {category.name}
+                    </Link>
+                  </li>
+                ))
+              )}
             </ul>
           </div>
 

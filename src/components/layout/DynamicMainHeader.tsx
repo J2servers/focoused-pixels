@@ -1,19 +1,30 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, User, ShoppingCart, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useCart } from '@/hooks/useCart';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
-import { categories } from '@/data/products';
+import { useCategories } from '@/hooks/useProducts';
 import logoPincelDeLuz from '@/assets/logo-pincel-de-luz.png';
 
 export function DynamicMainHeader() {
   const navigate = useNavigate();
   const { itemCount } = useCart();
   const { data: company } = useCompanyInfo();
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Build hierarchy: parent categories with their subcategories
+  const categoryTree = useMemo(() => {
+    const parentCategories = categories.filter(c => !c.parent_id);
+    return parentCategories.map(parent => ({
+      ...parent,
+      subcategories: categories.filter(c => c.parent_id === parent.id)
+    }));
+  }, [categories]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,16 +76,22 @@ export function DynamicMainHeader() {
 
                 {/* Mobile Categories */}
                 <nav className="flex flex-col gap-2">
-                  {categories.map((category) => (
-                    <SheetClose key={category.id} asChild>
-                      <Link 
-                        to={`/categoria/${category.slug}`}
-                        className="py-2 px-3 rounded-md hover:bg-secondary transition-colors font-medium"
-                      >
-                        {category.name}
-                      </Link>
-                    </SheetClose>
-                  ))}
+                  {categoriesLoading ? (
+                    [...Array(5)].map((_, i) => (
+                      <Skeleton key={i} className="h-10 w-full" />
+                    ))
+                  ) : (
+                    categoryTree.map((category) => (
+                      <SheetClose key={category.id} asChild>
+                        <Link 
+                          to={`/categoria/${category.slug}`}
+                          className="py-2 px-3 rounded-md hover:bg-secondary transition-colors font-medium"
+                        >
+                          {category.name}
+                        </Link>
+                      </SheetClose>
+                    ))
+                  )}
                 </nav>
 
                 {/* Mobile Links */}
