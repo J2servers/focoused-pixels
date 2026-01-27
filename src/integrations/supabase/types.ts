@@ -664,9 +664,11 @@ export type Database = {
           payment_method: string | null
           payment_status: string | null
           quote_id: string | null
+          shipping_company: string | null
           shipping_cost: number | null
           subtotal: number
           total: number
+          tracking_code: string | null
           updated_at: string
         }
         Insert: {
@@ -683,9 +685,11 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string | null
           quote_id?: string | null
+          shipping_company?: string | null
           shipping_cost?: number | null
           subtotal?: number
           total?: number
+          tracking_code?: string | null
           updated_at?: string
         }
         Update: {
@@ -702,9 +706,11 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string | null
           quote_id?: string | null
+          shipping_company?: string | null
           shipping_cost?: number | null
           subtotal?: number
           total?: number
+          tracking_code?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1057,6 +1063,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      tracking_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_date: string | null
+          id: string
+          location: string | null
+          order_id: string | null
+          raw_data: Json | null
+          status: string
+          tracking_code: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          location?: string | null
+          order_id?: string | null
+          raw_data?: Json | null
+          status: string
+          tracking_code: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          location?: string | null
+          order_id?: string | null
+          raw_data?: Json | null
+          status?: string
+          tracking_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tracking_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
