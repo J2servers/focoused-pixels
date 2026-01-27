@@ -1,16 +1,27 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, User, ShoppingCart, Menu, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { categories } from '@/data/products';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useCategories } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import logo from '@/assets/logo-pincel-de-luz.png';
 
 export function MainHeader() {
   const [searchQuery, setSearchQuery] = useState('');
   const { itemCount } = useCart();
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+
+  // Build hierarchy: parent categories with their subcategories
+  const categoryTree = useMemo(() => {
+    const parentCategories = categories.filter(c => !c.parent_id);
+    return parentCategories.map(parent => ({
+      ...parent,
+      subcategories: categories.filter(c => c.parent_id === parent.id)
+    }));
+  }, [categories]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,29 +46,35 @@ export function MainHeader() {
                 <Link to="/" className="text-lg font-semibold text-primary hover:underline">
                   Home
                 </Link>
-                {categories.map((category) => (
-                  <div key={category.id}>
-                    <Link 
-                      to={`/categoria/${category.slug}`}
-                      className="text-lg font-medium hover:text-primary transition-colors"
-                    >
-                      {category.name}
-                    </Link>
-                    {category.subcategories && (
-                      <div className="ml-4 mt-2 flex flex-col gap-2">
-                        {category.subcategories.map((sub) => (
-                          <Link
-                            key={sub.id}
-                            to={`/categoria/${category.slug}/${sub.slug}`}
-                            className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                          >
-                            {sub.name}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {categoriesLoading ? (
+                  [...Array(5)].map((_, i) => (
+                    <Skeleton key={i} className="h-6 w-32" />
+                  ))
+                ) : (
+                  categoryTree.map((category) => (
+                    <div key={category.id}>
+                      <Link 
+                        to={`/categoria/${category.slug}`}
+                        className="text-lg font-medium hover:text-primary transition-colors"
+                      >
+                        {category.name}
+                      </Link>
+                      {category.subcategories && category.subcategories.length > 0 && (
+                        <div className="ml-4 mt-2 flex flex-col gap-2">
+                          {category.subcategories.map((sub) => (
+                            <Link
+                              key={sub.id}
+                              to={`/categoria/${category.slug}/${sub.slug}`}
+                              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                            >
+                              {sub.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
                 <Link to="/rastreio" className="text-lg font-medium hover:text-primary transition-colors">
                   Rastreio
                 </Link>
