@@ -4,6 +4,7 @@
  * Provedor global que aplica configurações dinâmicas do admin ao site:
  * - Injeta CSS customizado
  * - Atualiza cores do tema via CSS variables
+ * - Aplica tema claro/escuro baseado na configuração do admin
  * - Carrega scripts de analytics (GA, GTM, Facebook Pixel)
  * - Atualiza meta tags SEO dinamicamente
  * - Renderiza página de manutenção quando ativo
@@ -25,6 +26,29 @@ export function SiteSettingsProvider({ children }: SiteSettingsProviderProps) {
   // Check if current route is admin
   const isAdminRoute = location.pathname.startsWith('/admin');
 
+  // Apply dark mode based on admin settings
+  useEffect(() => {
+    if (settings.isLoading) return;
+    
+    // Don't apply storefront theme to admin routes (admin has its own theme)
+    if (isAdminRoute) return;
+
+    const root = document.documentElement;
+    
+    if (settings.darkModeEnabled) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+
+    return () => {
+      // Don't cleanup if navigating to admin
+      if (!isAdminRoute) {
+        root.classList.remove('dark');
+      }
+    };
+  }, [settings.darkModeEnabled, settings.isLoading, isAdminRoute]);
+
   // Apply dynamic CSS variables for theme colors
   useEffect(() => {
     if (settings.isLoading) return;
@@ -33,7 +57,7 @@ export function SiteSettingsProvider({ children }: SiteSettingsProviderProps) {
 
     // Convert hex to HSL for Tailwind compatibility
     const hexToHSL = (hex: string): string => {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
       if (!result) return '0 0% 0%';
 
       let r = parseInt(result[1], 16) / 255;
