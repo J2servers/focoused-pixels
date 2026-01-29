@@ -125,116 +125,114 @@ const Index = () => {
 
       <main className="flex-1">
         {/* Hero Carousel */}
-        <section className="relative h-[300px] sm:h-[400px] lg:h-[500px] overflow-hidden bg-gradient-purple">
-          {slidesLoading ? (
-            <Skeleton className="w-full h-full" />
-          ) : heroSlides.length > 0 ? (
-            <>
-              <AnimatePresence mode="wait">
-                {heroSlides.map((slide, index) => (
-                  index === currentSlide && (
-                    <motion.div
-                      key={slide.id}
-                      initial={{ opacity: 0, scale: 1.1 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.7, ease: 'easeOut' }}
-                      className="absolute inset-0"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/60" />
-                      <motion.img
-                        src={slide.desktop_image}
-                        alt={slide.title || 'Banner'}
-                        className="w-full h-full object-cover"
-                        initial={{ scale: 1.2 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 6, ease: 'linear' }}
-                      />
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="container mx-auto px-4">
-                          <div className={`max-w-xl ${slide.theme === 'light' ? 'text-black' : 'text-white'}`}>
-                            {slide.title && (
-                              <motion.h2 
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3, duration: 0.5 }}
-                                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-2"
-                              >
-                                {slide.title}
-                              </motion.h2>
-                            )}
-                            {slide.subtitle && (
-                              <motion.p 
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4, duration: 0.5 }}
-                                className="text-lg sm:text-xl mb-6 opacity-90"
-                              >
-                                {slide.subtitle}
-                              </motion.p>
-                            )}
-                            {slide.cta_text && slide.cta_link && (
-                              <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6, duration: 0.5 }}
-                              >
-                                <Link to={slide.cta_link}>
-                                  <Button size="lg" variant="secondary" className="font-bold text-lg">
-                                    {slide.cta_text}
-                                  </Button>
-                                </Link>
-                              </motion.div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )
-                ))}
-              </AnimatePresence>
-              {heroSlides.length > 1 && (
+        <section className="py-6 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="relative h-[220px] sm:h-[280px] lg:h-[340px] max-w-[900px] mx-auto rounded-2xl overflow-hidden shadow-xl">
+              {slidesLoading ? (
+                <Skeleton className="w-full h-full" />
+              ) : heroSlides.length > 0 ? (
                 <>
-                  <motion.button
-                    onClick={prevSlide}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 p-2 rounded-full transition-colors"
-                  >
-                    <ChevronLeft className="h-6 w-6 text-white" />
-                  </motion.button>
-                  <motion.button
-                    onClick={nextSlide}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 p-2 rounded-full transition-colors"
-                  >
-                    <ChevronRight className="h-6 w-6 text-white" />
-                  </motion.button>
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                    {heroSlides.map((_, index) => (
-                      <motion.button
-                        key={index}
-                        onClick={() => setCurrentSlide(index)}
-                        whileHover={{ scale: 1.2 }}
-                        whileTap={{ scale: 0.9 }}
-                        className={`w-3 h-3 rounded-full transition-colors ${
-                          index === currentSlide ? 'bg-white' : 'bg-white/50'
-                        }`}
-                      />
+                  <AnimatePresence mode="wait">
+                    {heroSlides.map((slide, index) => (
+                      index === currentSlide && (
+                        <motion.div
+                          key={slide.id}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.5 }}
+                          className="absolute inset-0"
+                        >
+                          <motion.img
+                            src={slide.desktop_image}
+                            alt={slide.title || 'Banner'}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                          <div className="absolute inset-0 flex items-end justify-center pb-8">
+                            <div className={`text-center px-6 ${slide.theme === 'light' ? 'text-black' : 'text-white'}`}>
+                              {slide.title && (
+                                <motion.h2 
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.2 }}
+                                  className="text-xl sm:text-2xl lg:text-3xl font-bold mb-1"
+                                >
+                                  {slide.title}
+                                </motion.h2>
+                              )}
+                              {slide.subtitle && (
+                                <motion.p 
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.3 }}
+                                  className="text-sm sm:text-base mb-3 opacity-90"
+                                >
+                                  {slide.subtitle}
+                                </motion.p>
+                              )}
+                              {slide.cta_text && slide.cta_link && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.4 }}
+                                >
+                                  <Link to={slide.cta_link}>
+                                    <Button size="sm" variant="secondary" className="font-semibold">
+                                      {slide.cta_text}
+                                    </Button>
+                                  </Link>
+                                </motion.div>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )
                     ))}
-                  </div>
+                  </AnimatePresence>
+                  {heroSlides.length > 1 && (
+                    <>
+                      <motion.button
+                        onClick={prevSlide}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1.5 rounded-full transition-colors"
+                      >
+                        <ChevronLeft className="h-5 w-5 text-white" />
+                      </motion.button>
+                      <motion.button
+                        onClick={nextSlide}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1.5 rounded-full transition-colors"
+                      >
+                        <ChevronRight className="h-5 w-5 text-white" />
+                      </motion.button>
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                        {heroSlides.map((_, index) => (
+                          <motion.button
+                            key={index}
+                            onClick={() => setCurrentSlide(index)}
+                            whileHover={{ scale: 1.2 }}
+                            className={`h-2 rounded-full transition-all ${
+                              index === currentSlide ? 'w-6 bg-white' : 'w-2 bg-white/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </>
+              ) : (
+                <div className="w-full h-full bg-gradient-to-r from-primary to-primary/70 flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <h2 className="text-2xl font-bold mb-2">Pincel de Luz Personalizados</h2>
+                    <p className="text-base opacity-90">Produtos personalizados de alta qualidade</p>
+                  </div>
+                </div>
               )}
-            </>
-          ) : (
-            <div className="w-full h-full bg-gradient-to-r from-primary to-primary/70 flex items-center justify-center">
-              <div className="text-white text-center">
-                <h2 className="text-3xl font-bold mb-2">Pincel de Luz Personalizados</h2>
-                <p className="text-lg opacity-90">Produtos personalizados de alta qualidade</p>
-              </div>
             </div>
-          )}
+          </div>
         </section>
 
         {/* Benefits */}
