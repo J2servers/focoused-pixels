@@ -981,14 +981,117 @@ const AdminSettingsPage = () => {
 
           {/* Appearance Tab */}
           <TabsContent value="appearance" className="space-y-6">
+            {/* Dark Mode Card */}
+            <Card className={settings.dark_mode_enabled ? 'border-[hsl(var(--admin-accent-purple))]' : ''}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="h-5 w-5" />
+                  Tema da Loja
+                </CardTitle>
+                <CardDescription>
+                  Escolha entre tema claro ou escuro para a página de vendas
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Theme Toggle with Preview */}
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Light Theme Option */}
+                  <div 
+                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      !settings.dark_mode_enabled 
+                        ? 'border-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.1)]' 
+                        : 'border-[hsl(var(--admin-card-border))] hover:border-[hsl(var(--admin-accent-purple)/0.5)]'
+                    }`}
+                    onClick={() => updateSetting('dark_mode_enabled', false)}
+                  >
+                    {!settings.dark_mode_enabled && (
+                      <div className="absolute top-2 right-2">
+                        <CheckCircle2 className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
+                      </div>
+                    )}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-200 to-yellow-400 flex items-center justify-center">
+                          <Zap className="h-4 w-4 text-amber-800" />
+                        </div>
+                        <span className="font-semibold text-white">Tema Claro</span>
+                      </div>
+                      {/* Light Theme Preview */}
+                      <div className="rounded-lg overflow-hidden border bg-white p-3 space-y-2">
+                        <div className="h-3 w-20 bg-gray-200 rounded" />
+                        <div className="flex gap-2">
+                          <div className="h-8 w-8 bg-purple-500 rounded" />
+                          <div className="flex-1 space-y-1">
+                            <div className="h-2 w-full bg-gray-200 rounded" />
+                            <div className="h-2 w-2/3 bg-gray-100 rounded" />
+                          </div>
+                        </div>
+                        <div className="h-6 w-16 bg-purple-500 rounded text-[10px] text-white flex items-center justify-center">
+                          Comprar
+                        </div>
+                      </div>
+                      <p className="text-xs text-[hsl(var(--admin-text-muted))]">
+                        Fundo claro com elementos vibrantes. Ideal para lojas tradicionais.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Dark Theme Option */}
+                  <div 
+                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      settings.dark_mode_enabled 
+                        ? 'border-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.1)]' 
+                        : 'border-[hsl(var(--admin-card-border))] hover:border-[hsl(var(--admin-accent-purple)/0.5)]'
+                    }`}
+                    onClick={() => updateSetting('dark_mode_enabled', true)}
+                  >
+                    {settings.dark_mode_enabled && (
+                      <div className="absolute top-2 right-2">
+                        <CheckCircle2 className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
+                      </div>
+                    )}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-indigo-800 flex items-center justify-center">
+                          <Zap className="h-4 w-4 text-white" />
+                        </div>
+                        <span className="font-semibold text-white">Tema Escuro</span>
+                        <Badge className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white text-[10px]">
+                          Premium
+                        </Badge>
+                      </div>
+                      {/* Dark Theme Preview */}
+                      <div className="rounded-lg overflow-hidden border border-gray-700 bg-gray-900 p-3 space-y-2">
+                        <div className="h-3 w-20 bg-gray-700 rounded" />
+                        <div className="flex gap-2">
+                          <div className="h-8 w-8 bg-purple-500 rounded" />
+                          <div className="flex-1 space-y-1">
+                            <div className="h-2 w-full bg-gray-700 rounded" />
+                            <div className="h-2 w-2/3 bg-gray-800 rounded" />
+                          </div>
+                        </div>
+                        <div className="h-6 w-16 bg-purple-500 rounded text-[10px] text-white flex items-center justify-center">
+                          Comprar
+                        </div>
+                      </div>
+                      <p className="text-xs text-[hsl(var(--admin-text-muted))]">
+                        Visual moderno e elegante. Destaca produtos e reduz fadiga visual.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Colors Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Palette className="h-5 w-5" />
-                  Cores e Tema
+                  Cores do Tema
                 </CardTitle>
                 <CardDescription>
-                  Personalize as cores do seu site
+                  Personalize as cores principais do site
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1009,6 +1112,7 @@ const AdminSettingsPage = () => {
                         placeholder="#7c3aed"
                       />
                     </div>
+                    <p className="text-xs text-muted-foreground">Botões, links e destaques</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="secondary_color">Cor Secundária</Label>
@@ -1026,6 +1130,7 @@ const AdminSettingsPage = () => {
                         placeholder="#10b981"
                       />
                     </div>
+                    <p className="text-xs text-muted-foreground">Elementos secundários</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="accent_color">Cor de Destaque</Label>
@@ -1043,30 +1148,33 @@ const AdminSettingsPage = () => {
                         placeholder="#f59e0b"
                       />
                     </div>
+                    <p className="text-xs text-muted-foreground">Promoções e alertas</p>
                   </div>
                 </div>
-                <Separator />
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Modo Escuro</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Habilitar alternância para modo escuro
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.dark_mode_enabled ?? true}
-                      onCheckedChange={(checked) => updateSetting('dark_mode_enabled', checked)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
+              </CardContent>
+            </Card>
+
+            {/* Display Options Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Eye className="h-5 w-5" />
+                  Opções de Exibição
+                </CardTitle>
+                <CardDescription>
+                  Configure o que é exibido na loja
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="flex items-center justify-between p-4 rounded-lg border">
                     <div className="space-y-0.5">
                       <Label className="flex items-center gap-2">
                         <Eye className="h-4 w-4" />
                         Mostrar Avaliações
                       </Label>
                       <p className="text-sm text-muted-foreground">
-                        Exibir estrelas de avaliação nos produtos
+                        Exibir estrelas nos produtos
                       </p>
                     </div>
                     <Switch
@@ -1074,11 +1182,11 @@ const AdminSettingsPage = () => {
                       onCheckedChange={(checked) => updateSetting('show_product_ratings', checked)}
                     />
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-4 rounded-lg border">
                     <div className="space-y-0.5">
                       <Label>Mostrar Estoque</Label>
                       <p className="text-sm text-muted-foreground">
-                        Exibir quantidade disponível em estoque
+                        Exibir quantidade disponível
                       </p>
                     </div>
                     <Switch
@@ -1087,15 +1195,28 @@ const AdminSettingsPage = () => {
                     />
                   </div>
                 </div>
-                <Separator />
+              </CardContent>
+            </Card>
+
+            {/* Custom CSS Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  CSS Personalizado
+                  <Badge variant="outline">Avançado</Badge>
+                </CardTitle>
+                <CardDescription>
+                  Adicione estilos customizados para personalização avançada
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-2">
-                  <Label htmlFor="custom_css">CSS Personalizado</Label>
                   <Textarea
                     id="custom_css"
                     value={settings.custom_css || ''}
                     onChange={(e) => updateSetting('custom_css', e.target.value)}
-                    placeholder="/* Adicione seu CSS customizado aqui */"
-                    className="font-mono text-sm min-h-[150px]"
+                    placeholder="/* Adicione seu CSS customizado aqui */&#10;&#10;/* Exemplo: */&#10;.hero-section {&#10;  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);&#10;}"
+                    className="font-mono text-sm min-h-[200px]"
                   />
                 </div>
               </CardContent>
