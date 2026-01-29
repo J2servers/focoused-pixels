@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Pincel de Luz Personalizados Design System */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 @import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
