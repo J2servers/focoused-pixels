@@ -12,12 +12,12 @@ interface Product {
   name: string;
   slug: string;
   price: number;
-  promotional_price?: number | null;
-  cover_image?: string | null;
-  short_description?: string | null;
-  status?: string | null;
-  is_featured?: boolean | null;
-  stock?: number | null;
+  originalPrice?: number;
+  image: string;
+  description?: string;
+  badge?: string;
+  freeShipping?: boolean;
+  inStock?: boolean;
 }
 
 interface MobileProductCardProps {
@@ -28,10 +28,9 @@ interface MobileProductCardProps {
 export function MobileProductCard({ product, index = 0 }: MobileProductCardProps) {
   const { addItem } = useCart();
   
-  const hasDiscount = product.promotional_price && product.promotional_price < product.price;
-  const displayPrice = hasDiscount ? product.promotional_price! : product.price;
+  const hasDiscount = product.originalPrice && product.originalPrice > product.price;
   const discountPercent = hasDiscount 
-    ? Math.round(((product.price - product.promotional_price!) / product.price) * 100)
+    ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
     : 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -41,9 +40,9 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
     addItem({
       id: product.id,
       name: product.name,
-      price: displayPrice,
+      price: product.price,
       quantity: 1,
-      image: product.cover_image || '/placeholder.svg',
+      image: product.image,
     });
     
     toast.success('Produto adicionado ao carrinho!', {
@@ -66,7 +65,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
           {/* Image */}
           <div className="relative aspect-square overflow-hidden bg-muted">
             <motion.img
-              src={product.cover_image || '/placeholder.svg'}
+              src={product.image}
               alt={product.name}
               className="w-full h-full object-cover"
               loading="lazy"
@@ -76,7 +75,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             
             {/* Badges */}
             <div className="absolute top-2 left-2 flex flex-col gap-1">
-              {product.is_featured && (
+              {product.badge === 'lancamento' && (
                 <Badge className="bg-accent text-accent-foreground text-[10px] px-1.5 py-0.5">
                   DESTAQUE
                 </Badge>
@@ -86,7 +85,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
                   -{discountPercent}%
                 </Badge>
               )}
-              {product.stock === 0 && (
+              {!product.inStock && (
                 <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5">
                   ESGOTADO
                 </Badge>
@@ -102,7 +101,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
               <Button
                 size="icon"
                 onClick={handleAddToCart}
-                disabled={product.stock === 0}
+                disabled={!product.inStock}
                 className="h-9 w-9 rounded-full shadow-lg bg-primary/90 backdrop-blur-sm"
               >
                 <ShoppingCart className="h-4 w-4" />
@@ -118,21 +117,21 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             
             {/* Price */}
             <div className="mt-2 space-y-0.5">
-              {hasDiscount && (
+              {hasDiscount && product.originalPrice && (
                 <p className="text-xs text-muted-foreground line-through">
-                  R$ {product.price.toFixed(2).replace('.', ',')}
+                  R$ {product.originalPrice.toFixed(2).replace('.', ',')}
                 </p>
               )}
               <p className="text-lg font-bold text-primary">
-                R$ {displayPrice.toFixed(2).replace('.', ',')}
+                R$ {product.price.toFixed(2).replace('.', ',')}
               </p>
               <p className="text-[10px] text-muted-foreground">
-                ou 12x de R$ {(displayPrice / 12).toFixed(2).replace('.', ',')}
+                ou 12x de R$ {(product.price / 12).toFixed(2).replace('.', ',')}
               </p>
             </div>
 
             {/* Free Shipping Badge */}
-            {displayPrice >= 159 && (
+            {product.freeShipping && (
               <div className="flex items-center gap-1 mt-2 text-success">
                 <Truck className="h-3 w-3" />
                 <span className="text-[10px] font-medium">Frete Grátis</span>

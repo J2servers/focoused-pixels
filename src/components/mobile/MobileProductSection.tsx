@@ -8,12 +8,12 @@ interface Product {
   name: string;
   slug: string;
   price: number;
-  promotional_price?: number | null;
-  cover_image?: string | null;
-  short_description?: string | null;
-  status?: string | null;
-  is_featured?: boolean | null;
-  stock?: number | null;
+  originalPrice?: number;
+  image: string;
+  description?: string;
+  badge?: string;
+  freeShipping?: boolean;
+  inStock?: boolean;
 }
 
 interface MobileProductSectionProps {
