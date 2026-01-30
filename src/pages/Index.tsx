@@ -127,7 +127,7 @@ const Index = () => {
         {/* Hero Carousel */}
         <section className="py-6 bg-background">
           <div className="container mx-auto px-4">
-            <div className="relative h-[220px] sm:h-[280px] lg:h-[340px] max-w-[900px] mx-auto rounded-2xl overflow-hidden shadow-xl">
+            <div className="relative h-[280px] sm:h-[340px] lg:h-[400px] rounded-2xl overflow-hidden shadow-xl">
               {slidesLoading ? (
                 <Skeleton className="w-full h-full" />
               ) : heroSlides.length > 0 ? (
