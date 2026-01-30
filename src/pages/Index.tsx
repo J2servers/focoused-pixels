@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { 
   MobileHeader, 
@@ -11,10 +12,11 @@ import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { CookieBanner } from '@/components/CookieBanner';
 import { ProductCard } from '@/components/ProductCard';
+import { MiniCart, PromoPopupManager } from '@/components/storefront';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronLeft, ChevronRight, Truck, CreditCard, MessageCircle, ShieldCheck } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { benefits } from '@/data/store';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -31,6 +33,7 @@ const benefitIcons: Record<string, React.ReactNode> = {
 
 const Index = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [miniCartOpen, setMiniCartOpen] = useState(false);
   const isMobile = useIsMobile();
   
   const { data: products = [], isLoading: productsLoading } = useProducts();
@@ -288,7 +291,12 @@ const Index = () => {
                   </FadeInView>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
                     {categoryProducts.map((product, index) => (
-                      <ProductCard key={product.id} product={product} index={index} />
+                      <ProductCard 
+                        key={product.id} 
+                        product={product} 
+                        index={index}
+                        onAddToCart={() => setMiniCartOpen(true)}
+                      />
                     ))}
                   </div>
                 </div>
@@ -317,6 +325,8 @@ const Index = () => {
       <WhatsAppButton />
       <AIChatWidget />
       <CookieBanner />
+      <MiniCart open={miniCartOpen} onOpenChange={setMiniCartOpen} />
+      <PromoPopupManager />
     </div>
   );
 };

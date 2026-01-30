@@ -496,6 +496,96 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          category_ids: string[] | null
+          code: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          max_discount: number | null
+          min_order_value: number | null
+          product_ids: string[] | null
+          start_date: string | null
+          type: string
+          updated_at: string
+          usage_count: number | null
+          usage_limit: number | null
+          value: number
+        }
+        Insert: {
+          category_ids?: string[] | null
+          code: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_discount?: number | null
+          min_order_value?: number | null
+          product_ids?: string[] | null
+          start_date?: string | null
+          type: string
+          updated_at?: string
+          usage_count?: number | null
+          usage_limit?: number | null
+          value: number
+        }
+        Update: {
+          category_ids?: string[] | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_discount?: number | null
+          min_order_value?: number | null
+          product_ids?: string[] | null
+          start_date?: string | null
+          type?: string
+          updated_at?: string
+          usage_count?: number | null
+          usage_limit?: number | null
+          value?: number
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          subject: string
+          updated_at: string
+          variables: string[] | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          subject: string
+          updated_at?: string
+          variables?: string[] | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          subject?: string
+          updated_at?: string
+          variables?: string[] | null
+        }
+        Relationships: []
+      }
       hero_slides: {
         Row: {
           created_at: string
@@ -663,6 +753,10 @@ export type Database = {
           order_status: string | null
           payment_method: string | null
           payment_status: string | null
+          production_completed_at: string | null
+          production_notes: string | null
+          production_started_at: string | null
+          production_status: string | null
           quote_id: string | null
           shipping_company: string | null
           shipping_cost: number | null
@@ -684,6 +778,10 @@ export type Database = {
           order_status?: string | null
           payment_method?: string | null
           payment_status?: string | null
+          production_completed_at?: string | null
+          production_notes?: string | null
+          production_started_at?: string | null
+          production_status?: string | null
           quote_id?: string | null
           shipping_company?: string | null
           shipping_cost?: number | null
@@ -705,6 +803,10 @@ export type Database = {
           order_status?: string | null
           payment_method?: string | null
           payment_status?: string | null
+          production_completed_at?: string | null
+          production_notes?: string | null
+          production_started_at?: string | null
+          production_status?: string | null
           quote_id?: string | null
           shipping_company?: string | null
           shipping_cost?: number | null
@@ -833,6 +935,57 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      promo_popups: {
+        Row: {
+          content: string | null
+          created_at: string
+          cta_link: string | null
+          cta_text: string | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          show_once: boolean | null
+          start_date: string | null
+          title: string
+          trigger_type: string | null
+          trigger_value: number | null
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          cta_link?: string | null
+          cta_text?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          show_once?: boolean | null
+          start_date?: string | null
+          title: string
+          trigger_type?: string | null
+          trigger_value?: number | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          cta_link?: string | null
+          cta_text?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          show_once?: boolean | null
+          start_date?: string | null
+          title?: string
+          trigger_type?: string | null
+          trigger_value?: number | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1019,6 +1172,51 @@ export type Database = {
         }
         Relationships: []
       }
+      raw_materials: {
+        Row: {
+          category: string | null
+          cost_per_unit: number | null
+          created_at: string
+          id: string
+          min_quantity: number | null
+          name: string
+          notes: string | null
+          quantity: number
+          sku: string | null
+          supplier: string | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          cost_per_unit?: number | null
+          created_at?: string
+          id?: string
+          min_quantity?: number | null
+          name: string
+          notes?: string | null
+          quantity?: number
+          sku?: string | null
+          supplier?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          cost_per_unit?: number | null
+          created_at?: string
+          id?: string
+          min_quantity?: number | null
+          name?: string
+          notes?: string | null
+          quantity?: number
+          sku?: string | null
+          supplier?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           comment: string
@@ -1063,6 +1261,54 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      stock_movements: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          material_id: string | null
+          order_id: string | null
+          quantity: number
+          reason: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          material_id?: string | null
+          order_id?: string | null
+          quantity: number
+          reason?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          material_id?: string | null
+          order_id?: string | null
+          quantity?: number
+          reason?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "raw_materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tracking_events: {
         Row: {

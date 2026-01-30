@@ -13,7 +13,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  UserPlus
+  UserPlus,
+  ShoppingCart,
+  Tag,
+  Kanban,
+  Boxes
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -28,8 +32,12 @@ import {
 
 const menuItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard, end: true },
+  { title: 'Pedidos', url: '/admin/pedidos', icon: ShoppingCart },
+  { title: 'Orçamentos', url: '/admin/orcamentos', icon: FileText },
+  { title: 'Produção', url: '/admin/kanban', icon: Kanban },
   { title: 'Produtos', url: '/admin/produtos', icon: Package },
   { title: 'Categorias', url: '/admin/categorias', icon: FolderTree },
+  { title: 'Cupons', url: '/admin/cupons', icon: Tag },
   { title: 'Promoções', url: '/admin/promocoes', icon: Percent },
   { title: 'Banner Hero', url: '/admin/hero', icon: Image },
   { title: 'Avaliações', url: '/admin/avaliacoes', icon: Star },
