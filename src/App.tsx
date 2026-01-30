@@ -42,6 +42,10 @@ import {
   AdminLogsPage,
   AdminSettingsPage,
   AdminLeadsPage,
+  AdminOrdersPage,
+  AdminCouponsPage,
+  AdminKanbanPage,
+  AdminQuotesPage,
 } from "./pages/admin";
 
 const queryClient = new QueryClient();
@@ -82,8 +86,12 @@ const App = () => (
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLoginPage />} />
               <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
+              <Route path="/admin/orcamentos" element={<AdminQuotesPage />} />
+              <Route path="/admin/kanban" element={<AdminKanbanPage />} />
               <Route path="/admin/produtos" element={<AdminProductsPage />} />
               <Route path="/admin/categorias" element={<AdminCategoriesPage />} />
+              <Route path="/admin/cupons" element={<AdminCouponsPage />} />
               <Route path="/admin/promocoes" element={<AdminPromotionsPage />} />
               <Route path="/admin/hero" element={<AdminHeroPage />} />
               <Route path="/admin/avaliacoes" element={<AdminReviewsPage />} />
