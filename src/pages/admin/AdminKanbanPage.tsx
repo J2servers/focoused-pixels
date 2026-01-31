@@ -72,131 +72,127 @@ const AdminKanbanPage = () => {
         </div>
 
         {/* Kanban Board */}
-        <div className="overflow-x-auto pb-4">
-          <div className="flex gap-4 min-w-max">
-            {KANBAN_COLUMNS.map(({ status, icon: Icon, color }) => (
-              <Card key={status} className={`admin-card w-72 shrink-0 border-t-4 ${color}`}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-sm">
-                    <Icon className="h-4 w-4" />
-                    {PRODUCTION_STATUS_LABELS[status]}
-                    <Badge variant="secondary" className="ml-auto">
-                      {getOrdersByStatus(status).length}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-2">
-                  <ScrollArea className="h-[calc(100vh-320px)]">
-                    <div className="space-y-2 pr-2">
-                      {isLoading ? (
-                        <div className="text-center py-4 text-muted-foreground text-sm">
-                          Carregando...
-                        </div>
-                      ) : getOrdersByStatus(status).length === 0 ? (
-                        <div className="text-center py-8 text-muted-foreground text-sm">
-                          Nenhum pedido
-                        </div>
-                      ) : (
-                        getOrdersByStatus(status).map((order) => (
-                          <motion.div
-                            key={order.id}
-                            layout
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-background/50 border rounded-lg p-3 cursor-pointer hover:shadow-md transition-shadow"
-                          >
-                            <div className="flex items-start gap-2">
-                              <GripVertical className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="font-mono text-xs font-semibold text-primary">
-                                    {order.order_number}
-                                  </span>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6"
-                                    onClick={() => setSelectedOrder(order)}
-                                  >
-                                    <Eye className="h-3 w-3" />
-                                  </Button>
-                                </div>
-                                <p className="text-sm font-medium truncate">{order.customer_name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  R$ {order.total.toFixed(2).replace('.', ',')}
-                                </p>
-                                <p className="text-[10px] text-muted-foreground mt-1">
-                                  {format(new Date(order.created_at), "dd/MM HH:mm", { locale: ptBR })}
-                                </p>
-
-                                {/* Quick Actions */}
-                                <div className="flex gap-1 mt-2 flex-wrap">
-                                  {status !== 'shipped' && (
-                                    <>
-                                      {status === 'pending' && (
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="h-6 text-[10px] px-2"
-                                          onClick={() => handleQuickMove(order, 'in_production')}
-                                        >
-                                          Iniciar
-                                        </Button>
-                                      )}
-                                      {status === 'awaiting_material' && (
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="h-6 text-[10px] px-2"
-                                          onClick={() => handleQuickMove(order, 'in_production')}
-                                        >
-                                          Produzir
-                                        </Button>
-                                      )}
-                                      {status === 'in_production' && (
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="h-6 text-[10px] px-2"
-                                          onClick={() => handleQuickMove(order, 'quality_check')}
-                                        >
-                                          Revisar
-                                        </Button>
-                                      )}
-                                      {status === 'quality_check' && (
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="h-6 text-[10px] px-2"
-                                          onClick={() => handleQuickMove(order, 'ready')}
-                                        >
-                                          Pronto
-                                        </Button>
-                                      )}
-                                      {status === 'ready' && (
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="h-6 text-[10px] px-2"
-                                          onClick={() => handleQuickMove(order, 'shipped')}
-                                        >
-                                          Enviar
-                                        </Button>
-                                      )}
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </motion.div>
-                        ))
-                      )}
+        <div className="grid grid-cols-6 gap-3">
+          {KANBAN_COLUMNS.map(({ status, icon: Icon, color }) => (
+            <Card key={status} className={`admin-card border-t-4 ${color} flex flex-col`}>
+              <CardHeader className="pb-2 px-3">
+                <CardTitle className="flex items-center gap-1.5 text-xs">
+                  <Icon className="h-3.5 w-3.5" />
+                  <span className="truncate">{PRODUCTION_STATUS_LABELS[status]}</span>
+                  <Badge variant="secondary" className="ml-auto text-[10px] px-1.5">
+                    {getOrdersByStatus(status).length}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-2 flex-1 overflow-y-auto scrollbar-none" style={{ maxHeight: 'calc(100vh - 280px)' }}>
+                <div className="space-y-2">
+                  {isLoading ? (
+                    <div className="text-center py-4 text-muted-foreground text-xs">
+                      Carregando...
                     </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  ) : getOrdersByStatus(status).length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground text-xs">
+                      Nenhum pedido
+                    </div>
+                  ) : (
+                    getOrdersByStatus(status).map((order) => (
+                      <motion.div
+                        key={order.id}
+                        layout
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-background/50 border rounded-lg p-2 cursor-pointer hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start gap-1.5">
+                          <GripVertical className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <span className="font-mono text-[10px] font-semibold text-primary">
+                                {order.order_number}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-5 w-5"
+                                onClick={() => setSelectedOrder(order)}
+                              >
+                                <Eye className="h-2.5 w-2.5" />
+                              </Button>
+                            </div>
+                            <p className="text-xs font-medium truncate">{order.customer_name}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              R$ {order.total.toFixed(2).replace('.', ',')}
+                            </p>
+                            <p className="text-[9px] text-muted-foreground mt-0.5">
+                              {format(new Date(order.created_at), "dd/MM HH:mm", { locale: ptBR })}
+                            </p>
+
+                            {/* Quick Actions */}
+                            <div className="flex gap-1 mt-1.5 flex-wrap">
+                              {status !== 'shipped' && (
+                                <>
+                                  {status === 'pending' && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-5 text-[9px] px-1.5"
+                                      onClick={() => handleQuickMove(order, 'in_production')}
+                                    >
+                                      Iniciar
+                                    </Button>
+                                  )}
+                                  {status === 'awaiting_material' && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-5 text-[9px] px-1.5"
+                                      onClick={() => handleQuickMove(order, 'in_production')}
+                                    >
+                                      Produzir
+                                    </Button>
+                                  )}
+                                  {status === 'in_production' && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-5 text-[9px] px-1.5"
+                                      onClick={() => handleQuickMove(order, 'quality_check')}
+                                    >
+                                      Revisar
+                                    </Button>
+                                  )}
+                                  {status === 'quality_check' && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-5 text-[9px] px-1.5"
+                                      onClick={() => handleQuickMove(order, 'ready')}
+                                    >
+                                      Pronto
+                                    </Button>
+                                  )}
+                                  {status === 'ready' && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-5 text-[9px] px-1.5"
+                                      onClick={() => handleQuickMove(order, 'shipped')}
+                                    >
+                                      Enviar
+                                    </Button>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
 
