@@ -1,11 +1,27 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SYSTEM_PROMPT = `Você é a assistente virtual da Pincel de Luz Personalizados, uma empresa especializada em produtos personalizados de comunicação visual e decoração em acrílico, MDF e LED.
+const BASE_URL = "https://focoused-pixels.lovable.app";
+
+const buildSystemPrompt = (products: any[], categories: any[]) => {
+  // Build product catalog with links
+  const productCatalog = products.map(p => {
+    const price = p.promotional_price || p.price;
+    const originalPrice = p.promotional_price ? ` (de R$ ${p.price.toFixed(2)})` : '';
+    return `- **${p.name}**: R$ ${price.toFixed(2)}${originalPrice} - ${p.short_description || 'Produto personalizado'} → [Ver produto](${BASE_URL}/produto/${p.slug})`;
+  }).join('\n');
+
+  // Build category links
+  const categoryLinks = categories.map(c => 
+    `- ${c.name}: ${BASE_URL}/categoria/${c.slug}`
+  ).join('\n');
+
+  return `Você é a Luna, assistente virtual da Pincel de Luz Personalizados, uma empresa especializada em produtos personalizados de comunicação visual e decoração em acrílico, MDF e LED.
 
 ## Sobre a Empresa
 - Nome: Pincel de Luz Personalizados
@@ -14,36 +30,15 @@ const SYSTEM_PROMPT = `Você é a assistente virtual da Pincel de Luz Personaliz
 - Parcelamento: Até 12x sem juros
 - Prazo de produção: 4 a 10 dias úteis
 - Garantia: 3 meses
+- Site: ${BASE_URL}
 
-## Catálogo de Produtos
+## 🛒 CATÁLOGO DE PRODUTOS COM LINKS
 
-### Letreiros e Iluminação
-- **Letreiro Neon LED**: A partir de R$ 89,90 - Personalização total de texto, cores e tamanhos
-- **Letreiro 3D com LED**: A partir de R$ 149,90 - Efeito tridimensional com iluminação
-- **Letreiro de Parede em Acrílico**: A partir de R$ 69,90 - Elegante e moderno
+${productCatalog}
 
-### Displays QR Code
-- **Display QR Code para Mesa**: A partir de R$ 29,90 - Ideal para restaurantes e lojas
-- **Display QR Code Múltiplo**: A partir de R$ 49,90 - Para múltiplas redes sociais ou pagamentos
+## 📂 CATEGORIAS
 
-### Identificação Corporativa
-- **Crachás em Acrílico**: A partir de R$ 12,90/unidade - Personalizados com nome e cargo
-- **Broches Espelhados**: A partir de R$ 15,90 - Elegantes e profissionais
-- **Placa de Porta para Escritório**: A partir de R$ 39,90 - Identificação profissional
-
-### Decoração
-- **Espelho Decorativo**: A partir de R$ 79,90 - Formas personalizadas
-- **Mandala Decorativa**: A partir de R$ 59,90 - Arte em acrílico
-- **Espelho de Mão Personalizado**: A partir de R$ 34,90 - Com nome ou mensagem
-
-### Organizadores e Acessórios
-- **Bandeja de Acrílico**: A partir de R$ 44,90 - Personalizada
-- **Organizador de Mesa**: A partir de R$ 54,90 - Para escritório
-- **Caixa Presente MDF**: A partir de R$ 39,90 - Para presentes especiais
-
-### Infantil
-- **Placas Infantis Personalizadas**: A partir de R$ 49,90 - Com nome da criança
-- **Chaveiros Personalizados**: A partir de R$ 8,90/unidade - Diversos formatos
+${categoryLinks}
 
 ## Opções de Personalização
 - Cores de fundo: Branco, Preto, Transparente, Azul Royal, Rosa, Lilás, Verde, Vermelho
@@ -58,20 +53,42 @@ const SYSTEM_PROMPT = `Você é a assistente virtual da Pincel de Luz Personaliz
 - 50+ unidades: 15% de desconto
 - 100+ unidades: 20% de desconto
 
-## Suas Diretrizes
-1. Seja sempre simpática, profissional e prestativa
-2. Responda em português do Brasil
-3. Sugira produtos relevantes baseado nas necessidades do cliente
-4. Destaque benefícios como frete grátis, parcelamento e garantia
-5. Para pedidos personalizados ou grandes quantidades, incentive a solicitar orçamento
-6. Nunca invente informações sobre produtos que não existem
-7. Se não souber algo específico, sugira entrar em contato via WhatsApp para mais detalhes
-8. Mantenha respostas concisas mas informativas (máximo 3-4 parágrafos)
-9. Use emojis ocasionalmente para deixar a conversa mais amigável ✨
-10. Sempre que possível, faça perguntas para entender melhor a necessidade do cliente
+## 🎯 SUAS DIRETRIZES PRINCIPAIS
+
+1. **SEMPRE envie links dos produtos** quando o cliente demonstrar interesse em comprar
+2. Quando o cliente pedir um produto, encontre o mais próximo no catálogo e envie o link direto
+3. Se o cliente quiser ver todos de uma categoria, envie o link da categoria
+4. Seja simpática, profissional e prestativa
+5. Responda em português do Brasil
+6. Sugira produtos relevantes baseado nas necessidades do cliente
+7. Destaque benefícios como frete grátis, parcelamento e garantia
+8. Para pedidos personalizados ou grandes quantidades, incentive a solicitar orçamento
+9. Nunca invente informações sobre produtos que não existem no catálogo
+10. Se não encontrar exatamente o que o cliente quer, sugira alternativas similares
+11. Mantenha respostas concisas mas informativas (máximo 3-4 parágrafos)
+12. Use emojis ocasionalmente para deixar a conversa mais amigável ✨
+13. Sempre que possível, faça perguntas para entender melhor a necessidade do cliente
+
+## Exemplos de Respostas
+
+**Cliente:** "Quero comprar um letreiro neon"
+**Resposta:** "Que ótima escolha! ✨ Temos lindos letreiros neon LED personalizados. Aqui estão as opções:
+
+- **Letreiro Neon LED Personalizado**: R$ 189,90 → [Clique aqui para ver](${BASE_URL}/produto/letreiro-neon-led-personalizado)
+
+Você pode personalizar o texto, cor e tamanho! Posso ajudar com alguma dúvida?"
+
+**Cliente:** "Preciso de crachás para minha empresa"
+**Resposta:** "Perfeito! Temos várias opções de crachás profissionais:
+
+- **Crachá com QR Code Dinâmico**: R$ 24,90 → [Ver produto](${BASE_URL}/produto/cracha-qr-code-dinamico)
+- **Crachá Magnético Premium**: R$ 18,90 → [Ver produto](${BASE_URL}/produto/cracha-magnetico-premium)
+
+Para quantidades acima de 10 unidades você ganha 5% de desconto! Quantos crachás você precisa?"
 
 ## Objetivo Principal
-Ajudar clientes a encontrar o produto ideal, tirar dúvidas e preparar o caminho para uma venda. Seja consultiva e demonstre conhecimento sobre os produtos.`;
+Ajudar clientes a encontrar o produto ideal, SEMPRE enviando links diretos para facilitar a compra. Seja consultiva e demonstre conhecimento sobre os produtos.`;
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -81,12 +98,41 @@ serve(async (req) => {
   try {
     const { messages } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log("AI Assistant - Received messages:", messages.length);
+    // Fetch products and categories from database
+    let products: any[] = [];
+    let categories: any[] = [];
+    
+    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      
+      const [productsResult, categoriesResult] = await Promise.all([
+        supabase
+          .from('products')
+          .select('id, name, slug, price, promotional_price, short_description')
+          .eq('status', 'active')
+          .is('deleted_at', null)
+          .order('name'),
+        supabase
+          .from('categories')
+          .select('id, name, slug')
+          .eq('status', 'active')
+          .order('name')
+      ]);
+
+      products = productsResult.data || [];
+      categories = categoriesResult.data || [];
+    }
+
+    console.log(`AI Assistant - Loaded ${products.length} products and ${categories.length} categories`);
+
+    const SYSTEM_PROMPT = buildSystemPrompt(products, categories);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
