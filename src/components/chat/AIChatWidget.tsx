@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -239,7 +240,25 @@ export function AIChatWidget() {
                           : 'bg-muted text-foreground rounded-bl-md'
                       )}
                     >
-                      <p className="whitespace-pre-wrap">{message.content}</p>
+                      <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-a:text-primary prose-a:underline prose-strong:font-semibold">
+                        <ReactMarkdown
+                          components={{
+                            a: ({ href, children }) => (
+                              <a 
+                                href={href} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-primary hover:text-primary/80 underline font-medium"
+                              >
+                                {children}
+                              </a>
+                            ),
+                            p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                     {message.role === 'user' && (
                       <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
