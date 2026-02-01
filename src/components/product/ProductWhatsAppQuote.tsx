@@ -73,22 +73,22 @@ export const ProductWhatsAppQuote = ({
         <Button 
           onClick={handleWhatsAppQuote}
           size="lg" 
-          className="w-full text-lg font-bold bg-whatsapp hover:bg-whatsapp/90 h-14"
+          className="w-full text-sm sm:text-lg font-bold bg-whatsapp hover:bg-whatsapp/90 h-12 sm:h-14 px-3"
           disabled={isDisabled}
         >
-          <MessageCircle className="h-5 w-5 mr-2" />
-          {getButtonText()}
+          <MessageCircle className="h-5 w-5 flex-shrink-0" />
+          <span className="ml-2 truncate">{getButtonText()}</span>
         </Button>
         
         <Button 
           onClick={onAddToCart}
           variant="outline" 
           size="lg" 
-          className="w-full h-12"
+          className="w-full h-12 text-sm sm:text-base"
           disabled={isDisabled}
         >
-          <ShoppingCart className="h-5 w-5 mr-2" />
-          Adicionar ao Carrinho
+          <ShoppingCart className="h-5 w-5 flex-shrink-0" />
+          <span className="ml-2">Adicionar ao Carrinho</span>
         </Button>
       </div>
 

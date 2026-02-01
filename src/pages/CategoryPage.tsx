@@ -7,6 +7,8 @@ import { Footer } from '@/components/layout/Footer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { ProductCard } from '@/components/ProductCard';
+import { MobileProductCard } from '@/components/mobile/MobileProductCard';
+import { MobileHeader, MobileBottomNav, MobileFloatingContact } from '@/components/mobile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,11 +19,13 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Skeleton } from '@/components/ui/skeleton';
 import { SlidersHorizontal, ChevronRight } from 'lucide-react';
 import { useProductsByCategory, useCategoryBySlug, useCategories } from '@/hooks/useProducts';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type SortOption = 'relevance' | 'price-asc' | 'price-desc' | 'name-asc' | 'newest';
 
 const CategoryPage = () => {
   const { categorySlug, subcategorySlug } = useParams();
+  const isMobile = useIsMobile();
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -121,6 +125,20 @@ const CategoryPage = () => {
   const isLoading = categoryLoading || productsLoading;
 
   if (!isLoading && !category) {
+    if (isMobile) {
+      return (
+        <div className="min-h-screen flex flex-col pb-16">
+          <MobileHeader />
+          <main className="flex-1 container mx-auto px-4 py-16 text-center">
+            <h1 className="text-xl font-bold mb-4">Categoria não encontrada</h1>
+            <Link to="/">
+              <Button size="sm">Voltar para a home</Button>
+            </Link>
+          </main>
+          <MobileBottomNav />
+        </div>
+      );
+    }
     return (
       <div className="min-h-screen flex flex-col">
         <TopBar />
@@ -235,6 +253,102 @@ const CategoryPage = () => {
     </div>
   );
 
+  // Mobile Version
+  if (isMobile) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background pb-16">
+        <MobileHeader />
+        
+        <main className="flex-1">
+          <div className="px-4 py-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                {isLoading ? (
+                  <Skeleton className="h-6 w-32" />
+                ) : (
+                  <>
+                    <h1 className="text-lg font-bold">{category?.name}</h1>
+                    <p className="text-xs text-muted-foreground">
+                      {filteredProducts.length} produtos
+                    </p>
+                  </>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {/* Filter Button */}
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8">
+                      <SlidersHorizontal className="h-3.5 w-3.5 mr-1" />
+                      Filtros
+                      {hasActiveFilters && (
+                        <span className="ml-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
+                          !
+                        </span>
+                      )}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-80">
+                    <SheetHeader>
+                      <SheetTitle>Filtros</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6">
+                      <FilterContent />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+                
+                {/* Sort */}
+                <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+                  <SelectTrigger className="h-8 w-[120px] text-xs">
+                    <SelectValue placeholder="Ordenar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="relevance">Relevância</SelectItem>
+                    <SelectItem value="price-asc">Menor preço</SelectItem>
+                    <SelectItem value="price-desc">Maior preço</SelectItem>
+                    <SelectItem value="name-asc">Nome A-Z</SelectItem>
+                    <SelectItem value="newest">Lançamentos</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Products Grid */}
+            {isLoading ? (
+              <div className="grid grid-cols-2 gap-3">
+                {[...Array(6)].map((_, i) => (
+                  <Skeleton key={i} className="aspect-square rounded-2xl" />
+                ))}
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Nenhum produto encontrado.
+                </p>
+                {hasActiveFilters && (
+                  <Button size="sm" onClick={clearFilters}>Limpar filtros</Button>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {filteredProducts.map((product, index) => (
+                  <MobileProductCard key={product.id} product={product} index={index} />
+                ))}
+              </div>
+            )}
+          </div>
+        </main>
+
+        <MobileBottomNav />
+        <MobileFloatingContact />
+      </div>
+    );
+  }
+
+  // Desktop Version
   return (
     <div className="min-h-screen flex flex-col">
       <TopBar />
@@ -291,29 +405,6 @@ const CategoryPage = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Mobile Filter Button */}
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" className="lg:hidden">
-                    <SlidersHorizontal className="h-4 w-4 mr-2" />
-                    Filtros
-                    {hasActiveFilters && (
-                      <span className="ml-2 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
-                        !
-                      </span>
-                    )}
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-80">
-                  <SheetHeader>
-                    <SheetTitle>Filtros</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    <FilterContent />
-                  </div>
-                </SheetContent>
-              </Sheet>
-
               {/* Sort */}
               <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
                 <SelectTrigger className="w-[180px]">
