@@ -1,15 +1,12 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { TopBar } from '@/components/layout/TopBar';
-import { MainHeader } from '@/components/layout/MainHeader';
-import { NavigationBar } from '@/components/layout/NavigationBar';
-import { Footer } from '@/components/layout/Footer';
+import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Star, Truck } from 'lucide-react';
+import { Star, Truck, Shield, Clock, CreditCard } from 'lucide-react';
 import { useProductBySlug, useCategoryBySlug } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { storeInfo, discountTiers } from '@/data/store';
@@ -24,6 +21,7 @@ import {
   RelatedProducts,
 } from '@/components/product';
 import { ProductReviews } from '@/components/reviews';
+import { TrustBar, ViewingNowBadge } from '@/components/conversion';
 
 const ProductPage = () => {
   const { productSlug } = useParams();
@@ -37,8 +35,8 @@ const ProductPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <TopBar />
-        <MainHeader />
+        <TrustBar />
+        <DynamicMainHeader />
         <NavigationBar />
         <main className="flex-1">
           <div className="container mx-auto px-4 py-6">
@@ -54,7 +52,7 @@ const ProductPage = () => {
             </div>
           </div>
         </main>
-        <Footer />
+        <DynamicFooter />
       </div>
     );
   }
@@ -62,8 +60,8 @@ const ProductPage = () => {
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col">
-        <TopBar />
-        <MainHeader />
+        <TrustBar />
+        <DynamicMainHeader />
         <NavigationBar />
         <main className="flex-1 container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
@@ -71,7 +69,7 @@ const ProductPage = () => {
             <Button>Voltar para a home</Button>
           </Link>
         </main>
-        <Footer />
+        <DynamicFooter />
       </div>
     );
   }
@@ -115,8 +113,8 @@ const ProductPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <TopBar />
-      <MainHeader />
+      <TrustBar />
+      <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1">
@@ -161,7 +159,7 @@ const ProductPage = () => {
                   {product.name}
                 </h1>
                 
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex flex-wrap items-center gap-3 mb-4">
                   <div className="flex items-center">
                     {[...Array(5)].map((_, i) => (
                       <Star
@@ -177,6 +175,7 @@ const ProductPage = () => {
                   <span className="text-sm text-muted-foreground">
                     {product.rating.toFixed(1)} ({product.reviews} avaliações)
                   </span>
+                  <ViewingNowBadge productSlug={product.slug} variant="minimal" />
                 </div>
 
                 {/* Price */}
@@ -207,6 +206,26 @@ const ProductPage = () => {
               <p className="text-muted-foreground leading-relaxed">
                 {product.description}
               </p>
+
+              {/* Quick Trust Badges */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center gap-2 text-sm bg-muted/50 rounded-lg p-3">
+                  <Shield className="h-4 w-4 text-green-600" />
+                  <span>Compra Segura</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm bg-muted/50 rounded-lg p-3">
+                  <Clock className="h-4 w-4 text-blue-600" />
+                  <span>Entrega Rápida</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm bg-muted/50 rounded-lg p-3">
+                  <CreditCard className="h-4 w-4 text-purple-600" />
+                  <span>Até 12x s/ juros</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm bg-muted/50 rounded-lg p-3">
+                  <Truck className="h-4 w-4 text-orange-600" />
+                  <span>Frete Calculado</span>
+                </div>
+              </div>
 
               {/* Color Selector */}
               {product.colors && product.colors.length > 0 && (
@@ -261,7 +280,7 @@ const ProductPage = () => {
         </div>
       </main>
 
-      <Footer />
+      <DynamicFooter />
       <WhatsAppButton />
       <AIChatWidget />
     </div>
