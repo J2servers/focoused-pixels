@@ -20,6 +20,7 @@ import TermsPage from "./pages/TermsPage";
 import FAQPage from "./pages/FAQPage";
 import TrackingPage from "./pages/TrackingPage";
 import CategoriesPage from "./pages/CategoriesPage";
+import CustomerAreaPage from "./pages/CustomerAreaPage";
 import NotFound from "./pages/NotFound";
 
 // Payment Pages
@@ -81,6 +82,7 @@ const App = () => (
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/rastreio" element={<TrackingPage />} />
               <Route path="/categorias" element={<CategoriesPage />} />
+              <Route path="/minha-area" element={<CustomerAreaPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/cadastro" element={<RegisterPage />} />
               {/* Admin Routes */}
