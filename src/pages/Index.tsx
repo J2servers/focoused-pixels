@@ -1,5 +1,10 @@
+/**
+ * Index - Homepage otimizada para conversão
+ * Implementa: Trust Bar, Hero impactante, Best Sellers, Prova Social, Garantias
+ */
+
 import { useState } from 'react';
-import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
+import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { 
   MobileHeader, 
   MobileBottomNav, 
@@ -11,45 +16,32 @@ import {
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { CookieBanner } from '@/components/CookieBanner';
-import { ProductCard } from '@/components/ProductCard';
 import { MiniCart, PromoPopupManager } from '@/components/storefront';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronLeft, ChevronRight, Truck, CreditCard, MessageCircle, ShieldCheck } from 'lucide-react';
-import { useEffect } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { benefits } from '@/data/store';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FadeInView } from '@/components/animations';
-import { useProducts, useCategories, useHeroSlides } from '@/hooks/useProducts';
+import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-const benefitIcons: Record<string, React.ReactNode> = {
-  'truck': <Truck className="h-8 w-8" />,
-  'credit-card': <CreditCard className="h-8 w-8" />,
-  'message-circle': <MessageCircle className="h-8 w-8" />,
-  'shield-check': <ShieldCheck className="h-8 w-8" />,
-};
+// New conversion components
+import {
+  TrustBar,
+  HeroConversion,
+  ProductCardOptimized,
+  SocialProofSection,
+  BestSellersSection,
+  GuaranteesSection,
+} from '@/components/conversion';
 
 const Index = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
   const isMobile = useIsMobile();
   
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
-  const { data: heroSlides = [], isLoading: slidesLoading } = useHeroSlides();
-
-  useEffect(() => {
-    if (heroSlides.length === 0) return;
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [heroSlides.length]);
-
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
 
   // Get parent categories for display
   const parentCategories = categories.filter(c => !c.parent_id).slice(0, 4);
@@ -64,7 +56,7 @@ const Index = () => {
     }).slice(0, 4);
   };
 
-  // Mobile Version
+  // Mobile Version - Keep existing mobile layout
   if (isMobile) {
     return (
       <div className="min-h-screen flex flex-col bg-background pb-16">
@@ -119,147 +111,21 @@ const Index = () => {
     );
   }
 
-  // Desktop Version
+  // Desktop Version - Optimized for conversion
   return (
     <div className="min-h-screen flex flex-col">
-      <DynamicTopBar />
+      {/* Trust Bar - Fixed top with credibility indicators */}
+      <TrustBar />
+      
       <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1">
-        {/* Hero Carousel */}
-        <section className="py-6 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="relative h-[280px] sm:h-[340px] lg:h-[400px] rounded-2xl overflow-hidden shadow-xl">
-              {slidesLoading ? (
-                <Skeleton className="w-full h-full" />
-              ) : heroSlides.length > 0 ? (
-                <>
-                  <AnimatePresence mode="wait">
-                    {heroSlides.map((slide, index) => (
-                      index === currentSlide && (
-                        <motion.div
-                          key={slide.id}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.5 }}
-                          className="absolute inset-0"
-                        >
-                          <motion.img
-                            src={slide.desktop_image}
-                            alt={slide.title || 'Banner'}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                          <div className="absolute inset-0 flex items-end justify-center pb-8">
-                            <div className={`text-center px-6 ${slide.theme === 'light' ? 'text-black' : 'text-white'}`}>
-                              {slide.title && (
-                                <motion.h2 
-                                  initial={{ opacity: 0, y: 20 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: 0.2 }}
-                                  className="text-xl sm:text-2xl lg:text-3xl font-bold mb-1"
-                                >
-                                  {slide.title}
-                                </motion.h2>
-                              )}
-                              {slide.subtitle && (
-                                <motion.p 
-                                  initial={{ opacity: 0, y: 20 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: 0.3 }}
-                                  className="text-sm sm:text-base mb-3 opacity-90"
-                                >
-                                  {slide.subtitle}
-                                </motion.p>
-                              )}
-                              {slide.cta_text && slide.cta_link && (
-                                <motion.div
-                                  initial={{ opacity: 0, y: 20 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: 0.4 }}
-                                >
-                                  <Link to={slide.cta_link}>
-                                    <Button size="sm" variant="secondary" className="font-semibold">
-                                      {slide.cta_text}
-                                    </Button>
-                                  </Link>
-                                </motion.div>
-                              )}
-                            </div>
-                          </div>
-                        </motion.div>
-                      )
-                    ))}
-                  </AnimatePresence>
-                  {heroSlides.length > 1 && (
-                    <>
-                      <motion.button
-                        onClick={prevSlide}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1.5 rounded-full transition-colors"
-                      >
-                        <ChevronLeft className="h-5 w-5 text-white" />
-                      </motion.button>
-                      <motion.button
-                        onClick={nextSlide}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1.5 rounded-full transition-colors"
-                      >
-                        <ChevronRight className="h-5 w-5 text-white" />
-                      </motion.button>
-                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-                        {heroSlides.map((_, index) => (
-                          <motion.button
-                            key={index}
-                            onClick={() => setCurrentSlide(index)}
-                            whileHover={{ scale: 1.2 }}
-                            className={`h-2 rounded-full transition-all ${
-                              index === currentSlide ? 'w-6 bg-white' : 'w-2 bg-white/50'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </>
-              ) : (
-                <div className="w-full h-full bg-gradient-to-r from-primary to-primary/70 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <h2 className="text-2xl font-bold mb-2">Pincel de Luz Personalizados</h2>
-                    <p className="text-base opacity-90">Produtos personalizados de alta qualidade</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
+        {/* Hero Section - Conversion optimized with countdown */}
+        <HeroConversion />
 
-        {/* Benefits */}
-        <section className="py-8 border-b border-border">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {benefits.map((benefit, index) => (
-                <FadeInView key={benefit.title} delay={index * 0.1} direction="up">
-                  <motion.div 
-                    className="flex items-center gap-3 justify-center"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                  >
-                    <div className="text-primary">{benefitIcons[benefit.icon]}</div>
-                    <div>
-                      <p className="font-bold text-sm">{benefit.title}</p>
-                      <p className="text-xs text-muted-foreground">{benefit.description}</p>
-                    </div>
-                  </motion.div>
-                </FadeInView>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Best Sellers Section - High-converting products */}
+        <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
 
         {/* Product Sections by Category */}
         {productsLoading || categoriesLoading ? (
@@ -268,7 +134,7 @@ const Index = () => {
               <Skeleton className="h-8 w-48 mb-6" />
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="aspect-square rounded-lg" />
+                  <Skeleton key={i} className="aspect-square rounded-2xl" />
                 ))}
               </div>
             </div>
@@ -282,16 +148,22 @@ const Index = () => {
               <section key={category.id} className="py-12">
                 <div className="container mx-auto px-4">
                   <FadeInView delay={0.1}>
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-bold uppercase tracking-wide">{category.name}</h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <div>
+                        <h2 className="text-2xl md:text-3xl font-bold">{category.name}</h2>
+                        <p className="text-muted-foreground mt-1">Produtos personalizados de alta qualidade</p>
+                      </div>
                       <Link to={`/categoria/${category.slug}`}>
-                        <Button variant="outline" size="sm">Ver todos</Button>
+                        <Button variant="outline" className="group">
+                          Ver todos
+                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
                       </Link>
                     </div>
                   </FadeInView>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
                     {categoryProducts.map((product, index) => (
-                      <ProductCard 
+                      <ProductCardOptimized 
                         key={product.id} 
                         product={product} 
                         index={index}
@@ -304,6 +176,12 @@ const Index = () => {
             );
           })
         )}
+
+        {/* Social Proof Section - Reviews and stats */}
+        <SocialProofSection />
+
+        {/* Guarantees Section - Build trust */}
+        <GuaranteesSection />
 
         {/* If no products, show message */}
         {!productsLoading && products.length === 0 && (
