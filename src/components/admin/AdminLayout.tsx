@@ -1,9 +1,11 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -20,6 +22,8 @@ export const AdminLayout = ({
 }: AdminLayoutProps) => {
   const navigate = useNavigate();
   const { user, role, isLoading, canEdit, isAdmin } = useAuthContext();
+  const isMobile = useIsMobile();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
@@ -67,11 +71,19 @@ export const AdminLayout = ({
   }
 
   return (
-    <div className="min-h-screen flex admin-dark bg-[hsl(var(--admin-bg))]">
+    <div className="min-h-screen admin-dark bg-[hsl(var(--admin-bg))]">
       <AdminSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div 
+        className={cn(
+          "flex flex-col min-h-screen transition-all duration-300",
+          isMobile ? "ml-0" : sidebarCollapsed ? "ml-[72px]" : "ml-64"
+        )}
+      >
         <AdminHeader title={title} />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className={cn(
+          "flex-1 overflow-y-auto p-4 md:p-6",
+          isMobile && "pt-16" // Extra padding for mobile menu button
+        )}>
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

@@ -17,7 +17,8 @@ import {
   ShoppingCart,
   Tag,
   Kanban,
-  Boxes
+  Menu,
+  X
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const menuItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard, end: true },
@@ -48,10 +56,18 @@ const menuItems = [
   { title: 'Configurações', url: '/admin/configuracoes', icon: Settings },
 ];
 
-export const AdminSidebar = () => {
+// Sidebar content component to reuse in both desktop and mobile
+const SidebarContent = ({ 
+  collapsed, 
+  setCollapsed, 
+  onItemClick 
+}: { 
+  collapsed: boolean; 
+  setCollapsed: (v: boolean) => void;
+  onItemClick?: () => void;
+}) => {
   const location = useLocation();
   const { profile, role, signOut, isAdmin } = useAuthContext();
-  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
@@ -65,6 +81,7 @@ export const AdminSidebar = () => {
     const content = (
       <NavLink
         to={item.url}
+        onClick={onItemClick}
         className={cn(
           "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group/item",
           isActive 
@@ -100,15 +117,10 @@ export const AdminSidebar = () => {
   };
 
   return (
-    <aside 
-      className={cn(
-        "h-screen admin-gradient-sidebar flex flex-col transition-all duration-300 border-r border-[hsl(var(--admin-card-border)/0.5)]",
-        collapsed ? "w-[72px]" : "w-64"
-      )}
-    >
+    <>
       {/* Logo */}
       <div className={cn(
-        "h-16 flex items-center border-b border-[hsl(var(--admin-card-border)/0.5)]",
+        "h-16 flex items-center border-b border-[hsl(var(--admin-card-border)/0.5)] shrink-0",
         collapsed ? "justify-center px-2" : "justify-between px-4"
       )}>
         {!collapsed && (
@@ -150,7 +162,7 @@ export const AdminSidebar = () => {
       </nav>
 
       {/* User Info */}
-      <div className="border-t border-[hsl(var(--admin-card-border)/0.5)] p-4">
+      <div className="border-t border-[hsl(var(--admin-card-border)/0.5)] p-4 shrink-0">
         {!collapsed && (
           <div className="mb-3 px-1">
             <p className="text-sm font-semibold text-white truncate">
@@ -195,6 +207,59 @@ export const AdminSidebar = () => {
           </Button>
         )}
       </div>
+    </>
+  );
+};
+
+export const AdminSidebar = () => {
+  const isMobile = useIsMobile();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Mobile: Sheet drawer
+  if (isMobile) {
+    return (
+      <>
+        {/* Mobile trigger button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setMobileOpen(true)}
+          className="fixed top-3 left-3 z-50 h-10 w-10 bg-[hsl(var(--admin-card))] text-white hover:bg-[hsl(var(--admin-sidebar-hover))] shadow-lg border border-[hsl(var(--admin-card-border))]"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetContent 
+            side="left" 
+            className="w-64 p-0 admin-gradient-sidebar border-r border-[hsl(var(--admin-card-border)/0.5)]"
+          >
+            <SheetHeader className="sr-only">
+              <SheetTitle>Menu de Navegação</SheetTitle>
+            </SheetHeader>
+            <div className="h-full flex flex-col">
+              <SidebarContent 
+                collapsed={false} 
+                setCollapsed={() => {}} 
+                onItemClick={() => setMobileOpen(false)}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </>
+    );
+  }
+
+  // Desktop: Fixed sidebar
+  return (
+    <aside 
+      className={cn(
+        "fixed top-0 left-0 h-screen admin-gradient-sidebar flex flex-col transition-all duration-300 border-r border-[hsl(var(--admin-card-border)/0.5)] z-40",
+        collapsed ? "w-[72px]" : "w-64"
+      )}
+    >
+      <SidebarContent collapsed={collapsed} setCollapsed={setCollapsed} />
     </aside>
   );
 };
