@@ -6,11 +6,17 @@
  * - ai_assistant_name: Nome exibido no header do chat
  * - ai_assistant_greeting: Primeira mensagem do assistente
  * - ai_assistant_avatar: Avatar personalizado (ou usa ícone padrão)
+ * 
+ * FUNCIONALIDADES:
+ * - Links clicáveis que navegam internamente (chat permanece aberto)
+ * - Auto-popup após 5 minutos oferecendo ajuda
+ * - Persistência do estado do chat durante navegação
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
+import { X, Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -24,8 +30,11 @@ interface Message {
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
+const AUTO_POPUP_DELAY = 5 * 60 * 1000; // 5 minutes in milliseconds
+const AUTO_POPUP_MESSAGE = "Olá! 👋 Notei que você está navegando pelo nosso site. Posso ajudar você a encontrar algum produto específico? Temos letreiros neon, crachás, displays QR Code e muito mais! 🛍️";
 
 export function AIChatWidget() {
+  const navigate = useNavigate();
   const { 
     aiAssistantEnabled, 
     aiAssistantName, 
@@ -38,8 +47,10 @@ export function AIChatWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAutoOpened, setHasAutoOpened] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const autoPopupTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize greeting message from settings
   useEffect(() => {
@@ -48,17 +59,85 @@ export function AIChatWidget() {
     }
   }, [aiAssistantGreeting, messages.length]);
 
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
 
+  // Focus input when chat opens
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
     }
   }, [isOpen]);
+
+  // Auto-popup after 5 minutes
+  useEffect(() => {
+    if (!aiAssistantEnabled || hasAutoOpened) return;
+
+    // Check if user has already interacted with chat in this session
+    const hasInteracted = sessionStorage.getItem('luna_chat_interacted');
+    if (hasInteracted) {
+      setHasAutoOpened(true);
+      return;
+    }
+
+    autoPopupTimerRef.current = setTimeout(() => {
+      if (!isOpen && !hasAutoOpened) {
+        setIsOpen(true);
+        setHasAutoOpened(true);
+        sessionStorage.setItem('luna_chat_interacted', 'true');
+        
+        // Add proactive message if greeting already exists
+        if (messages.length > 0) {
+          setMessages(prev => [...prev, { role: 'assistant', content: AUTO_POPUP_MESSAGE }]);
+        } else {
+          setMessages([{ role: 'assistant', content: AUTO_POPUP_MESSAGE }]);
+        }
+      }
+    }, AUTO_POPUP_DELAY);
+
+    return () => {
+      if (autoPopupTimerRef.current) {
+        clearTimeout(autoPopupTimerRef.current);
+      }
+    };
+  }, [aiAssistantEnabled, hasAutoOpened, isOpen, messages.length]);
+
+  // Mark as interacted when user opens chat manually
+  const handleOpenChat = useCallback(() => {
+    setIsOpen(true);
+    sessionStorage.setItem('luna_chat_interacted', 'true');
+  }, []);
+
+  // Handle internal navigation from links
+  const handleLinkClick = useCallback((href: string) => {
+    // Check if it's an internal link
+    const isInternal = href.startsWith('/') || 
+                       href.includes('focoused-pixels.lovable.app') ||
+                       href.includes('localhost');
+    
+    if (isInternal) {
+      // Extract the path from the full URL if needed
+      let path = href;
+      if (href.includes('://')) {
+        try {
+          const url = new URL(href);
+          path = url.pathname;
+        } catch {
+          path = href;
+        }
+      }
+      
+      // Navigate internally - chat stays open
+      navigate(path);
+    } else {
+      // External link - open in new tab
+      window.open(href, '_blank', 'noopener,noreferrer');
+    }
+  }, [navigate]);
 
   // Don't render if disabled in settings
   if (!aiAssistantEnabled) return null;
@@ -165,7 +244,7 @@ export function AIChatWidget() {
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setIsOpen(true)}
+            onClick={handleOpenChat}
             className="fixed bottom-24 right-6 z-50 flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-full shadow-lg"
             aria-label="Abrir assistente virtual"
           >
@@ -240,20 +319,25 @@ export function AIChatWidget() {
                           : 'bg-muted text-foreground rounded-bl-md'
                       )}
                     >
-                      <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-a:text-primary prose-a:underline prose-strong:font-semibold">
+                      <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0.5">
                         <ReactMarkdown
                           components={{
                             a: ({ href, children }) => (
-                              <a 
-                                href={href} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-primary hover:text-primary/80 underline font-medium"
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (href) handleLinkClick(href);
+                                }}
+                                className="text-primary hover:text-primary/80 underline font-medium cursor-pointer inline"
                               >
                                 {children}
-                              </a>
+                              </button>
                             ),
                             p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
+                            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                            ul: ({ children }) => <ul className="list-disc pl-4 my-1">{children}</ul>,
+                            li: ({ children }) => <li className="my-0.5">{children}</li>,
                           }}
                         >
                           {message.content}

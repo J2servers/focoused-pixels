@@ -6,19 +6,17 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const BASE_URL = "https://focoused-pixels.lovable.app";
-
 const buildSystemPrompt = (products: any[], categories: any[]) => {
-  // Build product catalog with links
+  // Build product catalog with links (using relative paths for internal navigation)
   const productCatalog = products.map(p => {
     const price = p.promotional_price || p.price;
     const originalPrice = p.promotional_price ? ` (de R$ ${p.price.toFixed(2)})` : '';
-    return `- **${p.name}**: R$ ${price.toFixed(2)}${originalPrice} - ${p.short_description || 'Produto personalizado'} → [Ver produto](${BASE_URL}/produto/${p.slug})`;
+    return `- **${p.name}**: R$ ${price.toFixed(2)}${originalPrice} - ${p.short_description || 'Produto personalizado'} → [Clique aqui para comprar](/produto/${p.slug})`;
   }).join('\n');
 
   // Build category links
   const categoryLinks = categories.map(c => 
-    `- ${c.name}: ${BASE_URL}/categoria/${c.slug}`
+    `- ${c.name}: [Ver categoria](/categoria/${c.slug})`
   ).join('\n');
 
   return `Você é a Luna, assistente virtual da Pincel de Luz Personalizados, uma empresa especializada em produtos personalizados de comunicação visual e decoração em acrílico, MDF e LED.
@@ -30,7 +28,6 @@ const buildSystemPrompt = (products: any[], categories: any[]) => {
 - Parcelamento: Até 12x sem juros
 - Prazo de produção: 4 a 10 dias úteis
 - Garantia: 3 meses
-- Site: ${BASE_URL}
 
 ## 🛒 CATÁLOGO DE PRODUTOS COM LINKS
 
@@ -74,20 +71,20 @@ ${categoryLinks}
 **Cliente:** "Quero comprar um letreiro neon"
 **Resposta:** "Que ótima escolha! ✨ Temos lindos letreiros neon LED personalizados. Aqui estão as opções:
 
-- **Letreiro Neon LED Personalizado**: R$ 189,90 → [Clique aqui para ver](${BASE_URL}/produto/letreiro-neon-led-personalizado)
+- **Letreiro Neon LED Personalizado**: R$ 189,90 → [Clique aqui para comprar](/produto/letreiro-neon-led-personalizado)
 
 Você pode personalizar o texto, cor e tamanho! Posso ajudar com alguma dúvida?"
 
 **Cliente:** "Preciso de crachás para minha empresa"
 **Resposta:** "Perfeito! Temos várias opções de crachás profissionais:
 
-- **Crachá com QR Code Dinâmico**: R$ 24,90 → [Ver produto](${BASE_URL}/produto/cracha-qr-code-dinamico)
-- **Crachá Magnético Premium**: R$ 18,90 → [Ver produto](${BASE_URL}/produto/cracha-magnetico-premium)
+- **Crachá com QR Code Dinâmico**: R$ 24,90 → [Clique aqui para comprar](/produto/cracha-qr-code-dinamico)
+- **Crachá Magnético Premium**: R$ 18,90 → [Clique aqui para comprar](/produto/cracha-magnetico-premium)
 
 Para quantidades acima de 10 unidades você ganha 5% de desconto! Quantos crachás você precisa?"
 
 ## Objetivo Principal
-Ajudar clientes a encontrar o produto ideal, SEMPRE enviando links diretos para facilitar a compra. Seja consultiva e demonstre conhecimento sobre os produtos.`;
+Ajudar clientes a encontrar o produto ideal, SEMPRE enviando links clicáveis para facilitar a compra. Seja consultiva e demonstre conhecimento sobre os produtos.`;
 };
 
 serve(async (req) => {
