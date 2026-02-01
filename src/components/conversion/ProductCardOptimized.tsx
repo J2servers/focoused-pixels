@@ -177,10 +177,12 @@ export function ProductCardOptimized({
             <Button 
               onClick={handleAddToCart}
               disabled={!product.inStock}
-              className="w-full font-bold text-sm py-5 rounded-xl bg-primary hover:bg-primary/90 group/btn"
+              className="w-full font-bold text-xs sm:text-sm py-4 sm:py-5 rounded-xl bg-primary hover:bg-primary/90 group/btn px-2 sm:px-4"
             >
-              <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-              {product.inStock ? 'ADICIONAR AO CARRINHO' : 'INDISPONÍVEL'}
+              <ShoppingCart className="h-4 w-4 flex-shrink-0 group-hover/btn:scale-110 transition-transform" />
+              <span className="ml-1.5 sm:ml-2 truncate">
+                {product.inStock ? 'COMPRAR' : 'INDISPONÍVEL'}
+              </span>
             </Button>
           </div>
         </Link>

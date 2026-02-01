@@ -43,8 +43,32 @@ export function TrustBar() {
   return (
     <div className="bg-gradient-to-r from-primary via-primary to-primary/90 text-primary-foreground py-2 overflow-hidden">
       <div className="container mx-auto px-4">
+        {/* Mobile: Marquee scrolling */}
+        <div className="block md:hidden overflow-hidden">
+          <motion.div 
+            className="flex items-center gap-6 whitespace-nowrap"
+            animate={{ x: ['0%', '-50%'] }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+          >
+            {[...trustItems, ...trustItems].map((item, index) => (
+              <div
+                key={`${item.text}-${index}`}
+                className={`flex items-center gap-2 text-xs font-medium ${
+                  item.highlight ? 'text-accent' : 'text-primary-foreground/90'
+                }`}
+              >
+                <span className={item.highlight ? 'text-accent' : 'text-primary-foreground/80'}>
+                  {item.icon}
+                </span>
+                <span>{item.text}</span>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+        
+        {/* Desktop: Static centered */}
         <motion.div 
-          className="flex items-center justify-center gap-6 md:gap-10 flex-wrap"
+          className="hidden md:flex items-center justify-center gap-6 md:gap-10 flex-wrap"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -55,7 +79,7 @@ export function TrustBar() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.1 }}
-              className={`flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap ${
+              className={`flex items-center gap-2 text-sm font-medium whitespace-nowrap ${
                 item.highlight ? 'text-accent' : 'text-primary-foreground/90'
               }`}
             >

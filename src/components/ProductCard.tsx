@@ -166,12 +166,12 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full text-xs"
+                className="w-full text-xs px-2"
                 onClick={handleAddToCart}
                 disabled={!product.inStock}
               >
-                <ShoppingCart className="h-3 w-3 mr-1" />
-                ADICIONAR AO CARRINHO
+                <ShoppingCart className="h-3 w-3 flex-shrink-0" />
+                <span className="ml-1 truncate">ADICIONAR</span>
               </Button>
             </div>
           </div>
