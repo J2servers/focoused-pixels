@@ -47,6 +47,7 @@ import {
   AdminCouponsPage,
   AdminKanbanPage,
   AdminQuotesPage,
+  AdminApiDocsPage,
 } from "./pages/admin";
 
 const queryClient = new QueryClient();
@@ -102,6 +103,7 @@ const App = () => (
               <Route path="/admin/usuarios" element={<AdminUsersPage />} />
               <Route path="/admin/logs" element={<AdminLogsPage />} />
               <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
+              <Route path="/admin/api" element={<AdminApiDocsPage />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
