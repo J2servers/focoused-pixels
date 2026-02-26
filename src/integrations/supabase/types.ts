@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          name: string
+          permissions: string[]
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          name: string
+          permissions?: string[]
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          name?: string
+          permissions?: string[]
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -1372,6 +1411,51 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          direction: string
+          endpoint: string
+          error_message: string | null
+          event_type: string | null
+          id: string
+          method: string
+          processed: boolean
+          request_body: Json | null
+          response_body: Json | null
+          source: string | null
+          status_code: number | null
+        }
+        Insert: {
+          created_at?: string
+          direction?: string
+          endpoint: string
+          error_message?: string | null
+          event_type?: string | null
+          id?: string
+          method?: string
+          processed?: boolean
+          request_body?: Json | null
+          response_body?: Json | null
+          source?: string | null
+          status_code?: number | null
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          endpoint?: string
+          error_message?: string | null
+          event_type?: string | null
+          id?: string
+          method?: string
+          processed?: boolean
+          request_body?: Json | null
+          response_body?: Json | null
+          source?: string | null
+          status_code?: number | null
         }
         Relationships: []
       }

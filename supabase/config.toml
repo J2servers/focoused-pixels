@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.track-correios]
 verify_jwt = false
+
+[functions.crm-webhook]
+verify_jwt = false

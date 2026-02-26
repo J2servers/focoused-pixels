@@ -14,3 +14,4 @@ export { default as AdminOrdersPage } from './AdminOrdersPage';
 export { default as AdminCouponsPage } from './AdminCouponsPage';
 export { default as AdminKanbanPage } from './AdminKanbanPage';
 export { default as AdminQuotesPage } from './AdminQuotesPage';
+export { default as AdminApiDocsPage } from './AdminApiDocsPage';

@@ -18,7 +18,8 @@ import {
   Tag,
   Kanban,
   Menu,
-  X
+  X,
+  Webhook
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -52,6 +53,7 @@ const menuItems = [
   { title: 'Leads', url: '/admin/leads', icon: UserPlus },
   { title: 'Empresa', url: '/admin/empresa', icon: Building2 },
   { title: 'Usuários', url: '/admin/usuarios', icon: Users, adminOnly: true },
+  { title: 'API & CRM', url: '/admin/api', icon: Webhook },
   { title: 'Logs', url: '/admin/logs', icon: FileText },
   { title: 'Configurações', url: '/admin/configuracoes', icon: Settings },
 ];
