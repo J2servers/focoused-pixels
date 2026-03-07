@@ -22,6 +22,7 @@ import {
 } from '@/components/product';
 import { ProductReviews } from '@/components/reviews';
 import { TrustBar, ViewingNowBadge } from '@/components/conversion';
+import { LaserScrollSection } from '@/components/product/LaserScrollSection';
 
 const ProductPage = () => {
   const { productSlug } = useParams();
@@ -268,6 +269,9 @@ const ProductPage = () => {
           <div className="mt-12 max-w-3xl">
             <ProductSpecifications product={product} />
           </div>
+
+          {/* Laser Engraving Scroll Section */}
+          <LaserScrollSection />
 
           {/* Product Reviews */}
           <ProductReviews 
