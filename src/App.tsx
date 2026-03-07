@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SiteSettingsProvider } from "@/components/providers/SiteSettingsProvider";
+import { PageViewTracker } from "@/components/PageViewTracker";
 import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -61,6 +62,7 @@ const App = () => (
         <BrowserRouter>
           {/* SiteSettingsProvider must be inside BrowserRouter for useLocation */}
           <SiteSettingsProvider>
+            <PageViewTracker />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/categoria/:categorySlug" element={<CategoryPage />} />
