@@ -1,9 +1,10 @@
 /**
  * Index - Homepage otimizada para conversão
  * Implementa: Trust Bar, Hero impactante, Best Sellers, Prova Social, Garantias
+ * Scroll effects com Framer Motion para experiência premium
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { 
   MobileHeader, 
@@ -21,10 +22,11 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { FadeInView } from '@/components/animations';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { LaserScrollSection } from '@/components/product/LaserScrollSection';
 
 // New conversion components
 import {
@@ -35,6 +37,74 @@ import {
   BestSellersSection,
   GuaranteesSection,
 } from '@/components/conversion';
+
+/** Animated category section with parallax */
+function CategorySection({ 
+  category, 
+  products, 
+  index, 
+  onAddToCart 
+}: { 
+  category: any; 
+  products: any[]; 
+  index: number; 
+  onAddToCart: () => void;
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [60, -30]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0.7]);
+  const scale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.95, 1, 1, 0.98]);
+
+  return (
+    <motion.section 
+      ref={ref} 
+      style={{ opacity, scale }}
+      className="py-12"
+    >
+      <div className="container mx-auto px-4">
+        <FadeInView delay={0.1}>
+          <motion.div 
+            style={{ y }}
+            className="flex items-center justify-between mb-8"
+          >
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold">{category.name}</h2>
+              <p className="text-muted-foreground mt-1">Produtos personalizados de alta qualidade</p>
+            </div>
+            <Link to={`/categoria/${category.slug}`}>
+              <Button variant="outline" className="group">
+                Ver todos
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </motion.div>
+        </FadeInView>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+          {products.map((product, idx) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+            >
+              <ProductCardOptimized 
+                product={product} 
+                index={idx}
+                onAddToCart={onAddToCart}
+              />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </motion.section>
+  );
+}
 
 const Index = () => {
   const [miniCartOpen, setMiniCartOpen] = useState(false);
@@ -56,16 +126,14 @@ const Index = () => {
     }).slice(0, 4);
   };
 
-  // Mobile Version - Keep existing mobile layout
+  // Mobile Version
   if (isMobile) {
     return (
       <div className="min-h-screen flex flex-col bg-background pb-16">
         <MobileHeader />
-        
         <main className="flex-1">
           <MobileHeroCarousel />
           <MobileCategoryGrid />
-          
           {productsLoading ? (
             <div className="px-4 py-4">
               <Skeleton className="h-6 w-32 mb-3" />
@@ -79,7 +147,6 @@ const Index = () => {
             parentCategories.map((category) => {
               const categoryProducts = getProductsByCategory(category.id);
               if (categoryProducts.length === 0) return null;
-
               return (
                 <MobileProductSection
                   key={category.id}
@@ -90,20 +157,14 @@ const Index = () => {
               );
             })
           )}
-
           {!productsLoading && products.length === 0 && (
             <div className="py-12 px-4 text-center">
               <h2 className="text-lg font-bold mb-2">Catálogo em construção</h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                Em breve teremos produtos disponíveis.
-              </p>
-              <Link to="/sobre">
-                <Button size="sm">Saiba mais</Button>
-              </Link>
+              <p className="text-sm text-muted-foreground mb-4">Em breve teremos produtos disponíveis.</p>
+              <Link to="/sobre"><Button size="sm">Saiba mais</Button></Link>
             </div>
           )}
         </main>
-
         <MobileBottomNav />
         <MobileFloatingContact />
         <CookieBanner />
@@ -111,23 +172,18 @@ const Index = () => {
     );
   }
 
-  // Desktop Version - Optimized for conversion
+  // Desktop Version - with scroll effects
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Trust Bar - Fixed top with credibility indicators */}
       <TrustBar />
-      
       <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1">
-        {/* Hero Section - Conversion optimized with countdown */}
         <HeroConversion />
-
-        {/* Best Sellers Section - High-converting products */}
         <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
 
-        {/* Product Sections by Category */}
+        {/* Category Sections with scroll parallax */}
         {productsLoading || categoriesLoading ? (
           <section className="py-12">
             <div className="container mx-auto px-4">
@@ -140,60 +196,33 @@ const Index = () => {
             </div>
           </section>
         ) : (
-          parentCategories.map((category) => {
+          parentCategories.map((category, index) => {
             const categoryProducts = getProductsByCategory(category.id);
             if (categoryProducts.length === 0) return null;
-
             return (
-              <section key={category.id} className="py-12">
-                <div className="container mx-auto px-4">
-                  <FadeInView delay={0.1}>
-                    <div className="flex items-center justify-between mb-8">
-                      <div>
-                        <h2 className="text-2xl md:text-3xl font-bold">{category.name}</h2>
-                        <p className="text-muted-foreground mt-1">Produtos personalizados de alta qualidade</p>
-                      </div>
-                      <Link to={`/categoria/${category.slug}`}>
-                        <Button variant="outline" className="group">
-                          Ver todos
-                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </FadeInView>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-                    {categoryProducts.map((product, index) => (
-                      <ProductCardOptimized 
-                        key={product.id} 
-                        product={product} 
-                        index={index}
-                        onAddToCart={() => setMiniCartOpen(true)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </section>
+              <CategorySection
+                key={category.id}
+                category={category}
+                products={categoryProducts}
+                index={index}
+                onAddToCart={() => setMiniCartOpen(true)}
+              />
             );
           })
         )}
 
-        {/* Social Proof Section - Reviews and stats */}
-        <SocialProofSection />
+        {/* Laser Scroll Section */}
+        <LaserScrollSection />
 
-        {/* Guarantees Section - Build trust */}
+        <SocialProofSection />
         <GuaranteesSection />
 
-        {/* If no products, show message */}
         {!productsLoading && products.length === 0 && (
           <section className="py-16">
             <div className="container mx-auto px-4 text-center">
               <h2 className="text-2xl font-bold mb-4">Catálogo em construção</h2>
-              <p className="text-muted-foreground mb-6">
-                Em breve teremos produtos disponíveis. Enquanto isso, entre em contato conosco!
-              </p>
-              <Link to="/sobre">
-                <Button size="lg">Saiba mais</Button>
-              </Link>
+              <p className="text-muted-foreground mb-6">Em breve teremos produtos disponíveis. Enquanto isso, entre em contato conosco!</p>
+              <Link to="/sobre"><Button size="lg">Saiba mais</Button></Link>
             </div>
           </section>
         )}
