@@ -27,6 +27,7 @@ import {
   FinancialSummaryCards,
   ProductRankingCard,
   TaxInfoCard,
+  SiteVisitsCard,
 } from '@/components/admin/dashboard';
 import {
   CashFlowSummaryCards,
@@ -167,6 +168,9 @@ const AdminDashboardPage = () => {
           <div className="absolute -right-5 bottom-0 h-24 w-24 rounded-full bg-white/10 blur-lg" />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
         </div>
+
+        {/* Site Visits Analytics */}
+        <SiteVisitsCard />
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
