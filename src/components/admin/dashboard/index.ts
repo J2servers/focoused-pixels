@@ -3,3 +3,4 @@ export { ProductMarginTable } from './ProductMarginTable';
 export { FinancialSummaryCards } from './FinancialSummaryCards';
 export { ProductRankingCard } from './ProductRankingCard';
 export { TaxInfoCard } from './TaxInfoCard';
+export { SiteVisitsCard } from './SiteVisitsCard';
