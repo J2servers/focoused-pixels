@@ -173,7 +173,7 @@ const Index = () => {
           })
         )}
 
-        <LaserScrollSection />
+        
         <SocialProofSection />
         <GuaranteesSection />
 

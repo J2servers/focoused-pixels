@@ -270,8 +270,6 @@ const ProductPage = () => {
             <ProductSpecifications product={product} />
           </div>
 
-          {/* Laser Engraving Scroll Section */}
-          <LaserScrollSection />
 
           {/* Product Reviews */}
           <ProductReviews 
