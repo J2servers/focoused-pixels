@@ -108,6 +108,7 @@ const App = () => (
               <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
               <Route path="/admin/api" element={<AdminApiDocsPage />} />
               
+              <Route path="/teste" element={<TestePage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
