@@ -266,8 +266,8 @@ const AdminSettingsPage = () => {
                     <Input
                       id="boleto_days"
                       type="number"
-                      value={settings.boleto_extra_days || 3}
-                      onChange={(e) => updateSetting('boleto_extra_days', Number(e.target.value))}
+                      value={paymentSettings.boleto_extra_days || 3}
+                      onChange={(e) => updatePaymentSetting('boleto_extra_days', Number(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
