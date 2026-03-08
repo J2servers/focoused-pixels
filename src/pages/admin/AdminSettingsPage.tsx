@@ -494,7 +494,7 @@ const AdminSettingsPage = () => {
                           toast.error('Erro ao testar conexão');
                         }
                       }}
-                      disabled={testEfiBank.isPending || !settings.efi_client_id || !settings.efi_client_secret}
+                      disabled={testEfiBank.isPending || !paymentSettings.efi_client_id || !paymentSettings.efi_client_secret}
                     >
                       {testEfiBank.isPending ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
