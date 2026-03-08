@@ -667,8 +667,8 @@ const AdminSettingsPage = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={settings.asaas_enabled ?? false}
-                    onCheckedChange={(checked) => updateSetting('asaas_enabled', checked)}
+                    checked={paymentSettings.asaas_enabled ?? false}
+                    onCheckedChange={(checked) => updatePaymentSetting('asaas_enabled', checked)}
                   />
                 </div>
               </CardHeader>
