@@ -689,8 +689,8 @@ const AdminSettingsPage = () => {
                     <Input
                       id="asaas_key"
                       type="password"
-                      value={settings.asaas_api_key || ''}
-                      onChange={(e) => updateSetting('asaas_api_key', e.target.value)}
+                      value={paymentSettings.asaas_api_key || ''}
+                      onChange={(e) => updatePaymentSetting('asaas_api_key', e.target.value)}
                       placeholder="$aact_xxxxx..."
                     />
                   </div>
