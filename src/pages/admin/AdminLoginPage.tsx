@@ -271,16 +271,6 @@ const AdminLoginPage = () => {
                   >
                     Esqueceu sua senha?
                   </Button>
-                </div>
-                  <Button
-                    type="button"
-                    variant="link"
-                    className="text-sm text-[hsl(var(--admin-accent-purple))] hover:text-[hsl(var(--admin-accent-pink))]"
-                    onClick={() => setShowResetForm(true)}
-                  >
-                    Esqueceu sua senha?
-                  </Button>
-                </div>
               </form>
             )}
           </CardContent>
