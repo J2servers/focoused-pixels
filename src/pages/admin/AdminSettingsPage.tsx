@@ -611,8 +611,8 @@ const AdminSettingsPage = () => {
                       <Input
                         id="stripe_sk"
                         type="password"
-                        value={settings.stripe_secret_key || ''}
-                        onChange={(e) => updateSetting('stripe_secret_key', e.target.value)}
+                        value={paymentSettings.stripe_secret_key || ''}
+                        onChange={(e) => updatePaymentSetting('stripe_secret_key', e.target.value)}
                         placeholder="sk_test_xxxxx..."
                       />
                     </div>
