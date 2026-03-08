@@ -601,8 +601,8 @@ const AdminSettingsPage = () => {
                       <Label htmlFor="stripe_pk">Publishable Key</Label>
                       <Input
                         id="stripe_pk"
-                        value={settings.stripe_public_key || ''}
-                        onChange={(e) => updateSetting('stripe_public_key', e.target.value)}
+                        value={paymentSettings.stripe_public_key || ''}
+                        onChange={(e) => updatePaymentSetting('stripe_public_key', e.target.value)}
                         placeholder="pk_test_xxxxx..."
                       />
                     </div>
