@@ -37,10 +37,6 @@ const AdminLoginPage = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const signupForm = useForm<SignupFormData>({
-    resolver: zodResolver(signupSchema),
-  });
-
   const resetForm = useForm<ResetFormData>({
     resolver: zodResolver(resetSchema),
   });
@@ -67,28 +63,6 @@ const AdminLoginPage = () => {
       }
     } catch {
       toast.error('Erro ao fazer login. Tente novamente.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const onSignup = async (data: SignupFormData) => {
-    setIsSubmitting(true);
-    try {
-      const { error } = await signUp(data.email, data.password, data.fullName);
-      
-      if (error) {
-        if (isAuthError(error, 'User already registered')) {
-          toast.error('Este email já está cadastrado');
-        } else {
-          toast.error(getErrorMessage(error));
-        }
-      } else {
-        toast.success('Cadastro realizado com sucesso! Aguarde a aprovação de um administrador para acessar o painel.');
-        setShowSignupForm(false);
-      }
-    } catch {
-      toast.error('Erro ao fazer cadastro. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
