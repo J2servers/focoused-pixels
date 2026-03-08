@@ -257,8 +257,8 @@ const AdminSettingsPage = () => {
                     <Input
                       id="pix_discount"
                       type="number"
-                      value={settings.pix_discount_percent || 5}
-                      onChange={(e) => updateSetting('pix_discount_percent', Number(e.target.value))}
+                      value={paymentSettings.pix_discount_percent || 5}
+                      onChange={(e) => updatePaymentSetting('pix_discount_percent', Number(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
