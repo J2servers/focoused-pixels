@@ -91,27 +91,17 @@ export interface CompanyInfo {
   whatsapp_message_template: string | null;
   enable_reviews_auto_approve: boolean | null;
   reviews_min_rating_to_show: number | null;
-  // Payment Gateways
+  // Payment gateway flags kept for backward compatibility (credentials in payment_credentials table)
   payment_gateway_primary: string | null;
   mercadopago_enabled: boolean | null;
-  mercadopago_public_key: string | null;
-  mercadopago_access_token: string | null;
   mercadopago_sandbox: boolean | null;
   efi_enabled: boolean | null;
-  efi_client_id: string | null;
-  efi_client_secret: string | null;
   efi_sandbox: boolean | null;
-  efi_pix_key: string | null;
   pagseguro_enabled: boolean | null;
-  pagseguro_email: string | null;
-  pagseguro_token: string | null;
   pagseguro_sandbox: boolean | null;
   stripe_enabled: boolean | null;
-  stripe_public_key: string | null;
-  stripe_secret_key: string | null;
   stripe_sandbox: boolean | null;
   asaas_enabled: boolean | null;
-  asaas_api_key: string | null;
   asaas_sandbox: boolean | null;
   payment_methods_enabled: string[] | null;
   pix_discount_percent: number | null;
