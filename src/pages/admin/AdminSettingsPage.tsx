@@ -672,7 +672,7 @@ const AdminSettingsPage = () => {
                   />
                 </div>
               </CardHeader>
-              {settings.asaas_enabled && (
+              {paymentSettings.asaas_enabled && (
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
                     <div className="space-y-0.5">
