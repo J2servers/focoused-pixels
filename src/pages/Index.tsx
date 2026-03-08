@@ -1,5 +1,5 @@
 /**
- * Index - Homepage redesenhada com visual moderno
+ * Index - Homepage redesenhada com visual moderno e limpo
  */
 
 import { useState } from 'react';
@@ -18,108 +18,21 @@ import { CookieBanner } from '@/components/CookieBanner';
 import { MiniCart, PromoPopupManager } from '@/components/storefront';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowRight, ShoppingCart, Star, Eye } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useCart } from '@/hooks/useCart';
-import { toast } from 'sonner';
+import { ProductCardOptimized } from '@/components/conversion/ProductCardOptimized';
 import {
   TrustBar,
   HeroConversion,
   SocialProofSection,
+  BestSellersSection,
   GuaranteesSection,
 } from '@/components/conversion';
 
-/* ── Simple Product Card (inline to avoid ref issues) ── */
-function SimpleProductCard({ product, onAddToCart }: { product: any; onAddToCart: () => void }) {
-  const { addItem } = useCart();
-
-  const handleAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addItem({ id: product.id, name: product.name, price: product.price, image: product.image });
-    toast.success('Adicionado ao carrinho!');
-    onAddToCart();
-  };
-
-  const savings = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : product.discount || 0;
-
-  return (
-    <Link to={`/produto/${product.slug}`} className="group block">
-      <div className="bg-card rounded-2xl overflow-hidden border border-border/40 hover:shadow-xl transition-all duration-300">
-        {/* Image */}
-        <div className="relative w-full" style={{ paddingBottom: '100%' }}>
-          {savings > 0 && product.inStock && (
-            <span className="absolute top-3 left-3 z-10 bg-destructive text-destructive-foreground text-[11px] font-bold px-2.5 py-1 rounded-lg">
-              -{savings}%
-            </span>
-          )}
-          {!product.inStock && (
-            <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-sm flex items-center justify-center">
-              <span className="text-sm font-semibold text-muted-foreground bg-muted px-4 py-1.5 rounded-full">Esgotado</span>
-            </div>
-          )}
-          <img
-            src={product.image}
-            alt={product.name}
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          />
-        </div>
-
-        {/* Content */}
-        <div className="p-4">
-          {/* Rating */}
-          <div className="flex items-center gap-1 mb-2">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`h-3 w-3 ${i < Math.floor(product.rating) ? 'fill-accent text-accent' : 'fill-muted text-muted'}`}
-              />
-            ))}
-            <span className="text-[11px] text-muted-foreground ml-1">({product.reviews})</span>
-          </div>
-
-          {/* Name */}
-          <h3 className="font-medium text-sm leading-snug line-clamp-2 mb-3 text-foreground group-hover:text-primary transition-colors">
-            {product.name}
-          </h3>
-
-          {/* Price */}
-          <div className="space-y-0.5 mb-3">
-            {product.originalPrice && (
-              <span className="text-xs text-muted-foreground line-through block">
-                R$ {product.originalPrice.toFixed(2).replace('.', ',')}
-              </span>
-            )}
-            <span className="text-lg font-bold text-foreground">
-              R$ {product.price.toFixed(2).replace('.', ',')}
-            </span>
-            <p className="text-[11px] text-muted-foreground">
-              ou 3x de R$ {(product.price / 3).toFixed(2).replace('.', ',')}
-            </p>
-          </div>
-
-          {/* CTA */}
-          <button
-            onClick={handleAdd}
-            disabled={!product.inStock}
-            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 font-semibold text-xs rounded-lg h-9 transition-colors"
-          >
-            <ShoppingCart className="h-3.5 w-3.5" />
-            {product.inStock ? 'Adicionar' : 'Indisponível'}
-          </button>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-/* ── Categories Grid ── */
-function CategoriesGrid({ categories }: { categories: any[] }) {
+/* ── Category visual cards ── */
+function CategoriesShowcase({ categories }: { categories: any[] }) {
   if (categories.length === 0) return null;
 
   return (
@@ -127,7 +40,7 @@ function CategoriesGrid({ categories }: { categories: any[] }) {
       <div className="container mx-auto px-4">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Categorias</h2>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Categorias</h2>
             <p className="text-sm text-muted-foreground mt-1">Encontre o produto perfeito</p>
           </div>
           <Link to="/categorias">
@@ -137,13 +50,13 @@ function CategoriesGrid({ categories }: { categories: any[] }) {
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
           {categories.map((cat) => (
             <Link
               key={cat.id}
               to={`/categoria/${cat.slug}`}
-              className="group relative block rounded-2xl overflow-hidden bg-muted"
-              style={{ paddingBottom: '75%' }}
+              className="group relative aspect-[4/3] rounded-xl overflow-hidden bg-muted"
             >
               {cat.image_url && (
                 <img
@@ -165,47 +78,21 @@ function CategoriesGrid({ categories }: { categories: any[] }) {
   );
 }
 
-/* ── Best Sellers ── */
-function BestSellers({ products, onAddToCart }: { products: any[]; onAddToCart: () => void }) {
-  const bestSellers = [...products]
-    .filter(p => p.inStock)
-    .sort((a, b) => (b.rating * b.reviews) - (a.rating * a.reviews))
-    .slice(0, 8);
-
-  if (bestSellers.length === 0) return null;
-
-  return (
-    <section className="py-12 lg:py-16 bg-muted/30">
-      <div className="container mx-auto px-4">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Mais Vendidos</h2>
-            <p className="text-sm text-muted-foreground mt-1">Os favoritos dos nossos clientes</p>
-          </div>
-          <Link to="/categorias">
-            <Button variant="ghost" size="sm" className="text-primary font-semibold group">
-              Ver todos
-              <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-            </Button>
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
-          {bestSellers.map((product) => (
-            <SimpleProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── Category Products Section ── */
-function CategoryProducts({ category, products, onAddToCart }: { category: any; products: any[]; onAddToCart: () => void }) {
+/* ── Category product section ── */
+function CategoryProductsSection({ 
+  category, 
+  products, 
+  onAddToCart 
+}: { 
+  category: any; 
+  products: any[]; 
+  onAddToCart: () => void;
+}) {
   return (
     <section className="py-10 lg:py-14">
       <div className="container mx-auto px-4">
         <div className="flex items-end justify-between mb-6">
-          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">{category.name}</h2>
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight">{category.name}</h2>
           <Link to={`/categoria/${category.slug}`}>
             <Button variant="ghost" size="sm" className="text-primary font-semibold group">
               Ver todos
@@ -214,8 +101,13 @@ function CategoryProducts({ category, products, onAddToCart }: { category: any; 
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
-          {products.map((product) => (
-            <SimpleProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
+          {products.map((product, idx) => (
+            <ProductCardOptimized 
+              key={product.id}
+              product={product} 
+              index={idx}
+              onAddToCart={onAddToCart}
+            />
           ))}
         </div>
       </div>
@@ -241,8 +133,6 @@ const Index = () => {
     }).slice(0, 4);
   };
 
-  const openCart = () => setMiniCartOpen(true);
-
   // ═══ Mobile ═══
   if (isMobile) {
     return (
@@ -256,7 +146,7 @@ const Index = () => {
               <Skeleton className="h-6 w-32 mb-3" />
               <div className="grid grid-cols-2 gap-3">
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="h-48 rounded-xl" />
+                  <Skeleton key={i} className="aspect-square rounded-xl" />
                 ))}
               </div>
             </div>
@@ -297,52 +187,50 @@ const Index = () => {
       <NavigationBar />
 
       <main className="flex-1">
+        {/* Hero full-width */}
         <HeroConversion />
 
-        {categoriesLoading ? (
+        {/* Categories Showcase */}
+        {!categoriesLoading && (
+          <CategoriesShowcase categories={parentCategories} />
+        )}
+
+        {/* Best Sellers */}
+        <div className="bg-muted/20">
+          <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
+        </div>
+
+        {/* Category Sections */}
+        {productsLoading || categoriesLoading ? (
           <section className="py-12">
             <div className="container mx-auto px-4">
               <Skeleton className="h-8 w-48 mb-6" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="h-48 rounded-xl" />
+                  <Skeleton key={i} className="aspect-[3/4] rounded-xl" />
                 ))}
               </div>
             </div>
           </section>
         ) : (
-          <CategoriesGrid categories={parentCategories} />
+          parentCategories.slice(0, 3).map((category) => {
+            const categoryProducts = getProductsByCategory(category.id);
+            if (categoryProducts.length === 0) return null;
+            return (
+              <CategoryProductsSection
+                key={category.id}
+                category={category}
+                products={categoryProducts}
+                onAddToCart={() => setMiniCartOpen(true)}
+              />
+            );
+          })
         )}
 
-        {productsLoading ? (
-          <section className="py-12 bg-muted/30">
-            <div className="container mx-auto px-4">
-              <Skeleton className="h-8 w-48 mb-6" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="h-72 rounded-xl" />
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : (
-          <BestSellers products={products} onAddToCart={openCart} />
-        )}
-
-        {!productsLoading && !categoriesLoading && parentCategories.slice(0, 3).map((category) => {
-          const categoryProducts = getProductsByCategory(category.id);
-          if (categoryProducts.length === 0) return null;
-          return (
-            <CategoryProducts
-              key={category.id}
-              category={category}
-              products={categoryProducts}
-              onAddToCart={openCart}
-            />
-          );
-        })}
-
+        {/* Social Proof */}
         <SocialProofSection />
+
+        {/* Guarantees */}
         <GuaranteesSection />
 
         {!productsLoading && products.length === 0 && (
