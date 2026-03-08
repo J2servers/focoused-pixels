@@ -396,7 +396,7 @@ const AdminSettingsPage = () => {
                           toast.error('Erro ao testar conexão');
                         }
                       }}
-                      disabled={testMercadoPago.isPending || !settings.mercadopago_access_token}
+                      disabled={testMercadoPago.isPending || !paymentSettings.mercadopago_access_token}
                     >
                       {testMercadoPago.isPending ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
