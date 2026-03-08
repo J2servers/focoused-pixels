@@ -592,8 +592,8 @@ const AdminSettingsPage = () => {
                       <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
                     </div>
                     <Switch
-                      checked={settings.stripe_sandbox ?? true}
-                      onCheckedChange={(checked) => updateSetting('stripe_sandbox', checked)}
+                      checked={paymentSettings.stripe_sandbox ?? true}
+                      onCheckedChange={(checked) => updatePaymentSetting('stripe_sandbox', checked)}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
