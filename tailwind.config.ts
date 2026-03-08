@@ -154,7 +154,8 @@ export default {
   			'accordion-up': 'accordion-up 0.2s ease-out',
   			'slide-in': 'slide-in 0.3s ease-out',
   			'fade-in': 'fade-in 0.3s ease-out',
-  			'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite'
+			'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
+			marquee: 'marquee 20s linear infinite'
   		}
   	}
   },
