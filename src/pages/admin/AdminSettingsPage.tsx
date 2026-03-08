@@ -522,8 +522,8 @@ const AdminSettingsPage = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={settings.pagseguro_enabled ?? false}
-                    onCheckedChange={(checked) => updateSetting('pagseguro_enabled', checked)}
+                    checked={paymentSettings.pagseguro_enabled ?? false}
+                    onCheckedChange={(checked) => updatePaymentSetting('pagseguro_enabled', checked)}
                   />
                 </div>
               </CardHeader>
