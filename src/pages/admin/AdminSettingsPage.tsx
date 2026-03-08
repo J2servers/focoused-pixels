@@ -424,8 +424,8 @@ const AdminSettingsPage = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={settings.efi_enabled ?? false}
-                    onCheckedChange={(checked) => updateSetting('efi_enabled', checked)}
+                    checked={paymentSettings.efi_enabled ?? false}
+                    onCheckedChange={(checked) => updatePaymentSetting('efi_enabled', checked)}
                   />
                 </div>
               </CardHeader>
