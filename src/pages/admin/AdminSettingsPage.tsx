@@ -456,8 +456,8 @@ const AdminSettingsPage = () => {
                       <Input
                         id="efi_client_secret"
                         type="password"
-                        value={settings.efi_client_secret || ''}
-                        onChange={(e) => updateSetting('efi_client_secret', e.target.value)}
+                        value={paymentSettings.efi_client_secret || ''}
+                        onChange={(e) => updatePaymentSetting('efi_client_secret', e.target.value)}
                         placeholder="Client_Secret_xxxxx..."
                       />
                     </div>
