@@ -42,6 +42,7 @@ const AdminSettingsPage = () => {
   });
 
   const [settings, setSettings] = useState<Partial<CompanyInfo>>({});
+  const [paymentSettings, setPaymentSettings] = useState<Partial<PaymentCredentials>>({});
 
   useEffect(() => {
     if (companyInfo) {
