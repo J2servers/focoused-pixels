@@ -29,7 +29,7 @@ interface EfiConfig {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getPaymentConfig(supabaseClient: any): Promise<EfiConfig> {
   const { data, error } = await supabaseClient
-    .from("company_info")
+    .from("payment_credentials")
     .select("efi_enabled, efi_client_id, efi_client_secret, efi_sandbox, efi_pix_key")
     .order('updated_at', { ascending: false })
     .limit(1)

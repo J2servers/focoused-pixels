@@ -34,7 +34,7 @@ interface StripeConfig {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getPaymentConfig(supabaseClient: any): Promise<StripeConfig> {
   const { data, error } = await supabaseClient
-    .from("company_info")
+    .from("payment_credentials")
     .select("stripe_enabled, stripe_public_key, stripe_secret_key, stripe_sandbox")
     .order('updated_at', { ascending: false })
     .limit(1)
