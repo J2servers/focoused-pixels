@@ -1,10 +1,9 @@
 /**
  * Index - Homepage otimizada para conversão
- * Implementa: Trust Bar, Hero impactante, Best Sellers, Prova Social, Garantias
- * Scroll effects com Framer Motion para experiência premium
+ * Layout clean e direto
  */
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { 
   MobileHeader, 
@@ -22,87 +21,54 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { FadeInView } from '@/components/animations';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { LaserScrollSection } from '@/components/product/LaserScrollSection';
-
-// New conversion components
+import { ProductCardOptimized } from '@/components/conversion/ProductCardOptimized';
 import {
   TrustBar,
   HeroConversion,
-  ProductCardOptimized,
   SocialProofSection,
   BestSellersSection,
   GuaranteesSection,
 } from '@/components/conversion';
 
-/** Animated category section with parallax */
 function CategorySection({ 
   category, 
   products, 
-  index, 
   onAddToCart 
 }: { 
   category: any; 
   products: any[]; 
-  index: number; 
   onAddToCart: () => void;
 }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'end start'],
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], [60, -30]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0.7]);
-  const scale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.95, 1, 1, 0.98]);
-
   return (
-    <motion.section 
-      ref={ref} 
-      style={{ opacity, scale }}
-      className="py-12"
-    >
+    <section className="py-12">
       <div className="container mx-auto px-4">
-        <FadeInView delay={0.1}>
-          <motion.div 
-            style={{ y }}
-            className="flex items-center justify-between mb-8"
-          >
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold">{category.name}</h2>
-              <p className="text-muted-foreground mt-1">Produtos personalizados de alta qualidade</p>
-            </div>
-            <Link to={`/categoria/${category.slug}`}>
-              <Button variant="outline" className="group">
-                Ver todos
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-          </motion.div>
-        </FadeInView>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold">{category.name}</h2>
+            <p className="text-muted-foreground mt-1">Produtos personalizados de alta qualidade</p>
+          </div>
+          <Link to={`/categoria/${category.slug}`}>
+            <Button variant="outline" className="group">
+              Ver todos
+              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
           {products.map((product, idx) => (
-            <motion.div
+            <ProductCardOptimized 
               key={product.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-            >
-              <ProductCardOptimized 
-                product={product} 
-                index={idx}
-                onAddToCart={onAddToCart}
-              />
-            </motion.div>
+              product={product} 
+              index={idx}
+              onAddToCart={onAddToCart}
+            />
           ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
@@ -113,10 +79,8 @@ const Index = () => {
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
-  // Get parent categories for display
   const parentCategories = categories.filter(c => !c.parent_id).slice(0, 4);
 
-  // Get products by category
   const getProductsByCategory = (categoryId: string) => {
     const childIds = categories.filter(c => c.parent_id === categoryId).map(c => c.id);
     const allCategoryIds = [categoryId, ...childIds];
@@ -172,7 +136,7 @@ const Index = () => {
     );
   }
 
-  // Desktop Version - with scroll effects
+  // Desktop Version - clean layout
   return (
     <div className="min-h-screen flex flex-col">
       <TrustBar />
@@ -183,7 +147,6 @@ const Index = () => {
         <HeroConversion />
         <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
 
-        {/* Category Sections with scroll parallax */}
         {productsLoading || categoriesLoading ? (
           <section className="py-12">
             <div className="container mx-auto px-4">
@@ -196,7 +159,7 @@ const Index = () => {
             </div>
           </section>
         ) : (
-          parentCategories.map((category, index) => {
+          parentCategories.map((category) => {
             const categoryProducts = getProductsByCategory(category.id);
             if (categoryProducts.length === 0) return null;
             return (
@@ -204,16 +167,13 @@ const Index = () => {
                 key={category.id}
                 category={category}
                 products={categoryProducts}
-                index={index}
                 onAddToCart={() => setMiniCartOpen(true)}
               />
             );
           })
         )}
 
-        {/* Laser Scroll Section */}
         <LaserScrollSection />
-
         <SocialProofSection />
         <GuaranteesSection />
 
