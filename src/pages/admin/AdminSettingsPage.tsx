@@ -680,8 +680,8 @@ const AdminSettingsPage = () => {
                       <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
                     </div>
                     <Switch
-                      checked={settings.asaas_sandbox ?? true}
-                      onCheckedChange={(checked) => updateSetting('asaas_sandbox', checked)}
+                      checked={paymentSettings.asaas_sandbox ?? true}
+                      onCheckedChange={(checked) => updatePaymentSetting('asaas_sandbox', checked)}
                     />
                   </div>
                   <div className="space-y-2">
