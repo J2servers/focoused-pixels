@@ -26,7 +26,9 @@ import {
 const AdminSettingsPage = () => {
   const { profile, updatePassword, canEdit } = useAuthContext();
   const { data: companyInfo, isLoading: isLoadingCompany } = useCompanyInfo();
+  const { data: paymentCreds, isLoading: isLoadingPayment } = usePaymentCredentials();
   const updateCompany = useUpdateCompanyInfo();
+  const updatePayment = useUpdatePaymentCredentials();
   
   // Payment gateway test mutations
   const testMercadoPago = useTestMercadoPago();
