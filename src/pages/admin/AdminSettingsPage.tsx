@@ -336,8 +336,8 @@ const AdminSettingsPage = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={settings.mercadopago_enabled ?? false}
-                    onCheckedChange={(checked) => updateSetting('mercadopago_enabled', checked)}
+                    checked={paymentSettings.mercadopago_enabled ?? false}
+                    onCheckedChange={(checked) => updatePaymentSetting('mercadopago_enabled', checked)}
                   />
                 </div>
               </CardHeader>
