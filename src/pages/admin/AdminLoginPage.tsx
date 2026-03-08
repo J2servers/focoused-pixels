@@ -151,18 +151,12 @@ const AdminLoginPage = () => {
             </div>
             <div>
               <CardTitle className="text-2xl font-bold text-white">
-                {showResetForm 
-                  ? 'Recuperar Senha' 
-                  : showSignupForm 
-                    ? 'Criar Conta'
-                    : 'Bem-vindo de volta'}
+                {showResetForm ? 'Recuperar Senha' : 'Bem-vindo de volta'}
               </CardTitle>
               <CardDescription className="mt-2 text-[hsl(var(--admin-text-muted))]">
                 {showResetForm 
                   ? 'Digite seu email para recuperar a senha' 
-                  : showSignupForm 
-                    ? 'Crie sua conta para solicitar acesso'
-                    : 'Faça login para acessar o painel'}
+                  : 'Faça login para acessar o painel'}
               </CardDescription>
             </div>
           </CardHeader>
