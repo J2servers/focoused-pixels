@@ -22,7 +22,7 @@ import {
 } from '@/components/product';
 import { ProductReviews } from '@/components/reviews';
 import { TrustBar, ViewingNowBadge } from '@/components/conversion';
-import { LaserScrollSection } from '@/components/product/LaserScrollSection';
+
 
 const ProductPage = () => {
   const { productSlug } = useParams();
