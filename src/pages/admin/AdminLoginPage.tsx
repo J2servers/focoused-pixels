@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Loader2, Mail, Lock, ArrowLeft, User, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Mail, Lock, ArrowLeft, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,38 +17,24 @@ const loginSchema = z.object({
   password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
 });
 
-const signupSchema = z.object({
-  fullName: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  email: z.string().email('Email inválido'),
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
-  confirmPassword: z.string().min(6, 'Confirme sua senha'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Senhas não coincidem',
-  path: ['confirmPassword'],
-});
 
 const resetSchema = z.object({
   email: z.string().email('Email inválido'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
-type SignupFormData = z.infer<typeof signupSchema>;
 type ResetFormData = z.infer<typeof resetSchema>;
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
-  const { user, role, isLoading, signIn, signUp, resetPassword } = useAuthContext();
+  const { user, role, isLoading, signIn, resetPassword } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
-  const [showSignupForm, setShowSignupForm] = useState(false);
+  
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-  });
-
-  const signupForm = useForm<SignupFormData>({
-    resolver: zodResolver(signupSchema),
   });
 
   const resetForm = useForm<ResetFormData>({
@@ -77,28 +63,6 @@ const AdminLoginPage = () => {
       }
     } catch {
       toast.error('Erro ao fazer login. Tente novamente.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const onSignup = async (data: SignupFormData) => {
-    setIsSubmitting(true);
-    try {
-      const { error } = await signUp(data.email, data.password, data.fullName);
-      
-      if (error) {
-        if (isAuthError(error, 'User already registered')) {
-          toast.error('Este email já está cadastrado');
-        } else {
-          toast.error(getErrorMessage(error));
-        }
-      } else {
-        toast.success('Cadastro realizado com sucesso! Aguarde a aprovação de um administrador para acessar o painel.');
-        setShowSignupForm(false);
-      }
-    } catch {
-      toast.error('Erro ao fazer cadastro. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -187,18 +151,12 @@ const AdminLoginPage = () => {
             </div>
             <div>
               <CardTitle className="text-2xl font-bold text-white">
-                {showResetForm 
-                  ? 'Recuperar Senha' 
-                  : showSignupForm 
-                    ? 'Criar Conta'
-                    : 'Bem-vindo de volta'}
+                {showResetForm ? 'Recuperar Senha' : 'Bem-vindo de volta'}
               </CardTitle>
               <CardDescription className="mt-2 text-[hsl(var(--admin-text-muted))]">
                 {showResetForm 
                   ? 'Digite seu email para recuperar a senha' 
-                  : showSignupForm 
-                    ? 'Crie sua conta para solicitar acesso'
-                    : 'Faça login para acessar o painel'}
+                  : 'Faça login para acessar o painel'}
               </CardDescription>
             </div>
           </CardHeader>
@@ -241,112 +199,6 @@ const AdminLoginPage = () => {
                   variant="ghost"
                   className="w-full text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
                   onClick={() => setShowResetForm(false)}
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Voltar ao login
-                </Button>
-              </form>
-            ) : showSignupForm ? (
-              <form onSubmit={signupForm.handleSubmit(onSignup)} className="space-y-4">
-                <div>
-                  <Label htmlFor="signup-name" className="text-sm font-medium text-[hsl(var(--admin-text-muted))]">Nome completo</Label>
-                  <div className="relative mt-2">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
-                    <Input
-                      id="signup-name"
-                      type="text"
-                      {...signupForm.register('fullName')}
-                      placeholder="Seu nome"
-                      className="pl-10 h-11 bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-2 focus-visible:ring-[hsl(var(--admin-accent-purple))] focus-visible:border-[hsl(var(--admin-accent-purple))]"
-                    />
-                  </div>
-                  {signupForm.formState.errors.fullName && (
-                    <p className="text-sm text-red-400 mt-1.5">
-                      {signupForm.formState.errors.fullName.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="signup-email" className="text-sm font-medium text-[hsl(var(--admin-text-muted))]">Email</Label>
-                  <div className="relative mt-2">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      {...signupForm.register('email')}
-                      placeholder="seu@email.com"
-                      className="pl-10 h-11 bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-2 focus-visible:ring-[hsl(var(--admin-accent-purple))] focus-visible:border-[hsl(var(--admin-accent-purple))]"
-                    />
-                  </div>
-                  {signupForm.formState.errors.email && (
-                    <p className="text-sm text-red-400 mt-1.5">
-                      {signupForm.formState.errors.email.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="signup-password" className="text-sm font-medium text-[hsl(var(--admin-text-muted))]">Senha</Label>
-                  <div className="relative mt-2">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
-                    <Input
-                      id="signup-password"
-                      type={showPassword ? 'text' : 'password'}
-                      {...signupForm.register('password')}
-                      placeholder="••••••••"
-                      className="pl-10 pr-10 h-11 bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-2 focus-visible:ring-[hsl(var(--admin-accent-purple))] focus-visible:border-[hsl(var(--admin-accent-purple))]"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[hsl(var(--admin-text-muted))] hover:text-white transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                  {signupForm.formState.errors.password && (
-                    <p className="text-sm text-red-400 mt-1.5">
-                      {signupForm.formState.errors.password.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="signup-confirm" className="text-sm font-medium text-[hsl(var(--admin-text-muted))]">Confirmar senha</Label>
-                  <div className="relative mt-2">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
-                    <Input
-                      id="signup-confirm"
-                      type={showPassword ? 'text' : 'password'}
-                      {...signupForm.register('confirmPassword')}
-                      placeholder="••••••••"
-                      className="pl-10 h-11 bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-2 focus-visible:ring-[hsl(var(--admin-accent-purple))] focus-visible:border-[hsl(var(--admin-accent-purple))]"
-                    />
-                  </div>
-                  {signupForm.formState.errors.confirmPassword && (
-                    <p className="text-sm text-red-400 mt-1.5">
-                      {signupForm.formState.errors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-
-                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-purple))] hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Criando conta...
-                    </>
-                  ) : (
-                    'Criar conta'
-                  )}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
-                  onClick={() => setShowSignupForm(false)}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Voltar ao login
@@ -410,16 +262,7 @@ const AdminLoginPage = () => {
                   )}
                 </Button>
 
-                <div className="flex flex-col gap-2 pt-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full h-11 border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text-muted))] hover:bg-[hsl(var(--admin-sidebar-hover))] hover:text-white hover:border-[hsl(var(--admin-accent-purple)/0.5)]"
-                    onClick={() => setShowSignupForm(true)}
-                  >
-                    Criar nova conta
-                  </Button>
-                  
+                <div className="pt-2">
                   <Button
                     type="button"
                     variant="link"

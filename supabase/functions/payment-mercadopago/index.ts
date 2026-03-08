@@ -53,7 +53,7 @@ interface MercadoPagoConfig {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getPaymentConfig(supabaseClient: any): Promise<MercadoPagoConfig> {
   const { data, error } = await supabaseClient
-    .from("company_info")
+    .from("payment_credentials")
     .select(`
       mercadopago_enabled, 
       mercadopago_public_key, 

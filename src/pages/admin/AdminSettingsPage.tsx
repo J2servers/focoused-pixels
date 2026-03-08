@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCompanyInfo, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
+import { usePaymentCredentials, useUpdatePaymentCredentials, PaymentCredentials } from '@/hooks/usePaymentCredentials';
 import { useTestMercadoPago, useTestEfiBank, useTestStripe } from '@/hooks/usePaymentGateway';
 import { toast } from 'sonner';
 import { 
@@ -25,7 +26,9 @@ import {
 const AdminSettingsPage = () => {
   const { profile, updatePassword, canEdit } = useAuthContext();
   const { data: companyInfo, isLoading: isLoadingCompany } = useCompanyInfo();
+  const { data: paymentCreds, isLoading: isLoadingPayment } = usePaymentCredentials();
   const updateCompany = useUpdateCompanyInfo();
+  const updatePayment = useUpdatePaymentCredentials();
   
   // Payment gateway test mutations
   const testMercadoPago = useTestMercadoPago();
@@ -39,12 +42,19 @@ const AdminSettingsPage = () => {
   });
 
   const [settings, setSettings] = useState<Partial<CompanyInfo>>({});
+  const [paymentSettings, setPaymentSettings] = useState<Partial<PaymentCredentials>>({});
 
   useEffect(() => {
     if (companyInfo) {
       setSettings(companyInfo);
     }
   }, [companyInfo]);
+
+  useEffect(() => {
+    if (paymentCreds) {
+      setPaymentSettings(paymentCreds);
+    }
+  }, [paymentCreds]);
 
   const handleChangePassword = async () => {
     if (passwords.newPassword.length < 6) {
@@ -74,10 +84,16 @@ const AdminSettingsPage = () => {
 
   const handleSaveSettings = async () => {
     try {
-      await updateCompany.mutateAsync({
-        id: companyInfo?.id || null,
-        data: settings,
-      });
+      await Promise.all([
+        updateCompany.mutateAsync({
+          id: companyInfo?.id || null,
+          data: settings,
+        }),
+        updatePayment.mutateAsync({
+          id: paymentCreds?.id || null,
+          data: paymentSettings,
+        }),
+      ]);
       toast.success('Configurações salvas com sucesso!');
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao salvar';
@@ -89,12 +105,16 @@ const AdminSettingsPage = () => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
+  const updatePaymentSetting = <K extends keyof PaymentCredentials>(key: K, value: PaymentCredentials[K]) => {
+    setPaymentSettings(prev => ({ ...prev, [key]: value }));
+  };
+
   const togglePaymentMethod = (method: string) => {
-    const current = settings.payment_methods_enabled || ['pix', 'credit_card', 'boleto'];
+    const current = paymentSettings.payment_methods_enabled || ['pix', 'credit_card', 'boleto'];
     if (current.includes(method)) {
-      updateSetting('payment_methods_enabled', current.filter(m => m !== method));
+      updatePaymentSetting('payment_methods_enabled', current.filter(m => m !== method));
     } else {
-      updateSetting('payment_methods_enabled', [...current, method]);
+      updatePaymentSetting('payment_methods_enabled', [...current, method]);
     }
   };
 
