@@ -219,7 +219,7 @@ const AdminSettingsPage = () => {
                   <div className="flex items-center space-x-3 p-4 border rounded-lg">
                     <Checkbox
                       id="pix"
-                      checked={(settings.payment_methods_enabled || []).includes('pix')}
+                      checked={(paymentSettings.payment_methods_enabled || []).includes('pix')}
                       onCheckedChange={() => togglePaymentMethod('pix')}
                     />
                     <div className="flex items-center gap-2">
