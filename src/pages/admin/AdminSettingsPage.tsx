@@ -509,7 +509,7 @@ const AdminSettingsPage = () => {
             </Card>
 
             {/* PagSeguro */}
-            <Card className={settings.pagseguro_enabled ? 'border-emerald-500/50' : ''}>
+            <Card className={paymentSettings.pagseguro_enabled ? 'border-emerald-500/50' : ''}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
