@@ -437,8 +437,8 @@ const AdminSettingsPage = () => {
                       <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
                     </div>
                     <Switch
-                      checked={settings.efi_sandbox ?? true}
-                      onCheckedChange={(checked) => updateSetting('efi_sandbox', checked)}
+                      checked={paymentSettings.efi_sandbox ?? true}
+                      onCheckedChange={(checked) => updatePaymentSetting('efi_sandbox', checked)}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
