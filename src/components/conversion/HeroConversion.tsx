@@ -1,11 +1,11 @@
 /**
- * HeroConversion - Hero banner limpo e 100% editável via admin
- * Usa apenas dados do banco (hero_slides) - sem conteúdo hardcoded
+ * HeroConversion - Hero banner moderno, full-width
+ * 100% editável via admin (hero_slides)
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHeroSlides } from '@/hooks/useProducts';
@@ -15,7 +15,6 @@ export function HeroConversion() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { data: heroSlides = [], isLoading } = useHeroSlides();
 
-  // Auto-rotate slides
   useEffect(() => {
     if (heroSlides.length <= 1) return;
     const timer = setInterval(() => {
@@ -29,147 +28,119 @@ export function HeroConversion() {
 
   if (isLoading) {
     return (
-      <section className="py-4 md:py-6">
-        <div className="container mx-auto px-4">
-          <Skeleton className="w-full h-[280px] md:h-[340px] lg:h-[400px] rounded-2xl" />
-        </div>
+      <section>
+        <Skeleton className="w-full h-[320px] md:h-[420px] lg:h-[500px]" />
       </section>
     );
   }
 
   if (heroSlides.length === 0) {
     return (
-      <section className="py-4 md:py-6">
-        <div className="container mx-auto px-4">
-          <div className="w-full h-[280px] md:h-[340px] lg:h-[400px] rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-            <p className="text-primary-foreground text-lg">
-              Nenhum banner configurado. Adicione no painel admin.
-            </p>
-          </div>
-        </div>
+      <section className="w-full h-[320px] md:h-[420px] lg:h-[500px] bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+        <p className="text-muted-foreground">Nenhum banner configurado. Adicione no painel admin.</p>
       </section>
     );
   }
 
-  const currentSlideData = heroSlides[currentSlide];
-  const hasTextContent = currentSlideData?.title || currentSlideData?.subtitle || currentSlideData?.cta_text;
-  const isDarkTheme = currentSlideData?.theme === 'dark';
+  const slide = heroSlides[currentSlide];
+  const hasText = slide?.title || slide?.subtitle || slide?.cta_text;
+  const isDark = slide?.theme === 'dark';
 
   return (
-    <section className="py-4 md:py-6">
-      <div className="container mx-auto px-4">
-        <div className="relative h-[280px] md:h-[340px] lg:h-[400px] rounded-2xl overflow-hidden shadow-xl">
-          {/* Background Slides */}
-          <AnimatePresence mode="wait">
-            {heroSlides.map((slide, index) => (
-              index === currentSlide && (
-                <motion.div
-                  key={slide.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="absolute inset-0"
-                >
-                  <img
-                    src={slide.desktop_image}
-                    alt={slide.title || 'Banner promocional'}
-                    className="w-full h-full object-cover"
-                  />
-                </motion.div>
-              )
-            ))}
-          </AnimatePresence>
+    <section className="relative w-full h-[320px] md:h-[420px] lg:h-[500px] overflow-hidden">
+      {/* Slides */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={slide.id}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.7 }}
+          className="absolute inset-0"
+        >
+          <img
+            src={slide.desktop_image}
+            alt={slide.title || 'Banner'}
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
+      </AnimatePresence>
 
-          {/* Overlay - only if there's text content */}
-          {hasTextContent && (
-            <div className={`absolute inset-0 ${
-              isDarkTheme 
-                ? 'bg-gradient-to-r from-black/60 via-black/30 to-transparent' 
-                : 'bg-gradient-to-r from-white/70 via-white/40 to-transparent'
-            }`} />
-          )}
+      {/* Gradient overlay */}
+      {hasText && (
+        <div className={`absolute inset-0 ${
+          isDark
+            ? 'bg-gradient-to-r from-black/70 via-black/40 to-transparent'
+            : 'bg-gradient-to-r from-white/80 via-white/50 to-transparent'
+        }`} />
+      )}
 
-          {/* Content from database - only rendered if exists */}
-          {hasTextContent && (
-            <div className="absolute inset-0 flex items-center">
-              <div className="container mx-auto px-6 md:px-12">
-                <motion.div
-                  key={currentSlide}
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.1 }}
-                  className={`max-w-lg ${isDarkTheme ? 'text-white' : 'text-foreground'}`}
-                >
-                  {/* Title from DB */}
-                  {currentSlideData.title && (
-                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 md:mb-3 leading-tight">
-                      {currentSlideData.title}
-                    </h2>
-                  )}
-
-                  {/* Subtitle from DB */}
-                  {currentSlideData.subtitle && (
-                    <p className={`text-base md:text-lg mb-4 md:mb-6 ${
-                      isDarkTheme ? 'text-white/90' : 'text-muted-foreground'
-                    }`}>
-                      {currentSlideData.subtitle}
-                    </p>
-                  )}
-
-                  {/* CTA Button from DB */}
-                  {currentSlideData.cta_text && currentSlideData.cta_link && (
-                    <Link to={currentSlideData.cta_link}>
-                      <Button 
-                        size="lg" 
-                        className="font-semibold px-6 md:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all"
-                      >
-                        {currentSlideData.cta_text}
-                      </Button>
-                    </Link>
-                  )}
-                </motion.div>
-              </div>
-            </div>
-          )}
-
-          {/* Navigation Arrows */}
-          {heroSlides.length > 1 && (
-            <>
-              <button
-                onClick={prevSlide}
-                className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 p-2 md:p-3 rounded-full transition-colors backdrop-blur-sm"
-                aria-label="Slide anterior"
-              >
-                <ChevronLeft className="h-5 w-5 md:h-6 md:w-6 text-white" />
-              </button>
-              <button
-                onClick={nextSlide}
-                className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 p-2 md:p-3 rounded-full transition-colors backdrop-blur-sm"
-                aria-label="Próximo slide"
-              >
-                <ChevronRight className="h-5 w-5 md:h-6 md:w-6 text-white" />
-              </button>
-            </>
-          )}
-
-          {/* Slide indicators */}
-          {heroSlides.length > 1 && (
-            <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-              {heroSlides.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`h-2 rounded-full transition-all ${
-                    index === currentSlide ? 'w-6 md:w-8 bg-white' : 'w-2 bg-white/50'
-                  }`}
-                  aria-label={`Ir para slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          )}
+      {/* Text content */}
+      {hasText && (
+        <div className="absolute inset-0 flex items-center">
+          <div className="container mx-auto px-6 md:px-12">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className={`max-w-xl ${isDark ? 'text-white' : 'text-foreground'}`}
+            >
+              {slide.title && (
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-3 tracking-tight">
+                  {slide.title}
+                </h2>
+              )}
+              {slide.subtitle && (
+                <p className={`text-base md:text-lg mb-6 leading-relaxed ${isDark ? 'text-white/80' : 'text-muted-foreground'}`}>
+                  {slide.subtitle}
+                </p>
+              )}
+              {slide.cta_text && slide.cta_link && (
+                <Link to={slide.cta_link}>
+                  <Button size="lg" className="font-bold px-8 rounded-full shadow-lg text-sm tracking-wide">
+                    {slide.cta_text}
+                  </Button>
+                </Link>
+              )}
+            </motion.div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Navigation */}
+      {heroSlides.length > 1 && (
+        <>
+          <button
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 p-2.5 rounded-full transition-colors backdrop-blur-sm"
+            aria-label="Anterior"
+          >
+            <ChevronLeft className="h-5 w-5 text-white" />
+          </button>
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 p-2.5 rounded-full transition-colors backdrop-blur-sm"
+            aria-label="Próximo"
+          >
+            <ChevronRight className="h-5 w-5 text-white" />
+          </button>
+
+          {/* Dots */}
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+            {heroSlides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentSlide(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === currentSlide ? 'w-8 bg-white' : 'w-2 bg-white/40'
+                }`}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }

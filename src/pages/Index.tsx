@@ -1,6 +1,5 @@
 /**
- * Index - Homepage otimizada para conversão
- * Layout clean e direto
+ * Index - Homepage redesenhada com visual moderno e limpo
  */
 
 import { useState } from 'react';
@@ -23,7 +22,6 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
-
 import { ProductCardOptimized } from '@/components/conversion/ProductCardOptimized';
 import {
   TrustBar,
@@ -33,7 +31,55 @@ import {
   GuaranteesSection,
 } from '@/components/conversion';
 
-function CategorySection({ 
+/* ── Category visual cards ── */
+function CategoriesShowcase({ categories }: { categories: any[] }) {
+  if (categories.length === 0) return null;
+
+  return (
+    <section className="py-12 lg:py-16">
+      <div className="container mx-auto px-4">
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Categorias</h2>
+            <p className="text-sm text-muted-foreground mt-1">Encontre o produto perfeito</p>
+          </div>
+          <Link to="/categorias">
+            <Button variant="ghost" size="sm" className="text-primary font-semibold group">
+              Ver todas
+              <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </Button>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
+          {categories.map((cat) => (
+            <Link
+              key={cat.id}
+              to={`/categoria/${cat.slug}`}
+              className="group relative aspect-[4/3] rounded-xl overflow-hidden bg-muted"
+            >
+              {cat.image_url && (
+                <img
+                  src={cat.image_url}
+                  alt={cat.name}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  loading="lazy"
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <h3 className="text-white font-bold text-sm md:text-base leading-tight">{cat.name}</h3>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Category product section ── */
+function CategoryProductsSection({ 
   category, 
   products, 
   onAddToCart 
@@ -43,21 +89,18 @@ function CategorySection({
   onAddToCart: () => void;
 }) {
   return (
-    <section className="py-12">
+    <section className="py-10 lg:py-14">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold">{category.name}</h2>
-            <p className="text-muted-foreground mt-1">Produtos personalizados de alta qualidade</p>
-          </div>
+        <div className="flex items-end justify-between mb-6">
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight">{category.name}</h2>
           <Link to={`/categoria/${category.slug}`}>
-            <Button variant="outline" className="group">
+            <Button variant="ghost" size="sm" className="text-primary font-semibold group">
               Ver todos
-              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
           {products.map((product, idx) => (
             <ProductCardOptimized 
               key={product.id}
@@ -79,7 +122,7 @@ const Index = () => {
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
-  const parentCategories = categories.filter(c => !c.parent_id).slice(0, 4);
+  const parentCategories = categories.filter(c => !c.parent_id).slice(0, 8);
 
   const getProductsByCategory = (categoryId: string) => {
     const childIds = categories.filter(c => c.parent_id === categoryId).map(c => c.id);
@@ -90,7 +133,7 @@ const Index = () => {
     }).slice(0, 4);
   };
 
-  // Mobile Version
+  // ═══ Mobile ═══
   if (isMobile) {
     return (
       <div className="min-h-screen flex flex-col bg-background pb-16">
@@ -103,7 +146,7 @@ const Index = () => {
               <Skeleton className="h-6 w-32 mb-3" />
               <div className="grid grid-cols-2 gap-3">
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="aspect-square rounded-2xl" />
+                  <Skeleton key={i} className="aspect-square rounded-xl" />
                 ))}
               </div>
             </div>
@@ -136,34 +179,45 @@ const Index = () => {
     );
   }
 
-  // Desktop Version - clean layout
+  // ═══ Desktop ═══
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <TrustBar />
       <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1">
+        {/* Hero full-width */}
         <HeroConversion />
-        <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
 
+        {/* Categories Showcase */}
+        {!categoriesLoading && (
+          <CategoriesShowcase categories={parentCategories} />
+        )}
+
+        {/* Best Sellers */}
+        <div className="bg-muted/20">
+          <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
+        </div>
+
+        {/* Category Sections */}
         {productsLoading || categoriesLoading ? (
           <section className="py-12">
             <div className="container mx-auto px-4">
               <Skeleton className="h-8 w-48 mb-6" />
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="aspect-square rounded-2xl" />
+                  <Skeleton key={i} className="aspect-[3/4] rounded-xl" />
                 ))}
               </div>
             </div>
           </section>
         ) : (
-          parentCategories.map((category) => {
+          parentCategories.slice(0, 3).map((category) => {
             const categoryProducts = getProductsByCategory(category.id);
             if (categoryProducts.length === 0) return null;
             return (
-              <CategorySection
+              <CategoryProductsSection
                 key={category.id}
                 category={category}
                 products={categoryProducts}
@@ -173,15 +227,17 @@ const Index = () => {
           })
         )}
 
-        
+        {/* Social Proof */}
         <SocialProofSection />
+
+        {/* Guarantees */}
         <GuaranteesSection />
 
         {!productsLoading && products.length === 0 && (
           <section className="py-16">
             <div className="container mx-auto px-4 text-center">
               <h2 className="text-2xl font-bold mb-4">Catálogo em construção</h2>
-              <p className="text-muted-foreground mb-6">Em breve teremos produtos disponíveis. Enquanto isso, entre em contato conosco!</p>
+              <p className="text-muted-foreground mb-6">Em breve teremos produtos disponíveis.</p>
               <Link to="/sobre"><Button size="lg">Saiba mais</Button></Link>
             </div>
           </section>
