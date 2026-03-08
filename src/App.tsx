@@ -24,6 +24,7 @@ import CategoriesPage from "./pages/CategoriesPage";
 import CustomerAreaPage from "./pages/CustomerAreaPage";
 import NotFound from "./pages/NotFound";
 import TestePage from "./pages/TestePage";
+import Teste2Page from "./pages/Teste2Page";
 
 // Payment Pages
 import PaymentPage from "./pages/PaymentPage";
@@ -109,6 +110,7 @@ const App = () => (
               <Route path="/admin/api" element={<AdminApiDocsPage />} />
               
               <Route path="/teste" element={<TestePage />} />
+              <Route path="/teste2" element={<Teste2Page />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
