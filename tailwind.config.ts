@@ -24,6 +24,8 @@ export default {
   				'Segoe UI Symbol',
   				'Noto Color Emoji'
   			],
+  			bebas: ['Bebas Neue', 'sans-serif'],
+  			mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
   			serif: [
   				'ui-serif',
   				'Georgia',
