@@ -349,8 +349,8 @@ const AdminSettingsPage = () => {
                       <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
                     </div>
                     <Switch
-                      checked={settings.mercadopago_sandbox ?? true}
-                      onCheckedChange={(checked) => updateSetting('mercadopago_sandbox', checked)}
+                      checked={paymentSettings.mercadopago_sandbox ?? true}
+                      onCheckedChange={(checked) => updatePaymentSetting('mercadopago_sandbox', checked)}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
