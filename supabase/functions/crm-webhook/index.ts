@@ -92,19 +92,29 @@ async function logWebhook(
 }
 
 async function validateApiKey(supabase: ReturnType<typeof createClient>, apiKey: string): Promise<boolean> {
-  if (!apiKey) return false;
+  if (!apiKey || apiKey.length < 8) return false;
   
-  // Hash the provided key and compare
+  const prefix = apiKey.substring(0, 8);
+  
+  // Find key by prefix
   const { data, error } = await supabase
     .from("api_keys")
-    .select("id, is_active, expires_at, permissions")
-    .eq("key_prefix", apiKey.substring(0, 8))
+    .select("id, key_hash, is_active, expires_at, permissions")
+    .eq("key_prefix", prefix)
     .eq("is_active", true)
     .limit(1);
 
   if (error || !data || data.length === 0) return false;
 
   const keyRecord = data[0];
+  
+  // Verify hash matches
+  const encoder = new TextEncoder();
+  const hashBuffer = await crypto.subtle.digest("SHA-256", encoder.encode(apiKey));
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const computedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  
+  if (computedHash !== keyRecord.key_hash) return false;
   
   // Check expiration
   if (keyRecord.expires_at && new Date(keyRecord.expires_at) < new Date()) return false;

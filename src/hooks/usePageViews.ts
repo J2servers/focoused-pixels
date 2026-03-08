@@ -25,11 +25,22 @@ export function useTrackPageView() {
   useEffect(() => {
     const trackView = async () => {
       try {
+        // Rate limit: max 1 view per path per session per 30 seconds
+        const sessionId = getSessionId();
+        const cacheKey = `pv_${sessionId}_${location.pathname}`;
+        const lastTracked = sessionStorage.getItem(cacheKey);
+        const now = Date.now();
+        
+        if (lastTracked && now - parseInt(lastTracked) < 30000) {
+          return; // Skip duplicate within 30s
+        }
+        
+        sessionStorage.setItem(cacheKey, now.toString());
+        
         await supabase.from('page_views' as any).insert({
           page_path: location.pathname,
           referrer: document.referrer || null,
-          user_agent: navigator.userAgent,
-          session_id: getSessionId(),
+          session_id: sessionId,
         });
       } catch (e) {
         // Silent fail - don't break the app for analytics

@@ -119,13 +119,7 @@ export const useAuth = () => {
       },
     });
 
-    if (!error && data.user) {
-      // Create profile
-      await supabase.from('profiles').insert({
-        user_id: data.user.id,
-        full_name: fullName,
-      });
-    }
+    // Profile is created automatically via database trigger (handle_new_user)
 
     return { data, error };
   };
