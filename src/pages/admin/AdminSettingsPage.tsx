@@ -545,8 +545,8 @@ const AdminSettingsPage = () => {
                       <Input
                         id="ps_email"
                         type="email"
-                        value={settings.pagseguro_email || ''}
-                        onChange={(e) => updateSetting('pagseguro_email', e.target.value)}
+                        value={paymentSettings.pagseguro_email || ''}
+                        onChange={(e) => updatePaymentSetting('pagseguro_email', e.target.value)}
                         placeholder="email@empresa.com"
                       />
                     </div>
