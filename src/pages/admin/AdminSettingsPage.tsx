@@ -284,8 +284,8 @@ const AdminSettingsPage = () => {
                     <Input
                       id="min_installment"
                       type="number"
-                      value={settings.min_installment_value || 50}
-                      onChange={(e) => updateSetting('min_installment_value', Number(e.target.value))}
+                      value={paymentSettings.min_installment_value || 50}
+                      onChange={(e) => updatePaymentSetting('min_installment_value', Number(e.target.value))}
                     />
                   </div>
                 </div>
