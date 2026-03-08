@@ -654,7 +654,7 @@ const AdminSettingsPage = () => {
             </Card>
 
             {/* Asaas */}
-            <Card className={settings.asaas_enabled ? 'border-emerald-500/50' : ''}>
+            <Card className={paymentSettings.asaas_enabled ? 'border-emerald-500/50' : ''}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
