@@ -23,6 +23,7 @@ import TrackingPage from "./pages/TrackingPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import CustomerAreaPage from "./pages/CustomerAreaPage";
 import NotFound from "./pages/NotFound";
+import TestePage from "./pages/TestePage";
 
 // Payment Pages
 import PaymentPage from "./pages/PaymentPage";
