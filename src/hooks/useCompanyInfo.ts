@@ -91,27 +91,17 @@ export interface CompanyInfo {
   whatsapp_message_template: string | null;
   enable_reviews_auto_approve: boolean | null;
   reviews_min_rating_to_show: number | null;
-  // Payment Gateways
+  // Payment gateway flags kept for backward compatibility (credentials in payment_credentials table)
   payment_gateway_primary: string | null;
   mercadopago_enabled: boolean | null;
-  mercadopago_public_key: string | null;
-  mercadopago_access_token: string | null;
   mercadopago_sandbox: boolean | null;
   efi_enabled: boolean | null;
-  efi_client_id: string | null;
-  efi_client_secret: string | null;
   efi_sandbox: boolean | null;
-  efi_pix_key: string | null;
   pagseguro_enabled: boolean | null;
-  pagseguro_email: string | null;
-  pagseguro_token: string | null;
   pagseguro_sandbox: boolean | null;
   stripe_enabled: boolean | null;
-  stripe_public_key: string | null;
-  stripe_secret_key: string | null;
   stripe_sandbox: boolean | null;
   asaas_enabled: boolean | null;
-  asaas_api_key: string | null;
   asaas_sandbox: boolean | null;
   payment_methods_enabled: string[] | null;
   pix_discount_percent: number | null;
@@ -210,27 +200,17 @@ const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
   whatsapp_message_template: 'Olá! Gostaria de saber mais sobre os produtos da Pincel de Luz.',
   enable_reviews_auto_approve: false,
   reviews_min_rating_to_show: 1,
-  // Payment Gateways
+  // Payment flags (credentials are in payment_credentials table)
   payment_gateway_primary: 'mercadopago',
   mercadopago_enabled: false,
-  mercadopago_public_key: null,
-  mercadopago_access_token: null,
   mercadopago_sandbox: true,
   efi_enabled: false,
-  efi_client_id: null,
-  efi_client_secret: null,
   efi_sandbox: true,
-  efi_pix_key: null,
   pagseguro_enabled: false,
-  pagseguro_email: null,
-  pagseguro_token: null,
   pagseguro_sandbox: true,
   stripe_enabled: false,
-  stripe_public_key: null,
-  stripe_secret_key: null,
   stripe_sandbox: true,
   asaas_enabled: false,
-  asaas_api_key: null,
   asaas_sandbox: true,
   payment_methods_enabled: ['pix', 'credit_card', 'boleto'],
   pix_discount_percent: 5,

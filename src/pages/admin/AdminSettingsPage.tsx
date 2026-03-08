@@ -219,7 +219,7 @@ const AdminSettingsPage = () => {
                   <div className="flex items-center space-x-3 p-4 border rounded-lg">
                     <Checkbox
                       id="pix"
-                      checked={(settings.payment_methods_enabled || []).includes('pix')}
+                      checked={(paymentSettings.payment_methods_enabled || []).includes('pix')}
                       onCheckedChange={() => togglePaymentMethod('pix')}
                     />
                     <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ const AdminSettingsPage = () => {
                   <div className="flex items-center space-x-3 p-4 border rounded-lg">
                     <Checkbox
                       id="credit_card"
-                      checked={(settings.payment_methods_enabled || []).includes('credit_card')}
+                      checked={(paymentSettings.payment_methods_enabled || []).includes('credit_card')}
                       onCheckedChange={() => togglePaymentMethod('credit_card')}
                     />
                     <div className="flex items-center gap-2">
@@ -241,7 +241,7 @@ const AdminSettingsPage = () => {
                   <div className="flex items-center space-x-3 p-4 border rounded-lg">
                     <Checkbox
                       id="boleto"
-                      checked={(settings.payment_methods_enabled || []).includes('boleto')}
+                      checked={(paymentSettings.payment_methods_enabled || []).includes('boleto')}
                       onCheckedChange={() => togglePaymentMethod('boleto')}
                     />
                     <div className="flex items-center gap-2">
@@ -257,8 +257,8 @@ const AdminSettingsPage = () => {
                     <Input
                       id="pix_discount"
                       type="number"
-                      value={settings.pix_discount_percent || 5}
-                      onChange={(e) => updateSetting('pix_discount_percent', Number(e.target.value))}
+                      value={paymentSettings.pix_discount_percent || 5}
+                      onChange={(e) => updatePaymentSetting('pix_discount_percent', Number(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -266,8 +266,8 @@ const AdminSettingsPage = () => {
                     <Input
                       id="boleto_days"
                       type="number"
-                      value={settings.boleto_extra_days || 3}
-                      onChange={(e) => updateSetting('boleto_extra_days', Number(e.target.value))}
+                      value={paymentSettings.boleto_extra_days || 3}
+                      onChange={(e) => updatePaymentSetting('boleto_extra_days', Number(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -275,8 +275,8 @@ const AdminSettingsPage = () => {
                     <Input
                       id="max_installments"
                       type="number"
-                      value={settings.max_installments || 12}
-                      onChange={(e) => updateSetting('max_installments', Number(e.target.value))}
+                      value={paymentSettings.max_installments || 12}
+                      onChange={(e) => updatePaymentSetting('max_installments', Number(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -284,8 +284,8 @@ const AdminSettingsPage = () => {
                     <Input
                       id="min_installment"
                       type="number"
-                      value={settings.min_installment_value || 50}
-                      onChange={(e) => updateSetting('min_installment_value', Number(e.target.value))}
+                      value={paymentSettings.min_installment_value || 50}
+                      onChange={(e) => updatePaymentSetting('min_installment_value', Number(e.target.value))}
                     />
                   </div>
                 </div>
@@ -305,8 +305,8 @@ const AdminSettingsPage = () => {
               </CardHeader>
               <CardContent>
                 <Select
-                  value={settings.payment_gateway_primary || 'mercadopago'}
-                  onValueChange={(value) => updateSetting('payment_gateway_primary', value)}
+                  value={paymentSettings.payment_gateway_primary || 'mercadopago'}
+                  onValueChange={(value) => updatePaymentSetting('payment_gateway_primary', value)}
                 >
                   <SelectTrigger className="w-full md:w-80">
                     <SelectValue />
@@ -323,7 +323,7 @@ const AdminSettingsPage = () => {
             </Card>
 
             {/* Mercado Pago */}
-            <Card className={settings.mercadopago_enabled ? 'border-emerald-500/50' : ''}>
+            <Card className={paymentSettings.mercadopago_enabled ? 'border-emerald-500/50' : ''}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -336,12 +336,12 @@ const AdminSettingsPage = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={settings.mercadopago_enabled ?? false}
-                    onCheckedChange={(checked) => updateSetting('mercadopago_enabled', checked)}
+                    checked={paymentSettings.mercadopago_enabled ?? false}
+                    onCheckedChange={(checked) => updatePaymentSetting('mercadopago_enabled', checked)}
                   />
                 </div>
               </CardHeader>
-              {settings.mercadopago_enabled && (
+              {paymentSettings.mercadopago_enabled && (
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
                     <div className="space-y-0.5">
@@ -349,8 +349,8 @@ const AdminSettingsPage = () => {
                       <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
                     </div>
                     <Switch
-                      checked={settings.mercadopago_sandbox ?? true}
-                      onCheckedChange={(checked) => updateSetting('mercadopago_sandbox', checked)}
+                      checked={paymentSettings.mercadopago_sandbox ?? true}
+                      onCheckedChange={(checked) => updatePaymentSetting('mercadopago_sandbox', checked)}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
@@ -358,8 +358,8 @@ const AdminSettingsPage = () => {
                       <Label htmlFor="mp_public_key">Public Key</Label>
                       <Input
                         id="mp_public_key"
-                        value={settings.mercadopago_public_key || ''}
-                        onChange={(e) => updateSetting('mercadopago_public_key', e.target.value)}
+                        value={paymentSettings.mercadopago_public_key || ''}
+                        onChange={(e) => updatePaymentSetting('mercadopago_public_key', e.target.value)}
                         placeholder="APP_USR-xxxx..."
                       />
                     </div>
@@ -368,8 +368,8 @@ const AdminSettingsPage = () => {
                       <Input
                         id="mp_access_token"
                         type="password"
-                        value={settings.mercadopago_access_token || ''}
-                        onChange={(e) => updateSetting('mercadopago_access_token', e.target.value)}
+                        value={paymentSettings.mercadopago_access_token || ''}
+                        onChange={(e) => updatePaymentSetting('mercadopago_access_token', e.target.value)}
                         placeholder="APP_USR-xxxx..."
                       />
                     </div>
@@ -396,7 +396,7 @@ const AdminSettingsPage = () => {
                           toast.error('Erro ao testar conexão');
                         }
                       }}
-                      disabled={testMercadoPago.isPending || !settings.mercadopago_access_token}
+                      disabled={testMercadoPago.isPending || !paymentSettings.mercadopago_access_token}
                     >
                       {testMercadoPago.isPending ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -411,7 +411,7 @@ const AdminSettingsPage = () => {
             </Card>
 
             {/* EFI Bank */}
-            <Card className={settings.efi_enabled ? 'border-emerald-500/50' : ''}>
+            <Card className={paymentSettings.efi_enabled ? 'border-emerald-500/50' : ''}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -424,12 +424,12 @@ const AdminSettingsPage = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={settings.efi_enabled ?? false}
-                    onCheckedChange={(checked) => updateSetting('efi_enabled', checked)}
+                    checked={paymentSettings.efi_enabled ?? false}
+                    onCheckedChange={(checked) => updatePaymentSetting('efi_enabled', checked)}
                   />
                 </div>
               </CardHeader>
-              {settings.efi_enabled && (
+              {paymentSettings.efi_enabled && (
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
                     <div className="space-y-0.5">
@@ -437,8 +437,8 @@ const AdminSettingsPage = () => {
                       <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
                     </div>
                     <Switch
-                      checked={settings.efi_sandbox ?? true}
-                      onCheckedChange={(checked) => updateSetting('efi_sandbox', checked)}
+                      checked={paymentSettings.efi_sandbox ?? true}
+                      onCheckedChange={(checked) => updatePaymentSetting('efi_sandbox', checked)}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
@@ -446,8 +446,8 @@ const AdminSettingsPage = () => {
                       <Label htmlFor="efi_client_id">Client ID</Label>
                       <Input
                         id="efi_client_id"
-                        value={settings.efi_client_id || ''}
-                        onChange={(e) => updateSetting('efi_client_id', e.target.value)}
+                        value={paymentSettings.efi_client_id || ''}
+                        onChange={(e) => updatePaymentSetting('efi_client_id', e.target.value)}
                         placeholder="Client_Id_xxxxx..."
                       />
                     </div>
@@ -456,8 +456,8 @@ const AdminSettingsPage = () => {
                       <Input
                         id="efi_client_secret"
                         type="password"
-                        value={settings.efi_client_secret || ''}
-                        onChange={(e) => updateSetting('efi_client_secret', e.target.value)}
+                        value={paymentSettings.efi_client_secret || ''}
+                        onChange={(e) => updatePaymentSetting('efi_client_secret', e.target.value)}
                         placeholder="Client_Secret_xxxxx..."
                       />
                     </div>
@@ -466,8 +466,8 @@ const AdminSettingsPage = () => {
                     <Label htmlFor="efi_pix_key">Chave PIX</Label>
                     <Input
                       id="efi_pix_key"
-                      value={settings.efi_pix_key || ''}
-                      onChange={(e) => updateSetting('efi_pix_key', e.target.value)}
+                      value={paymentSettings.efi_pix_key || ''}
+                      onChange={(e) => updatePaymentSetting('efi_pix_key', e.target.value)}
                       placeholder="email@empresa.com ou CNPJ"
                     />
                     <p className="text-xs text-muted-foreground">Chave PIX cadastrada na EFI</p>
@@ -494,7 +494,7 @@ const AdminSettingsPage = () => {
                           toast.error('Erro ao testar conexão');
                         }
                       }}
-                      disabled={testEfiBank.isPending || !settings.efi_client_id || !settings.efi_client_secret}
+                      disabled={testEfiBank.isPending || !paymentSettings.efi_client_id || !paymentSettings.efi_client_secret}
                     >
                       {testEfiBank.isPending ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -509,7 +509,7 @@ const AdminSettingsPage = () => {
             </Card>
 
             {/* PagSeguro */}
-            <Card className={settings.pagseguro_enabled ? 'border-emerald-500/50' : ''}>
+            <Card className={paymentSettings.pagseguro_enabled ? 'border-emerald-500/50' : ''}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -522,12 +522,12 @@ const AdminSettingsPage = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={settings.pagseguro_enabled ?? false}
-                    onCheckedChange={(checked) => updateSetting('pagseguro_enabled', checked)}
+                    checked={paymentSettings.pagseguro_enabled ?? false}
+                    onCheckedChange={(checked) => updatePaymentSetting('pagseguro_enabled', checked)}
                   />
                 </div>
               </CardHeader>
-              {settings.pagseguro_enabled && (
+              {paymentSettings.pagseguro_enabled && (
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
                     <div className="space-y-0.5">
@@ -535,8 +535,8 @@ const AdminSettingsPage = () => {
                       <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
                     </div>
                     <Switch
-                      checked={settings.pagseguro_sandbox ?? true}
-                      onCheckedChange={(checked) => updateSetting('pagseguro_sandbox', checked)}
+                      checked={paymentSettings.pagseguro_sandbox ?? true}
+                      onCheckedChange={(checked) => updatePaymentSetting('pagseguro_sandbox', checked)}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
@@ -545,8 +545,8 @@ const AdminSettingsPage = () => {
                       <Input
                         id="ps_email"
                         type="email"
-                        value={settings.pagseguro_email || ''}
-                        onChange={(e) => updateSetting('pagseguro_email', e.target.value)}
+                        value={paymentSettings.pagseguro_email || ''}
+                        onChange={(e) => updatePaymentSetting('pagseguro_email', e.target.value)}
                         placeholder="email@empresa.com"
                       />
                     </div>
@@ -555,8 +555,8 @@ const AdminSettingsPage = () => {
                       <Input
                         id="ps_token"
                         type="password"
-                        value={settings.pagseguro_token || ''}
-                        onChange={(e) => updateSetting('pagseguro_token', e.target.value)}
+                        value={paymentSettings.pagseguro_token || ''}
+                        onChange={(e) => updatePaymentSetting('pagseguro_token', e.target.value)}
                         placeholder="xxxxx-xxxxx-xxxxx..."
                       />
                     </div>
@@ -566,7 +566,7 @@ const AdminSettingsPage = () => {
             </Card>
 
             {/* Stripe */}
-            <Card className={settings.stripe_enabled ? 'border-emerald-500/50' : ''}>
+            <Card className={paymentSettings.stripe_enabled ? 'border-emerald-500/50' : ''}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -579,12 +579,12 @@ const AdminSettingsPage = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={settings.stripe_enabled ?? false}
-                    onCheckedChange={(checked) => updateSetting('stripe_enabled', checked)}
+                    checked={paymentSettings.stripe_enabled ?? false}
+                    onCheckedChange={(checked) => updatePaymentSetting('stripe_enabled', checked)}
                   />
                 </div>
               </CardHeader>
-              {settings.stripe_enabled && (
+              {paymentSettings.stripe_enabled && (
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
                     <div className="space-y-0.5">
@@ -592,8 +592,8 @@ const AdminSettingsPage = () => {
                       <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
                     </div>
                     <Switch
-                      checked={settings.stripe_sandbox ?? true}
-                      onCheckedChange={(checked) => updateSetting('stripe_sandbox', checked)}
+                      checked={paymentSettings.stripe_sandbox ?? true}
+                      onCheckedChange={(checked) => updatePaymentSetting('stripe_sandbox', checked)}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
@@ -601,8 +601,8 @@ const AdminSettingsPage = () => {
                       <Label htmlFor="stripe_pk">Publishable Key</Label>
                       <Input
                         id="stripe_pk"
-                        value={settings.stripe_public_key || ''}
-                        onChange={(e) => updateSetting('stripe_public_key', e.target.value)}
+                        value={paymentSettings.stripe_public_key || ''}
+                        onChange={(e) => updatePaymentSetting('stripe_public_key', e.target.value)}
                         placeholder="pk_test_xxxxx..."
                       />
                     </div>
@@ -611,8 +611,8 @@ const AdminSettingsPage = () => {
                       <Input
                         id="stripe_sk"
                         type="password"
-                        value={settings.stripe_secret_key || ''}
-                        onChange={(e) => updateSetting('stripe_secret_key', e.target.value)}
+                        value={paymentSettings.stripe_secret_key || ''}
+                        onChange={(e) => updatePaymentSetting('stripe_secret_key', e.target.value)}
                         placeholder="sk_test_xxxxx..."
                       />
                     </div>
@@ -639,7 +639,7 @@ const AdminSettingsPage = () => {
                           toast.error('Erro ao testar conexão');
                         }
                       }}
-                      disabled={testStripe.isPending || !settings.stripe_secret_key}
+                      disabled={testStripe.isPending || !paymentSettings.stripe_secret_key}
                     >
                       {testStripe.isPending ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -654,7 +654,7 @@ const AdminSettingsPage = () => {
             </Card>
 
             {/* Asaas */}
-            <Card className={settings.asaas_enabled ? 'border-emerald-500/50' : ''}>
+            <Card className={paymentSettings.asaas_enabled ? 'border-emerald-500/50' : ''}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -667,12 +667,12 @@ const AdminSettingsPage = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={settings.asaas_enabled ?? false}
-                    onCheckedChange={(checked) => updateSetting('asaas_enabled', checked)}
+                    checked={paymentSettings.asaas_enabled ?? false}
+                    onCheckedChange={(checked) => updatePaymentSetting('asaas_enabled', checked)}
                   />
                 </div>
               </CardHeader>
-              {settings.asaas_enabled && (
+              {paymentSettings.asaas_enabled && (
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
                     <div className="space-y-0.5">
@@ -680,8 +680,8 @@ const AdminSettingsPage = () => {
                       <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
                     </div>
                     <Switch
-                      checked={settings.asaas_sandbox ?? true}
-                      onCheckedChange={(checked) => updateSetting('asaas_sandbox', checked)}
+                      checked={paymentSettings.asaas_sandbox ?? true}
+                      onCheckedChange={(checked) => updatePaymentSetting('asaas_sandbox', checked)}
                     />
                   </div>
                   <div className="space-y-2">
@@ -689,8 +689,8 @@ const AdminSettingsPage = () => {
                     <Input
                       id="asaas_key"
                       type="password"
-                      value={settings.asaas_api_key || ''}
-                      onChange={(e) => updateSetting('asaas_api_key', e.target.value)}
+                      value={paymentSettings.asaas_api_key || ''}
+                      onChange={(e) => updatePaymentSetting('asaas_api_key', e.target.value)}
                       placeholder="$aact_xxxxx..."
                     />
                   </div>

@@ -47,7 +47,7 @@ serve(async (req) => {
       if (paymentId) {
         // Get payment config
         const { data: config } = await supabase
-          .from("company_info")
+          .from("payment_credentials")
           .select("mercadopago_access_token")
           .order('updated_at', { ascending: false })
           .limit(1)
