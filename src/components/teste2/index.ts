@@ -1,0 +1,11 @@
+export { GlassNav } from './GlassNav';
+export { DarkHero } from './DarkHero';
+export { CategoriesGrid } from './CategoriesGrid';
+export { DarkProductCard } from './DarkProductCard';
+export { FeaturedSection } from './FeaturedSection';
+export { SocialProofSection } from './SocialProofSection';
+export { NewsletterSection } from './NewsletterSection';
+export { DifferentialsSection } from './DifferentialsSection';
+export { CTASection } from './CTASection';
+export { DarkFooter } from './DarkFooter';
+export { TrustMarquee } from './TrustMarquee';
