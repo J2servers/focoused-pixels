@@ -23,7 +23,7 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { LaserScrollSection } from '@/components/product/LaserScrollSection';
+
 import { ProductCardOptimized } from '@/components/conversion/ProductCardOptimized';
 import {
   TrustBar,
@@ -173,7 +173,7 @@ const Index = () => {
           })
         )}
 
-        <LaserScrollSection />
+        
         <SocialProofSection />
         <GuaranteesSection />
 
