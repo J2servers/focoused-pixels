@@ -105,12 +105,16 @@ const AdminSettingsPage = () => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
+  const updatePaymentSetting = <K extends keyof PaymentCredentials>(key: K, value: PaymentCredentials[K]) => {
+    setPaymentSettings(prev => ({ ...prev, [key]: value }));
+  };
+
   const togglePaymentMethod = (method: string) => {
-    const current = settings.payment_methods_enabled || ['pix', 'credit_card', 'boleto'];
+    const current = paymentSettings.payment_methods_enabled || ['pix', 'credit_card', 'boleto'];
     if (current.includes(method)) {
-      updateSetting('payment_methods_enabled', current.filter(m => m !== method));
+      updatePaymentSetting('payment_methods_enabled', current.filter(m => m !== method));
     } else {
-      updateSetting('payment_methods_enabled', [...current, method]);
+      updatePaymentSetting('payment_methods_enabled', [...current, method]);
     }
   };
 
