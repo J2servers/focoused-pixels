@@ -305,8 +305,8 @@ const AdminSettingsPage = () => {
               </CardHeader>
               <CardContent>
                 <Select
-                  value={settings.payment_gateway_primary || 'mercadopago'}
-                  onValueChange={(value) => updateSetting('payment_gateway_primary', value)}
+                  value={paymentSettings.payment_gateway_primary || 'mercadopago'}
+                  onValueChange={(value) => updatePaymentSetting('payment_gateway_primary', value)}
                 >
                   <SelectTrigger className="w-full md:w-80">
                     <SelectValue />
