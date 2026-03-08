@@ -23,7 +23,6 @@ const resetSchema = z.object({
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
-type SignupFormData = z.infer<typeof signupSchema>;
 type ResetFormData = z.infer<typeof resetSchema>;
 
 const AdminLoginPage = () => {
