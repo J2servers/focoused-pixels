@@ -446,8 +446,8 @@ const AdminSettingsPage = () => {
                       <Label htmlFor="efi_client_id">Client ID</Label>
                       <Input
                         id="efi_client_id"
-                        value={settings.efi_client_id || ''}
-                        onChange={(e) => updateSetting('efi_client_id', e.target.value)}
+                        value={paymentSettings.efi_client_id || ''}
+                        onChange={(e) => updatePaymentSetting('efi_client_id', e.target.value)}
                         placeholder="Client_Id_xxxxx..."
                       />
                     </div>
