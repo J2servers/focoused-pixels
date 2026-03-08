@@ -358,8 +358,8 @@ const AdminSettingsPage = () => {
                       <Label htmlFor="mp_public_key">Public Key</Label>
                       <Input
                         id="mp_public_key"
-                        value={settings.mercadopago_public_key || ''}
-                        onChange={(e) => updateSetting('mercadopago_public_key', e.target.value)}
+                        value={paymentSettings.mercadopago_public_key || ''}
+                        onChange={(e) => updatePaymentSetting('mercadopago_public_key', e.target.value)}
                         placeholder="APP_USR-xxxx..."
                       />
                     </div>
