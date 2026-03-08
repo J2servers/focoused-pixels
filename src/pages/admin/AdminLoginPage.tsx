@@ -262,16 +262,16 @@ const AdminLoginPage = () => {
                   )}
                 </Button>
 
-                <div className="flex flex-col gap-2 pt-2">
+                <div className="pt-2">
                   <Button
                     type="button"
-                    variant="outline"
-                    className="w-full h-11 border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text-muted))] hover:bg-[hsl(var(--admin-sidebar-hover))] hover:text-white hover:border-[hsl(var(--admin-accent-purple)/0.5)]"
-                    onClick={() => setShowSignupForm(true)}
+                    variant="link"
+                    className="text-sm text-[hsl(var(--admin-accent-purple))] hover:text-[hsl(var(--admin-accent-pink))]"
+                    onClick={() => setShowResetForm(true)}
                   >
-                    Criar nova conta
+                    Esqueceu sua senha?
                   </Button>
-                  
+                </div>
                   <Button
                     type="button"
                     variant="link"
