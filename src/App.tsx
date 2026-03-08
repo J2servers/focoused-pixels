@@ -24,6 +24,7 @@ import CategoriesPage from "./pages/CategoriesPage";
 import CustomerAreaPage from "./pages/CustomerAreaPage";
 import NotFound from "./pages/NotFound";
 import TestePage from "./pages/TestePage";
+import Teste2Page from "./pages/Teste2Page";
 
 // Payment Pages
 import PaymentPage from "./pages/PaymentPage";
