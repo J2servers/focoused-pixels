@@ -368,8 +368,8 @@ const AdminSettingsPage = () => {
                       <Input
                         id="mp_access_token"
                         type="password"
-                        value={settings.mercadopago_access_token || ''}
-                        onChange={(e) => updateSetting('mercadopago_access_token', e.target.value)}
+                        value={paymentSettings.mercadopago_access_token || ''}
+                        onChange={(e) => updatePaymentSetting('mercadopago_access_token', e.target.value)}
                         placeholder="APP_USR-xxxx..."
                       />
                     </div>
