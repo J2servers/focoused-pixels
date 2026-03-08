@@ -639,7 +639,7 @@ const AdminSettingsPage = () => {
                           toast.error('Erro ao testar conexão');
                         }
                       }}
-                      disabled={testStripe.isPending || !settings.stripe_secret_key}
+                      disabled={testStripe.isPending || !paymentSettings.stripe_secret_key}
                     >
                       {testStripe.isPending ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
