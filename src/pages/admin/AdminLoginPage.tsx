@@ -27,7 +27,7 @@ type ResetFormData = z.infer<typeof resetSchema>;
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
-  const { user, role, isLoading, signIn, signUp, resetPassword } = useAuthContext();
+  const { user, role, isLoading, signIn, resetPassword } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
