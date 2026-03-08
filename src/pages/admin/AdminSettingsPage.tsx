@@ -555,8 +555,8 @@ const AdminSettingsPage = () => {
                       <Input
                         id="ps_token"
                         type="password"
-                        value={settings.pagseguro_token || ''}
-                        onChange={(e) => updateSetting('pagseguro_token', e.target.value)}
+                        value={paymentSettings.pagseguro_token || ''}
+                        onChange={(e) => updatePaymentSetting('pagseguro_token', e.target.value)}
                         placeholder="xxxxx-xxxxx-xxxxx..."
                       />
                     </div>
