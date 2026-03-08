@@ -50,6 +50,12 @@ const AdminSettingsPage = () => {
     }
   }, [companyInfo]);
 
+  useEffect(() => {
+    if (paymentCreds) {
+      setPaymentSettings(paymentCreds);
+    }
+  }, [paymentCreds]);
+
   const handleChangePassword = async () => {
     if (passwords.newPassword.length < 6) {
       toast.error('A senha deve ter pelo menos 6 caracteres');
