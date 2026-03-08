@@ -84,10 +84,16 @@ const AdminSettingsPage = () => {
 
   const handleSaveSettings = async () => {
     try {
-      await updateCompany.mutateAsync({
-        id: companyInfo?.id || null,
-        data: settings,
-      });
+      await Promise.all([
+        updateCompany.mutateAsync({
+          id: companyInfo?.id || null,
+          data: settings,
+        }),
+        updatePayment.mutateAsync({
+          id: paymentCreds?.id || null,
+          data: paymentSettings,
+        }),
+      ]);
       toast.success('Configurações salvas com sucesso!');
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao salvar';
