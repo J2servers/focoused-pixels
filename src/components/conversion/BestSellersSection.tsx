@@ -1,10 +1,8 @@
 /**
- * BestSellersSection - Seção de produtos mais vendidos com contador
- * Direciona atenção para produtos de alta conversão
+ * BestSellersSection - Mais vendidos com design limpo
  */
 
-import { motion } from 'framer-motion';
-import { Flame, TrendingUp, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,20 +16,19 @@ interface BestSellersSectionProps {
 export function BestSellersSection({ onAddToCart }: BestSellersSectionProps) {
   const { data: products = [], isLoading } = useProducts();
 
-  // Sort by rating and reviews to get "best sellers"
   const bestSellers = [...products]
     .filter(p => p.inStock)
     .sort((a, b) => (b.rating * b.reviews) - (a.rating * a.reviews))
-    .slice(0, 4);
+    .slice(0, 8);
 
   if (isLoading) {
     return (
-      <section className="py-16">
+      <section className="py-12 lg:py-16">
         <div className="container mx-auto px-4">
-          <Skeleton className="h-10 w-64 mb-8" />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          <Skeleton className="h-8 w-48 mb-8" />
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="aspect-square rounded-2xl" />
+              <Skeleton key={i} className="aspect-[3/4] rounded-xl" />
             ))}
           </div>
         </div>
@@ -42,38 +39,26 @@ export function BestSellersSection({ onAddToCart }: BestSellersSectionProps) {
   if (bestSellers.length === 0) return null;
 
   return (
-    <section className="py-16">
+    <section className="py-12 lg:py-16">
       <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8"
-        >
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-destructive/10">
-              <Flame className="h-6 w-6 text-destructive" />
-            </div>
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-                Mais Vendidos 
-                <TrendingUp className="h-6 w-6 text-primary" />
-              </h2>
-              <p className="text-muted-foreground">Os favoritos dos nossos clientes</p>
-            </div>
+        {/* Header */}
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+              Mais Vendidos
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">Os favoritos dos nossos clientes</p>
           </div>
-          
           <Link to="/categorias">
-            <Button variant="outline" className="group">
-              Ver todos os produtos
-              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            <Button variant="ghost" size="sm" className="text-primary font-semibold group">
+              Ver todos
+              <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
             </Button>
           </Link>
-        </motion.div>
+        </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        {/* Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
           {bestSellers.map((product, index) => (
             <ProductCardOptimized
               key={product.id}

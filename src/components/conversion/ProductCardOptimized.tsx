@@ -1,17 +1,15 @@
 /**
- * ProductCardOptimized - Card de produto otimizado para conversão
- * Design simplificado com 1 CTA forte, badges de urgência e economia destacada
+ * ProductCardOptimized - Card de produto com design moderno e limpo
  */
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Flame, Zap, Eye, ShoppingCart, TrendingUp } from 'lucide-react';
+import { Star, Eye, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Product } from '@/data/products';
 import { useCart } from '@/hooks/useCart';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
 import { QuickViewModal } from '@/components/storefront/QuickViewModal';
 
 interface ProductCardOptimizedProps {
@@ -54,139 +52,99 @@ export function ProductCardOptimized({
     setQuickViewOpen(true);
   };
 
-  // Calculate savings
   const savings = product.originalPrice 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : product.discount || 0;
 
-  // Dynamic badges
-  const getBadge = () => {
-    if (!product.inStock) {
-      return { icon: null, label: 'ESGOTADO', className: 'bg-muted text-muted-foreground' };
-    }
-    if (savings >= 20) {
-      return { icon: <Flame className="h-3 w-3" />, label: `-${savings}%`, className: 'bg-destructive text-destructive-foreground' };
-    }
-    if (product.badge === 'lancamento') {
-      return { icon: <Zap className="h-3 w-3" />, label: 'NOVO', className: 'bg-primary text-primary-foreground' };
-    }
-    if (product.badge === 'brinde') {
-      return { icon: <TrendingUp className="h-3 w-3" />, label: 'POPULAR', className: 'bg-accent text-accent-foreground' };
-    }
-    return null;
-  };
-
-  const badge = getBadge();
-
-  // Fake stock count for urgency (random between 3-12)
-  const fakeStock = Math.floor(Math.random() * 10) + 3;
-
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: index * 0.05, ease: 'easeOut' }}
-        className="h-full"
+      <Link 
+        to={`/produto/${product.slug}`}
+        className="group flex flex-col h-full bg-card rounded-xl overflow-hidden border border-border/50 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500"
       >
-        <Link 
-          to={`/produto/${product.slug}`}
-          className="group flex flex-col h-full bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/30 hover:shadow-xl transition-all duration-300"
-        >
-          {/* Image Container */}
-          <div className="relative aspect-square overflow-hidden">
-            {/* Badge */}
-            {badge && (
-              <Badge className={`absolute top-3 left-3 z-10 ${badge.className} text-xs font-bold px-2 py-1 flex items-center gap-1`}>
-                {badge.icon}
-                {badge.label}
-              </Badge>
-            )}
+        {/* Image */}
+        <div className="relative aspect-square overflow-hidden bg-muted/30">
+          {/* Badge */}
+          {savings > 0 && product.inStock && (
+            <Badge className="absolute top-2.5 left-2.5 z-10 bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-md">
+              -{savings}%
+            </Badge>
+          )}
+          {!product.inStock && (
+            <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-[2px] flex items-center justify-center">
+              <span className="text-sm font-semibold text-muted-foreground bg-muted px-4 py-1.5 rounded-full">Esgotado</span>
+            </div>
+          )}
 
-            {/* Quick View */}
-            <motion.button
-              onClick={handleQuickView}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="absolute top-3 right-3 z-10 bg-background/90 hover:bg-background p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all"
-            >
-              <Eye className="h-4 w-4" />
-            </motion.button>
+          {/* Quick View on hover */}
+          <button
+            onClick={handleQuickView}
+            className="absolute top-2.5 right-2.5 z-10 bg-card/90 backdrop-blur-sm hover:bg-card p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0"
+          >
+            <Eye className="h-4 w-4 text-foreground/70" />
+          </button>
 
-            {/* Product Image */}
-            <motion.img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-full object-cover"
-              whileHover={{ scale: 1.08 }}
-              transition={{ duration: 0.4 }}
-            />
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            loading="lazy"
+          />
+        </div>
 
-            {/* Urgency indicator */}
-            {product.inStock && fakeStock <= 5 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3"
-              >
-                <div className="flex items-center gap-2 text-white text-xs font-medium">
-                  <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-                  Apenas {fakeStock} em estoque!
-                </div>
-              </motion.div>
-            )}
+        {/* Content */}
+        <div className="flex flex-col flex-1 p-3.5 sm:p-4">
+          {/* Rating */}
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <div className="flex items-center gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-3 w-3 ${
+                    i < Math.floor(product.rating)
+                      ? 'fill-accent text-accent'
+                      : 'fill-muted text-muted'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-[11px] text-muted-foreground">({product.reviews})</span>
           </div>
 
-          {/* Content */}
-          <div className="flex flex-col flex-1 p-4">
-            {/* Rating - Compact */}
-            <div className="flex items-center gap-1 mb-2">
-              <Star className="h-4 w-4 fill-accent text-accent" />
-              <span className="text-sm font-medium">{product.rating.toFixed(1)}</span>
-              <span className="text-xs text-muted-foreground">({product.reviews})</span>
-            </div>
+          {/* Name */}
+          <h3 className="font-medium text-sm leading-snug line-clamp-2 mb-auto text-foreground/90 group-hover:text-primary transition-colors duration-300">
+            {product.name}
+          </h3>
 
-            {/* Product Name */}
-            <h3 className="font-semibold text-sm line-clamp-2 mb-3 group-hover:text-primary transition-colors flex-1">
-              {product.name}
-            </h3>
-
-            {/* Price Section - Emphasis on savings */}
-            <div className="mb-4">
-              {product.originalPrice && (
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm text-muted-foreground line-through">
-                    R$ {product.originalPrice.toFixed(2).replace('.', ',')}
-                  </span>
-                  <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs font-bold">
-                    Economize R$ {(product.originalPrice - product.price).toFixed(2).replace('.', ',')}
-                  </Badge>
-                </div>
-              )}
-              <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-primary">
-                  R$ {product.price.toFixed(2).replace('.', ',')}
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                ou 3x de R$ {(product.price / 3).toFixed(2).replace('.', ',')} sem juros
-              </p>
-            </div>
-
-            {/* Single Strong CTA */}
-            <Button 
-              onClick={handleAddToCart}
-              disabled={!product.inStock}
-              className="w-full font-bold text-xs sm:text-sm py-4 sm:py-5 rounded-xl bg-primary hover:bg-primary/90 group/btn px-2 sm:px-4"
-            >
-              <ShoppingCart className="h-4 w-4 flex-shrink-0 group-hover/btn:scale-110 transition-transform" />
-              <span className="ml-1.5 sm:ml-2 truncate">
-                {product.inStock ? 'COMPRAR' : 'INDISPONÍVEL'}
+          {/* Price */}
+          <div className="mt-3 space-y-0.5">
+            {product.originalPrice && (
+              <span className="text-xs text-muted-foreground line-through block">
+                R$ {product.originalPrice.toFixed(2).replace('.', ',')}
               </span>
-            </Button>
+            )}
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg sm:text-xl font-bold text-foreground">
+                R$ {product.price.toFixed(2).replace('.', ',')}
+              </span>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              ou 3x de R$ {(product.price / 3).toFixed(2).replace('.', ',')}
+            </p>
           </div>
-        </Link>
-      </motion.div>
+
+          {/* CTA */}
+          <Button 
+            onClick={handleAddToCart}
+            disabled={!product.inStock}
+            size="sm"
+            className="w-full mt-3 font-semibold text-xs rounded-lg h-9"
+          >
+            <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
+            {product.inStock ? 'Adicionar' : 'Indisponível'}
+          </Button>
+        </div>
+      </Link>
 
       <QuickViewModal
         product={product}
