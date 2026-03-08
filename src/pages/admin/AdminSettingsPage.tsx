@@ -275,8 +275,8 @@ const AdminSettingsPage = () => {
                     <Input
                       id="max_installments"
                       type="number"
-                      value={settings.max_installments || 12}
-                      onChange={(e) => updateSetting('max_installments', Number(e.target.value))}
+                      value={paymentSettings.max_installments || 12}
+                      onChange={(e) => updatePaymentSetting('max_installments', Number(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
