@@ -466,8 +466,8 @@ const AdminSettingsPage = () => {
                     <Label htmlFor="efi_pix_key">Chave PIX</Label>
                     <Input
                       id="efi_pix_key"
-                      value={settings.efi_pix_key || ''}
-                      onChange={(e) => updateSetting('efi_pix_key', e.target.value)}
+                      value={paymentSettings.efi_pix_key || ''}
+                      onChange={(e) => updatePaymentSetting('efi_pix_key', e.target.value)}
                       placeholder="email@empresa.com ou CNPJ"
                     />
                     <p className="text-xs text-muted-foreground">Chave PIX cadastrada na EFI</p>
