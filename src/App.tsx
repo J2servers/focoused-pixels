@@ -110,6 +110,7 @@ const App = () => (
               <Route path="/admin/api" element={<AdminApiDocsPage />} />
               
               <Route path="/teste" element={<TestePage />} />
+              <Route path="/teste2" element={<Teste2Page />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
