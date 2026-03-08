@@ -579,8 +579,8 @@ const AdminSettingsPage = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={settings.stripe_enabled ?? false}
-                    onCheckedChange={(checked) => updateSetting('stripe_enabled', checked)}
+                    checked={paymentSettings.stripe_enabled ?? false}
+                    onCheckedChange={(checked) => updatePaymentSetting('stripe_enabled', checked)}
                   />
                 </div>
               </CardHeader>
