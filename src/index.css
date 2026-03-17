@@ -95,33 +95,40 @@
   }
 
   .dark {
-    --background: 270 20% 8%;
-    --foreground: 0 0% 98%;
+    --background: 240 15% 13%;
+    --foreground: 0 0% 95%;
 
-    --card: 270 20% 10%;
-    --card-foreground: 0 0% 98%;
+    --card: 240 15% 13%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 270 20% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 240 15% 15%;
+    --popover-foreground: 0 0% 95%;
 
     --primary: 280 70% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 280 30% 20%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 280 20% 22%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 270 20% 18%;
-    --muted-foreground: 270 10% 65%;
+    --muted: 240 15% 18%;
+    --muted-foreground: 240 10% 60%;
 
     --accent: 45 100% 50%;
-    --accent-foreground: 270 10% 10%;
+    --accent-foreground: 240 10% 10%;
 
     --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 270 20% 20%;
-    --input: 270 20% 20%;
+    --border: 240 15% 18%;
+    --input: 240 15% 18%;
     --ring: 280 70% 55%;
+
+    /* Dark Neumorphism */
+    --neu-light: 240 15% 18%;
+    --neu-dark: 240 15% 8%;
+    --neu-distance: 6px;
+    --neu-blur: 12px;
+    --neu-intensity: 1;
 
     --admin-bg: 250 25% 8%;
     --admin-sidebar: 255 30% 6%;
@@ -139,13 +146,13 @@
     --admin-text: 0 0% 98%;
     --admin-text-muted: 250 15% 60%;
     --admin-glow: 280 100% 65%;
-    --sidebar-background: 270 20% 10%;
-    --sidebar-foreground: 0 0% 98%;
+    --sidebar-background: 240 15% 13%;
+    --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 280 70% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 280 30% 20%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 270 20% 20%;
+    --sidebar-accent: 280 20% 22%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 240 15% 18%;
     --sidebar-ring: 280 70% 55%;
   }
 }
