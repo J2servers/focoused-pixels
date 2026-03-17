@@ -116,42 +116,48 @@
   }
 
   .dark {
-    --background: 240 15% 13%;
+    --background: 252 15% 13%;
     --foreground: 0 0% 95%;
 
-    --card: 240 15% 13%;
+    --card: 252 15% 13%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 240 15% 15%;
+    --popover: 252 15% 15%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 280 70% 55%;
+    --primary: 264 90% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 280 20% 22%;
+    --secondary: 264 20% 22%;
     --secondary-foreground: 0 0% 95%;
 
-    --muted: 240 15% 18%;
-    --muted-foreground: 240 10% 60%;
+    --muted: 252 15% 18%;
+    --muted-foreground: 252 10% 60%;
 
     --accent: 45 100% 50%;
-    --accent-foreground: 240 10% 10%;
+    --accent-foreground: 252 10% 10%;
 
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 240 15% 18%;
-    --input: 240 15% 18%;
-    --ring: 280 70% 55%;
+    --border: 252 15% 18%;
+    --input: 252 15% 18%;
+    --ring: 264 90% 60%;
 
-    /* Dark Neumorphism - Deep Machined */
-    --neu-light: 240 15% 20%;
-    --neu-dark: 240 15% 5%;
-    --neu-distance: 8px;
-    --neu-blur: 16px;
+    --neu-light: 252 15% 20%;
+    --neu-dark: 252 15% 5%;
+    --neu-distance: 6px;
+    --neu-blur: 12px;
     --neu-intensity: 1;
-    --neu-inner-distance: 4px;
-    --neu-inner-blur: 8px;
+    --neu-inner-distance: 3px;
+    --neu-inner-blur: 6px;
+
+    --neon-opacity: 0.25;
+    --neon-opacity-hover: 0.5;
+
+    --surface-base: 252 15% 13%;
+    --surface-elevated: 252 15% 16%;
+    --surface-inset: 252 15% 10%;
 
     --admin-bg: 250 25% 8%;
     --admin-sidebar: 255 30% 6%;
@@ -169,14 +175,14 @@
     --admin-text: 0 0% 98%;
     --admin-text-muted: 250 15% 60%;
     --admin-glow: 280 100% 65%;
-    --sidebar-background: 240 15% 13%;
+    --sidebar-background: 252 15% 13%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 280 70% 55%;
+    --sidebar-primary: 264 90% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 280 20% 22%;
+    --sidebar-accent: 264 20% 22%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 240 15% 18%;
-    --sidebar-ring: 280 70% 55%;
+    --sidebar-border: 252 15% 18%;
+    --sidebar-ring: 264 90% 60%;
   }
 }
 
