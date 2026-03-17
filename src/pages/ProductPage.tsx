@@ -28,6 +28,7 @@ const ProductPage = () => {
   const { productSlug } = useParams();
   const { data: product, isLoading } = useProductBySlug(productSlug);
   const { data: category } = useCategoryBySlug(product?.category);
+  const navigate = useNavigate();
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
