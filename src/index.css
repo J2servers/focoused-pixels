@@ -17,65 +17,75 @@
 
 @layer base {
   :root {
-    /* Neumorphism Base - Soft Light Theme */
-    --background: 240 20% 92%;
-    --foreground: 240 10% 15%;
+    /* ═══ Neumorphism Premium Surfaces ═══ */
+    --background: 252 18% 93%;
+    --foreground: 260 20% 16%;
 
-    --card: 240 20% 92%;
-    --card-foreground: 240 10% 15%;
+    --card: 252 18% 93%;
+    --card-foreground: 260 20% 16%;
 
-    --popover: 240 20% 94%;
-    --popover-foreground: 240 10% 15%;
+    --popover: 252 20% 95%;
+    --popover-foreground: 260 20% 16%;
 
-    /* Primary - Roxo Vibrante Pincel de Luz */
-    --primary: 280 70% 43%;
+    /* Primary - Roxo Assinatura */
+    --primary: 264 100% 65%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Roxo Claro */
-    --secondary: 280 30% 88%;
-    --secondary-foreground: 280 70% 43%;
+    --secondary: 264 30% 90%;
+    --secondary-foreground: 264 80% 50%;
 
-    --muted: 240 15% 88%;
-    --muted-foreground: 240 10% 45%;
+    --muted: 252 15% 88%;
+    --muted-foreground: 260 12% 42%;
 
-    /* Accent - Amarelo Dourado */
+    /* Accent - Dourado Premium */
     --accent: 45 100% 50%;
-    --accent-foreground: 240 10% 15%;
+    --accent-foreground: 260 20% 16%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 15% 85%;
-    --input: 240 15% 85%;
-    --ring: 280 70% 43%;
+    --border: 252 15% 86%;
+    --input: 252 15% 86%;
+    --ring: 264 100% 65%;
 
     --radius: 0.75rem;
 
-    /* Neumorphism Shadow Tokens - Deep Machined */
+    /* ═══ Neumorphism Shadow System ═══ */
     --neu-light: 0 0% 100%;
-    --neu-dark: 240 20% 75%;
-    --neu-distance: 8px;
-    --neu-blur: 16px;
-    --neu-intensity: 0.85;
-    --neu-inner-distance: 4px;
-    --neu-inner-blur: 8px;
+    --neu-dark: 240 18% 76%;
+    --neu-distance: 6px;
+    --neu-blur: 12px;
+    --neu-intensity: 0.92;
+    --neu-inner-distance: 3px;
+    --neu-inner-blur: 6px;
 
-    /* Neon Glow Border Tokens */
-    --neon-primary: 280 90% 65%;
+    /* ═══ Purple Signature Borders ═══ */
+    --neon-primary: 264 100% 65%;
     --neon-accent: 45 100% 55%;
     --neon-cyan: 185 100% 60%;
     --neon-pink: 340 100% 65%;
     --neon-border-width: 1px;
-    --neon-opacity: 0.6;
-    --neon-opacity-hover: 1;
+    --neon-opacity: 0.22;
+    --neon-opacity-hover: 0.45;
 
-    /* Custom Pincel de Luz tokens */
-    --purple-dark: 280 80% 35%;
-    --purple-light: 280 60% 92%;
+    /* ═══ Surface Tokens ═══ */
+    --surface-base: 252 18% 93%;
+    --surface-elevated: 252 22% 96%;
+    --surface-inset: 252 16% 90%;
+
+    /* ═══ Purple Palette ═══ */
+    --purple-dark: 264 90% 38%;
+    --purple-light: 264 40% 94%;
     --gold: 45 100% 50%;
     --gold-dark: 40 90% 45%;
     --success: 142 76% 36%;
     --whatsapp: 142 70% 45%;
+
+    /* ═══ Typography ═══ */
+    --heading-color: 260 20% 16%;
+    --body-color: 260 14% 34%;
+    --price-color: 264 100% 65%;
 
     /* Admin Panel Tokens - Vivid Dark Theme */
     --admin-bg: 250 25% 8%;
@@ -95,14 +105,14 @@
     --admin-text-muted: 250 15% 60%;
     --admin-glow: 280 100% 65%;
 
-    --sidebar-background: 240 20% 92%;
-    --sidebar-foreground: 240 10% 26%;
-    --sidebar-primary: 280 70% 43%;
+    --sidebar-background: 252 18% 93%;
+    --sidebar-foreground: 260 10% 26%;
+    --sidebar-primary: 264 100% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 280 30% 88%;
-    --sidebar-accent-foreground: 280 70% 43%;
-    --sidebar-border: 240 15% 85%;
-    --sidebar-ring: 280 70% 43%;
+    --sidebar-accent: 264 30% 90%;
+    --sidebar-accent-foreground: 264 80% 50%;
+    --sidebar-border: 252 15% 86%;
+    --sidebar-ring: 264 100% 65%;
   }
 
   .dark {
