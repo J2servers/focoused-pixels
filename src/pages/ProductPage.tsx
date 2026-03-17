@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Star, Truck, Shield, Clock, CreditCard } from 'lucide-react';
+import { Star, Truck, Shield, Clock, CreditCard, ShoppingBag, Zap } from 'lucide-react';
 import { useProductBySlug, useCategoryBySlug } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { storeInfo, discountTiers } from '@/data/store';
@@ -28,6 +28,7 @@ const ProductPage = () => {
   const { productSlug } = useParams();
   const { data: product, isLoading } = useProductBySlug(productSlug);
   const { data: category } = useCategoryBySlug(product?.category);
+  const navigate = useNavigate();
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -210,6 +211,35 @@ const ProductPage = () => {
               <p className="text-muted-foreground leading-relaxed px-1">
                 {product.description}
               </p>
+
+              {/* Buy Now Button */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  size="lg"
+                  className="flex-1 h-14 text-base font-bold rounded-2xl gap-2"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--purple-dark)))',
+                    border: '1px solid hsl(var(--neon-primary) / 0.6)',
+                    boxShadow: '0 4px 14px hsl(var(--primary) / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.15)',
+                  }}
+                  onClick={() => {
+                    handleAddToCart();
+                    navigate('/pagamento');
+                  }}
+                >
+                  <Zap className="h-5 w-5" />
+                  COMPRAR AGORA
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="flex-1 h-14 text-base font-bold rounded-2xl gap-2 neon-border-primary"
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingBag className="h-5 w-5" />
+                  ADICIONAR
+                </Button>
+              </div>
 
               {/* Quick Trust Badges */}
               <div className="grid grid-cols-2 gap-3">
