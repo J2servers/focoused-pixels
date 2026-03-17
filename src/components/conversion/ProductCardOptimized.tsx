@@ -94,8 +94,8 @@ export function ProductCardOptimized({
 
         {/* Content */}
         <div className="flex flex-col flex-1 p-3.5 sm:p-4">
-          {/* Rating */}
-          <div className="flex items-center gap-1.5 mb-1.5">
+          {/* Rating - fixed height */}
+          <div className="flex items-center gap-1.5 mb-1.5 h-4">
             <div className="flex items-center gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <Star
@@ -111,24 +111,26 @@ export function ProductCardOptimized({
             <span className="text-[11px] text-muted-foreground">({product.reviews})</span>
           </div>
 
-          {/* Name */}
-          <h3 className="font-medium text-sm leading-snug line-clamp-2 mb-auto text-foreground/90 group-hover:text-primary transition-colors duration-300">
+          {/* Name - fixed height */}
+          <h3 className="font-medium text-sm leading-snug line-clamp-2 h-10 text-foreground/90 group-hover:text-primary transition-colors duration-300">
             {product.name}
           </h3>
 
-          {/* Price */}
-          <div className="mt-3 space-y-0.5">
-            {product.originalPrice && (
-              <span className="text-xs text-muted-foreground line-through block">
-                R$ {product.originalPrice.toFixed(2).replace('.', ',')}
-              </span>
-            )}
+          {/* Price - fixed height block */}
+          <div className="mt-auto pt-2">
+            <div className="h-4">
+              {product.originalPrice ? (
+                <span className="text-xs text-muted-foreground line-through block leading-none">
+                  R$ {product.originalPrice.toFixed(2).replace('.', ',')}
+                </span>
+              ) : <div />}
+            </div>
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg sm:text-xl font-bold text-foreground">
                 R$ {product.price.toFixed(2).replace('.', ',')}
               </span>
             </div>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[11px] text-muted-foreground mt-0.5">
               ou 3x de R$ {(product.price / 3).toFixed(2).replace('.', ',')}
             </p>
           </div>

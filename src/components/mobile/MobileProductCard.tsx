@@ -110,23 +110,25 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             </motion.div>
           </div>
 
-          {/* Content - flex-grow to fill remaining space */}
+          {/* Content - fixed heights for uniformity */}
           <div className="p-3 flex flex-col flex-grow">
-            <h3 className="font-medium text-sm text-foreground line-clamp-2 h-[2.5rem] leading-tight">
+            <h3 className="font-medium text-xs text-foreground line-clamp-2 h-8 leading-tight">
               {product.name}
             </h3>
             
-            {/* Price */}
-            <div className="mt-auto pt-2 space-y-0.5">
-              {hasDiscount && product.originalPrice && (
-                <p className="text-xs text-muted-foreground line-through">
-                  R$ {product.originalPrice.toFixed(2).replace('.', ',')}
-                </p>
-              )}
-              <p className="text-lg font-bold text-primary leading-tight">
+            {/* Price - fixed height block */}
+            <div className="mt-auto pt-1.5">
+              <div className="h-4">
+                {hasDiscount && product.originalPrice ? (
+                  <p className="text-[10px] text-muted-foreground line-through leading-none">
+                    R$ {product.originalPrice.toFixed(2).replace('.', ',')}
+                  </p>
+                ) : <div />}
+              </div>
+              <p className="text-base font-bold text-primary leading-tight">
                 R$ {product.price.toFixed(2).replace('.', ',')}
               </p>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-[10px] text-muted-foreground mt-0.5">
                 ou 12x de R$ {(product.price / 12).toFixed(2).replace('.', ',')}
               </p>
             </div>
