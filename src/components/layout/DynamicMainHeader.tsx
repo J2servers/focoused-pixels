@@ -120,7 +120,7 @@ export function DynamicMainHeader() {
             <img 
               src={headerLogo} 
               alt={company?.company_name || 'Logo'} 
-              className="h-12 md:h-14 w-auto object-contain"
+              className="h-14 md:h-16 lg:h-20 w-auto max-w-[220px] object-contain"
             />
           </Link>
 
