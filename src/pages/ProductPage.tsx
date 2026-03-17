@@ -212,6 +212,35 @@ const ProductPage = () => {
                 {product.description}
               </p>
 
+              {/* Buy Now Button */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  size="lg"
+                  className="flex-1 h-14 text-base font-bold rounded-2xl gap-2"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--purple-dark)))',
+                    border: '1px solid hsl(var(--neon-primary) / 0.6)',
+                    boxShadow: '0 4px 14px hsl(var(--primary) / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.15)',
+                  }}
+                  onClick={() => {
+                    handleAddToCart();
+                    navigate('/pagamento');
+                  }}
+                >
+                  <Zap className="h-5 w-5" />
+                  COMPRAR AGORA
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="flex-1 h-14 text-base font-bold rounded-2xl gap-2 neon-border-primary"
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingBag className="h-5 w-5" />
+                  ADICIONAR
+                </Button>
+              </div>
+
               {/* Quick Trust Badges */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-center gap-2 text-sm rounded-xl p-3.5 neu-concave">
