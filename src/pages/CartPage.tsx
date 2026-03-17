@@ -1,8 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { TopBar } from '@/components/layout/TopBar';
-import { MainHeader } from '@/components/layout/MainHeader';
-import { NavigationBar } from '@/components/layout/NavigationBar';
-import { Footer } from '@/components/layout/Footer';
+import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
+import { TrustBar } from '@/components/conversion';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Button } from '@/components/ui/button';
@@ -16,18 +14,14 @@ const CartPage = () => {
 
   const handleCheckoutWhatsApp = () => {
     if (items.length === 0) return;
-
     const itemsList = items
       .map(item => `• ${item.name}${item.size ? ` (${item.size})` : ''} - Qtd: ${item.quantity} - R$ ${(item.price * item.quantity).toFixed(2)}`)
       .join('\n');
-
     const message = `Olá! Gostaria de finalizar meu pedido:\n\n${itemsList}\n\n*Total: R$ ${total.toFixed(2)}*\n\nPoderia me ajudar?`;
-    
     window.open(`${storeInfo.whatsappLink}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handlePayNow = () => {
-    // Store payment data in session for the payment page
     const paymentData = {
       orderId: `cart-${Date.now()}`,
       amount: total,
@@ -45,9 +39,9 @@ const CartPage = () => {
   const hasFreeShipping = total >= storeInfo.freeShippingMinimum;
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <TopBar />
-      <MainHeader />
+    <div className="min-h-screen flex flex-col bg-background">
+      <TrustBar />
+      <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1">
@@ -56,14 +50,16 @@ const CartPage = () => {
 
           {items.length === 0 ? (
             <div className="text-center py-16">
-              <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-semibold mb-2">Seu carrinho está vazio</h2>
-              <p className="text-muted-foreground mb-6">
-                Adicione produtos ao carrinho para continuar comprando
-              </p>
-              <Link to="/">
-                <Button size="lg">Continuar comprando</Button>
-              </Link>
+              <div className="rounded-2xl neu-concave p-12 max-w-md mx-auto">
+                <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <h2 className="text-xl font-semibold mb-2">Seu carrinho está vazio</h2>
+                <p className="text-muted-foreground mb-6">
+                  Adicione produtos ao carrinho para continuar comprando
+                </p>
+                <Link to="/">
+                  <Button size="lg">Continuar comprando</Button>
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="grid lg:grid-cols-3 gap-8">
@@ -71,14 +67,14 @@ const CartPage = () => {
               <div className="lg:col-span-2 space-y-4">
                 {/* Free Shipping Progress */}
                 {!hasFreeShipping && (
-                  <div className="bg-secondary/50 rounded-lg p-4 mb-6">
+                  <div className="rounded-2xl neu-concave p-5 mb-6">
                     <p className="text-sm">
                       Faltam <strong>R$ {freeShippingRemaining.toFixed(2)}</strong> para você ganhar{' '}
                       <span className="text-primary font-semibold">Frete Grátis!</span>
                     </p>
-                    <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="mt-2 h-2 rounded-full overflow-hidden neu-pressed">
                       <div 
-                        className="h-full bg-primary transition-all duration-300"
+                        className="h-full bg-primary transition-all duration-300 rounded-full"
                         style={{ width: `${Math.min((total / storeInfo.freeShippingMinimum) * 100, 100)}%` }}
                       />
                     </div>
@@ -86,7 +82,7 @@ const CartPage = () => {
                 )}
 
                 {hasFreeShipping && (
-                  <div className="bg-success/10 text-success rounded-lg p-4 mb-6 flex items-center gap-2">
+                  <div className="rounded-2xl neu-flat p-5 mb-6 flex items-center gap-2 text-success">
                     <span className="text-lg">🎉</span>
                     <p className="font-medium">Parabéns! Você ganhou Frete Grátis!</p>
                   </div>
@@ -96,14 +92,16 @@ const CartPage = () => {
                 {items.map((item) => (
                   <div 
                     key={`${item.id}-${item.size || ''}`}
-                    className="flex gap-4 bg-card rounded-lg border border-border p-4"
+                    className="flex gap-4 rounded-2xl neu-flat p-5"
                   >
                     <Link to={`/produto/${item.id}`} className="flex-shrink-0">
-                      <img 
-                        src={item.image} 
-                        alt={item.name}
-                        className="w-24 h-24 object-cover rounded-lg"
-                      />
+                      <div className="rounded-xl neu-pressed p-1">
+                        <img 
+                          src={item.image} 
+                          alt={item.name}
+                          className="w-24 h-24 object-cover rounded-lg"
+                        />
+                      </div>
                     </Link>
                     <div className="flex-1 min-w-0">
                       <Link 
@@ -126,7 +124,7 @@ const CartPage = () => {
                           <Button
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8"
+                            className="h-8 w-8 rounded-xl"
                             onClick={() => updateQuantity(item.id, item.size, Math.max(1, item.quantity - 1))}
                             disabled={item.quantity <= 1}
                           >
@@ -136,7 +134,7 @@ const CartPage = () => {
                           <Button
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8"
+                            className="h-8 w-8 rounded-xl"
                             onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
                           >
                             <Plus className="h-3 w-3" />
@@ -156,7 +154,6 @@ const CartPage = () => {
                   </div>
                 ))}
 
-                {/* Clear Cart */}
                 <Button 
                   variant="ghost" 
                   onClick={clearCart}
@@ -168,7 +165,7 @@ const CartPage = () => {
 
               {/* Order Summary */}
               <div className="lg:col-span-1">
-                <div className="bg-card rounded-lg border border-border p-6 sticky top-32">
+                <div className="rounded-2xl neu-raised p-6 sticky top-32">
                   <h2 className="text-lg font-bold mb-4">Resumo do Pedido</h2>
                   
                   <div className="space-y-3 text-sm">
@@ -184,7 +181,7 @@ const CartPage = () => {
                     </div>
                   </div>
 
-                  <div className="border-t border-border my-4" />
+                  <div className="border-t border-border/30 my-4" />
 
                   <div className="flex justify-between items-center mb-6">
                     <span className="font-bold text-lg">Total</span>
@@ -197,51 +194,43 @@ const CartPage = () => {
                     ou em até {storeInfo.installments}x de R$ {(total / storeInfo.installments).toFixed(2)} sem juros
                   </p>
 
-                  <Link to="/checkout">
+                  <div className="space-y-3">
                     <Button 
+                      onClick={handlePayNow}
                       size="lg" 
-                      className="w-full font-bold"
+                      className="w-full font-bold rounded-xl"
                     >
-                      <FileText className="h-5 w-5 mr-2" />
-                      Solicitar Orçamento
+                      <CreditCard className="h-5 w-5 mr-2" />
+                      Pagar Agora
                     </Button>
-                  </Link>
 
-                  <Button 
-                    onClick={handlePayNow}
-                    size="lg" 
-                    className="w-full font-bold bg-emerald-600 hover:bg-emerald-700"
-                  >
-                    <CreditCard className="h-5 w-5 mr-2" />
-                    Pagar Agora
-                  </Button>
+                    <Link to="/checkout">
+                      <Button 
+                        size="lg" 
+                        variant="outline"
+                        className="w-full font-bold rounded-xl"
+                      >
+                        <FileText className="h-5 w-5 mr-2" />
+                        Solicitar Orçamento
+                      </Button>
+                    </Link>
 
-                  <Link to="/checkout">
                     <Button 
+                      onClick={handleCheckoutWhatsApp}
                       size="lg" 
-                      variant="outline"
-                      className="w-full font-bold"
+                      variant="ghost"
+                      className="w-full font-bold text-success hover:text-success"
                     >
-                      <FileText className="h-5 w-5 mr-2" />
-                      Solicitar Orçamento
+                      <MessageCircle className="h-5 w-5 mr-2" />
+                      Comprar via WhatsApp
                     </Button>
-                  </Link>
 
-                  <Button 
-                    onClick={handleCheckoutWhatsApp}
-                    size="lg" 
-                    variant="ghost"
-                    className="w-full font-bold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                  >
-                    <MessageCircle className="h-5 w-5 mr-2" />
-                    Comprar via WhatsApp
-                  </Button>
-
-                  <Link to="/" className="block">
-                    <Button variant="ghost" className="w-full text-muted-foreground">
-                      Continuar comprando
-                    </Button>
-                  </Link>
+                    <Link to="/" className="block">
+                      <Button variant="ghost" className="w-full text-muted-foreground">
+                        Continuar comprando
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -249,7 +238,7 @@ const CartPage = () => {
         </div>
       </main>
 
-      <Footer />
+      <DynamicFooter />
       <WhatsAppButton />
       <AIChatWidget />
     </div>
