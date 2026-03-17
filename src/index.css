@@ -51,12 +51,23 @@
 
     --radius: 0.75rem;
 
-    /* Neumorphism Shadow Tokens */
+    /* Neumorphism Shadow Tokens - Deep Machined */
     --neu-light: 0 0% 100%;
-    --neu-dark: 240 20% 80%;
-    --neu-distance: 6px;
-    --neu-blur: 12px;
-    --neu-intensity: 0.7;
+    --neu-dark: 240 20% 75%;
+    --neu-distance: 8px;
+    --neu-blur: 16px;
+    --neu-intensity: 0.85;
+    --neu-inner-distance: 4px;
+    --neu-inner-blur: 8px;
+
+    /* Neon Glow Border Tokens */
+    --neon-primary: 280 90% 65%;
+    --neon-accent: 45 100% 55%;
+    --neon-cyan: 185 100% 60%;
+    --neon-pink: 340 100% 65%;
+    --neon-border-width: 1px;
+    --neon-opacity: 0.6;
+    --neon-opacity-hover: 1;
 
     /* Custom Pincel de Luz tokens */
     --purple-dark: 280 80% 35%;
