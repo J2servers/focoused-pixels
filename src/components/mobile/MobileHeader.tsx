@@ -42,7 +42,7 @@ export function MobileHeader() {
         boxShadow: '0 4px 12px hsl(var(--neu-dark) / 0.3), 0 -2px 8px hsl(var(--neu-light) / 0.5) inset',
         borderBottom: '1px solid hsl(var(--neon-primary) / 0.25)',
       }}>
-        <div className="flex items-center justify-between h-14 px-3">
+        <div className="flex items-center justify-between h-16 px-3">
           {/* Menu Button */}
           <Sheet>
             <SheetTrigger asChild>
