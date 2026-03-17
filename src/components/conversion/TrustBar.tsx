@@ -1,5 +1,5 @@
 /**
- * TrustBar - Barra de confiança neumorphism premium
+ * TrustBar - Barra de confiança neumorphism
  */
 
 import { Truck, Star, Shield, Clock, CreditCard } from 'lucide-react';
@@ -18,17 +18,14 @@ export function TrustBar() {
   ];
 
   return (
-    <div className="py-2.5 overflow-hidden" style={{
-      background: 'hsl(var(--surface-inset))',
-      boxShadow: 'inset -3px -3px 6px hsl(var(--neu-light) / 0.85), inset 3px 3px 8px hsl(var(--neu-dark) / 0.20), 0 0 0 1px hsl(var(--neon-primary) / 0.08)',
-    }}>
+    <div className="bg-foreground text-background py-2.5 overflow-hidden neu-sm">
       <div className="container mx-auto px-4">
         {/* Mobile: scrolling */}
         <div className="block md:hidden overflow-hidden">
           <div className="flex items-center gap-8 whitespace-nowrap animate-marquee">
             {[...items, ...items].map((item, i) => (
-              <div key={i} className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-                <span className="text-primary">{item.icon}</span>
+              <div key={i} className="flex items-center gap-1.5 text-[11px] font-medium opacity-90">
+                {item.icon}
                 <span>{item.text}</span>
               </div>
             ))}
@@ -37,8 +34,8 @@ export function TrustBar() {
         {/* Desktop: static */}
         <div className="hidden md:flex items-center justify-center gap-8 lg:gap-12">
           {items.map((item) => (
-            <div key={item.text} className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <span className="text-primary">{item.icon}</span>
+            <div key={item.text} className="flex items-center gap-1.5 text-xs font-medium opacity-90">
+              {item.icon}
               <span>{item.text}</span>
             </div>
           ))}

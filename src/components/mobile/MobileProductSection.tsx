@@ -34,6 +34,7 @@ export function MobileProductSection({
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(true);
 
+  // Handle scroll to update fade indicators
   const handleScroll = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -56,16 +57,12 @@ export function MobileProductSection({
 
   return (
     <section className="py-4">
-      {/* Section Header */}
       <div className="flex items-center justify-between px-4 mb-3">
-        <h2 className="text-base font-bold" style={{ color: 'hsl(var(--heading-color))' }}>
-          {title}
-        </h2>
+        <h2 className="text-base font-bold">{title}</h2>
         {showAll && categorySlug && (
           <Link 
             to={`/categoria/${categorySlug}`} 
-            className="text-sm font-semibold flex items-center gap-0.5 transition-colors"
-            style={{ color: 'hsl(var(--primary))' }}
+            className="text-sm text-primary font-medium flex items-center"
           >
             Ver todos
             <ChevronRight className="h-4 w-4" />
@@ -81,7 +78,7 @@ export function MobileProductSection({
           className="absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"
         />
         
-        {/* Right fade with chevron */}
+        {/* Right fade indicator with animated chevron */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: showRightFade ? 1 : 0 }}
@@ -90,17 +87,12 @@ export function MobileProductSection({
           <motion.div
             animate={{ x: [0, 4, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="w-6 h-6 rounded-lg flex items-center justify-center"
-            style={{
-              background: 'hsl(var(--surface-elevated) / 0.8)',
-              boxShadow: '-2px -2px 4px hsl(var(--neu-light) / 0.6), 2px 2px 4px hsl(var(--neu-dark) / 0.2)',
-            }}
           >
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            <ChevronRight className="h-5 w-5 text-muted-foreground" />
           </motion.div>
         </motion.div>
 
-        {/* Horizontal Scroll */}
+        {/* Horizontal Scroll - hidden scrollbar */}
         <div 
           ref={scrollContainerRef}
           className="overflow-x-auto pb-2 scrollbar-none"
@@ -139,9 +131,7 @@ export function MobileProductGrid({
   return (
     <section className="py-4 px-4">
       {title && (
-        <h2 className="text-base font-bold mb-3" style={{ color: 'hsl(var(--heading-color))' }}>
-          {title}
-        </h2>
+        <h2 className="text-base font-bold mb-3">{title}</h2>
       )}
       <div className="grid grid-cols-2 gap-3">
         {products.map((product, index) => (

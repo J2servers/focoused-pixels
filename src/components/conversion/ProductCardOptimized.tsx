@@ -60,45 +60,26 @@ export function ProductCardOptimized({
     <>
       <Link 
         to={`/produto/${product.slug}`}
-        className="group flex flex-col h-full rounded-[20px] overflow-hidden transition-all duration-500"
-        style={{
-          background: 'linear-gradient(145deg, hsl(var(--surface-elevated)), hsl(var(--surface-inset)))',
-          boxShadow: '-6px -6px 12px hsl(var(--neu-light) / 0.92), 8px 8px 16px hsl(var(--neu-dark) / 0.42), 0 0 0 1px hsl(var(--neon-primary) / 0.16)',
-        }}
+        className="group flex flex-col h-full rounded-2xl overflow-hidden neu-raised hover:shadow-product-hover transition-all duration-500"
       >
         {/* Image */}
-        <div className="relative aspect-square overflow-hidden m-2 mb-0 rounded-2xl">
+        <div className="relative aspect-square overflow-hidden rounded-t-2xl">
           {/* Badge */}
           {savings > 0 && product.inStock && (
-            <span className="absolute top-2.5 left-2.5 z-10 text-[11px] font-bold px-2.5 py-1 rounded-full"
-              style={{
-                background: 'hsl(var(--destructive) / 0.8)',
-                color: 'hsl(var(--destructive-foreground))',
-                boxShadow: '0 2px 6px hsl(var(--destructive) / 0.25)',
-              }}
-            >
+            <Badge className="absolute top-2.5 left-2.5 z-10 bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-xl">
               -{savings}%
-            </span>
+            </Badge>
           )}
           {!product.inStock && (
             <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-[2px] flex items-center justify-center">
-              <span className="text-sm font-semibold text-muted-foreground px-4 py-1.5 rounded-full"
-                style={{
-                  background: 'hsl(var(--surface-elevated) / 0.9)',
-                  boxShadow: '-3px -3px 6px hsl(var(--neu-light) / 0.85), 4px 4px 8px hsl(var(--neu-dark) / 0.30)',
-                }}
-              >Esgotado</span>
+              <span className="text-sm font-semibold text-muted-foreground neu-flat px-4 py-1.5 rounded-full">Esgotado</span>
             </div>
           )}
 
           {/* Quick View on hover */}
           <button
             onClick={handleQuickView}
-            className="absolute top-2.5 right-2.5 z-10 p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0"
-            style={{
-              background: 'hsl(var(--surface-elevated) / 0.95)',
-              boxShadow: '-2px -2px 4px hsl(var(--neu-light) / 0.85), 3px 3px 6px hsl(var(--neu-dark) / 0.35), 0 0 0 1px hsl(var(--neon-primary) / 0.16)',
-            }}
+            className="absolute top-2.5 right-2.5 z-10 neu-btn p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0"
           >
             <Eye className="h-4 w-4 text-foreground/70" />
           </button>
@@ -106,7 +87,7 @@ export function ProductCardOptimized({
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out rounded-2xl"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             loading="lazy"
           />
         </div>
@@ -145,7 +126,7 @@ export function ProductCardOptimized({
               ) : <div />}
             </div>
             <div className="flex items-baseline gap-1.5">
-              <span className="text-lg sm:text-xl font-bold" style={{ color: 'hsl(var(--price-color))' }}>
+              <span className="text-lg sm:text-xl font-bold text-foreground">
                 R$ {product.price.toFixed(2).replace('.', ',')}
               </span>
             </div>

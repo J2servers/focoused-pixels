@@ -10,16 +10,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-[_-4px_-4px_8px_hsl(var(--neu-light)/0.92),5px_5px_10px_hsl(var(--neu-dark)/0.42),0_0_0_1px_hsl(var(--neon-primary)/0.22)] hover:shadow-[_-3px_-3px_6px_hsl(var(--neu-light)/0.92),4px_4px_8px_hsl(var(--neu-dark)/0.42),0_0_0_1px_hsl(var(--neon-primary)/0.45),0_0_10px_hsl(var(--neon-primary)/0.1)] hover:brightness-110 hover:-translate-y-0.5 active:shadow-[inset_-3px_-3px_6px_hsl(var(--neu-light)/0.3),inset_3px_3px_8px_hsl(var(--neu-dark)/0.4)] active:translate-y-0 border-none",
+          "bg-primary text-primary-foreground shadow-[4px_4px_8px_hsl(var(--neu-dark)/var(--neu-intensity)),-4px_-4px_8px_hsl(var(--neu-light)/var(--neu-intensity)),inset_0_1px_0_hsl(0_0%_100%/0.2)] border border-[hsl(var(--neon-primary)/var(--neon-opacity))] hover:border-[hsl(var(--neon-primary)/var(--neon-opacity-hover))] hover:brightness-110 hover:-translate-y-0.5 active:shadow-[inset_3px_3px_6px_hsl(var(--neu-dark)/0.5),inset_-3px_-3px_6px_hsl(var(--neu-light)/0.2)] active:translate-y-0",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-[_-4px_-4px_8px_hsl(var(--neu-light)/0.92),5px_5px_10px_hsl(var(--neu-dark)/0.42)] hover:brightness-110 hover:-translate-y-0.5 border-none",
+          "bg-destructive text-destructive-foreground shadow-[4px_4px_8px_hsl(var(--neu-dark)/var(--neu-intensity)),-4px_-4px_8px_hsl(var(--neu-light)/var(--neu-intensity))] border border-[hsl(0_70%_50%/0.5)] hover:border-[hsl(0_70%_50%/1)] hover:brightness-110 hover:-translate-y-0.5",
         outline:
-          "neu-btn bg-surface-elevated text-foreground hover:text-primary",
+          "neu-btn bg-background text-foreground hover:text-primary",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-[_-4px_-4px_8px_hsl(var(--neu-light)/0.92),5px_5px_10px_hsl(var(--neu-dark)/0.42),0_0_0_1px_hsl(var(--neon-primary)/0.12)] hover:shadow-[_-3px_-3px_6px_hsl(var(--neu-light)/0.92),4px_4px_8px_hsl(var(--neu-dark)/0.42),0_0_0_1px_hsl(var(--neon-primary)/0.35)] hover:brightness-105 hover:-translate-y-0.5 border-none",
+          "bg-secondary text-secondary-foreground shadow-[4px_4px_8px_hsl(var(--neu-dark)/var(--neu-intensity)),-4px_-4px_8px_hsl(var(--neu-light)/var(--neu-intensity)),inset_0_1px_0_hsl(var(--neu-light)/0.4)] border border-[hsl(var(--neon-cyan)/var(--neon-opacity))] hover:border-[hsl(var(--neon-cyan)/var(--neon-opacity-hover))] hover:brightness-105 hover:-translate-y-0.5",
         ghost:
-          "hover:bg-muted/60 hover:text-foreground border-none",
-        link: "text-primary underline-offset-4 hover:underline border-none",
+          "hover:bg-muted/60 hover:text-foreground border border-transparent hover:border-[hsl(var(--neon-primary)/0.3)]",
+        link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-5 py-2",

@@ -20,8 +20,9 @@ export function MobileBottomNav() {
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 safe-area-pb"
       style={{
-        background: 'hsl(var(--surface-elevated))',
-        boxShadow: '0 -6px 16px hsl(var(--neu-dark) / 0.25), -6px -6px 12px hsl(var(--neu-light) / 0.6) inset, 0 0 0 1px hsl(var(--neon-primary) / 0.12)',
+        background: 'hsl(var(--background))',
+        boxShadow: '0 -6px 16px hsl(var(--neu-dark) / 0.35), 0 2px 8px hsl(var(--neu-light) / 0.4) inset',
+        borderTop: '1px solid hsl(var(--neon-primary) / 0.25)',
       }}
     >
       <div className="flex items-center justify-around h-16 px-1">
@@ -37,13 +38,17 @@ export function MobileBottomNav() {
             >
               <motion.div
                 whileTap={{ scale: 0.85 }}
-                className="relative w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200"
+                className={cn(
+                  "relative w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200",
+                )}
                 style={isActive ? {
-                  background: 'hsl(var(--surface-inset))',
-                  boxShadow: 'inset -3px -3px 6px hsl(var(--neu-light) / 0.85), inset 3px 3px 8px hsl(var(--neu-dark) / 0.30), 0 0 0 1px hsl(var(--neon-primary) / 0.35)',
+                  background: 'hsl(var(--background))',
+                  boxShadow: 'inset 3px 3px 6px hsl(var(--neu-dark) / var(--neu-intensity)), inset -3px -3px 6px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 3px hsl(var(--neu-dark) / 0.2)',
+                  border: '1px solid hsl(var(--neon-primary) / 0.6)',
                 } : {
-                  background: 'hsl(var(--surface-elevated))',
-                  boxShadow: '-2px -2px 5px hsl(var(--neu-light) / 0.7), 3px 3px 6px hsl(var(--neu-dark) / 0.25)',
+                  background: 'hsl(var(--background))',
+                  boxShadow: '2px 2px 5px hsl(var(--neu-dark) / calc(var(--neu-intensity) * 0.5)), -2px -2px 5px hsl(var(--neu-light) / calc(var(--neu-intensity) * 0.7)), inset 0 1px 0 hsl(var(--neu-light) / 0.3)',
+                  border: '1px solid transparent',
                 }}
               >
                 <item.icon className={cn(
@@ -60,7 +65,8 @@ export function MobileBottomNav() {
                     style={{
                       background: 'hsl(var(--primary))',
                       color: 'hsl(var(--primary-foreground))',
-                      boxShadow: '0 2px 6px hsl(var(--primary) / 0.35)',
+                      border: '1px solid hsl(var(--neon-primary) / 0.8)',
+                      boxShadow: '0 2px 4px hsl(var(--primary) / 0.4)',
                     }}
                   >
                     {itemCount > 9 ? '9+' : itemCount}
@@ -82,7 +88,7 @@ export function MobileBottomNav() {
                   className="absolute -bottom-0.5 w-1 h-1 rounded-full"
                   style={{
                     background: 'hsl(var(--primary))',
-                    boxShadow: '0 0 6px hsl(var(--primary) / 0.5)',
+                    boxShadow: '0 0 6px hsl(var(--neon-primary) / 0.8)',
                   }}
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
