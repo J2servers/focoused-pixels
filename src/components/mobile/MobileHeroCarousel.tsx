@@ -19,15 +19,17 @@ export function MobileHeroCarousel() {
   }, [slides.length]);
 
   if (isLoading) {
-    return <Skeleton className="w-full aspect-[16/9] rounded-none" />;
+    return <Skeleton className="w-full aspect-[16/9] mx-4 rounded-2xl" />;
   }
 
   if (slides.length === 0) {
     return (
-      <div className="w-full aspect-[16/9] bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-        <div className="text-white text-center px-6">
-          <h2 className="text-xl font-bold mb-1">Pincel de Luz</h2>
-          <p className="text-sm opacity-90">Personalização de alta qualidade</p>
+      <div className="w-full px-4 py-3">
+        <div className="aspect-[16/9] rounded-2xl neu-concave flex items-center justify-center">
+          <div className="text-center px-6">
+            <h2 className="text-xl font-bold mb-1 text-foreground">Pincel de Luz</h2>
+            <p className="text-sm text-muted-foreground">Personalização de alta qualidade</p>
+          </div>
         </div>
       </div>
     );
@@ -35,7 +37,7 @@ export function MobileHeroCarousel() {
 
   return (
     <div className="w-full px-4 py-3">
-      <div className="relative w-full h-[180px] max-w-[600px] mx-auto rounded-xl overflow-hidden shadow-lg">
+      <div className="relative w-full h-[180px] max-w-[600px] mx-auto rounded-2xl overflow-hidden neu-raised">
         <AnimatePresence mode="wait">
           {slides.map((slide, index) => (
             index === currentSlide && (
@@ -54,7 +56,6 @@ export function MobileHeroCarousel() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 
-                {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -70,7 +71,7 @@ export function MobileHeroCarousel() {
                     )}
                     {slide.cta_text && slide.cta_link && (
                       <Link to={slide.cta_link}>
-                        <Button size="sm" variant="secondary" className="font-semibold text-xs h-7 px-4">
+                        <Button size="sm" variant="secondary" className="font-semibold text-xs h-7 px-4 rounded-xl">
                           {slide.cta_text}
                         </Button>
                       </Link>
@@ -82,7 +83,6 @@ export function MobileHeroCarousel() {
           ))}
         </AnimatePresence>
 
-        {/* Indicators */}
         {slides.length > 1 && (
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
             {slides.map((_, index) => (

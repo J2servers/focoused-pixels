@@ -10,14 +10,11 @@ export function MobileCategoryGrid() {
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(true);
   
-  // Filter only parent categories
   const parentCategories = categories.filter(c => !c.parent_id).slice(0, 8);
 
-  // Handle scroll to update fade indicators
   const handleScroll = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    
     const { scrollLeft, scrollWidth, clientWidth } = container;
     setShowLeftFade(scrollLeft > 10);
     setShowRightFade(scrollLeft < scrollWidth - clientWidth - 10);
@@ -45,14 +42,12 @@ export function MobileCategoryGrid() {
       </div>
       
       <div className="relative">
-        {/* Left fade indicator */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: showLeftFade ? 1 : 0 }}
           className="absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"
         />
         
-        {/* Right fade indicator with animated chevron */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: showRightFade ? 1 : 0 }}
@@ -66,7 +61,6 @@ export function MobileCategoryGrid() {
           </motion.div>
         </motion.div>
         
-        {/* Scrollable container - hidden scrollbar */}
         <div 
           ref={scrollContainerRef}
           className="overflow-x-auto pb-2 scrollbar-none"
@@ -88,7 +82,7 @@ export function MobileCategoryGrid() {
                   to={`/categoria/${category.slug}`}
                   className="flex flex-col items-center w-20 group"
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mb-1.5 transition-transform group-active:scale-95 overflow-hidden border border-primary/10">
+                  <div className="w-16 h-16 rounded-2xl neu-convex flex items-center justify-center mb-1.5 transition-transform group-active:scale-95 overflow-hidden">
                     {category.image_url ? (
                       <img 
                         src={category.image_url} 
