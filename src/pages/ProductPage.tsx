@@ -96,11 +96,11 @@ const ProductPage = () => {
   const handleAddToCart = () => {
     if (product.sizes && product.sizes.length > 0 && !selectedSize) {
       toast.error('Por favor, selecione um tamanho');
-      return;
+      return false;
     }
     if (product.colors && product.colors.length > 0 && !selectedColor) {
       toast.error('Por favor, selecione uma cor');
-      return;
+      return false;
     }
 
     addItem({
@@ -112,6 +112,26 @@ const ProductPage = () => {
       size: selectedSize || undefined,
     });
     toast.success('Produto adicionado ao carrinho!');
+    return true;
+  };
+
+  const handleBuyNow = () => {
+    const added = handleAddToCart();
+    if (!added) return;
+
+    // Save payment data to sessionStorage for PaymentPage
+    const totalAmount = discountedPrice * quantity;
+    sessionStorage.setItem('pending_payment', JSON.stringify({
+      orderId: `quick-${Date.now()}`,
+      amount: totalAmount,
+      customerName: '',
+      customerEmail: '',
+      customerCpf: '',
+      customerPhone: '',
+      description: `${product.name} x${quantity}`,
+    }));
+
+    navigate('/pagamento');
   };
 
   return (
@@ -215,10 +235,7 @@ const ProductPage = () => {
               {/* Buy Now & Add to Cart — Neumorphism Buttons */}
               <div className="flex flex-col gap-3">
                 <button
-                  onClick={() => {
-                    handleAddToCart();
-                    navigate('/pagamento');
-                  }}
+                  onClick={handleBuyNow}
                   className="w-full h-12 sm:h-14 rounded-2xl flex items-center justify-center gap-2 text-sm sm:text-lg font-bold transition-all duration-200 active:scale-[0.97]"
                   style={{
                     background: 'hsl(var(--primary))',
