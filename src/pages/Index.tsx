@@ -1,5 +1,5 @@
 /**
- * Index - Homepage redesenhada com visual moderno e limpo
+ * Index - Homepage com tema Neumorphism
  */
 
 import { useState } from 'react';
@@ -51,12 +51,12 @@ function CategoriesShowcase({ categories }: { categories: any[] }) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
           {categories.map((cat) => (
             <Link
               key={cat.id}
               to={`/categoria/${cat.slug}`}
-              className="group relative aspect-[4/3] rounded-xl overflow-hidden bg-muted"
+              className="group relative aspect-[4/3] rounded-2xl overflow-hidden neu-raised hover:shadow-product-hover transition-all duration-500"
             >
               {cat.image_url && (
                 <img
@@ -143,10 +143,10 @@ const Index = () => {
           <MobileCategoryGrid />
           {productsLoading ? (
             <div className="px-4 py-4">
-              <Skeleton className="h-6 w-32 mb-3" />
+              <Skeleton className="h-6 w-32 mb-3 rounded-xl" />
               <div className="grid grid-cols-2 gap-3">
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="aspect-square rounded-xl" />
+                  <Skeleton key={i} className="aspect-square rounded-2xl" />
                 ))}
               </div>
             </div>
@@ -166,9 +166,11 @@ const Index = () => {
           )}
           {!productsLoading && products.length === 0 && (
             <div className="py-12 px-4 text-center">
-              <h2 className="text-lg font-bold mb-2">Catálogo em construção</h2>
-              <p className="text-sm text-muted-foreground mb-4">Em breve teremos produtos disponíveis.</p>
-              <Link to="/sobre"><Button size="sm">Saiba mais</Button></Link>
+              <div className="rounded-2xl neu-concave p-8">
+                <h2 className="text-lg font-bold mb-2">Catálogo em construção</h2>
+                <p className="text-sm text-muted-foreground mb-4">Em breve teremos produtos disponíveis.</p>
+                <Link to="/sobre"><Button size="sm">Saiba mais</Button></Link>
+              </div>
             </div>
           )}
         </main>
@@ -196,18 +198,16 @@ const Index = () => {
         )}
 
         {/* Best Sellers */}
-        <div className="bg-muted/20">
-          <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
-        </div>
+        <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
 
         {/* Category Sections */}
         {productsLoading || categoriesLoading ? (
           <section className="py-12">
             <div className="container mx-auto px-4">
-              <Skeleton className="h-8 w-48 mb-6" />
+              <Skeleton className="h-8 w-48 mb-6 rounded-xl" />
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="aspect-[3/4] rounded-xl" />
+                  <Skeleton key={i} className="aspect-[3/4] rounded-2xl" />
                 ))}
               </div>
             </div>
@@ -236,9 +236,11 @@ const Index = () => {
         {!productsLoading && products.length === 0 && (
           <section className="py-16">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-2xl font-bold mb-4">Catálogo em construção</h2>
-              <p className="text-muted-foreground mb-6">Em breve teremos produtos disponíveis.</p>
-              <Link to="/sobre"><Button size="lg">Saiba mais</Button></Link>
+              <div className="rounded-2xl neu-concave p-12 max-w-lg mx-auto">
+                <h2 className="text-2xl font-bold mb-4">Catálogo em construção</h2>
+                <p className="text-muted-foreground mb-6">Em breve teremos produtos disponíveis.</p>
+                <Link to="/sobre"><Button size="lg">Saiba mais</Button></Link>
+              </div>
             </div>
           </section>
         )}
