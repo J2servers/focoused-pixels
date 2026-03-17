@@ -96,11 +96,11 @@ const ProductPage = () => {
   const handleAddToCart = () => {
     if (product.sizes && product.sizes.length > 0 && !selectedSize) {
       toast.error('Por favor, selecione um tamanho');
-      return;
+      return false;
     }
     if (product.colors && product.colors.length > 0 && !selectedColor) {
       toast.error('Por favor, selecione uma cor');
-      return;
+      return false;
     }
 
     addItem({
@@ -112,6 +112,26 @@ const ProductPage = () => {
       size: selectedSize || undefined,
     });
     toast.success('Produto adicionado ao carrinho!');
+    return true;
+  };
+
+  const handleBuyNow = () => {
+    const added = handleAddToCart();
+    if (!added) return;
+
+    // Save payment data to sessionStorage for PaymentPage
+    const totalAmount = discountedPrice * quantity;
+    sessionStorage.setItem('pending_payment', JSON.stringify({
+      orderId: `quick-${Date.now()}`,
+      amount: totalAmount,
+      customerName: '',
+      customerEmail: '',
+      customerCpf: '',
+      customerPhone: '',
+      description: `${product.name} x${quantity}`,
+    }));
+
+    navigate('/pagamento');
   };
 
   return (
