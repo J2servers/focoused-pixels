@@ -135,11 +135,11 @@ export function MobileHeader() {
           </Sheet>
 
           {/* Logo */}
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="flex items-center flex-1 justify-center px-3">
             <img 
               src={company?.header_logo || logoPincel} 
               alt="Pincel de Luz"
-              className="h-11 w-auto"
+              className="h-12 w-auto max-w-[180px] object-contain"
             />
           </Link>
 
