@@ -77,10 +77,11 @@ export function MobileCategoryGrid() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
+                className="w-20 flex-shrink-0"
               >
                 <Link
                   to={`/categoria/${category.slug}`}
-                  className="flex flex-col items-center w-20 group"
+                  className="flex flex-col items-center group"
                 >
                   <div className="w-16 h-16 rounded-2xl neu-convex flex items-center justify-center mb-1.5 transition-transform group-active:scale-95 overflow-hidden">
                     {category.image_url ? (
@@ -93,7 +94,7 @@ export function MobileCategoryGrid() {
                       <span className="text-2xl">📦</span>
                     )}
                   </div>
-                  <span className="text-xs text-center font-medium text-foreground line-clamp-2 leading-tight">
+                  <span className="text-xs text-center font-medium text-foreground line-clamp-2 leading-tight h-8">
                     {category.name}
                   </span>
                 </Link>

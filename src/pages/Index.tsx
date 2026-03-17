@@ -146,7 +146,7 @@ const Index = () => {
               <Skeleton className="h-6 w-32 mb-3 rounded-xl" />
               <div className="grid grid-cols-2 gap-3">
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="aspect-square rounded-2xl" />
+                  <Skeleton key={i} className="aspect-[3/4] rounded-2xl" />
                 ))}
               </div>
             </div>
@@ -173,6 +173,9 @@ const Index = () => {
               </div>
             </div>
           )}
+          <div className="px-4 py-2">
+            <GuaranteesSection />
+          </div>
         </main>
         <MobileBottomNav />
         <MobileFloatingContact />

@@ -56,14 +56,15 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
+      className="h-full"
     >
       <Link
         to={`/produto/${product.slug}`}
-        className="block group"
+        className="block group h-full"
       >
-        <div className="relative rounded-2xl overflow-hidden neu-raised transition-all duration-300 active:scale-[0.98]">
-          {/* Image */}
-          <div className="relative aspect-square overflow-hidden rounded-t-2xl">
+        <div className="relative rounded-2xl overflow-hidden neu-raised transition-all duration-300 active:scale-[0.98] h-full flex flex-col">
+          {/* Image - fixed aspect ratio */}
+          <div className="relative aspect-square overflow-hidden rounded-t-2xl flex-shrink-0">
             <motion.img
               src={product.image}
               alt={product.name}
@@ -109,20 +110,20 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             </motion.div>
           </div>
 
-          {/* Content */}
-          <div className="p-3">
-            <h3 className="font-medium text-sm text-foreground line-clamp-2 min-h-[2.5rem] leading-tight">
+          {/* Content - flex-grow to fill remaining space */}
+          <div className="p-3 flex flex-col flex-grow">
+            <h3 className="font-medium text-sm text-foreground line-clamp-2 h-[2.5rem] leading-tight">
               {product.name}
             </h3>
             
             {/* Price */}
-            <div className="mt-2 space-y-0.5">
+            <div className="mt-auto pt-2 space-y-0.5">
               {hasDiscount && product.originalPrice && (
                 <p className="text-xs text-muted-foreground line-through">
                   R$ {product.originalPrice.toFixed(2).replace('.', ',')}
                 </p>
               )}
-              <p className="text-lg font-bold text-primary">
+              <p className="text-lg font-bold text-primary leading-tight">
                 R$ {product.price.toFixed(2).replace('.', ',')}
               </p>
               <p className="text-[10px] text-muted-foreground">
@@ -131,12 +132,14 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             </div>
 
             {/* Free Shipping Badge */}
-            {product.freeShipping && (
-              <div className="flex items-center gap-1 mt-2 text-success">
-                <Truck className="h-3 w-3" />
-                <span className="text-[10px] font-medium">Frete Grátis</span>
-              </div>
-            )}
+            <div className="h-5 mt-1.5">
+              {product.freeShipping && (
+                <div className="flex items-center gap-1 text-success">
+                  <Truck className="h-3 w-3" />
+                  <span className="text-[10px] font-medium">Frete Grátis</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </Link>

@@ -135,7 +135,11 @@ export function MobileProductGrid({
       )}
       <div className="grid grid-cols-2 gap-3">
         {products.map((product, index) => (
-          <MobileProductCard key={product.id} product={product} index={index} />
+          <div key={product.id} className="flex">
+            <div className="w-full">
+              <MobileProductCard product={product} index={index} />
+            </div>
+          </div>
         ))}
       </div>
     </section>
