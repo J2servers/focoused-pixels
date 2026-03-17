@@ -139,7 +139,7 @@ export function MobileHeader() {
             <img 
               src={company?.header_logo || logoPincel} 
               alt="Pincel de Luz"
-              className="h-8 w-auto"
+              className="h-11 w-auto"
             />
           </Link>
 
