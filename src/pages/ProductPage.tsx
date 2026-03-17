@@ -232,16 +232,15 @@ const ProductPage = () => {
                 {product.description}
               </p>
 
-              {/* Buy Now & Add to Cart — Neumorphism Buttons */}
+              {/* Buy Now & Add to Cart — Soft Neumorphism */}
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleBuyNow}
                   className="w-full h-12 sm:h-14 rounded-2xl flex items-center justify-center gap-2 text-sm sm:text-lg font-bold transition-all duration-200 active:scale-[0.97]"
                   style={{
-                    background: 'hsl(var(--primary))',
+                    background: 'linear-gradient(145deg, hsl(var(--primary)), hsl(var(--purple-dark)))',
                     color: 'hsl(var(--primary-foreground))',
-                    boxShadow: '6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)), -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(0 0% 100% / 0.2), inset 0 -1px 0 hsl(var(--neu-dark) / 0.15)',
-                    border: '1px solid hsl(var(--border) / 0.4)',
+                    boxShadow: '-6px -6px 12px hsl(var(--neu-light) / 0.92), 8px 8px 16px hsl(var(--neu-dark) / 0.42), 0 0 0 1px hsl(var(--neon-primary) / 0.35)',
                   }}
                 >
                   <Zap className="h-5 w-5 flex-shrink-0" />
@@ -251,10 +250,9 @@ const ProductPage = () => {
                   onClick={handleAddToCart}
                   className="w-full h-12 sm:h-14 rounded-2xl flex items-center justify-center gap-2 text-sm sm:text-lg font-bold transition-all duration-200 active:scale-[0.97]"
                   style={{
-                    background: 'hsl(var(--background))',
+                    background: 'hsl(var(--surface-elevated))',
                     color: 'hsl(var(--foreground))',
-                    boxShadow: '6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)), -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(var(--neu-light) / 0.5), inset 0 -1px 0 hsl(var(--neu-dark) / 0.1)',
-                    border: '1px solid hsl(var(--border) / 0.5)',
+                    boxShadow: '-6px -6px 12px hsl(var(--neu-light) / 0.92), 8px 8px 16px hsl(var(--neu-dark) / 0.42), 0 0 0 1px hsl(var(--neon-primary) / 0.22)',
                   }}
                 >
                   <ShoppingBag className="h-5 w-5 flex-shrink-0" />

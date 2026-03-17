@@ -145,7 +145,7 @@ export function ProductCardOptimized({
               ) : <div />}
             </div>
             <div className="flex items-baseline gap-1.5">
-              <span className="text-lg sm:text-xl font-bold text-foreground">
+              <span className="text-lg sm:text-xl font-bold" style={{ color: 'hsl(var(--price-color))' }}>
                 R$ {product.price.toFixed(2).replace('.', ',')}
               </span>
             </div>
