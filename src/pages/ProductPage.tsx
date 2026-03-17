@@ -121,9 +121,9 @@ const ProductPage = () => {
       <NavigationBar />
 
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 py-4 md:py-6">
           {/* Breadcrumb */}
-          <Breadcrumb className="mb-6">
+          <Breadcrumb className="mb-4">
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink href="/">Home</BreadcrumbLink>
@@ -145,9 +145,9 @@ const ProductPage = () => {
             </BreadcrumbList>
           </Breadcrumb>
 
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-12">
             {/* Image Gallery */}
-            <div className="rounded-2xl neu-pressed p-3">
+            <div className="rounded-2xl neu-pressed p-2 md:p-3">
               <ProductImageGallery 
                 images={images}
                 productName={product.name}
@@ -157,19 +157,19 @@ const ProductPage = () => {
             </div>
 
             {/* Product Info */}
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {/* Title & Rating */}
-              <div className="rounded-2xl neu-flat p-6">
-                <h1 className="text-2xl lg:text-3xl font-bold mb-3 text-foreground">
+              <div className="rounded-2xl neu-flat p-4 md:p-6">
+                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold mb-2 text-foreground">
                   {product.name}
                 </h1>
                 
-                <div className="flex flex-wrap items-center gap-3 mb-4">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
                   <div className="flex items-center">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-4 w-4 ${
+                        className={`h-3.5 w-3.5 ${
                           i < Math.floor(product.rating) 
                             ? 'fill-accent text-accent' 
                             : 'fill-muted text-muted'
@@ -177,86 +177,90 @@ const ProductPage = () => {
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     {product.rating.toFixed(1)} ({product.reviews} avaliações)
                   </span>
                   <ViewingNowBadge productSlug={product.slug} variant="minimal" />
                 </div>
 
                 {/* Price */}
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   {product.originalPrice && (
-                    <p className="text-lg text-muted-foreground line-through">
+                    <p className="text-base text-muted-foreground line-through">
                       R$ {product.originalPrice.toFixed(2)}
                     </p>
                   )}
-                  <p className="text-3xl font-bold text-primary">
+                  <p className="text-2xl md:text-3xl font-bold text-primary">
                     R$ {product.price.toFixed(2)}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     ou em até {storeInfo.installments}x de R$ {(product.price / storeInfo.installments).toFixed(2)} sem juros
                   </p>
                 </div>
 
                 {/* Free Shipping Badge */}
                 {product.freeShipping && (
-                  <div className="flex items-center gap-2 text-success mt-3 neu-pressed px-4 py-2.5 rounded-xl w-fit">
-                    <Truck className="h-5 w-5" />
-                    <span className="font-medium">Frete Grátis</span>
+                  <div className="flex items-center gap-2 text-success mt-3 neu-pressed px-3 py-2 rounded-xl w-fit">
+                    <Truck className="h-4 w-4" />
+                    <span className="text-sm font-medium">Frete Grátis</span>
                   </div>
                 )}
               </div>
 
               {/* Short Description */}
-              <p className="text-muted-foreground leading-relaxed px-1">
+              <p className="text-sm text-muted-foreground leading-relaxed px-1">
                 {product.description}
               </p>
 
-              {/* Buy Now Button */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  size="lg"
-                  className="flex-1 h-14 text-base font-bold rounded-2xl gap-2"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--purple-dark)))',
-                    border: '1px solid hsl(var(--neon-primary) / 0.6)',
-                    boxShadow: '0 4px 14px hsl(var(--primary) / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.15)',
-                  }}
+              {/* Buy Now & Add to Cart — Neumorphism Buttons */}
+              <div className="flex flex-col gap-3">
+                <button
                   onClick={() => {
                     handleAddToCart();
                     navigate('/pagamento');
                   }}
+                  className="w-full h-13 md:h-14 rounded-2xl flex items-center justify-center gap-2 text-base font-bold transition-all duration-200 active:scale-[0.97]"
+                  style={{
+                    background: 'hsl(var(--primary))',
+                    color: 'hsl(var(--primary-foreground))',
+                    boxShadow: '5px 5px 10px hsl(var(--neu-dark) / var(--neu-intensity)), -5px -5px 10px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(0 0% 100% / 0.2), inset 0 -1px 0 hsl(var(--neu-dark) / 0.15)',
+                    border: '1px solid hsl(var(--border) / 0.4)',
+                  }}
                 >
                   <Zap className="h-5 w-5" />
                   COMPRAR AGORA
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="flex-1 h-14 text-base font-bold rounded-2xl gap-2 neon-border-primary"
+                </button>
+                <button
                   onClick={handleAddToCart}
+                  className="w-full h-13 md:h-14 rounded-2xl flex items-center justify-center gap-2 text-base font-bold transition-all duration-200 active:scale-[0.97]"
+                  style={{
+                    background: 'hsl(var(--background))',
+                    color: 'hsl(var(--foreground))',
+                    boxShadow: '5px 5px 10px hsl(var(--neu-dark) / var(--neu-intensity)), -5px -5px 10px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(var(--neu-light) / 0.5), inset 0 -1px 0 hsl(var(--neu-dark) / 0.1)',
+                    border: '1px solid hsl(var(--border) / 0.5)',
+                  }}
                 >
                   <ShoppingBag className="h-5 w-5" />
-                  ADICIONAR
-                </Button>
+                  ADICIONAR AO CARRINHO
+                </button>
               </div>
 
               {/* Quick Trust Badges */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 text-sm rounded-xl p-3.5 neu-concave">
-                  <Shield className="h-4 w-4 text-primary" />
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="flex items-center gap-2 text-xs md:text-sm rounded-xl p-3 neu-concave">
+                  <Shield className="h-4 w-4 text-primary shrink-0" />
                   <span>Compra Segura</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm rounded-xl p-3.5 neu-concave">
-                  <Clock className="h-4 w-4 text-primary" />
+                <div className="flex items-center gap-2 text-xs md:text-sm rounded-xl p-3 neu-concave">
+                  <Clock className="h-4 w-4 text-primary shrink-0" />
                   <span>Entrega Rápida</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm rounded-xl p-3.5 neu-concave">
-                  <CreditCard className="h-4 w-4 text-primary" />
+                <div className="flex items-center gap-2 text-xs md:text-sm rounded-xl p-3 neu-concave">
+                  <CreditCard className="h-4 w-4 text-primary shrink-0" />
                   <span>Até 12x s/ juros</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm rounded-xl p-3.5 neu-concave">
-                  <Truck className="h-4 w-4 text-primary" />
+                <div className="flex items-center gap-2 text-xs md:text-sm rounded-xl p-3 neu-concave">
+                  <Truck className="h-4 w-4 text-primary shrink-0" />
                   <span>Frete Calculado</span>
                 </div>
               </div>

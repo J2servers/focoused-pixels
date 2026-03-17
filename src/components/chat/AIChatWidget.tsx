@@ -30,7 +30,7 @@ interface Message {
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
-const AUTO_POPUP_DELAY = 5 * 60 * 1000; // 5 minutes in milliseconds
+const AUTO_POPUP_DELAY = 1 * 60 * 1000; // 1 minute in milliseconds
 const AUTO_POPUP_MESSAGE = "Olá! 👋 Notei que você está navegando pelo nosso site. Posso ajudar você a encontrar algum produto específico? Temos letreiros neon, crachás, displays QR Code e muito mais! 🛍️";
 
 export function AIChatWidget() {
