@@ -219,29 +219,29 @@ const ProductPage = () => {
                     handleAddToCart();
                     navigate('/pagamento');
                   }}
-                  className="w-full h-13 md:h-14 rounded-2xl flex items-center justify-center gap-2 text-base font-bold transition-all duration-200 active:scale-[0.97]"
+                  className="w-full h-12 sm:h-14 rounded-2xl flex items-center justify-center gap-2 text-sm sm:text-lg font-bold transition-all duration-200 active:scale-[0.97]"
                   style={{
                     background: 'hsl(var(--primary))',
                     color: 'hsl(var(--primary-foreground))',
-                    boxShadow: '5px 5px 10px hsl(var(--neu-dark) / var(--neu-intensity)), -5px -5px 10px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(0 0% 100% / 0.2), inset 0 -1px 0 hsl(var(--neu-dark) / 0.15)',
+                    boxShadow: '6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)), -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(0 0% 100% / 0.2), inset 0 -1px 0 hsl(var(--neu-dark) / 0.15)',
                     border: '1px solid hsl(var(--border) / 0.4)',
                   }}
                 >
-                  <Zap className="h-5 w-5" />
-                  COMPRAR AGORA
+                  <Zap className="h-5 w-5 flex-shrink-0" />
+                  <span className="truncate">COMPRAR AGORA</span>
                 </button>
                 <button
                   onClick={handleAddToCart}
-                  className="w-full h-13 md:h-14 rounded-2xl flex items-center justify-center gap-2 text-base font-bold transition-all duration-200 active:scale-[0.97]"
+                  className="w-full h-12 sm:h-14 rounded-2xl flex items-center justify-center gap-2 text-sm sm:text-lg font-bold transition-all duration-200 active:scale-[0.97]"
                   style={{
                     background: 'hsl(var(--background))',
                     color: 'hsl(var(--foreground))',
-                    boxShadow: '5px 5px 10px hsl(var(--neu-dark) / var(--neu-intensity)), -5px -5px 10px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(var(--neu-light) / 0.5), inset 0 -1px 0 hsl(var(--neu-dark) / 0.1)',
+                    boxShadow: '6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)), -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(var(--neu-light) / 0.5), inset 0 -1px 0 hsl(var(--neu-dark) / 0.1)',
                     border: '1px solid hsl(var(--border) / 0.5)',
                   }}
                 >
-                  <ShoppingBag className="h-5 w-5" />
-                  ADICIONAR AO CARRINHO
+                  <ShoppingBag className="h-5 w-5 flex-shrink-0" />
+                  <span className="truncate">ADICIONAR AO CARRINHO</span>
                 </button>
               </div>
 
