@@ -134,12 +134,14 @@
     --input: 240 15% 18%;
     --ring: 280 70% 55%;
 
-    /* Dark Neumorphism */
-    --neu-light: 240 15% 18%;
-    --neu-dark: 240 15% 8%;
-    --neu-distance: 6px;
-    --neu-blur: 12px;
+    /* Dark Neumorphism - Deep Machined */
+    --neu-light: 240 15% 20%;
+    --neu-dark: 240 15% 5%;
+    --neu-distance: 8px;
+    --neu-blur: 16px;
     --neu-intensity: 1;
+    --neu-inner-distance: 4px;
+    --neu-inner-blur: 8px;
 
     --admin-bg: 250 25% 8%;
     --admin-sidebar: 255 30% 6%;
