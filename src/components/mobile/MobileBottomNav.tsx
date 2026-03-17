@@ -17,7 +17,7 @@ export function MobileBottomNav() {
   const { itemCount } = useCart();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background neu-flat safe-area-pb">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background neu-flat neon-border-primary safe-area-pb">
       <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;

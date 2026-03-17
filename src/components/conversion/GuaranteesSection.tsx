@@ -19,8 +19,8 @@ export function GuaranteesSection() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
           {guarantees.map((item) => (
-            <div key={item.title} className="flex flex-col items-center text-center gap-3 p-4 rounded-2xl neu-concave">
-              <div className="w-12 h-12 rounded-xl neu-convex flex items-center justify-center text-primary">
+            <div key={item.title} className="flex flex-col items-center text-center gap-3 p-4 rounded-2xl neu-concave group cursor-default">
+              <div className="w-12 h-12 rounded-xl neu-convex flex items-center justify-center text-primary group-hover:scale-105 transition-transform duration-300">
                 {item.icon}
               </div>
               <div>
