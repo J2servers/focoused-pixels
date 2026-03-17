@@ -17,39 +17,46 @@
 
 @layer base {
   :root {
-    /* Pincel de Luz Brand Colors */
-    --background: 214 31.8182% 91.3725%;
-    --foreground: 270 10% 15%;
+    /* Neumorphism Base - Soft Light Theme */
+    --background: 240 20% 92%;
+    --foreground: 240 10% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 270 10% 15%;
+    --card: 240 20% 92%;
+    --card-foreground: 240 10% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 270 10% 15%;
+    --popover: 240 20% 94%;
+    --popover-foreground: 240 10% 15%;
 
     /* Primary - Roxo Vibrante Pincel de Luz */
     --primary: 280 70% 43%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Roxo Claro */
-    --secondary: 280 60% 95%;
+    --secondary: 280 30% 88%;
     --secondary-foreground: 280 70% 43%;
 
-    --muted: 270 10% 96%;
-    --muted-foreground: 270 10% 45%;
+    --muted: 240 15% 88%;
+    --muted-foreground: 240 10% 45%;
 
     /* Accent - Amarelo Dourado */
     --accent: 45 100% 50%;
-    --accent-foreground: 270 10% 15%;
+    --accent-foreground: 240 10% 15%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 10% 90%;
-    --input: 270 10% 90%;
+    --border: 240 15% 85%;
+    --input: 240 15% 85%;
     --ring: 280 70% 43%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Neumorphism Shadow Tokens */
+    --neu-light: 0 0% 100%;
+    --neu-dark: 240 20% 80%;
+    --neu-distance: 6px;
+    --neu-blur: 12px;
+    --neu-intensity: 0.7;
 
     /* Custom Pincel de Luz tokens */
     --purple-dark: 280 80% 35%;
@@ -77,13 +84,13 @@
     --admin-text-muted: 250 15% 60%;
     --admin-glow: 280 100% 65%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-background: 240 20% 92%;
+    --sidebar-foreground: 240 10% 26%;
     --sidebar-primary: 280 70% 43%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 280 60% 95%;
+    --sidebar-accent: 280 30% 88%;
     --sidebar-accent-foreground: 280 70% 43%;
-    --sidebar-border: 270 10% 90%;
+    --sidebar-border: 240 15% 85%;
     --sidebar-ring: 280 70% 43%;
   }
 
