@@ -17,7 +17,6 @@ export function DynamicMainHeader() {
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Build hierarchy: parent categories with their subcategories
   const categoryTree = useMemo(() => {
     const parentCategories = categories.filter(c => !c.parent_id);
     return parentCategories.map(parent => ({
@@ -33,21 +32,20 @@ export function DynamicMainHeader() {
     }
   };
 
-  // Use custom logo from database or fallback to Pincel de Luz logo
   const headerLogo = company?.header_logo || logoPincelDeLuz;
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
+    <header className="sticky top-0 z-50 bg-background neu-flat">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild className="lg:hidden">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="neu-btn rounded-xl">
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[350px]">
+            <SheetContent side="left" className="w-[300px] sm:w-[350px] bg-background">
               <div className="flex flex-col gap-6 mt-8">
                 <SheetClose asChild>
                   <Link to="/" className="text-lg font-bold text-primary">
@@ -55,7 +53,6 @@ export function DynamicMainHeader() {
                   </Link>
                 </SheetClose>
 
-                {/* Mobile Search */}
                 <form onSubmit={handleSearch} className="relative">
                   <Input
                     type="search"
@@ -74,7 +71,6 @@ export function DynamicMainHeader() {
                   </Button>
                 </form>
 
-                {/* Mobile Categories */}
                 <nav className="flex flex-col gap-2">
                   {categoriesLoading ? (
                     [...Array(5)].map((_, i) => (
@@ -85,7 +81,7 @@ export function DynamicMainHeader() {
                       <SheetClose key={category.id} asChild>
                         <Link 
                           to={`/categoria/${category.slug}`}
-                          className="py-2 px-3 rounded-md hover:bg-secondary transition-colors font-medium"
+                          className="py-2.5 px-4 rounded-xl neu-btn font-medium text-sm"
                         >
                           {category.name}
                         </Link>
@@ -94,15 +90,14 @@ export function DynamicMainHeader() {
                   )}
                 </nav>
 
-                {/* Mobile Links */}
-                <div className="border-t pt-4 flex flex-col gap-2">
+                <div className="border-t border-border/30 pt-4 flex flex-col gap-2">
                   <SheetClose asChild>
-                    <Link to="/checkout" className="py-2 px-3 rounded-md hover:bg-secondary transition-colors">
+                    <Link to="/checkout" className="py-2.5 px-4 rounded-xl hover:bg-muted/50 transition-colors">
                       Solicitar Orçamento
                     </Link>
                   </SheetClose>
                   <SheetClose asChild>
-                    <Link to="/login" className="py-2 px-3 rounded-md hover:bg-secondary transition-colors">
+                    <Link to="/login" className="py-2.5 px-4 rounded-xl hover:bg-muted/50 transition-colors">
                       Minha Conta
                     </Link>
                   </SheetClose>
@@ -128,12 +123,12 @@ export function DynamicMainHeader() {
                 placeholder="O que você está procurando?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pr-12 h-11"
+                className="w-full pr-12 h-11 rounded-2xl"
               />
               <Button 
                 type="submit" 
                 size="icon"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-xl"
               >
                 <Search className="h-4 w-4" />
               </Button>
@@ -141,15 +136,14 @@ export function DynamicMainHeader() {
           </form>
 
           {/* Desktop Actions */}
-          <div className="flex items-center gap-2 lg:gap-4">
-            {/* Mobile Search Toggle */}
+          <div className="flex items-center gap-2 lg:gap-3">
             <Sheet>
               <SheetTrigger asChild className="lg:hidden">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="neu-btn rounded-xl">
                   <Search className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="top" className="h-auto">
+              <SheetContent side="top" className="h-auto bg-background">
                 <form onSubmit={handleSearch} className="pt-4">
                   <div className="relative">
                     <Input
@@ -173,23 +167,20 @@ export function DynamicMainHeader() {
               </SheetContent>
             </Sheet>
 
-            {/* Quote Button */}
             <Link to="/checkout" className="hidden md:block">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="rounded-xl">
                 Orçamento
               </Button>
             </Link>
 
-            {/* User */}
             <Link to="/login">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="neu-btn rounded-xl">
                 <User className="h-5 w-5" />
               </Button>
             </Link>
 
-            {/* Cart */}
             <Link to="/carrinho" className="relative">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="neu-btn rounded-xl">
                 <ShoppingCart className="h-5 w-5" />
                 {itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">

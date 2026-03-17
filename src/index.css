@@ -17,39 +17,46 @@
 
 @layer base {
   :root {
-    /* Pincel de Luz Brand Colors */
-    --background: 214 31.8182% 91.3725%;
-    --foreground: 270 10% 15%;
+    /* Neumorphism Base - Soft Light Theme */
+    --background: 240 20% 92%;
+    --foreground: 240 10% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 270 10% 15%;
+    --card: 240 20% 92%;
+    --card-foreground: 240 10% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 270 10% 15%;
+    --popover: 240 20% 94%;
+    --popover-foreground: 240 10% 15%;
 
     /* Primary - Roxo Vibrante Pincel de Luz */
     --primary: 280 70% 43%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Roxo Claro */
-    --secondary: 280 60% 95%;
+    --secondary: 280 30% 88%;
     --secondary-foreground: 280 70% 43%;
 
-    --muted: 270 10% 96%;
-    --muted-foreground: 270 10% 45%;
+    --muted: 240 15% 88%;
+    --muted-foreground: 240 10% 45%;
 
     /* Accent - Amarelo Dourado */
     --accent: 45 100% 50%;
-    --accent-foreground: 270 10% 15%;
+    --accent-foreground: 240 10% 15%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 10% 90%;
-    --input: 270 10% 90%;
+    --border: 240 15% 85%;
+    --input: 240 15% 85%;
     --ring: 280 70% 43%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Neumorphism Shadow Tokens */
+    --neu-light: 0 0% 100%;
+    --neu-dark: 240 20% 80%;
+    --neu-distance: 6px;
+    --neu-blur: 12px;
+    --neu-intensity: 0.7;
 
     /* Custom Pincel de Luz tokens */
     --purple-dark: 280 80% 35%;
@@ -77,44 +84,51 @@
     --admin-text-muted: 250 15% 60%;
     --admin-glow: 280 100% 65%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-background: 240 20% 92%;
+    --sidebar-foreground: 240 10% 26%;
     --sidebar-primary: 280 70% 43%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 280 60% 95%;
+    --sidebar-accent: 280 30% 88%;
     --sidebar-accent-foreground: 280 70% 43%;
-    --sidebar-border: 270 10% 90%;
+    --sidebar-border: 240 15% 85%;
     --sidebar-ring: 280 70% 43%;
   }
 
   .dark {
-    --background: 270 20% 8%;
-    --foreground: 0 0% 98%;
+    --background: 240 15% 13%;
+    --foreground: 0 0% 95%;
 
-    --card: 270 20% 10%;
-    --card-foreground: 0 0% 98%;
+    --card: 240 15% 13%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 270 20% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 240 15% 15%;
+    --popover-foreground: 0 0% 95%;
 
     --primary: 280 70% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 280 30% 20%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 280 20% 22%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 270 20% 18%;
-    --muted-foreground: 270 10% 65%;
+    --muted: 240 15% 18%;
+    --muted-foreground: 240 10% 60%;
 
     --accent: 45 100% 50%;
-    --accent-foreground: 270 10% 10%;
+    --accent-foreground: 240 10% 10%;
 
     --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 270 20% 20%;
-    --input: 270 20% 20%;
+    --border: 240 15% 18%;
+    --input: 240 15% 18%;
     --ring: 280 70% 55%;
+
+    /* Dark Neumorphism */
+    --neu-light: 240 15% 18%;
+    --neu-dark: 240 15% 8%;
+    --neu-distance: 6px;
+    --neu-blur: 12px;
+    --neu-intensity: 1;
 
     --admin-bg: 250 25% 8%;
     --admin-sidebar: 255 30% 6%;
@@ -132,13 +146,13 @@
     --admin-text: 0 0% 98%;
     --admin-text-muted: 250 15% 60%;
     --admin-glow: 280 100% 65%;
-    --sidebar-background: 270 20% 10%;
-    --sidebar-foreground: 0 0% 98%;
+    --sidebar-background: 240 15% 13%;
+    --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 280 70% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 280 30% 20%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 270 20% 20%;
+    --sidebar-accent: 280 20% 22%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 240 15% 18%;
     --sidebar-ring: 280 70% 55%;
   }
 }
@@ -167,12 +181,105 @@
     background: linear-gradient(135deg, hsl(280 70% 43%) 0%, hsl(280 80% 35%) 100%);
   }
 
+  /* ═══ Neumorphism Utilities ═══ */
+  .neu-flat {
+    background: hsl(var(--background));
+    box-shadow:
+      var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
+      calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity));
+    border: none;
+  }
+
+  .neu-raised {
+    background: linear-gradient(145deg, hsl(var(--background)), hsl(var(--neu-dark) / 0.15));
+    box-shadow:
+      var(--neu-distance) var(--neu-distance) calc(var(--neu-blur) * 1.5) hsl(var(--neu-dark) / var(--neu-intensity)),
+      calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) calc(var(--neu-blur) * 1.5) hsl(var(--neu-light) / var(--neu-intensity));
+    border: none;
+  }
+
+  .neu-pressed {
+    background: hsl(var(--background));
+    box-shadow:
+      inset var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
+      inset calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity));
+    border: none;
+  }
+
+  .neu-concave {
+    background: linear-gradient(145deg, hsl(var(--neu-dark) / 0.08), hsl(var(--neu-light) / 0.5));
+    box-shadow:
+      var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
+      calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity));
+    border: none;
+  }
+
+  .neu-convex {
+    background: linear-gradient(145deg, hsl(var(--neu-light) / 0.5), hsl(var(--neu-dark) / 0.08));
+    box-shadow:
+      var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
+      calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity));
+    border: none;
+  }
+
+  .neu-sm {
+    --neu-distance: 3px;
+    --neu-blur: 6px;
+  }
+
+  .neu-lg {
+    --neu-distance: 10px;
+    --neu-blur: 20px;
+  }
+
+  .neu-xl {
+    --neu-distance: 14px;
+    --neu-blur: 28px;
+  }
+
+  .neu-btn {
+    background: hsl(var(--background));
+    box-shadow:
+      4px 4px 8px hsl(var(--neu-dark) / var(--neu-intensity)),
+      -4px -4px 8px hsl(var(--neu-light) / var(--neu-intensity));
+    border: none;
+    transition: all 0.15s ease;
+  }
+
+  .neu-btn:hover {
+    box-shadow:
+      2px 2px 4px hsl(var(--neu-dark) / var(--neu-intensity)),
+      -2px -2px 4px hsl(var(--neu-light) / var(--neu-intensity));
+  }
+
+  .neu-btn:active, .neu-btn-active {
+    box-shadow:
+      inset 3px 3px 6px hsl(var(--neu-dark) / var(--neu-intensity)),
+      inset -3px -3px 6px hsl(var(--neu-light) / var(--neu-intensity));
+  }
+
+  .neu-input {
+    background: hsl(var(--background));
+    box-shadow:
+      inset 3px 3px 6px hsl(var(--neu-dark) / calc(var(--neu-intensity) * 0.6)),
+      inset -3px -3px 6px hsl(var(--neu-light) / calc(var(--neu-intensity) * 0.8));
+    border: none;
+  }
+
+  .neu-circle {
+    border-radius: 50%;
+  }
+
   .shadow-product {
-    box-shadow: 0 4px 20px -2px hsl(270 10% 15% / 0.08);
+    box-shadow:
+      6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)),
+      -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity));
   }
 
   .shadow-product-hover {
-    box-shadow: 0 8px 30px -4px hsl(280 70% 43% / 0.15);
+    box-shadow:
+      8px 8px 16px hsl(var(--neu-dark) / var(--neu-intensity)),
+      -8px -8px 16px hsl(var(--neu-light) / var(--neu-intensity));
   }
 
   /* Admin Panel Utilities - Vivid Dark Theme */
@@ -204,29 +311,12 @@
     filter: blur(20px);
   }
 
-  .admin-stat-blue::before {
-    background: hsl(210 100% 60%);
-  }
-
-  .admin-stat-green::before {
-    background: hsl(160 100% 45%);
-  }
-
-  .admin-stat-orange::before {
-    background: hsl(30 100% 55%);
-  }
-
-  .admin-stat-purple::before {
-    background: hsl(280 90% 60%);
-  }
-
-  .admin-stat-pink::before {
-    background: hsl(340 100% 65%);
-  }
-
-  .admin-stat-cyan::before {
-    background: hsl(185 100% 50%);
-  }
+  .admin-stat-blue::before { background: hsl(210 100% 60%); }
+  .admin-stat-green::before { background: hsl(160 100% 45%); }
+  .admin-stat-orange::before { background: hsl(30 100% 55%); }
+  .admin-stat-purple::before { background: hsl(280 90% 60%); }
+  .admin-stat-pink::before { background: hsl(340 100% 65%); }
+  .admin-stat-cyan::before { background: hsl(185 100% 50%); }
 
   .admin-card-hover {
     @apply transition-all duration-300;
@@ -239,10 +329,7 @@
     border-color: hsl(280 80% 50% / 0.3);
   }
 
-  .admin-glow-border {
-    position: relative;
-  }
-
+  .admin-glow-border { position: relative; }
   .admin-glow-border::before {
     content: '';
     position: absolute;
@@ -257,10 +344,7 @@
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-
-  .admin-glow-border:hover::before {
-    opacity: 1;
-  }
+  .admin-glow-border:hover::before { opacity: 1; }
 
   .admin-gradient-text {
     background: linear-gradient(135deg, hsl(280 90% 65%) 0%, hsl(340 100% 70%) 50%, hsl(210 100% 65%) 100%);

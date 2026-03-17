@@ -11,7 +11,6 @@ export function NavigationBar() {
   const { data: categories = [], isLoading } = useCategories();
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
 
-  // Build hierarchy: parent categories with their subcategories
   const categoryTree = useMemo(() => {
     const parentCategories = categories.filter(c => !c.parent_id);
     return parentCategories.map(parent => ({
@@ -22,11 +21,11 @@ export function NavigationBar() {
 
   if (isLoading) {
     return (
-      <nav className="bg-background border-b border-border hidden lg:block">
+      <nav className="bg-background hidden lg:block neu-flat">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-2 h-12">
             {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-8 w-24" />
+              <Skeleton key={i} className="h-8 w-24 rounded-xl" />
             ))}
           </div>
         </div>
@@ -35,7 +34,7 @@ export function NavigationBar() {
   }
 
   return (
-    <nav className="bg-background border-b border-border hidden lg:block relative z-50">
+    <nav className="bg-background hidden lg:block relative z-50 neu-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center flex-wrap">
           {categoryTree.map((category) => (
@@ -58,7 +57,6 @@ export function NavigationBar() {
                     )} />
                   </Link>
                   
-                  {/* Mega Menu Dropdown */}
                   <AnimatePresence>
                     {hoveredCategory === category.id && (
                       <motion.div
@@ -68,27 +66,25 @@ export function NavigationBar() {
                         transition={{ duration: 0.15 }}
                         className="absolute left-0 top-full pt-1 z-50"
                       >
-                        <div className="bg-card border border-border rounded-lg shadow-xl p-4 min-w-[300px]">
-                          {/* Category Header */}
+                        <div className="rounded-2xl neu-raised p-4 min-w-[300px]">
                           <Link
                             to={`/categoria/${category.slug}`}
-                            className="block mb-3 pb-3 border-b border-border"
+                            className="block mb-3 pb-3 border-b border-border/30"
                           >
                             <span className="text-sm font-bold text-primary hover:underline">
                               Ver todos em {category.name}
                             </span>
                           </Link>
                           
-                          {/* Subcategories Grid */}
                           <div className="grid grid-cols-1 gap-1">
                             {category.subcategories.map((sub) => (
                               <Link
                                 key={sub.id}
                                 to={`/categoria/${category.slug}/${sub.slug}`}
-                                className="group flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors"
+                                className="group flex items-center gap-3 p-2 rounded-xl hover:bg-muted/40 transition-colors"
                               >
                                 {sub.image_url && (
-                                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted shrink-0">
+                                  <div className="w-10 h-10 rounded-xl overflow-hidden neu-pressed shrink-0">
                                     <img 
                                       src={sub.image_url} 
                                       alt={sub.name}

@@ -23,7 +23,6 @@ export function MobileHeader() {
   const { data: company } = useCompanyInfo();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
-  // Filter only parent categories for the mobile menu
   const parentCategories = useMemo(() => 
     categories.filter(c => !c.parent_id), 
     [categories]
@@ -39,45 +38,45 @@ export function MobileHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border safe-area-pt">
+    <header className="sticky top-0 z-40 bg-background neu-flat safe-area-pt">
       <div className="flex items-center justify-between h-14 px-4">
         {/* Menu */}
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="shrink-0">
+            <Button variant="ghost" size="icon" className="shrink-0 neu-btn rounded-xl">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[280px] p-0">
-            <SheetHeader className="p-4 border-b">
+          <SheetContent side="left" className="w-[280px] p-0 bg-background">
+            <SheetHeader className="p-4 border-b border-border/30">
               <SheetTitle className="text-left">Menu</SheetTitle>
             </SheetHeader>
-            <nav className="p-4 space-y-1">
+            <nav className="p-4 space-y-2">
               {categoriesLoading ? (
                 [...Array(6)].map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full rounded-lg" />
+                  <Skeleton key={i} className="h-12 w-full rounded-xl" />
                 ))
               ) : (
                 parentCategories.map((cat) => (
                   <Link
                     key={cat.id}
                     to={`/categoria/${cat.slug}`}
-                    className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-secondary transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl neu-btn text-sm font-medium"
                   >
-                    <span className="font-medium">{cat.name}</span>
+                    {cat.name}
                   </Link>
                 ))
               )}
-              <div className="pt-4 border-t mt-4">
+              <div className="pt-4 border-t border-border/30 mt-4 space-y-2">
                 <Link
                   to="/sobre"
-                  className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-secondary transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/40 transition-colors"
                 >
                   <span className="font-medium">Sobre Nós</span>
                 </Link>
                 <Link
                   to="/faq"
-                  className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-secondary transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/40 transition-colors"
                 >
                   <span className="font-medium">FAQ</span>
                 </Link>
@@ -95,12 +94,13 @@ export function MobileHeader() {
           />
         </Link>
 
-        {/* Search & Notifications */}
+        {/* Search */}
         <div className="flex items-center gap-1">
           <Button 
             variant="ghost" 
             size="icon"
             onClick={() => setIsSearchOpen(true)}
+            className="neu-btn rounded-xl"
           >
             <Search className="h-5 w-5" />
           </Button>
@@ -131,7 +131,7 @@ export function MobileHeader() {
                 placeholder="Buscar produtos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 border-0 bg-secondary/50 focus-visible:ring-0"
+                className="flex-1"
                 autoFocus
               />
               <Button type="submit" size="sm" disabled={!searchQuery.trim()}>

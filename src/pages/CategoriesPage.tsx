@@ -11,10 +11,8 @@ export default function CategoriesPage() {
   const { data: categories = [], isLoading } = useCategories();
   const isMobile = useIsMobile();
   
-  // Get parent categories
   const parentCategories = categories.filter(c => !c.parent_id);
   
-  // Get subcategories for a parent
   const getSubcategories = (parentId: string) => {
     return categories.filter(c => c.parent_id === parentId);
   };
@@ -24,17 +22,19 @@ export default function CategoriesPage() {
       <h1 className="text-2xl font-bold mb-6">Todas as Categorias</h1>
       
       {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {[...Array(8)].map((_, i) => (
             <Skeleton key={i} className="aspect-square rounded-2xl" />
           ))}
         </div>
       ) : parentCategories.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Nenhuma categoria disponível no momento.</p>
+          <div className="rounded-2xl neu-concave p-8 max-w-sm mx-auto">
+            <p className="text-muted-foreground">Nenhuma categoria disponível no momento.</p>
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {parentCategories.map((category, index) => {
             const subcategories = getSubcategories(category.id);
             
@@ -49,7 +49,7 @@ export default function CategoriesPage() {
                   to={`/categoria/${category.slug}`}
                   className="group block"
                 >
-                  <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border border-border">
+                  <div className="relative aspect-square rounded-2xl overflow-hidden neu-raised transition-all duration-300 hover:shadow-product-hover">
                     {category.image_url ? (
                       <img 
                         src={category.image_url} 
@@ -57,7 +57,7 @@ export default function CategoriesPage() {
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
+                      <div className="w-full h-full flex items-center justify-center neu-concave">
                         <span className="text-5xl">📦</span>
                       </div>
                     )}
@@ -75,7 +75,6 @@ export default function CategoriesPage() {
                   </div>
                 </Link>
                 
-                {/* Subcategories */}
                 {subcategories.length > 0 && (
                   <div className="mt-2 space-y-1">
                     {subcategories.slice(0, 3).map((sub) => (
@@ -110,22 +109,18 @@ export default function CategoriesPage() {
     return (
       <div className="min-h-screen flex flex-col bg-background pb-20">
         <MobileHeader />
-        <main className="flex-1">
-          {content}
-        </main>
+        <main className="flex-1">{content}</main>
         <MobileBottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <DynamicTopBar />
       <DynamicMainHeader />
       <NavigationBar />
-      <main className="flex-1">
-        {content}
-      </main>
+      <main className="flex-1">{content}</main>
       <DynamicFooter />
     </div>
   );

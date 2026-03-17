@@ -1,5 +1,5 @@
 /**
- * SocialProofSection - Prova social com design moderno e limpo
+ * SocialProofSection - Prova social com design neumorphism
  */
 
 import { useState, useEffect } from 'react';
@@ -55,11 +55,11 @@ export function SocialProofSection() {
 
   if (isLoading) {
     return (
-      <section className="py-12 lg:py-16 bg-muted/30">
+      <section className="py-12 lg:py-16">
         <div className="container mx-auto px-4">
           <Skeleton className="h-8 w-64 mx-auto mb-8" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-48 rounded-xl" />)}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-48 rounded-2xl" />)}
           </div>
         </div>
       </section>
@@ -67,7 +67,7 @@ export function SocialProofSection() {
   }
 
   return (
-    <section className="py-12 lg:py-16 bg-muted/30">
+    <section className="py-12 lg:py-16">
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
@@ -78,12 +78,12 @@ export function SocialProofSection() {
           </p>
         </div>
 
-        {/* Reviews Grid - show up to 3 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 max-w-5xl mx-auto">
+        {/* Reviews Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
           {displayReviews.slice(0, 3).map((review) => (
             <div
               key={review.id}
-              className="bg-card rounded-xl border border-border/50 p-6 flex flex-col"
+              className="rounded-2xl p-6 flex flex-col neu-concave"
             >
               {/* Stars */}
               <div className="flex items-center gap-0.5 mb-3">
@@ -101,8 +101,8 @@ export function SocialProofSection() {
               </p>
 
               {/* Author */}
-              <div className="flex items-center gap-2.5 mt-4 pt-4 border-t border-border/50">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+              <div className="flex items-center gap-2.5 mt-4 pt-4 border-t border-border/30">
+                <div className="w-9 h-9 rounded-xl neu-convex flex items-center justify-center text-primary font-bold text-xs">
                   {review.customer_name?.charAt(0)}
                 </div>
                 <div>

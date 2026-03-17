@@ -41,14 +41,14 @@ const ProductPage = () => {
         <NavigationBar />
         <main className="flex-1">
           <div className="container mx-auto px-4 py-6">
-            <Skeleton className="h-6 w-64 mb-6" />
+            <Skeleton className="h-6 w-64 mb-6 rounded-xl" />
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-              <Skeleton className="aspect-square rounded-lg" />
+              <Skeleton className="aspect-square rounded-2xl" />
               <div className="space-y-4">
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-6 w-1/2" />
-                <Skeleton className="h-10 w-1/3" />
-                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-8 w-3/4 rounded-xl" />
+                <Skeleton className="h-6 w-1/2 rounded-xl" />
+                <Skeleton className="h-10 w-1/3 rounded-xl" />
+                <Skeleton className="h-20 w-full rounded-xl" />
               </div>
             </div>
           </div>
@@ -65,10 +65,12 @@ const ProductPage = () => {
         <DynamicMainHeader />
         <NavigationBar />
         <main className="flex-1 container mx-auto px-4 py-16 text-center">
-          <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
-          <Link to="/">
-            <Button>Voltar para a home</Button>
-          </Link>
+          <div className="rounded-2xl neu-concave p-12 max-w-md mx-auto">
+            <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
+            <Link to="/">
+              <Button>Voltar para a home</Button>
+            </Link>
+          </div>
         </main>
         <DynamicFooter />
       </div>
@@ -77,7 +79,6 @@ const ProductPage = () => {
 
   const images = product.images?.length ? product.images : [product.image];
 
-  // Calcular desconto por quantidade
   const getDiscountPercent = (qty: number): number => {
     let discount = 0;
     for (const tier of discountTiers) {
@@ -145,17 +146,19 @@ const ProductPage = () => {
 
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Image Gallery */}
-            <ProductImageGallery 
-              images={images}
-              productName={product.name}
-              badge={product.badge}
-              discount={product.discount}
-            />
+            <div className="rounded-2xl neu-pressed p-3">
+              <ProductImageGallery 
+                images={images}
+                productName={product.name}
+                badge={product.badge}
+                discount={product.discount}
+              />
+            </div>
 
             {/* Product Info */}
             <div className="space-y-6">
               {/* Title & Rating */}
-              <div>
+              <div className="rounded-2xl neu-flat p-6">
                 <h1 className="text-2xl lg:text-3xl font-bold mb-3 text-foreground">
                   {product.name}
                 </h1>
@@ -196,7 +199,7 @@ const ProductPage = () => {
 
                 {/* Free Shipping Badge */}
                 {product.freeShipping && (
-                  <div className="flex items-center gap-2 text-success mt-3 bg-success/10 px-3 py-2 rounded-lg w-fit">
+                  <div className="flex items-center gap-2 text-success mt-3 neu-pressed px-4 py-2.5 rounded-xl w-fit">
                     <Truck className="h-5 w-5" />
                     <span className="font-medium">Frete Grátis</span>
                   </div>
@@ -204,26 +207,26 @@ const ProductPage = () => {
               </div>
 
               {/* Short Description */}
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed px-1">
                 {product.description}
               </p>
 
               {/* Quick Trust Badges */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 text-sm bg-muted/50 rounded-lg p-3">
-                  <Shield className="h-4 w-4 text-green-600" />
+                <div className="flex items-center gap-2 text-sm rounded-xl p-3.5 neu-concave">
+                  <Shield className="h-4 w-4 text-primary" />
                   <span>Compra Segura</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm bg-muted/50 rounded-lg p-3">
-                  <Clock className="h-4 w-4 text-blue-600" />
+                <div className="flex items-center gap-2 text-sm rounded-xl p-3.5 neu-concave">
+                  <Clock className="h-4 w-4 text-primary" />
                   <span>Entrega Rápida</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm bg-muted/50 rounded-lg p-3">
-                  <CreditCard className="h-4 w-4 text-purple-600" />
+                <div className="flex items-center gap-2 text-sm rounded-xl p-3.5 neu-concave">
+                  <CreditCard className="h-4 w-4 text-primary" />
                   <span>Até 12x s/ juros</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm bg-muted/50 rounded-lg p-3">
-                  <Truck className="h-4 w-4 text-orange-600" />
+                <div className="flex items-center gap-2 text-sm rounded-xl p-3.5 neu-concave">
+                  <Truck className="h-4 w-4 text-primary" />
                   <span>Frete Calculado</span>
                 </div>
               </div>
@@ -267,9 +270,10 @@ const ProductPage = () => {
 
           {/* Specifications & Details */}
           <div className="mt-12 max-w-3xl">
-            <ProductSpecifications product={product} />
+            <div className="rounded-2xl neu-flat p-6">
+              <ProductSpecifications product={product} />
+            </div>
           </div>
-
 
           {/* Product Reviews */}
           <ProductReviews 

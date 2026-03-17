@@ -1,5 +1,5 @@
 /**
- * TrustBar - Barra de confiança minimalista
+ * TrustBar - Barra de confiança neumorphism
  */
 
 import { Truck, Star, Shield, Clock, CreditCard } from 'lucide-react';
@@ -18,7 +18,7 @@ export function TrustBar() {
   ];
 
   return (
-    <div className="bg-foreground text-background py-2 overflow-hidden">
+    <div className="bg-foreground text-background py-2.5 overflow-hidden neu-sm">
       <div className="container mx-auto px-4">
         {/* Mobile: scrolling */}
         <div className="block md:hidden overflow-hidden">

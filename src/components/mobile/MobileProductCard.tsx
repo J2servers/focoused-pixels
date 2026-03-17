@@ -61,9 +61,9 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
         to={`/produto/${product.slug}`}
         className="block group"
       >
-        <div className="relative bg-card rounded-2xl overflow-hidden shadow-sm border border-border/50 transition-all duration-300 active:scale-[0.98]">
+        <div className="relative rounded-2xl overflow-hidden neu-raised transition-all duration-300 active:scale-[0.98]">
           {/* Image */}
-          <div className="relative aspect-square overflow-hidden bg-muted">
+          <div className="relative aspect-square overflow-hidden rounded-t-2xl">
             <motion.img
               src={product.image}
               alt={product.name}
@@ -76,17 +76,17 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             {/* Badges */}
             <div className="absolute top-2 left-2 flex flex-col gap-1">
               {product.badge === 'lancamento' && (
-                <Badge className="bg-accent text-accent-foreground text-[10px] px-1.5 py-0.5">
+                <Badge className="bg-accent text-accent-foreground text-[10px] px-1.5 py-0.5 rounded-xl">
                   DESTAQUE
                 </Badge>
               )}
               {hasDiscount && (
-                <Badge className="bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5">
+                <Badge className="bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-xl">
                   -{discountPercent}%
                 </Badge>
               )}
               {!product.inStock && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5">
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 rounded-xl">
                   ESGOTADO
                 </Badge>
               )}
@@ -102,7 +102,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
                 size="icon"
                 onClick={handleAddToCart}
                 disabled={!product.inStock}
-                className="h-9 w-9 rounded-full shadow-lg bg-primary/90 backdrop-blur-sm"
+                className="h-9 w-9 rounded-xl shadow-lg"
               >
                 <ShoppingCart className="h-4 w-4" />
               </Button>

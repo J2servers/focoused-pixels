@@ -1,5 +1,5 @@
 /**
- * GuaranteesSection - Garantias com design clean e horizontal
+ * GuaranteesSection - Garantias com design neumorphism
  */
 
 import { Shield, Truck, CreditCard, Clock, Award, RefreshCw } from 'lucide-react';
@@ -15,12 +15,12 @@ const guarantees = [
 
 export function GuaranteesSection() {
   return (
-    <section className="py-10 border-t border-border/50">
+    <section className="py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
           {guarantees.map((item) => (
-            <div key={item.title} className="flex flex-col items-center text-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <div key={item.title} className="flex flex-col items-center text-center gap-3 p-4 rounded-2xl neu-concave">
+              <div className="w-12 h-12 rounded-xl neu-convex flex items-center justify-center text-primary">
                 {item.icon}
               </div>
               <div>
