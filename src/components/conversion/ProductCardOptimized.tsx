@@ -1,5 +1,5 @@
 /**
- * ProductCardOptimized - Card de produto com design moderno e limpo
+ * ProductCardOptimized - Card de produto com design neumorphism
  */
 
 import { useState } from 'react';
@@ -60,26 +60,26 @@ export function ProductCardOptimized({
     <>
       <Link 
         to={`/produto/${product.slug}`}
-        className="group flex flex-col h-full bg-card rounded-xl overflow-hidden border border-border/50 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500"
+        className="group flex flex-col h-full rounded-2xl overflow-hidden neu-raised hover:shadow-product-hover transition-all duration-500"
       >
         {/* Image */}
-        <div className="relative aspect-square overflow-hidden bg-muted/30">
+        <div className="relative aspect-square overflow-hidden rounded-t-2xl">
           {/* Badge */}
           {savings > 0 && product.inStock && (
-            <Badge className="absolute top-2.5 left-2.5 z-10 bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-md">
+            <Badge className="absolute top-2.5 left-2.5 z-10 bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-xl">
               -{savings}%
             </Badge>
           )}
           {!product.inStock && (
             <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-[2px] flex items-center justify-center">
-              <span className="text-sm font-semibold text-muted-foreground bg-muted px-4 py-1.5 rounded-full">Esgotado</span>
+              <span className="text-sm font-semibold text-muted-foreground neu-flat px-4 py-1.5 rounded-full">Esgotado</span>
             </div>
           )}
 
           {/* Quick View on hover */}
           <button
             onClick={handleQuickView}
-            className="absolute top-2.5 right-2.5 z-10 bg-card/90 backdrop-blur-sm hover:bg-card p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0"
+            className="absolute top-2.5 right-2.5 z-10 neu-btn p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0"
           >
             <Eye className="h-4 w-4 text-foreground/70" />
           </button>
@@ -138,7 +138,7 @@ export function ProductCardOptimized({
             onClick={handleAddToCart}
             disabled={!product.inStock}
             size="sm"
-            className="w-full mt-3 font-semibold text-xs rounded-lg h-9"
+            className="w-full mt-3 font-semibold text-xs rounded-xl h-9"
           >
             <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
             {product.inStock ? 'Adicionar' : 'Indisponível'}

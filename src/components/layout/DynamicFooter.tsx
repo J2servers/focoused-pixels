@@ -12,7 +12,6 @@ export function DynamicFooter() {
   const { data: company } = useCompanyInfo();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
-  // Filter only parent categories for the footer
   const parentCategories = useMemo(() => 
     categories.filter(c => !c.parent_id).slice(0, 6), 
     [categories]
@@ -36,22 +35,22 @@ export function DynamicFooter() {
   ];
 
   return (
-    <footer className="bg-card border-t border-border">
+    <footer className="bg-background">
       {/* Newsletter */}
-      <div className="bg-primary text-primary-foreground py-8">
+      <div className="py-10">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="rounded-2xl neu-raised p-8 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-xl font-bold">Receba Ofertas Exclusivas</h3>
-              <p className="text-primary-foreground/80">Cadastre-se e ganhe 10% de desconto na primeira compra</p>
+              <h3 className="text-xl font-bold text-foreground">Receba Ofertas Exclusivas</h3>
+              <p className="text-muted-foreground text-sm">Cadastre-se e ganhe 10% de desconto na primeira compra</p>
             </div>
-            <form className="flex gap-2 w-full md:w-auto">
+            <form className="flex gap-3 w-full md:w-auto">
               <Input 
                 type="email" 
                 placeholder="Seu melhor email" 
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/60 min-w-[250px]"
+                className="min-w-[250px] rounded-xl"
               />
-              <Button variant="secondary">Cadastrar</Button>
+              <Button className="rounded-xl">Cadastrar</Button>
             </form>
           </div>
         </div>
@@ -75,19 +74,19 @@ export function DynamicFooter() {
             <div className="flex gap-3">
               {company?.social_instagram && (
                 <a href={company.social_instagram} target="_blank" rel="noopener noreferrer" 
-                   className="p-2 rounded-full bg-secondary hover:bg-primary hover:text-primary-foreground transition-colors">
+                   className="p-2.5 rounded-xl neu-btn hover:text-primary transition-colors">
                   <Instagram className="h-5 w-5" />
                 </a>
               )}
               {company?.social_facebook && (
                 <a href={company.social_facebook} target="_blank" rel="noopener noreferrer"
-                   className="p-2 rounded-full bg-secondary hover:bg-primary hover:text-primary-foreground transition-colors">
+                   className="p-2.5 rounded-xl neu-btn hover:text-primary transition-colors">
                   <Facebook className="h-5 w-5" />
                 </a>
               )}
               {company?.social_youtube && (
                 <a href={company.social_youtube} target="_blank" rel="noopener noreferrer"
-                   className="p-2 rounded-full bg-secondary hover:bg-primary hover:text-primary-foreground transition-colors">
+                   className="p-2.5 rounded-xl neu-btn hover:text-primary transition-colors">
                   <Youtube className="h-5 w-5" />
                 </a>
               )}
@@ -100,9 +99,7 @@ export function DynamicFooter() {
             <ul className="space-y-2 text-sm">
               {categoriesLoading ? (
                 [...Array(6)].map((_, i) => (
-                  <li key={i}>
-                    <Skeleton className="h-5 w-24" />
-                  </li>
+                  <li key={i}><Skeleton className="h-5 w-24 rounded-lg" /></li>
                 ))
               ) : (
                 parentCategories.map((category) => (
@@ -165,7 +162,6 @@ export function DynamicFooter() {
               )}
             </ul>
 
-            {/* Payment Methods */}
             <div className="mt-6">
               <h5 className="font-medium text-sm mb-2">Formas de Pagamento</h5>
               <p className="text-xs text-muted-foreground">
@@ -177,10 +173,12 @@ export function DynamicFooter() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-border py-4">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
-          <p>{company?.copyright_text || `© ${new Date().getFullYear()} ${company?.company_name || 'Pincel de Luz Personalizados'}. Todos os direitos reservados.`}</p>
-          {company?.cnpj && <p>CNPJ: {company.cnpj}</p>}
+      <div className="py-4">
+        <div className="container mx-auto px-4">
+          <div className="rounded-xl neu-pressed p-4 flex flex-col md:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+            <p>{company?.copyright_text || `© ${new Date().getFullYear()} ${company?.company_name || 'Pincel de Luz Personalizados'}. Todos os direitos reservados.`}</p>
+            {company?.cnpj && <p>CNPJ: {company.cnpj}</p>}
+          </div>
         </div>
       </div>
     </footer>
