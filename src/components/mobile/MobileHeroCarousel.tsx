@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useHeroSlides } from '@/hooks/useProducts';
@@ -19,13 +18,16 @@ export function MobileHeroCarousel() {
   }, [slides.length]);
 
   if (isLoading) {
-    return <Skeleton className="w-full aspect-[16/9] mx-4 rounded-2xl" />;
+    return <Skeleton className="w-full aspect-[16/9] mx-4 rounded-[20px]" />;
   }
 
   if (slides.length === 0) {
     return (
-      <div className="w-full px-4 py-3">
-        <div className="aspect-[16/9] rounded-2xl neu-concave flex items-center justify-center">
+      <div className="w-full px-4 py-2">
+        <div className="aspect-[16/9] rounded-[20px] flex items-center justify-center" style={{
+          background: 'linear-gradient(145deg, hsl(var(--surface-elevated)), hsl(var(--surface-inset)))',
+          boxShadow: '-6px -6px 12px hsl(var(--neu-light) / 0.92), 8px 8px 16px hsl(var(--neu-dark) / 0.42), 0 0 0 1px hsl(var(--neon-primary) / 0.16)',
+        }}>
           <div className="text-center px-6">
             <h2 className="text-xl font-bold mb-1 text-foreground">Pincel de Luz</h2>
             <p className="text-sm text-muted-foreground">Personalização de alta qualidade</p>
@@ -36,8 +38,13 @@ export function MobileHeroCarousel() {
   }
 
   return (
-    <div className="w-full px-4 py-3">
-      <div className="relative w-full h-[180px] max-w-[600px] mx-auto rounded-2xl overflow-hidden neu-raised">
+    <div className="w-full px-4 py-2">
+      <div
+        className="relative w-full h-[180px] max-w-[600px] mx-auto rounded-[20px] overflow-hidden"
+        style={{
+          boxShadow: '-6px -6px 12px hsl(var(--neu-light) / 0.92), 8px 8px 16px hsl(var(--neu-dark) / 0.42), 0 0 0 1px hsl(var(--neon-primary) / 0.16)',
+        }}
+      >
         <AnimatePresence mode="wait">
           {slides.map((slide, index) => (
             index === currentSlide && (
@@ -54,7 +61,7 @@ export function MobileHeroCarousel() {
                   alt={slide.title || 'Banner'}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                 
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <motion.div
@@ -89,9 +96,12 @@ export function MobileHeroCarousel() {
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === currentSlide ? 'w-5 bg-white' : 'w-1.5 bg-white/50'
-                }`}
+                className="h-1.5 rounded-full transition-all duration-300"
+                style={{
+                  width: index === currentSlide ? '20px' : '6px',
+                  background: index === currentSlide ? 'white' : 'rgba(255,255,255,0.5)',
+                  boxShadow: index === currentSlide ? '0 0 6px rgba(255,255,255,0.5)' : 'none',
+                }}
               />
             ))}
           </div>

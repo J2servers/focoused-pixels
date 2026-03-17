@@ -17,65 +17,75 @@
 
 @layer base {
   :root {
-    /* Neumorphism Base - Soft Light Theme */
-    --background: 240 20% 92%;
-    --foreground: 240 10% 15%;
+    /* ═══ Neumorphism Premium Surfaces ═══ */
+    --background: 252 18% 93%;
+    --foreground: 260 20% 16%;
 
-    --card: 240 20% 92%;
-    --card-foreground: 240 10% 15%;
+    --card: 252 18% 93%;
+    --card-foreground: 260 20% 16%;
 
-    --popover: 240 20% 94%;
-    --popover-foreground: 240 10% 15%;
+    --popover: 252 20% 95%;
+    --popover-foreground: 260 20% 16%;
 
-    /* Primary - Roxo Vibrante Pincel de Luz */
-    --primary: 280 70% 43%;
+    /* Primary - Roxo Assinatura */
+    --primary: 264 100% 65%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Roxo Claro */
-    --secondary: 280 30% 88%;
-    --secondary-foreground: 280 70% 43%;
+    --secondary: 264 30% 90%;
+    --secondary-foreground: 264 80% 50%;
 
-    --muted: 240 15% 88%;
-    --muted-foreground: 240 10% 45%;
+    --muted: 252 15% 88%;
+    --muted-foreground: 260 12% 42%;
 
-    /* Accent - Amarelo Dourado */
+    /* Accent - Dourado Premium */
     --accent: 45 100% 50%;
-    --accent-foreground: 240 10% 15%;
+    --accent-foreground: 260 20% 16%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 15% 85%;
-    --input: 240 15% 85%;
-    --ring: 280 70% 43%;
+    --border: 252 15% 86%;
+    --input: 252 15% 86%;
+    --ring: 264 100% 65%;
 
     --radius: 0.75rem;
 
-    /* Neumorphism Shadow Tokens - Deep Machined */
+    /* ═══ Neumorphism Shadow System ═══ */
     --neu-light: 0 0% 100%;
-    --neu-dark: 240 20% 75%;
-    --neu-distance: 8px;
-    --neu-blur: 16px;
-    --neu-intensity: 0.85;
-    --neu-inner-distance: 4px;
-    --neu-inner-blur: 8px;
+    --neu-dark: 240 18% 76%;
+    --neu-distance: 6px;
+    --neu-blur: 12px;
+    --neu-intensity: 0.92;
+    --neu-inner-distance: 3px;
+    --neu-inner-blur: 6px;
 
-    /* Neon Glow Border Tokens */
-    --neon-primary: 280 90% 65%;
+    /* ═══ Purple Signature Borders ═══ */
+    --neon-primary: 264 100% 65%;
     --neon-accent: 45 100% 55%;
     --neon-cyan: 185 100% 60%;
     --neon-pink: 340 100% 65%;
     --neon-border-width: 1px;
-    --neon-opacity: 0.6;
-    --neon-opacity-hover: 1;
+    --neon-opacity: 0.22;
+    --neon-opacity-hover: 0.45;
 
-    /* Custom Pincel de Luz tokens */
-    --purple-dark: 280 80% 35%;
-    --purple-light: 280 60% 92%;
+    /* ═══ Surface Tokens ═══ */
+    --surface-base: 252 18% 93%;
+    --surface-elevated: 252 22% 96%;
+    --surface-inset: 252 16% 90%;
+
+    /* ═══ Purple Palette ═══ */
+    --purple-dark: 264 90% 38%;
+    --purple-light: 264 40% 94%;
     --gold: 45 100% 50%;
     --gold-dark: 40 90% 45%;
     --success: 142 76% 36%;
     --whatsapp: 142 70% 45%;
+
+    /* ═══ Typography ═══ */
+    --heading-color: 260 20% 16%;
+    --body-color: 260 14% 34%;
+    --price-color: 264 100% 65%;
 
     /* Admin Panel Tokens - Vivid Dark Theme */
     --admin-bg: 250 25% 8%;
@@ -95,53 +105,59 @@
     --admin-text-muted: 250 15% 60%;
     --admin-glow: 280 100% 65%;
 
-    --sidebar-background: 240 20% 92%;
-    --sidebar-foreground: 240 10% 26%;
-    --sidebar-primary: 280 70% 43%;
+    --sidebar-background: 252 18% 93%;
+    --sidebar-foreground: 260 10% 26%;
+    --sidebar-primary: 264 100% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 280 30% 88%;
-    --sidebar-accent-foreground: 280 70% 43%;
-    --sidebar-border: 240 15% 85%;
-    --sidebar-ring: 280 70% 43%;
+    --sidebar-accent: 264 30% 90%;
+    --sidebar-accent-foreground: 264 80% 50%;
+    --sidebar-border: 252 15% 86%;
+    --sidebar-ring: 264 100% 65%;
   }
 
   .dark {
-    --background: 240 15% 13%;
+    --background: 252 15% 13%;
     --foreground: 0 0% 95%;
 
-    --card: 240 15% 13%;
+    --card: 252 15% 13%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 240 15% 15%;
+    --popover: 252 15% 15%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 280 70% 55%;
+    --primary: 264 90% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 280 20% 22%;
+    --secondary: 264 20% 22%;
     --secondary-foreground: 0 0% 95%;
 
-    --muted: 240 15% 18%;
-    --muted-foreground: 240 10% 60%;
+    --muted: 252 15% 18%;
+    --muted-foreground: 252 10% 60%;
 
     --accent: 45 100% 50%;
-    --accent-foreground: 240 10% 10%;
+    --accent-foreground: 252 10% 10%;
 
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 240 15% 18%;
-    --input: 240 15% 18%;
-    --ring: 280 70% 55%;
+    --border: 252 15% 18%;
+    --input: 252 15% 18%;
+    --ring: 264 90% 60%;
 
-    /* Dark Neumorphism - Deep Machined */
-    --neu-light: 240 15% 20%;
-    --neu-dark: 240 15% 5%;
-    --neu-distance: 8px;
-    --neu-blur: 16px;
+    --neu-light: 252 15% 20%;
+    --neu-dark: 252 15% 5%;
+    --neu-distance: 6px;
+    --neu-blur: 12px;
     --neu-intensity: 1;
-    --neu-inner-distance: 4px;
-    --neu-inner-blur: 8px;
+    --neu-inner-distance: 3px;
+    --neu-inner-blur: 6px;
+
+    --neon-opacity: 0.25;
+    --neon-opacity-hover: 0.5;
+
+    --surface-base: 252 15% 13%;
+    --surface-elevated: 252 15% 16%;
+    --surface-inset: 252 15% 10%;
 
     --admin-bg: 250 25% 8%;
     --admin-sidebar: 255 30% 6%;
@@ -159,14 +175,14 @@
     --admin-text: 0 0% 98%;
     --admin-text-muted: 250 15% 60%;
     --admin-glow: 280 100% 65%;
-    --sidebar-background: 240 15% 13%;
+    --sidebar-background: 252 15% 13%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 280 70% 55%;
+    --sidebar-primary: 264 90% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 280 20% 22%;
+    --sidebar-accent: 264 20% 22%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 240 15% 18%;
-    --sidebar-ring: 280 70% 55%;
+    --sidebar-border: 252 15% 18%;
+    --sidebar-ring: 264 90% 60%;
   }
 }
 
@@ -191,190 +207,194 @@
   }
 
   .bg-gradient-purple {
-    background: linear-gradient(135deg, hsl(280 70% 43%) 0%, hsl(280 80% 35%) 100%);
+    background: linear-gradient(135deg, hsl(264 100% 65%) 0%, hsl(264 90% 38%) 100%);
   }
 
-  /* ═══ Neumorphism Utilities — Deep Machined ═══ */
+  /* ═══ Neumorphism Utilities — Soft Premium ═══ */
   .neu-flat {
-    background: hsl(var(--background));
+    background: hsl(var(--surface-elevated));
     box-shadow:
-      var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
-      calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 1px 0 hsl(var(--neu-light) / 0.4),
-      inset 0 -1px 0 hsl(var(--neu-dark) / 0.2);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / var(--neon-opacity));
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)),
+      8px 8px 16px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity));
+    transition: box-shadow 0.3s ease;
   }
 
   .neu-flat:hover {
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
+    box-shadow:
+      -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)),
+      8px 8px 16px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity-hover)),
+      0 0 12px hsl(var(--neon-primary) / 0.1);
   }
 
   .neu-raised {
-    background: linear-gradient(145deg, hsl(var(--background)), hsl(var(--neu-dark) / 0.1));
+    background: linear-gradient(145deg, hsl(var(--surface-elevated)), hsl(var(--surface-inset)));
     box-shadow:
-      var(--neu-distance) var(--neu-distance) calc(var(--neu-blur) * 1.5) hsl(var(--neu-dark) / var(--neu-intensity)),
-      calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) calc(var(--neu-blur) * 1.5) hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 2px 0 hsl(var(--neu-light) / 0.5),
-      inset 0 -2px 0 hsl(var(--neu-dark) / 0.15);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / calc(var(--neon-opacity) * 0.5));
+      -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)),
+      8px 8px 16px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / 0.16);
     transition: all 0.3s ease;
   }
 
   .neu-raised:hover {
     box-shadow:
-      calc(var(--neu-distance) * 1.3) calc(var(--neu-distance) * 1.3) calc(var(--neu-blur) * 2) hsl(var(--neu-dark) / var(--neu-intensity)),
-      calc(var(--neu-distance) * -1.3) calc(var(--neu-distance) * -1.3) calc(var(--neu-blur) * 2) hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 2px 0 hsl(var(--neu-light) / 0.6),
-      inset 0 -2px 0 hsl(var(--neu-dark) / 0.2);
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
+      -8px -8px 16px hsl(var(--neu-light) / var(--neu-intensity)),
+      10px 10px 20px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity-hover)),
+      0 0 16px hsl(var(--neon-primary) / 0.1);
     transform: translateY(-1px);
   }
 
   .neu-pressed {
-    background: hsl(var(--background));
+    background: hsl(var(--surface-inset));
     box-shadow:
-      inset var(--neu-inner-distance) var(--neu-inner-distance) var(--neu-inner-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
-      inset calc(var(--neu-inner-distance) * -1) calc(var(--neu-inner-distance) * -1) var(--neu-inner-blur) hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 1px 3px hsl(var(--neu-dark) / 0.3);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / 0.3);
+      inset -3px -3px 6px hsl(var(--neu-light) / 0.85),
+      inset 3px 3px 8px hsl(var(--neu-dark) / 0.30),
+      0 0 0 1px hsl(var(--neon-primary) / 0.16);
   }
 
   .neu-concave {
-    background: linear-gradient(145deg, hsl(var(--neu-dark) / 0.12), hsl(var(--neu-light) / 0.6));
+    background: linear-gradient(145deg, hsl(var(--surface-inset)), hsl(var(--surface-elevated)));
     box-shadow:
-      var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
-      calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 1px 0 hsl(var(--neu-dark) / 0.15),
-      inset 0 -1px 0 hsl(var(--neu-light) / 0.3);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / calc(var(--neon-opacity) * 0.4));
-    transition: border-color 0.3s ease;
+      -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)),
+      8px 8px 16px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / 0.12);
+    transition: box-shadow 0.3s ease;
   }
 
   .neu-concave:hover {
-    border-color: hsl(var(--neon-cyan) / var(--neon-opacity-hover));
+    box-shadow:
+      -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)),
+      8px 8px 16px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity-hover));
   }
 
   .neu-convex {
-    background: linear-gradient(145deg, hsl(var(--neu-light) / 0.6), hsl(var(--neu-dark) / 0.12));
+    background: linear-gradient(145deg, hsl(var(--surface-elevated)), hsl(var(--surface-inset)));
     box-shadow:
-      var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
-      calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 2px 0 hsl(var(--neu-light) / 0.5),
-      inset 0 -1px 0 hsl(var(--neu-dark) / 0.1);
-    border: var(--neon-border-width) solid hsl(var(--neon-accent) / calc(var(--neon-opacity) * 0.4));
+      -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)),
+      8px 8px 16px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / 0.12);
     transition: all 0.3s ease;
   }
 
   .neu-convex:hover {
-    border-color: hsl(var(--neon-accent) / var(--neon-opacity-hover));
+    box-shadow:
+      -8px -8px 16px hsl(var(--neu-light) / var(--neu-intensity)),
+      10px 10px 20px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity-hover));
     transform: translateY(-1px);
   }
 
   .neu-sm {
     --neu-distance: 4px;
     --neu-blur: 8px;
-    --neu-inner-distance: 3px;
-    --neu-inner-blur: 6px;
+    --neu-inner-distance: 2px;
+    --neu-inner-blur: 4px;
   }
 
   .neu-lg {
-    --neu-distance: 12px;
-    --neu-blur: 24px;
-    --neu-inner-distance: 6px;
-    --neu-inner-blur: 12px;
+    --neu-distance: 10px;
+    --neu-blur: 20px;
+    --neu-inner-distance: 5px;
+    --neu-inner-blur: 10px;
   }
 
   .neu-xl {
-    --neu-distance: 18px;
-    --neu-blur: 36px;
-    --neu-inner-distance: 8px;
-    --neu-inner-blur: 16px;
+    --neu-distance: 14px;
+    --neu-blur: 28px;
+    --neu-inner-distance: 7px;
+    --neu-inner-blur: 14px;
   }
 
-  /* ═══ Button — Deep Machined with Neon Border ═══ */
+  /* ═══ Button — Soft Elevated ═══ */
   .neu-btn {
     position: relative;
-    background: hsl(var(--background));
+    background: hsl(var(--surface-elevated));
     box-shadow:
-      5px 5px 10px hsl(var(--neu-dark) / var(--neu-intensity)),
-      -5px -5px 10px hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 1px 0 hsl(var(--neu-light) / 0.5),
-      inset 0 -1px 0 hsl(var(--neu-dark) / 0.15);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / var(--neon-opacity));
+      -4px -4px 8px hsl(var(--neu-light) / var(--neu-intensity)),
+      5px 5px 10px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity));
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    border: none;
   }
 
   .neu-btn:hover {
     box-shadow:
-      3px 3px 6px hsl(var(--neu-dark) / var(--neu-intensity)),
       -3px -3px 6px hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 1px 0 hsl(var(--neu-light) / 0.6),
-      inset 0 -1px 0 hsl(var(--neu-dark) / 0.2);
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
+      4px 4px 8px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity-hover)),
+      0 0 10px hsl(var(--neon-primary) / 0.1);
     transform: translateY(-1px);
   }
 
   .neu-btn:active, .neu-btn-active {
     box-shadow:
-      inset 4px 4px 8px hsl(var(--neu-dark) / var(--neu-intensity)),
-      inset -4px -4px 8px hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 1px 3px hsl(var(--neu-dark) / 0.3);
-    border-color: hsl(var(--neon-cyan) / var(--neon-opacity-hover));
+      inset -3px -3px 6px hsl(var(--neu-light) / 0.85),
+      inset 3px 3px 8px hsl(var(--neu-dark) / 0.30),
+      0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity-hover));
     transform: translateY(1px);
   }
 
-  /* ═══ Input — Deep Inset Machined ═══ */
+  /* ═══ Input — Soft Inset ═══ */
   .neu-input {
-    background: hsl(var(--background));
+    background: hsl(var(--surface-inset));
     box-shadow:
-      inset 4px 4px 8px hsl(var(--neu-dark) / calc(var(--neu-intensity) * 0.7)),
-      inset -4px -4px 8px hsl(var(--neu-light) / calc(var(--neu-intensity) * 0.9)),
-      inset 0 1px 3px hsl(var(--neu-dark) / 0.2);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / 0.2);
-    transition: border-color 0.3s ease;
+      inset -3px -3px 6px hsl(var(--neu-light) / 0.85),
+      inset 3px 3px 8px hsl(var(--neu-dark) / 0.25),
+      0 0 0 1px hsl(var(--neon-primary) / 0.12);
+    border: none;
+    transition: box-shadow 0.3s ease;
   }
 
   .neu-input:focus, .neu-input:focus-within {
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
+    box-shadow:
+      inset -3px -3px 6px hsl(var(--neu-light) / 0.85),
+      inset 3px 3px 8px hsl(var(--neu-dark) / 0.25),
+      0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity-hover));
   }
 
   .neu-circle {
     border-radius: 50%;
   }
 
-  /* ═══ Neon Border Utilities ═══ */
+  /* ═══ Subtle Border Utilities ═══ */
   .neon-border-primary {
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / var(--neon-opacity));
-    transition: border-color 0.3s ease;
+    box-shadow: 0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity));
+    border: none;
+    transition: box-shadow 0.3s ease;
   }
   .neon-border-primary:hover {
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
+    box-shadow: 0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity-hover));
   }
 
   .neon-border-accent {
-    border: var(--neon-border-width) solid hsl(var(--neon-accent) / var(--neon-opacity));
-    transition: border-color 0.3s ease;
+    box-shadow: 0 0 0 1px hsl(var(--neon-accent) / var(--neon-opacity));
+    border: none;
+    transition: box-shadow 0.3s ease;
   }
   .neon-border-accent:hover {
-    border-color: hsl(var(--neon-accent) / var(--neon-opacity-hover));
+    box-shadow: 0 0 0 1px hsl(var(--neon-accent) / var(--neon-opacity-hover));
   }
 
   .neon-border-cyan {
-    border: var(--neon-border-width) solid hsl(var(--neon-cyan) / var(--neon-opacity));
-    transition: border-color 0.3s ease;
+    box-shadow: 0 0 0 1px hsl(var(--neon-cyan) / var(--neon-opacity));
+    border: none;
+    transition: box-shadow 0.3s ease;
   }
   .neon-border-cyan:hover {
-    border-color: hsl(var(--neon-cyan) / var(--neon-opacity-hover));
+    box-shadow: 0 0 0 1px hsl(var(--neon-cyan) / var(--neon-opacity-hover));
   }
 
   .neon-border-pink {
-    border: var(--neon-border-width) solid hsl(var(--neon-pink) / var(--neon-opacity));
-    transition: border-color 0.3s ease;
+    box-shadow: 0 0 0 1px hsl(var(--neon-pink) / var(--neon-opacity));
+    border: none;
+    transition: box-shadow 0.3s ease;
   }
   .neon-border-pink:hover {
-    border-color: hsl(var(--neon-pink) / var(--neon-opacity-hover));
+    box-shadow: 0 0 0 1px hsl(var(--neon-pink) / var(--neon-opacity-hover));
   }
 
   /* ═══ Neon Gradient Border (animated) ═══ */
@@ -387,7 +407,7 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    padding: var(--neon-border-width);
+    padding: 1px;
     background: linear-gradient(135deg, hsl(var(--neon-primary)), hsl(var(--neon-cyan)), hsl(var(--neon-accent)));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -401,22 +421,21 @@
     opacity: var(--neon-opacity-hover);
   }
 
-  /* ═══ Product Card Shadow — Deep Machined ═══ */
+  /* ═══ Product Card Shadow — Premium ═══ */
   .shadow-product {
     box-shadow:
-      8px 8px 16px hsl(var(--neu-dark) / var(--neu-intensity)),
-      -8px -8px 16px hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 1px 0 hsl(var(--neu-light) / 0.3);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / calc(var(--neon-opacity) * 0.3));
+      -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)),
+      8px 8px 16px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / 0.16);
     transition: all 0.3s ease;
   }
 
   .shadow-product-hover {
     box-shadow:
-      10px 10px 20px hsl(var(--neu-dark) / var(--neu-intensity)),
-      -10px -10px 20px hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 2px 0 hsl(var(--neu-light) / 0.4);
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
+      -8px -8px 16px hsl(var(--neu-light) / var(--neu-intensity)),
+      10px 10px 20px hsl(var(--neu-dark) / 0.42),
+      0 0 0 1px hsl(var(--neon-primary) / var(--neon-opacity-hover)),
+      0 0 16px hsl(var(--neon-primary) / 0.1);
     transform: translateY(-2px);
   }
 
