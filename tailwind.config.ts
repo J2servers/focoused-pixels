@@ -98,7 +98,12 @@ export default {
   				dark: 'hsl(var(--gold-dark))'
   			},
   			success: 'hsl(var(--success))',
-  			whatsapp: 'hsl(var(--whatsapp))'
+  			whatsapp: 'hsl(var(--whatsapp))',
+  			surface: {
+  				base: 'hsl(var(--surface-base))',
+  				elevated: 'hsl(var(--surface-elevated))',
+  				inset: 'hsl(var(--surface-inset))',
+  			}
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
