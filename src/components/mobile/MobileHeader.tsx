@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, X, Menu, ChevronRight, Sparkles, Home, Info, HelpCircle, Package } from 'lucide-react';
+import { Search, X, Menu, ChevronRight, Sparkles, Info, HelpCircle, Package } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -38,39 +38,36 @@ export function MobileHeader() {
   return (
     <header className="sticky top-0 z-40 safe-area-pt">
       {/* Main Header Bar */}
-      <div className="bg-background" style={{
-        boxShadow: '0 4px 12px hsl(var(--neu-dark) / 0.3), 0 -2px 8px hsl(var(--neu-light) / 0.5) inset',
-        borderBottom: '1px solid hsl(var(--neon-primary) / 0.25)',
+      <div style={{
+        background: 'hsl(var(--surface-elevated))',
+        boxShadow: '-6px -6px 12px hsl(var(--neu-light) / 0.92) inset, 0 8px 16px hsl(var(--neu-dark) / 0.25), 0 0 0 1px hsl(var(--neon-primary) / 0.12)',
       }}>
-        <div className="flex items-center justify-between h-14 px-3">
+        <div className="grid grid-cols-[48px_1fr_48px] items-center h-14 px-3 gap-2">
           {/* Menu Button */}
           <Sheet>
             <SheetTrigger asChild>
               <motion.button
                 whileTap={{ scale: 0.92 }}
-                className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200"
+                className="w-11 h-11 rounded-2xl flex items-center justify-center"
                 style={{
-                  background: 'hsl(var(--background))',
-                  boxShadow: '3px 3px 6px hsl(var(--neu-dark) / var(--neu-intensity)), -3px -3px 6px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(var(--neu-light) / 0.4)',
-                  border: '1px solid hsl(var(--neon-primary) / 0.3)',
+                  background: 'hsl(var(--surface-elevated))',
+                  boxShadow: '-3px -3px 6px hsl(var(--neu-light) / 0.92), 4px 4px 8px hsl(var(--neu-dark) / 0.42), 0 0 0 1px hsl(var(--neon-primary) / 0.16)',
                 }}
               >
                 <Menu className="h-5 w-5 text-foreground" />
               </motion.button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] p-0 border-r-0" style={{
-              background: 'hsl(var(--background))',
-              borderRight: '1px solid hsl(var(--neon-primary) / 0.4)',
+              background: 'hsl(var(--surface-base))',
             }}>
               {/* Drawer Header */}
               <div className="p-5 pb-4" style={{
-                borderBottom: '1px solid hsl(var(--neon-primary) / 0.15)',
+                borderBottom: '1px solid hsl(var(--neon-primary) / 0.12)',
               }}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{
-                    background: 'hsl(var(--primary))',
-                    boxShadow: '2px 2px 6px hsl(var(--neu-dark) / 0.5), -2px -2px 6px hsl(var(--neu-light) / 0.3)',
-                    border: '1px solid hsl(var(--neon-primary) / 0.6)',
+                    background: 'linear-gradient(145deg, hsl(var(--primary)), hsl(var(--purple-dark)))',
+                    boxShadow: '-2px -2px 4px hsl(var(--neu-light) / 0.3), 3px 3px 6px hsl(var(--neu-dark) / 0.4), 0 0 0 1px hsl(var(--neon-primary) / 0.3)',
                   }}>
                     <Sparkles className="h-5 w-5 text-primary-foreground" />
                   </div>
@@ -100,9 +97,8 @@ export function MobileHeader() {
                         to={`/categoria/${cat.slug}`}
                         className="flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 group"
                         style={{
-                          background: 'hsl(var(--background))',
-                          boxShadow: '3px 3px 6px hsl(var(--neu-dark) / calc(var(--neu-intensity) * 0.6)), -3px -3px 6px hsl(var(--neu-light) / calc(var(--neu-intensity) * 0.8)), inset 0 1px 0 hsl(var(--neu-light) / 0.3)',
-                          border: '1px solid hsl(var(--neon-primary) / 0.1)',
+                          background: 'hsl(var(--surface-elevated))',
+                          boxShadow: '-3px -3px 6px hsl(var(--neu-light) / 0.85), 4px 4px 8px hsl(var(--neu-dark) / 0.30), 0 0 0 1px hsl(var(--neon-primary) / 0.1)',
                         }}
                       >
                         <span className="group-hover:text-primary transition-colors">{cat.name}</span>
@@ -113,13 +109,13 @@ export function MobileHeader() {
                 )}
 
                 {/* Divider */}
-                <div className="pt-3 mt-3" style={{ borderTop: '1px solid hsl(var(--neon-primary) / 0.1)' }}>
+                <div className="pt-3 mt-3" style={{ borderTop: '1px solid hsl(var(--neon-primary) / 0.08)' }}>
                   <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold px-2 mb-2">Links</p>
                   {[
                     { to: '/rastreio', icon: Package, label: 'Rastrear Pedido' },
                     { to: '/sobre', icon: Info, label: 'Sobre Nós' },
                     { to: '/faq', icon: HelpCircle, label: 'FAQ' },
-                  ].map((link, i) => (
+                  ].map((link) => (
                     <Link
                       key={link.to}
                       to={link.to}
@@ -134,12 +130,12 @@ export function MobileHeader() {
             </SheetContent>
           </Sheet>
 
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
+          {/* Logo — centered */}
+          <Link to="/" className="flex items-center justify-center">
             <img 
               src={company?.header_logo || logoPincel} 
               alt="Pincel de Luz"
-              className="h-8 w-auto"
+              className="h-9 w-auto"
             />
           </Link>
 
@@ -147,11 +143,10 @@ export function MobileHeader() {
           <motion.button
             whileTap={{ scale: 0.92 }}
             onClick={() => setIsSearchOpen(true)}
-            className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200"
+            className="w-11 h-11 rounded-2xl flex items-center justify-center justify-self-end"
             style={{
-              background: 'hsl(var(--background))',
-              boxShadow: '3px 3px 6px hsl(var(--neu-dark) / var(--neu-intensity)), -3px -3px 6px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(var(--neu-light) / 0.4)',
-              border: '1px solid hsl(var(--neon-primary) / 0.3)',
+              background: 'hsl(var(--surface-elevated))',
+              boxShadow: '-3px -3px 6px hsl(var(--neu-light) / 0.92), 4px 4px 8px hsl(var(--neu-dark) / 0.42), 0 0 0 1px hsl(var(--neon-primary) / 0.16)',
             }}
           >
             <Search className="h-5 w-5 text-foreground" />
@@ -169,9 +164,8 @@ export function MobileHeader() {
             transition={{ duration: 0.2 }}
             className="absolute inset-x-0 top-0 z-50 h-14 px-3"
             style={{
-              background: 'hsl(var(--background))',
-              boxShadow: '0 4px 12px hsl(var(--neu-dark) / 0.3)',
-              borderBottom: '1px solid hsl(var(--neon-primary) / 0.4)',
+              background: 'hsl(var(--surface-elevated))',
+              boxShadow: '0 8px 16px hsl(var(--neu-dark) / 0.3), 0 0 0 1px hsl(var(--neon-primary) / 0.2)',
             }}
           >
             <form onSubmit={handleSearch} className="flex items-center h-full gap-2">
@@ -181,8 +175,8 @@ export function MobileHeader() {
                 onClick={() => setIsSearchOpen(false)}
                 className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                 style={{
-                  background: 'hsl(var(--background))',
-                  boxShadow: '2px 2px 4px hsl(var(--neu-dark) / 0.5), -2px -2px 4px hsl(var(--neu-light) / 0.5)',
+                  background: 'hsl(var(--surface-elevated))',
+                  boxShadow: '-2px -2px 4px hsl(var(--neu-light) / 0.85), 3px 3px 6px hsl(var(--neu-dark) / 0.35)',
                 }}
               >
                 <X className="h-4 w-4" />
@@ -203,11 +197,11 @@ export function MobileHeader() {
         )}
       </AnimatePresence>
 
-      {/* Promo Strip */}
-      <div className="py-1.5 px-4 text-center text-xs font-semibold" style={{
-        background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--purple-dark)))',
-        color: 'hsl(var(--primary-foreground))',
-        borderBottom: '1px solid hsl(var(--neon-accent) / 0.3)',
+      {/* Promo Strip — Pill-like elevated */}
+      <div className="mx-4 my-2 py-2 px-4 text-center text-xs font-semibold rounded-2xl" style={{
+        background: 'linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--purple-dark) / 0.12))',
+        color: 'hsl(var(--primary))',
+        boxShadow: '-3px -3px 6px hsl(var(--neu-light) / 0.85), 4px 4px 8px hsl(var(--neu-dark) / 0.30), 0 0 0 1px hsl(var(--neon-primary) / 0.22)',
       }}>
         🚚 {company?.free_shipping_message || 'Frete grátis acima de R$ 159'}
       </div>
