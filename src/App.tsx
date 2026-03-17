@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SiteSettingsProvider } from "@/components/providers/SiteSettingsProvider";
 import { PageViewTracker } from "@/components/PageViewTracker";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
