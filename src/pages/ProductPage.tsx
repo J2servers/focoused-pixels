@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Star, Truck, Shield, Clock, CreditCard } from 'lucide-react';
+import { Star, Truck, Shield, Clock, CreditCard, ShoppingBag, Zap } from 'lucide-react';
 import { useProductBySlug, useCategoryBySlug } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { storeInfo, discountTiers } from '@/data/store';
