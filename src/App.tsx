@@ -65,6 +65,7 @@ const App = () => (
         <BrowserRouter>
           {/* SiteSettingsProvider must be inside BrowserRouter for useLocation */}
           <SiteSettingsProvider>
+            <ScrollToTop />
             <PageViewTracker />
             <Routes>
               <Route path="/" element={<Index />} />
