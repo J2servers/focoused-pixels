@@ -42,7 +42,7 @@ export function MobileHeader() {
         boxShadow: '0 4px 12px hsl(var(--neu-dark) / 0.3), 0 -2px 8px hsl(var(--neu-light) / 0.5) inset',
         borderBottom: '1px solid hsl(var(--neon-primary) / 0.25)',
       }}>
-        <div className="flex items-center justify-between h-16 px-3">
+        <div className="flex items-center justify-between h-[72px] px-3">
           {/* Menu Button */}
           <Sheet>
             <SheetTrigger asChild>
@@ -135,11 +135,11 @@ export function MobileHeader() {
           </Sheet>
 
           {/* Logo */}
-          <Link to="/" className="flex items-center flex-1 justify-center px-3">
+          <Link to="/" className="flex items-center flex-1 justify-center px-2">
             <img 
               src={company?.header_logo || logoPincel} 
               alt="Pincel de Luz"
-              className="h-12 w-auto max-w-[180px] object-contain"
+              className="h-14 w-auto max-w-[200px] object-contain"
             />
           </Link>
 

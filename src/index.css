@@ -436,6 +436,41 @@
     --input: 250 20% 15%;
   }
 
+  /* Neutralize ALL neumorphism inside admin */
+  .admin-dark .neu-flat,
+  .admin-dark .neu-raised,
+  .admin-dark .neu-pressed,
+  .admin-dark .neu-concave,
+  .admin-dark .neu-convex,
+  .admin-dark .neu-btn,
+  .admin-dark .neu-input,
+  .admin-dark .shadow-product {
+    background: hsl(var(--admin-card));
+    box-shadow: none;
+    border: 1px solid hsl(var(--admin-card-border));
+  }
+  .admin-dark .neu-flat:hover,
+  .admin-dark .neu-raised:hover,
+  .admin-dark .neu-concave:hover,
+  .admin-dark .neu-convex:hover,
+  .admin-dark .neu-btn:hover,
+  .admin-dark .shadow-product:hover {
+    box-shadow: 0 4px 12px hsl(280 100% 50% / 0.1);
+    border-color: hsl(280 80% 50% / 0.3);
+    transform: none;
+  }
+  .admin-dark .neu-btn:active,
+  .admin-dark .neu-btn-active {
+    box-shadow: inset 0 2px 4px hsl(0 0% 0% / 0.3);
+    transform: none;
+  }
+  .admin-dark .neon-border-primary,
+  .admin-dark .neon-border-accent,
+  .admin-dark .neon-border-cyan,
+  .admin-dark .neon-border-pink {
+    border-color: hsl(var(--admin-card-border));
+  }
+
   .admin-stat-card {
     @apply relative overflow-hidden;
     background: linear-gradient(135deg, hsl(var(--admin-card)) 0%, hsl(250 25% 14%) 100%);
