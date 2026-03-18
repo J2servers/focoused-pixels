@@ -174,6 +174,22 @@ const PaymentPage = () => {
     return () => clearInterval(interval);
   }, [pixData, paymentStatus, mercadoPago, navigate]);
 
+  const saveCustomerAsLead = async (name: string, email: string, phone: string) => {
+    try {
+      await supabase.from('leads').upsert({
+        name,
+        email,
+        phone: phone || null,
+        source: 'checkout',
+        tags: ['cliente', 'pagamento'],
+        is_subscribed: true,
+        subscribed_at: new Date().toISOString(),
+      }, { onConflict: 'email' });
+    } catch (e) {
+      console.error('Error saving lead:', e);
+    }
+  };
+
   const createOrderInDB = async (state: PaymentState): Promise<string | null> => {
     // If orderId is already a UUID (came from DB), skip creation
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -207,6 +223,9 @@ const PaymentPage = () => {
       toast.error('Erro ao criar pedido. Tente novamente.');
       return null;
     }
+
+    // Save customer as lead
+    await saveCustomerAsLead(state.customerName, state.customerEmail, state.customerPhone);
 
     return order.id;
   };
