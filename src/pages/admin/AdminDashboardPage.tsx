@@ -139,14 +139,24 @@ const AdminDashboardPage = () => {
       href: '/admin/avaliacoes'
     },
     { 
+      title: 'Pedidos Pendentes', 
+      value: stats.pendingOrders, 
+      icon: ShoppingCart, 
+      color: 'from-rose-500 to-rose-600',
+      bgAccent: 'bg-rose-500',
+      trend: stats.pendingOrders > 0 ? 'Atenção' : 'OK',
+      trendUp: stats.pendingOrders === 0,
+      href: '/admin/pedidos'
+    },
+    { 
       title: 'Total de Orçamentos', 
       value: stats.totalQuotes, 
-      icon: ShoppingCart, 
+      icon: FileText, 
       color: 'from-purple-500 to-purple-600',
       bgAccent: 'bg-purple-500',
       trend: '+8%',
       trendUp: true,
-      href: '/admin'
+      href: '/admin/orcamentos'
     },
   ];
 
