@@ -149,6 +149,8 @@ export function HeroConversion() {
           </div>
         </>
       )}
+        </div>
+      </div>
     </section>
   );
 }
