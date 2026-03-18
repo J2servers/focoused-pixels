@@ -5,6 +5,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+/** Sanitize phone number to 55XXXXXXXXXXX format */
+function sanitizePhone(phone: string): string {
+  let clean = phone.replace(/\D/g, "");
+  if (clean.length === 11 && clean.startsWith("0")) {
+    clean = "55" + clean.substring(1);
+  } else if (clean.length === 11 || clean.length === 10) {
+    clean = "55" + clean;
+  }
+  // If already has 55 prefix or other formats, return as-is
+  return clean;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -22,7 +34,30 @@ serve(async (req) => {
     }
 
     const baseUrl = evolutionUrl.replace(/\/$/, "");
-    const { action, instanceName, number, text } = await req.json();
+    
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ success: false, error: "Invalid JSON body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { action, instanceName, number, text } = body as {
+      action: string;
+      instanceName?: string;
+      number?: string;
+      text?: string;
+    };
+
+    if (!action) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Missing 'action' field" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const headers = {
       "Content-Type": "application/json",
@@ -48,7 +83,7 @@ serve(async (req) => {
           }),
         });
         result = await resp.json();
-        console.log(`[Evolution] Create result:`, JSON.stringify(result));
+        console.log(`[Evolution] Create result:`, JSON.stringify(result).slice(0, 300));
         break;
       }
 
@@ -102,15 +137,37 @@ serve(async (req) => {
         }
 
         const name = instanceName || "pinceldeluz";
-        // Clean phone number
-        let cleanNumber = number.replace(/\D/g, "");
-        if (cleanNumber.length === 11 && cleanNumber.startsWith("0")) {
-          cleanNumber = "55" + cleanNumber.substring(1);
-        } else if (cleanNumber.length === 11 || cleanNumber.length === 10) {
-          cleanNumber = "55" + cleanNumber;
+        const cleanNumber = sanitizePhone(number);
+
+        if (cleanNumber.length < 12) {
+          return new Response(
+            JSON.stringify({ success: false, error: `Invalid phone number: ${cleanNumber}` }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
 
         console.log(`[Evolution] Sending text to ${cleanNumber} via ${name}`);
+
+        // Check connection status first
+        try {
+          const statusResp = await fetch(`${baseUrl}/instance/connectionState/${name}`, {
+            method: "GET",
+            headers,
+          });
+          const statusData = await statusResp.json();
+          const state = statusData?.instance?.state;
+          
+          if (state !== "open") {
+            console.error(`[Evolution] Instance ${name} is not connected (state: ${state})`);
+            return new Response(
+              JSON.stringify({ success: false, error: `WhatsApp not connected (state: ${state})` }),
+              { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        } catch (statusErr) {
+          console.error(`[Evolution] Status check failed:`, statusErr);
+          // Continue anyway - let the send attempt determine outcome
+        }
 
         const resp = await fetch(`${baseUrl}/message/sendText/${name}`, {
           method: "POST",
@@ -123,7 +180,7 @@ serve(async (req) => {
         result = await resp.json();
         
         if (!resp.ok) {
-          console.error(`[Evolution] Send failed [${resp.status}]:`, JSON.stringify(result));
+          console.error(`[Evolution] Send failed [${resp.status}]:`, JSON.stringify(result).slice(0, 300));
           return new Response(
             JSON.stringify({ success: false, error: `Send failed: ${resp.status}`, details: result }),
             { status: resp.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -21,6 +21,18 @@ interface WebhookPayload {
   }>;
 }
 
+// ===== HELPERS =====
+
+/** Sanitize phone number to E.164-like format (55XXXXXXXXXXX) */
+function sanitizePhone(phone: string | null | undefined): string | null {
+  if (!phone) return null;
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 10) return null;
+  if (digits.startsWith("55") && digits.length >= 12) return digits;
+  if (digits.startsWith("0")) return `55${digits.substring(1)}`;
+  return `55${digits}`;
+}
+
 // ===== NOTIFICATION HELPERS =====
 
 async function sendWhatsAppNotification(
@@ -31,9 +43,9 @@ async function sendWhatsAppNotification(
     customer_phone: string; 
     total: number;
     items: unknown;
-    payment_method?: string;
+    payment_method?: string | null;
   }
-) {
+): Promise<{ sent: boolean }> {
   try {
     const { data: company } = await supabase
       .from("company_info")
@@ -41,8 +53,9 @@ async function sendWhatsAppNotification(
       .limit(1)
       .single();
 
-    if (!order.customer_phone) {
-      console.log("[Notification] No customer phone, skipping WhatsApp");
+    const cleanPhone = sanitizePhone(order.customer_phone);
+    if (!cleanPhone) {
+      console.log("[Notification] Invalid customer phone, skipping WhatsApp");
       return { sent: false };
     }
 
@@ -55,7 +68,7 @@ async function sendWhatsAppNotification(
     // Build items description
     let itemsDescription = "";
     if (Array.isArray(order.items)) {
-      itemsDescription = (order.items as Array<{ name?: string; description?: string; quantity?: number; price?: number }>)
+      itemsDescription = (order.items as Array<{ name?: string; description?: string; quantity?: number }>)
         .map((item) => {
           const name = item.name || item.description || "Produto";
           const qty = item.quantity || 1;
@@ -64,12 +77,16 @@ async function sendWhatsAppNotification(
         .join("\n");
     }
 
+    const paymentLabel = order.payment_method === "credit_card" ? "Cartão" 
+      : order.payment_method === "boleto" ? "Boleto"
+      : "PIX";
+
     const message = `✅ *Compra Confirmada!*\n\n` +
       `Olá ${order.customer_name.split(" ")[0]}! 🎉\n\n` +
       `Seu pagamento foi *confirmado* com sucesso!\n\n` +
       `📋 *Pedido:* #${order.order_number}\n` +
       `💰 *Total:* ${formattedTotal}\n` +
-      `💳 *Método:* ${order.payment_method === "pix" ? "PIX" : order.payment_method === "credit_card" ? "Cartão" : order.payment_method || "PIX"}\n` +
+      `💳 *Método:* ${paymentLabel}\n` +
       (itemsDescription ? `\n📦 *Itens:*\n${itemsDescription}\n` : "") +
       `\nSeu pedido será processado e você receberá atualizações sobre a produção e envio.\n\n` +
       `Obrigado por comprar na *${companyName}*! 💜`;
@@ -87,24 +104,32 @@ async function sendWhatsAppNotification(
       body: JSON.stringify({
         action: "sendText",
         instanceName: "pinceldeluz",
-        number: order.customer_phone,
+        number: cleanPhone,
         text: message,
       }),
     });
 
     const whatsappResult = await whatsappResponse.json();
-    console.log(`[Notification] WhatsApp Evolution result:`, JSON.stringify(whatsappResult));
+    console.log(`[Notification] WhatsApp result:`, JSON.stringify(whatsappResult));
 
     const sent = whatsappResult?.success === true;
 
-    // Update order notes
+    // Append to existing notes (don't overwrite)
+    const { data: existingOrder } = await supabase
+      .from("orders")
+      .select("notes")
+      .eq("order_number", order.order_number)
+      .single();
+
+    const existingNotes = existingOrder?.notes || "";
+    const separator = existingNotes ? "\n---\n" : "";
+    const newNote = sent 
+      ? `✅ WhatsApp enviado para ${cleanPhone} em ${new Date().toLocaleString("pt-BR")}`
+      : `⚠️ WhatsApp falhou para ${cleanPhone} - Link manual: https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message).slice(0, 500)}`;
+
     await supabase
       .from("orders")
-      .update({
-        notes: sent 
-          ? `✅ WhatsApp enviado automaticamente para ${order.customer_phone}`
-          : `⚠️ WhatsApp falhou para ${order.customer_phone} - Envio manual: https://api.whatsapp.com/send?phone=${order.customer_phone.replace(/\D/g, "")}&text=${encodeURIComponent(message)}`,
-      })
+      .update({ notes: existingNotes + separator + newNote })
       .eq("order_number", order.order_number);
 
     return { sent };
@@ -120,12 +145,18 @@ async function sendEmailNotification(
     order_number: string;
     customer_name: string;
     customer_email: string;
+    customer_phone: string;
     total: number;
     items: unknown;
-    payment_method?: string;
+    payment_method?: string | null;
   }
-) {
+): Promise<{ sent: boolean }> {
   try {
+    if (!order.customer_email || !order.customer_email.includes("@")) {
+      console.log("[Notification] Invalid email, skipping");
+      return { sent: false };
+    }
+
     const { data: company } = await supabase
       .from("company_info")
       .select("company_name, email, whatsapp")
@@ -141,6 +172,10 @@ async function sendEmailNotification(
       currency: "BRL",
     }).format(order.total);
 
+    const paymentLabel = order.payment_method === "credit_card" ? "Cartão de Crédito" 
+      : order.payment_method === "boleto" ? "Boleto Bancário"
+      : "PIX";
+
     // Build items HTML
     let itemsHtml = "";
     if (Array.isArray(order.items)) {
@@ -148,11 +183,13 @@ async function sendEmailNotification(
         .map((item) => {
           const name = item.name || item.description || "Produto";
           const qty = item.quantity || 1;
-          const price = item.price ? `R$ ${item.price.toFixed(2)}` : "";
+          const price = item.price ? `R$ ${Number(item.price).toFixed(2)}` : "";
           return `<tr><td style="padding:8px;border-bottom:1px solid #eee;">${name}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">${qty}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">${price}</td></tr>`;
         })
         .join("");
     }
+
+    const whatsappClean = companyWhatsapp.replace(/\D/g, "");
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -170,7 +207,7 @@ async function sendEmailNotification(
           <div style="background:#f3f4f6;border-radius:8px;padding:16px;margin:16px 0;">
             <p style="margin:4px 0;"><strong>📋 Pedido:</strong> #${order.order_number}</p>
             <p style="margin:4px 0;"><strong>💰 Total:</strong> ${formattedTotal}</p>
-            <p style="margin:4px 0;"><strong>💳 Pagamento:</strong> ${order.payment_method === "pix" ? "PIX" : order.payment_method === "credit_card" ? "Cartão de Crédito" : order.payment_method || "PIX"}</p>
+            <p style="margin:4px 0;"><strong>💳 Pagamento:</strong> ${paymentLabel}</p>
           </div>
 
           ${itemsHtml ? `
@@ -196,17 +233,13 @@ async function sendEmailNotification(
             <p style="margin:4px 0;font-size:14px;color:#374151;">
               Tem dúvidas sobre seu pedido? Quer enviar sua <strong>logo, QR Code</strong> ou informações adicionais?
             </p>
-            <p style="margin:8px 0 4px;font-size:14px;color:#374151;">
-              ${companyWhatsapp ? `📱 <strong>WhatsApp:</strong> <a href="https://wa.me/${companyWhatsapp.replace(/\D/g, '')}" style="color:#25D366;text-decoration:none;font-weight:bold;">${companyWhatsapp}</a>` : ""}
-            </p>
-            <p style="margin:4px 0;font-size:14px;color:#374151;">
-              📧 <strong>E-mail:</strong> <a href="mailto:${companyEmail}" style="color:#7c3aed;text-decoration:none;">${companyEmail}</a>
-            </p>
+            ${whatsappClean ? `<p style="margin:8px 0 4px;font-size:14px;color:#374151;">📱 <strong>WhatsApp:</strong> <a href="https://wa.me/${whatsappClean}" style="color:#25D366;text-decoration:none;font-weight:bold;">${companyWhatsapp}</a></p>` : ""}
+            ${companyEmail ? `<p style="margin:4px 0;font-size:14px;color:#374151;">📧 <strong>E-mail:</strong> <a href="mailto:${companyEmail}" style="color:#7c3aed;text-decoration:none;">${companyEmail}</a></p>` : ""}
           </div>
 
-          ${companyWhatsapp ? `
+          ${whatsappClean ? `
           <div style="text-align:center;margin-top:24px;">
-            <a href="https://wa.me/${companyWhatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá! Acabei de fazer o pedido #${order.order_number} e gostaria de tirar uma dúvida.`)}" style="display:inline-block;background:#25D366;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
+            <a href="https://wa.me/${whatsappClean}?text=${encodeURIComponent(`Olá! Acabei de fazer o pedido #${order.order_number} e gostaria de tirar uma dúvida.`)}" style="display:inline-block;background:#25D366;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
               💬 Falar no WhatsApp
             </a>
           </div>` : ""}
@@ -220,10 +253,8 @@ async function sendEmailNotification(
       </html>
     `;
 
-    // Actually send email via SMTP edge function
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
     const customerSubject = `✅ Pedido #${order.order_number} Confirmado - ${companyName}`;
 
     // Send customer email
@@ -249,10 +280,7 @@ async function sendEmailNotification(
       direction: "outbound",
       endpoint: "email-notification",
       event_type: "order_confirmed",
-      request_body: {
-        to: order.customer_email,
-        subject: customerSubject,
-      } as Record<string, unknown>,
+      request_body: { to: order.customer_email, subject: customerSubject } as Record<string, unknown>,
       response_body: emailResult as Record<string, unknown>,
       status_code: emailResponse.status,
       source: "system",
@@ -267,14 +295,14 @@ async function sendEmailNotification(
           <p><strong>Pedido:</strong> #${order.order_number}</p>
           <p><strong>Cliente:</strong> ${order.customer_name}</p>
           <p><strong>Email:</strong> ${order.customer_email}</p>
-          <p><strong>Telefone:</strong> ${(order as { customer_phone?: string }).customer_phone || "N/A"}</p>
+          <p><strong>Telefone:</strong> ${order.customer_phone || "N/A"}</p>
           <p><strong>Total:</strong> ${formattedTotal}</p>
-          <p><strong>Método:</strong> ${order.payment_method || "PIX"}</p>
+          <p><strong>Método:</strong> ${paymentLabel}</p>
           ${itemsHtml ? `<h3>Itens:</h3><table style="width:100%;border-collapse:collapse;"><tbody>${itemsHtml}</tbody></table>` : ""}
         </div>
       `;
 
-      const adminResponse = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+      await fetch(`${supabaseUrl}/functions/v1/send-email`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -287,9 +315,6 @@ async function sendEmailNotification(
           from_name: companyName,
         }),
       });
-
-      const adminResult = await adminResponse.json();
-      console.log(`[Notification] Admin email result:`, adminResult);
     }
 
     return { sent: true };
@@ -297,6 +322,50 @@ async function sendEmailNotification(
     console.error("[Notification] Email error:", e);
     return { sent: false };
   }
+}
+
+/** Process paid order: update lead, send notifications */
+async function processConfirmedOrder(
+  supabase: ReturnType<typeof createClient>,
+  order: {
+    order_number: string;
+    customer_name: string;
+    customer_email: string;
+    customer_phone: string;
+    total: number;
+    items: unknown;
+    payment_method?: string | null;
+  }
+) {
+  // Save/update lead with payment tags
+  try {
+    if (order.customer_email && order.customer_email.includes("@")) {
+      await supabase.from("leads").upsert({
+        name: order.customer_name,
+        email: order.customer_email.trim().toLowerCase(),
+        phone: sanitizePhone(order.customer_phone),
+        source: "pagamento",
+        tags: ["cliente", "pagamento-confirmado"],
+        is_subscribed: true,
+        subscribed_at: new Date().toISOString(),
+      }, { onConflict: "email" });
+      console.log(`[Webhook] Lead saved: ${order.customer_email}`);
+    }
+  } catch (e) {
+    console.error("[Webhook] Lead save error (non-critical):", e);
+  }
+
+  // Send notifications in parallel
+  const [whatsResult, emailResult] = await Promise.allSettled([
+    sendWhatsAppNotification(supabase, order),
+    sendEmailNotification(supabase, order),
+  ]);
+
+  console.log(`[Webhook] Notifications for ${order.order_number}: WhatsApp=${
+    whatsResult.status === "fulfilled" ? whatsResult.value.sent : "error"
+  }, Email=${
+    emailResult.status === "fulfilled" ? emailResult.value.sent : "error"
+  }`);
 }
 
 // ===== MAIN HANDLER =====
@@ -313,94 +382,106 @@ serve(async (req) => {
     const url = new URL(req.url);
     const provider = url.searchParams.get("provider") || "mercadopago";
     
-    const payload = await req.json() as WebhookPayload;
-    console.log(`[Webhook] Provider: ${provider}, Payload:`, JSON.stringify(payload));
+    let payload: WebhookPayload;
+    try {
+      payload = await req.json() as WebhookPayload;
+    } catch {
+      console.error("[Webhook] Invalid JSON body");
+      return new Response(JSON.stringify({ received: true, error: "Invalid JSON" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    
+    console.log(`[Webhook] Provider: ${provider}, Payload:`, JSON.stringify(payload).slice(0, 500));
 
-    // Mercado Pago webhook
+    // Log incoming webhook
+    await supabase.from("webhook_logs").insert({
+      direction: "inbound",
+      endpoint: `payment-webhook?provider=${provider}`,
+      event_type: payload.type || payload.topic || "unknown",
+      request_body: payload as Record<string, unknown>,
+      source: provider,
+      processed: false,
+    });
+
+    // ===== MERCADO PAGO =====
     if (provider === "mercadopago" || payload.topic === "payment") {
       const paymentId = payload.data?.id || url.searchParams.get("id");
       
-      if (paymentId) {
-        const { data: config } = await supabase
-          .from("payment_credentials")
-          .select("mercadopago_access_token")
-          .order('updated_at', { ascending: false })
-          .limit(1)
-          .single();
+      if (!paymentId) {
+        console.log("[Webhook MP] No payment ID found");
+        return new Response(JSON.stringify({ received: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
-        if (config?.mercadopago_access_token) {
-          const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-            headers: {
-              Authorization: `Bearer ${config.mercadopago_access_token}`,
-            },
-          });
+      const { data: config } = await supabase
+        .from("payment_credentials")
+        .select("mercadopago_access_token")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .single();
 
-          const paymentData = await response.json();
-          console.log(`[Webhook MP] Payment ${paymentId} status: ${paymentData.status}`);
+      if (!config?.mercadopago_access_token) {
+        console.error("[Webhook MP] No access token configured");
+        return new Response(JSON.stringify({ received: true, error: "No token" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
-          if (paymentData.external_reference) {
-            const newStatus = paymentData.status === "approved" ? "paid" 
-              : paymentData.status === "rejected" ? "rejected"
-              : paymentData.status === "pending" ? "pending"
-              : "unknown";
+      const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+        headers: { Authorization: `Bearer ${config.mercadopago_access_token}` },
+      });
 
-            const extRef = paymentData.external_reference;
-            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-            
-            const updateData: Record<string, unknown> = { 
-              payment_status: newStatus,
-              payment_method: paymentData.payment_method_id || "pix",
-              updated_at: new Date().toISOString(),
-            };
-            if (newStatus === "paid") {
-              updateData.order_status = "confirmed";
-            }
+      if (!response.ok) {
+        console.error(`[Webhook MP] Failed to fetch payment: ${response.status}`);
+        return new Response(JSON.stringify({ received: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
-            // Select full order data for notifications
-            let result;
-            if (uuidRegex.test(extRef)) {
-              result = await supabase
-                .from("orders")
-                .update(updateData)
-                .eq("id", extRef)
-                .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
-                .single();
-            } else {
-              result = await supabase
-                .from("orders")
-                .update(updateData)
-                .eq("order_number", extRef)
-                .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
-                .single();
-            }
+      const paymentData = await response.json();
+      console.log(`[Webhook MP] Payment ${paymentId} status: ${paymentData.status}`);
 
-            if (result.error) {
-              console.error(`[Webhook MP] Error updating order:`, result.error);
-            } else {
-              console.log(`[Webhook MP] Order ${extRef} updated to ${newStatus}`);
-              
-              if (newStatus === "paid" && result.data) {
-                const order = result.data;
+      if (!paymentData.external_reference) {
+        console.log("[Webhook MP] No external_reference");
+        return new Response(JSON.stringify({ received: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
-                // Save customer as lead
-                await supabase.from("leads").upsert({
-                  name: order.customer_name,
-                  email: order.customer_email,
-                  phone: order.customer_phone || null,
-                  source: "pagamento",
-                  tags: ["cliente", "pagamento-confirmado"],
-                  is_subscribed: true,
-                  subscribed_at: new Date().toISOString(),
-                }, { onConflict: "email" });
-                console.log(`[Webhook MP] Lead saved: ${order.customer_email}`);
+      const newStatus = paymentData.status === "approved" ? "paid" 
+        : paymentData.status === "rejected" ? "rejected"
+        : paymentData.status === "pending" ? "pending"
+        : "unknown";
 
-                // Send notifications
-                await sendWhatsAppNotification(supabase, order);
-                await sendEmailNotification(supabase, order);
-                console.log(`[Webhook MP] Notifications sent for order ${order.order_number}`);
-              }
-            }
-          }
+      const extRef = paymentData.external_reference;
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      
+      const updateData: Record<string, unknown> = { 
+        payment_status: newStatus,
+        payment_method: paymentData.payment_method_id || "pix",
+        updated_at: new Date().toISOString(),
+      };
+      if (newStatus === "paid") {
+        updateData.order_status = "confirmed";
+      }
+
+      const matchColumn = uuidRegex.test(extRef) ? "id" : "order_number";
+      const result = await supabase
+        .from("orders")
+        .update(updateData)
+        .eq(matchColumn, extRef)
+        .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
+        .single();
+
+      if (result.error) {
+        console.error(`[Webhook MP] Error updating order:`, result.error);
+      } else {
+        console.log(`[Webhook MP] Order ${extRef} updated to ${newStatus}`);
+        
+        if (newStatus === "paid" && result.data) {
+          await processConfirmedOrder(supabase, result.data);
         }
       }
 
@@ -409,29 +490,31 @@ serve(async (req) => {
       });
     }
 
-    // EFI (Gerencianet) webhook
+    // ===== EFI (GERENCIANET) =====
     if (provider === "efi" || payload.pix) {
       const pixPayments = payload.pix || [];
       
       for (const pix of pixPayments) {
-        if (pix.txid) {
-          console.log(`[Webhook EFI] PIX received: ${pix.txid}, value: ${pix.valor}`);
-          
-          const result = await supabase
-            .from("orders")
-            .update({ 
-              payment_status: "paid",
-              order_status: "confirmed",
-              updated_at: new Date().toISOString(),
-            })
-            .eq("order_number", pix.txid)
-            .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
-            .single();
+        if (!pix.txid) continue;
+        
+        console.log(`[Webhook EFI] PIX received: ${pix.txid}, value: ${pix.valor}`);
+        
+        const result = await supabase
+          .from("orders")
+          .update({ 
+            payment_status: "paid",
+            order_status: "confirmed",
+            payment_method: "pix",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("order_number", pix.txid)
+          .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
+          .single();
 
-          if (result.data) {
-            await sendWhatsAppNotification(supabase, result.data);
-            await sendEmailNotification(supabase, result.data);
-          }
+        if (result.data) {
+          await processConfirmedOrder(supabase, result.data);
+        } else {
+          console.error(`[Webhook EFI] Order not found for txid: ${pix.txid}`);
         }
       }
 
@@ -440,7 +523,7 @@ serve(async (req) => {
       });
     }
 
-    // Stripe webhook
+    // ===== STRIPE =====
     if (provider === "stripe" || payload.object === "event") {
       const eventType = payload.type;
       
@@ -454,6 +537,7 @@ serve(async (req) => {
             .update({ 
               payment_status: "paid",
               order_status: "confirmed",
+              payment_method: "credit_card",
               updated_at: new Date().toISOString(),
             })
             .eq("id", orderId)
@@ -463,8 +547,7 @@ serve(async (req) => {
           console.log(`[Webhook Stripe] Order ${orderId} marked as paid`);
           
           if (result.data) {
-            await sendWhatsAppNotification(supabase, result.data);
-            await sendEmailNotification(supabase, result.data);
+            await processConfirmedOrder(supabase, result.data);
           }
         }
       }
