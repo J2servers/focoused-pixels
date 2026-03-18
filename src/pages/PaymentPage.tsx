@@ -254,12 +254,27 @@ const PaymentPage = () => {
     }
   };
 
+  const ensureOrderExists = async (): Promise<string | null> => {
+    if (!paymentState) return null;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (uuidRegex.test(paymentState.orderId)) return paymentState.orderId;
+    
+    const dbOrderId = await createOrderInDB(paymentState);
+    if (dbOrderId) {
+      setPaymentState(prev => prev ? { ...prev, orderId: dbOrderId } : null);
+    }
+    return dbOrderId;
+  };
+
   const handleGeneratePix = async () => {
     if (!paymentState) return;
 
+    const orderId = await ensureOrderExists();
+    if (!orderId) return;
+
     try {
       const result = await createPix.mutateAsync({
-        orderId: paymentState.orderId,
+        orderId,
         amount: paymentState.amount,
         description: paymentState.description,
         payerEmail: paymentState.customerEmail,
@@ -287,10 +302,13 @@ const PaymentPage = () => {
       return;
     }
 
+    const orderId = await ensureOrderExists();
+    if (!orderId) return;
+
     try {
       const result = await mercadoPago.mutateAsync({
         action: 'create_boleto',
-        orderId: paymentState.orderId,
+        orderId,
         amount: paymentState.amount,
         description: paymentState.description,
         payerEmail: paymentState.customerEmail,
@@ -314,6 +332,9 @@ const PaymentPage = () => {
   const handleCreditCard = async () => {
     if (!paymentState) return;
 
+    const orderId = await ensureOrderExists();
+    if (!orderId) return;
+
     try {
       const items = [{
         title: paymentState.description,
@@ -322,7 +343,7 @@ const PaymentPage = () => {
       }];
 
       const result = await createPreference.mutateAsync({
-        orderId: paymentState.orderId,
+        orderId,
         items,
         payerEmail: paymentState.customerEmail,
         payerName: paymentState.customerName,
