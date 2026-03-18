@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +29,8 @@ import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   QrCode, CreditCard, Building2, Loader2, Copy, CheckCircle2, 
-  Clock, AlertCircle, ExternalLink, Percent, Shield, User
+  Clock, AlertCircle, ExternalLink, Percent, Shield, User,
+  Upload, FileImage, X, Type
 } from 'lucide-react';
 
 interface PaymentState {
