@@ -85,6 +85,7 @@ const AdminDashboardPage = () => {
           activePromotions: promotions.count || 0,
           pendingReviews: reviews.count || 0,
           totalQuotes: quotes.count || 0,
+          pendingOrders: pendingOrders.count || 0,
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
