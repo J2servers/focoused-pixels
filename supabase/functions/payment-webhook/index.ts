@@ -35,7 +35,6 @@ async function sendWhatsAppNotification(
   }
 ) {
   try {
-    // Get company WhatsApp number for context
     const { data: company } = await supabase
       .from("company_info")
       .select("whatsapp, company_name")
@@ -44,18 +43,10 @@ async function sendWhatsAppNotification(
 
     if (!order.customer_phone) {
       console.log("[Notification] No customer phone, skipping WhatsApp");
-      return;
+      return { sent: false };
     }
 
-    // Format phone number (remove non-digits, ensure country code)
-    let phone = order.customer_phone.replace(/\D/g, "");
-    if (phone.length === 11 && phone.startsWith("0")) {
-      phone = "55" + phone.substring(1);
-    } else if (phone.length === 11 || phone.length === 10) {
-      phone = "55" + phone;
-    }
-
-    const companyName = company?.company_name || "Goat Comunicação Visual";
+    const companyName = company?.company_name || "Pincel de Luz";
     const formattedTotal = new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
@@ -83,25 +74,40 @@ async function sendWhatsAppNotification(
       `\nSeu pedido será processado e você receberá atualizações sobre a produção e envio.\n\n` +
       `Obrigado por comprar na *${companyName}*! 💜`;
 
-    // Send via WhatsApp Web API URL (store for admin to see)
-    // Since we can't send WhatsApp programmatically without a Business API,
-    // we'll log the notification and store it for the admin to send manually
-    // OR use the WhatsApp API link
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+    // Send via Evolution API
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Store notification in a log so admin can see and send
-    console.log(`[Notification] WhatsApp message prepared for ${phone}`);
-    console.log(`[Notification] WhatsApp URL: ${whatsappUrl}`);
+    const whatsappResponse = await fetch(`${supabaseUrl}/functions/v1/whatsapp-evolution`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseServiceKey}`,
+      },
+      body: JSON.stringify({
+        action: "sendText",
+        instanceName: "pinceldeluz",
+        number: order.customer_phone,
+        text: message,
+      }),
+    });
 
-    // Save notification record in orders notes for admin reference
+    const whatsappResult = await whatsappResponse.json();
+    console.log(`[Notification] WhatsApp Evolution result:`, JSON.stringify(whatsappResult));
+
+    const sent = whatsappResult?.success === true;
+
+    // Update order notes
     await supabase
       .from("orders")
       .update({
-        notes: `WhatsApp enviado ao cliente: ${order.customer_phone}\n${whatsappUrl}`,
+        notes: sent 
+          ? `✅ WhatsApp enviado automaticamente para ${order.customer_phone}`
+          : `⚠️ WhatsApp falhou para ${order.customer_phone} - Envio manual: https://api.whatsapp.com/send?phone=${order.customer_phone.replace(/\D/g, "")}&text=${encodeURIComponent(message)}`,
       })
       .eq("order_number", order.order_number);
 
-    return { sent: true, whatsappUrl };
+    return { sent };
   } catch (e) {
     console.error("[Notification] WhatsApp error:", e);
     return { sent: false };
