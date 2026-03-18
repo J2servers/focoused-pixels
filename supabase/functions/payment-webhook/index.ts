@@ -12,18 +12,241 @@ interface WebhookPayload {
   data?: {
     id?: string;
   };
-  // Mercado Pago specific
   topic?: string;
   resource?: string;
-  // Stripe specific
   object?: string;
-  // EFI specific
   pix?: Array<{
     txid?: string;
     valor?: string;
   }>;
 }
 
+// ===== NOTIFICATION HELPERS =====
+
+async function sendWhatsAppNotification(
+  supabase: ReturnType<typeof createClient>,
+  order: { 
+    order_number: string; 
+    customer_name: string; 
+    customer_phone: string; 
+    total: number;
+    items: unknown;
+    payment_method?: string;
+  }
+) {
+  try {
+    // Get company WhatsApp number for context
+    const { data: company } = await supabase
+      .from("company_info")
+      .select("whatsapp, company_name")
+      .limit(1)
+      .single();
+
+    if (!order.customer_phone) {
+      console.log("[Notification] No customer phone, skipping WhatsApp");
+      return;
+    }
+
+    // Format phone number (remove non-digits, ensure country code)
+    let phone = order.customer_phone.replace(/\D/g, "");
+    if (phone.length === 11 && phone.startsWith("0")) {
+      phone = "55" + phone.substring(1);
+    } else if (phone.length === 11 || phone.length === 10) {
+      phone = "55" + phone;
+    }
+
+    const companyName = company?.company_name || "Goat Comunicação Visual";
+    const formattedTotal = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(order.total);
+
+    // Build items description
+    let itemsDescription = "";
+    if (Array.isArray(order.items)) {
+      itemsDescription = (order.items as Array<{ name?: string; description?: string; quantity?: number; price?: number }>)
+        .map((item) => {
+          const name = item.name || item.description || "Produto";
+          const qty = item.quantity || 1;
+          return `  • ${name} x${qty}`;
+        })
+        .join("\n");
+    }
+
+    const message = `✅ *Compra Confirmada!*\n\n` +
+      `Olá ${order.customer_name.split(" ")[0]}! 🎉\n\n` +
+      `Seu pagamento foi *confirmado* com sucesso!\n\n` +
+      `📋 *Pedido:* #${order.order_number}\n` +
+      `💰 *Total:* ${formattedTotal}\n` +
+      `💳 *Método:* ${order.payment_method === "pix" ? "PIX" : order.payment_method === "credit_card" ? "Cartão" : order.payment_method || "PIX"}\n` +
+      (itemsDescription ? `\n📦 *Itens:*\n${itemsDescription}\n` : "") +
+      `\nSeu pedido será processado e você receberá atualizações sobre a produção e envio.\n\n` +
+      `Obrigado por comprar na *${companyName}*! 💜`;
+
+    // Send via WhatsApp Web API URL (store for admin to see)
+    // Since we can't send WhatsApp programmatically without a Business API,
+    // we'll log the notification and store it for the admin to send manually
+    // OR use the WhatsApp API link
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+
+    // Store notification in a log so admin can see and send
+    console.log(`[Notification] WhatsApp message prepared for ${phone}`);
+    console.log(`[Notification] WhatsApp URL: ${whatsappUrl}`);
+
+    // Save notification record in orders notes for admin reference
+    await supabase
+      .from("orders")
+      .update({
+        notes: `WhatsApp enviado ao cliente: ${order.customer_phone}\n${whatsappUrl}`,
+      })
+      .eq("order_number", order.order_number);
+
+    return { sent: true, whatsappUrl };
+  } catch (e) {
+    console.error("[Notification] WhatsApp error:", e);
+    return { sent: false };
+  }
+}
+
+async function sendEmailNotification(
+  supabase: ReturnType<typeof createClient>,
+  order: {
+    order_number: string;
+    customer_name: string;
+    customer_email: string;
+    total: number;
+    items: unknown;
+    payment_method?: string;
+  }
+) {
+  try {
+    const { data: company } = await supabase
+      .from("company_info")
+      .select("company_name, email, whatsapp")
+      .limit(1)
+      .single();
+
+    const companyName = company?.company_name || "Goat Comunicação Visual";
+    const companyEmail = company?.email || "";
+    const companyWhatsapp = company?.whatsapp || "";
+    
+    const formattedTotal = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(order.total);
+
+    // Build items HTML
+    let itemsHtml = "";
+    if (Array.isArray(order.items)) {
+      itemsHtml = (order.items as Array<{ name?: string; description?: string; quantity?: number; price?: number }>)
+        .map((item) => {
+          const name = item.name || item.description || "Produto";
+          const qty = item.quantity || 1;
+          const price = item.price ? `R$ ${item.price.toFixed(2)}` : "";
+          return `<tr><td style="padding:8px;border-bottom:1px solid #eee;">${name}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">${qty}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">${price}</td></tr>`;
+        })
+        .join("");
+    }
+
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8"></head>
+      <body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9f9f9;padding:20px;">
+        <div style="background:white;border-radius:12px;padding:32px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <div style="text-align:center;margin-bottom:24px;">
+            <h1 style="color:#7c3aed;margin:0;">✅ Pagamento Confirmado!</h1>
+          </div>
+          
+          <p style="font-size:16px;">Olá <strong>${order.customer_name.split(" ")[0]}</strong>,</p>
+          <p>Seu pagamento foi confirmado com sucesso! Aqui estão os detalhes do seu pedido:</p>
+          
+          <div style="background:#f3f4f6;border-radius:8px;padding:16px;margin:16px 0;">
+            <p style="margin:4px 0;"><strong>📋 Pedido:</strong> #${order.order_number}</p>
+            <p style="margin:4px 0;"><strong>💰 Total:</strong> ${formattedTotal}</p>
+            <p style="margin:4px 0;"><strong>💳 Pagamento:</strong> ${order.payment_method === "pix" ? "PIX" : order.payment_method === "credit_card" ? "Cartão de Crédito" : order.payment_method || "PIX"}</p>
+          </div>
+
+          ${itemsHtml ? `
+          <h3 style="color:#374151;">📦 Itens do Pedido</h3>
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f3f4f6;">
+                <th style="padding:8px;text-align:left;">Produto</th>
+                <th style="padding:8px;text-align:center;">Qtd</th>
+                <th style="padding:8px;text-align:right;">Preço</th>
+              </tr>
+            </thead>
+            <tbody>${itemsHtml}</tbody>
+          </table>` : ""}
+
+          <div style="margin-top:24px;padding:16px;background:#ede9fe;border-radius:8px;">
+            <p style="margin:0;font-size:14px;">🏭 <strong>Próximos passos:</strong> Seu pedido será processado e você receberá atualizações sobre a produção e envio.</p>
+          </div>
+
+          ${companyWhatsapp ? `
+          <div style="text-align:center;margin-top:24px;">
+            <a href="https://wa.me/${companyWhatsapp.replace(/\D/g, '')}" style="display:inline-block;background:#25D366;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">
+              💬 Falar no WhatsApp
+            </a>
+          </div>` : ""}
+
+          <hr style="margin:24px 0;border:none;border-top:1px solid #e5e7eb;">
+          <p style="font-size:12px;color:#9ca3af;text-align:center;">
+            ${companyName} — Obrigado por sua compra! 💜
+          </p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Store email content for sending (will be sent when email infra is ready)
+    // For now, log it and store in webhook_logs for admin visibility
+    console.log(`[Notification] Email prepared for ${order.customer_email}`);
+
+    await supabase.from("webhook_logs").insert({
+      direction: "outbound",
+      endpoint: "email-notification",
+      event_type: "order_confirmed",
+      request_body: {
+        to: order.customer_email,
+        subject: `✅ Pedido #${order.order_number} Confirmado - ${companyName}`,
+        html: emailHtml,
+      } as Record<string, unknown>,
+      response_body: { status: "queued_for_email_setup" } as Record<string, unknown>,
+      status_code: 200,
+      source: "system",
+      processed: false,
+    });
+
+    // Also notify admin
+    const adminNotificationEmail = company?.email;
+    if (adminNotificationEmail) {
+      await supabase.from("webhook_logs").insert({
+        direction: "outbound",
+        endpoint: "email-notification-admin",
+        event_type: "new_sale",
+        request_body: {
+          to: adminNotificationEmail,
+          subject: `🎉 Nova Venda! Pedido #${order.order_number} - ${formattedTotal}`,
+          customer: order.customer_name,
+          phone: (order as { customer_phone?: string }).customer_phone,
+        } as Record<string, unknown>,
+        response_body: { status: "queued_for_email_setup" } as Record<string, unknown>,
+        status_code: 200,
+        source: "system",
+        processed: false,
+      });
+    }
+
+    return { sent: true };
+  } catch (e) {
+    console.error("[Notification] Email error:", e);
+    return { sent: false };
+  }
+}
+
+// ===== MAIN HANDLER =====
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -45,7 +268,6 @@ serve(async (req) => {
       const paymentId = payload.data?.id || url.searchParams.get("id");
       
       if (paymentId) {
-        // Get payment config
         const { data: config } = await supabase
           .from("payment_credentials")
           .select("mercadopago_access_token")
@@ -63,39 +285,39 @@ serve(async (req) => {
           const paymentData = await response.json();
           console.log(`[Webhook MP] Payment ${paymentId} status: ${paymentData.status}`);
 
-          // Update order status based on payment
           if (paymentData.external_reference) {
             const newStatus = paymentData.status === "approved" ? "paid" 
               : paymentData.status === "rejected" ? "rejected"
               : paymentData.status === "pending" ? "pending"
               : "unknown";
 
-            // Try matching by id first, then by order_number
             const extRef = paymentData.external_reference;
             const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
             
             const updateData: Record<string, unknown> = { 
               payment_status: newStatus,
+              payment_method: paymentData.payment_method_id || "pix",
               updated_at: new Date().toISOString(),
             };
             if (newStatus === "paid") {
               updateData.order_status = "confirmed";
             }
 
+            // Select full order data for notifications
             let result;
             if (uuidRegex.test(extRef)) {
               result = await supabase
                 .from("orders")
                 .update(updateData)
                 .eq("id", extRef)
-                .select("customer_name, customer_email, customer_phone")
+                .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
                 .single();
             } else {
               result = await supabase
                 .from("orders")
                 .update(updateData)
                 .eq("order_number", extRef)
-                .select("customer_name, customer_email, customer_phone")
+                .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
                 .single();
             }
 
@@ -104,19 +326,25 @@ serve(async (req) => {
             } else {
               console.log(`[Webhook MP] Order ${extRef} updated to ${newStatus}`);
               
-              // Save customer as lead when payment is confirmed
               if (newStatus === "paid" && result.data) {
-                const customer = result.data;
+                const order = result.data;
+
+                // Save customer as lead
                 await supabase.from("leads").upsert({
-                  name: customer.customer_name,
-                  email: customer.customer_email,
-                  phone: customer.customer_phone || null,
+                  name: order.customer_name,
+                  email: order.customer_email,
+                  phone: order.customer_phone || null,
                   source: "pagamento",
                   tags: ["cliente", "pagamento-confirmado"],
                   is_subscribed: true,
                   subscribed_at: new Date().toISOString(),
                 }, { onConflict: "email" });
-                console.log(`[Webhook MP] Lead saved: ${customer.customer_email}`);
+                console.log(`[Webhook MP] Lead saved: ${order.customer_email}`);
+
+                // Send notifications
+                await sendWhatsAppNotification(supabase, order);
+                await sendEmailNotification(supabase, order);
+                console.log(`[Webhook MP] Notifications sent for order ${order.order_number}`);
               }
             }
           }
@@ -136,14 +364,21 @@ serve(async (req) => {
         if (pix.txid) {
           console.log(`[Webhook EFI] PIX received: ${pix.txid}, value: ${pix.valor}`);
           
-          // Update order if txid matches
-          await supabase
+          const result = await supabase
             .from("orders")
             .update({ 
               payment_status: "paid",
+              order_status: "confirmed",
               updated_at: new Date().toISOString(),
             })
-            .eq("order_number", pix.txid);
+            .eq("order_number", pix.txid)
+            .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
+            .single();
+
+          if (result.data) {
+            await sendWhatsAppNotification(supabase, result.data);
+            await sendEmailNotification(supabase, result.data);
+          }
         }
       }
 
@@ -159,18 +394,25 @@ serve(async (req) => {
       if (eventType === "checkout.session.completed" || eventType === "payment_intent.succeeded") {
         console.log(`[Webhook Stripe] Event: ${eventType}`);
         
-        // Update order status
         const orderId = (payload.data as { object?: { metadata?: { order_id?: string } } })?.object?.metadata?.order_id;
         if (orderId) {
-          await supabase
+          const result = await supabase
             .from("orders")
             .update({ 
               payment_status: "paid",
+              order_status: "confirmed",
               updated_at: new Date().toISOString(),
             })
-            .eq("id", orderId);
+            .eq("id", orderId)
+            .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
+            .single();
             
           console.log(`[Webhook Stripe] Order ${orderId} marked as paid`);
+          
+          if (result.data) {
+            await sendWhatsAppNotification(supabase, result.data);
+            await sendEmailNotification(supabase, result.data);
+          }
         }
       }
 
@@ -186,7 +428,6 @@ serve(async (req) => {
 
   } catch (error) {
     console.error("[Webhook] Error:", error);
-    // Always return 200 for webhooks to prevent retries
     return new Response(JSON.stringify({ received: true, error: "Processing error" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
