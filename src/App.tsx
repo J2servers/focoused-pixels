@@ -53,6 +53,7 @@ import {
   AdminQuotesPage,
   AdminApiDocsPage,
 } from "./pages/admin";
+import AdminWhatsAppPage from "./pages/admin/AdminWhatsAppPage";
 
 const queryClient = new QueryClient();
 
@@ -110,6 +111,7 @@ const App = () => (
               <Route path="/admin/logs" element={<AdminLogsPage />} />
               <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
               <Route path="/admin/api" element={<AdminApiDocsPage />} />
+              <Route path="/admin/whatsapp" element={<AdminWhatsAppPage />} />
               
               <Route path="/teste" element={<TestePage />} />
               <Route path="/teste2" element={<Teste2Page />} />
