@@ -15,7 +15,8 @@ import {
   Eye,
   BarChart3,
   Wallet,
-  Calendar
+  Calendar,
+  FileText
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,7 @@ import {
   TaxInfoCard,
   SiteVisitsCard,
 } from '@/components/admin/dashboard';
+import { RealActivityFeed } from '@/components/admin/dashboard/RealActivityFeed';
 import {
   CashFlowSummaryCards,
   CashTransactionsTable,
@@ -42,6 +44,7 @@ interface DashboardStats {
   activePromotions: number;
   pendingReviews: number;
   totalQuotes: number;
+  pendingOrders: number;
 }
 
 const AdminDashboardPage = () => {
@@ -51,6 +54,7 @@ const AdminDashboardPage = () => {
     activePromotions: 0,
     pendingReviews: 0,
     totalQuotes: 0,
+    pendingOrders: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   
@@ -67,12 +71,13 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [products, categories, promotions, reviews, quotes] = await Promise.all([
+        const [products, categories, promotions, reviews, quotes, pendingOrders] = await Promise.all([
           supabase.from('products').select('id', { count: 'exact', head: true }),
           supabase.from('categories').select('id', { count: 'exact', head: true }),
           supabase.from('promotions').select('id', { count: 'exact', head: true }).eq('status', 'active'),
           supabase.from('reviews').select('id', { count: 'exact', head: true }).eq('is_approved', false),
           supabase.from('quotes').select('id', { count: 'exact', head: true }),
+          supabase.from('orders').select('id', { count: 'exact', head: true }).in('order_status', ['pending', 'processing']),
         ]);
 
         setStats({
@@ -81,6 +86,7 @@ const AdminDashboardPage = () => {
           activePromotions: promotions.count || 0,
           pendingReviews: reviews.count || 0,
           totalQuotes: quotes.count || 0,
+          pendingOrders: pendingOrders.count || 0,
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -134,14 +140,24 @@ const AdminDashboardPage = () => {
       href: '/admin/avaliacoes'
     },
     { 
+      title: 'Pedidos Pendentes', 
+      value: stats.pendingOrders, 
+      icon: ShoppingCart, 
+      color: 'from-rose-500 to-rose-600',
+      bgAccent: 'bg-rose-500',
+      trend: stats.pendingOrders > 0 ? 'Atenção' : 'OK',
+      trendUp: stats.pendingOrders === 0,
+      href: '/admin/pedidos'
+    },
+    { 
       title: 'Total de Orçamentos', 
       value: stats.totalQuotes, 
-      icon: ShoppingCart, 
+      icon: FileText, 
       color: 'from-purple-500 to-purple-600',
       bgAccent: 'bg-purple-500',
       trend: '+8%',
       trendUp: true,
-      href: '/admin'
+      href: '/admin/orcamentos'
     },
   ];
 
@@ -173,7 +189,7 @@ const AdminDashboardPage = () => {
         <SiteVisitsCard />
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 stagger-children">
           {statCards.map((stat) => (
             <Link 
               key={stat.title} 
@@ -326,31 +342,7 @@ const AdminDashboardPage = () => {
 
             {/* Activity & Tips Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-lg text-white">Atividade Recente</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {[
-                      { action: 'Novo orçamento recebido', time: 'há 5 minutos', icon: ShoppingCart, color: 'text-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.15)]' },
-                      { action: 'Produto atualizado', time: 'há 1 hora', icon: Package, color: 'text-[hsl(var(--admin-accent-blue))] bg-[hsl(var(--admin-accent-blue)/0.15)]' },
-                      { action: 'Nova avaliação pendente', time: 'há 2 horas', icon: Star, color: 'text-[hsl(var(--admin-accent-orange))] bg-[hsl(var(--admin-accent-orange)/0.15)]' },
-                      { action: 'Promoção iniciada', time: 'há 3 horas', icon: Percent, color: 'text-[hsl(var(--admin-accent-pink))] bg-[hsl(var(--admin-accent-pink)/0.15)]' },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-4 p-3 rounded-lg hover:bg-[hsl(var(--admin-sidebar-hover))] transition-colors">
-                        <div className={cn("p-2 rounded-lg", item.color)}>
-                          <item.icon className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white truncate">{item.action}</p>
-                          <p className="text-xs text-[hsl(var(--admin-text-muted))]">{item.time}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <RealActivityFeed />
 
               <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
                 <CardHeader>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
@@ -22,17 +22,32 @@ import {
 } from '@/components/product';
 import { ProductReviews } from '@/components/reviews';
 import { TrustBar, ViewingNowBadge } from '@/components/conversion';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { RecentlyViewedBar } from '@/components/product/RecentlyViewedBar';
 
 
 const ProductPage = () => {
   const { productSlug } = useParams();
   const { data: product, isLoading } = useProductBySlug(productSlug);
   const { data: category } = useCategoryBySlug(product?.category);
+  const { addItem: addRecentlyViewed } = useRecentlyViewed();
   const navigate = useNavigate();
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+
+  // Track recently viewed - must be before early returns
+  useEffect(() => {
+    if (product) {
+      addRecentlyViewed({
+        slug: product.slug,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+      });
+    }
+  }, [product?.slug]);
 
   if (isLoading) {
     return (
@@ -141,7 +156,7 @@ const ProductPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background page-enter">
       <TrustBar />
       <DynamicMainHeader />
       <NavigationBar />
@@ -340,6 +355,9 @@ const ProductPage = () => {
 
           {/* Related Products */}
           <RelatedProducts product={product} limit={4} />
+
+          {/* Recently Viewed */}
+          <RecentlyViewedBar />
         </div>
       </main>
 
