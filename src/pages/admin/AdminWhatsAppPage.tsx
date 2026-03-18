@@ -198,7 +198,7 @@ const AdminWhatsAppPage = () => {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="WhatsApp Business">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
