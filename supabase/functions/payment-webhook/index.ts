@@ -74,29 +74,50 @@ serve(async (req) => {
             const extRef = paymentData.external_reference;
             const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
             
-            const updateData = { 
+            const updateData: Record<string, unknown> = { 
               payment_status: newStatus,
-              order_status: newStatus === "paid" ? "confirmed" : undefined,
               updated_at: new Date().toISOString(),
             };
+            if (newStatus === "paid") {
+              updateData.order_status = "confirmed";
+            }
 
             let result;
             if (uuidRegex.test(extRef)) {
               result = await supabase
                 .from("orders")
                 .update(updateData)
-                .eq("id", extRef);
+                .eq("id", extRef)
+                .select("customer_name, customer_email, customer_phone")
+                .single();
             } else {
               result = await supabase
                 .from("orders")
                 .update(updateData)
-                .eq("order_number", extRef);
+                .eq("order_number", extRef)
+                .select("customer_name, customer_email, customer_phone")
+                .single();
             }
 
             if (result.error) {
               console.error(`[Webhook MP] Error updating order:`, result.error);
             } else {
               console.log(`[Webhook MP] Order ${extRef} updated to ${newStatus}`);
+              
+              // Save customer as lead when payment is confirmed
+              if (newStatus === "paid" && result.data) {
+                const customer = result.data;
+                await supabase.from("leads").upsert({
+                  name: customer.customer_name,
+                  email: customer.customer_email,
+                  phone: customer.customer_phone || null,
+                  source: "pagamento",
+                  tags: ["cliente", "pagamento-confirmado"],
+                  is_subscribed: true,
+                  subscribed_at: new Date().toISOString(),
+                }, { onConflict: "email" });
+                console.log(`[Webhook MP] Lead saved: ${customer.customer_email}`);
+              }
             }
           }
         }
