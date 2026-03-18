@@ -254,42 +254,32 @@ const PaymentPage = () => {
     const storedPayment = sessionStorage.getItem('pending_payment');
     const cartItemsRaw = storedPayment ? JSON.parse(storedPayment) : {};
 
-    const orderData: Record<string, unknown> = {
-      order_number: orderNumber,
-      customer_name: state.customerName,
-      customer_email: state.customerEmail,
-      customer_phone: state.customerPhone || '',
-      items: cartItemsRaw.cartItems || [{ description: state.description, amount: state.amount }],
-      subtotal: state.amount,
-      total: state.amount,
-      order_status: 'pending',
-      payment_status: 'pending',
-      production_status: 'pending',
-    };
-
-    // Add optional custom text and files
-    if (customText.trim()) {
-      orderData.custom_text = customText.trim();
-    }
-    if (uploadedFiles.length > 0) {
-      orderData.customer_files = uploadedFiles.map(f => f.url);
-    }
-
     // Build production notes from custom data
-    const notes: string[] = [];
+    const prodNotes: string[] = [];
     if (customText.trim()) {
-      notes.push(`📝 Texto do cliente: ${customText.trim()}`);
+      prodNotes.push(`📝 Texto do cliente: ${customText.trim()}`);
     }
     if (uploadedFiles.length > 0) {
-      notes.push(`📎 Arquivos: ${uploadedFiles.map(f => f.name).join(', ')}`);
-    }
-    if (notes.length > 0) {
-      orderData.production_notes = notes.join('\n');
+      prodNotes.push(`📎 Arquivos: ${uploadedFiles.map(f => f.name).join(', ')}`);
     }
 
     const { data: order, error } = await supabase
       .from('orders')
-      .insert(orderData)
+      .insert({
+        order_number: orderNumber,
+        customer_name: state.customerName,
+        customer_email: state.customerEmail,
+        customer_phone: state.customerPhone || '',
+        items: (cartItemsRaw.cartItems || [{ description: state.description, amount: state.amount }]) as unknown as import('@/integrations/supabase/types').Json,
+        subtotal: state.amount,
+        total: state.amount,
+        order_status: 'pending',
+        payment_status: 'pending',
+        production_status: 'pending',
+        custom_text: customText.trim() || null,
+        customer_files: uploadedFiles.length > 0 ? uploadedFiles.map(f => f.url) : [],
+        production_notes: prodNotes.length > 0 ? prodNotes.join('\n') : null,
+      })
       .select('id')
       .single();
 
