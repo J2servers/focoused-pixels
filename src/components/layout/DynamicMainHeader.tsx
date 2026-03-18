@@ -182,7 +182,7 @@ export function DynamicMainHeader() {
               </Button>
             </Link>
 
-            <Link to="/area-cliente">
+            <Link to="/minha-area">
               <Button variant="ghost" size="icon" className="neu-btn rounded-2xl neon-border-primary">
                 <User className="h-5 w-5" />
               </Button>
