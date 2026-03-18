@@ -355,6 +355,9 @@ const ProductPage = () => {
 
           {/* Related Products */}
           <RelatedProducts product={product} limit={4} />
+
+          {/* Recently Viewed */}
+          <RecentlyViewedBar />
         </div>
       </main>
 
