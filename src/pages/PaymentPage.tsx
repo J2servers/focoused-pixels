@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +29,8 @@ import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   QrCode, CreditCard, Building2, Loader2, Copy, CheckCircle2, 
-  Clock, AlertCircle, ExternalLink, Percent, Shield, User
+  Clock, AlertCircle, ExternalLink, Percent, Shield, User,
+  Upload, FileImage, X, Type
 } from 'lucide-react';
 
 interface PaymentState {
@@ -58,6 +60,11 @@ const PaymentPage = () => {
     cpf: '',
     phone: '',
   });
+  
+  // Custom product details (optional)
+  const [customText, setCustomText] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; url: string }[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   
   // PIX state
   const [pixData, setPixData] = useState<{
@@ -190,6 +197,52 @@ const PaymentPage = () => {
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        if (file.size > 10 * 1024 * 1024) {
+          toast.error(`Arquivo ${file.name} é muito grande (máx. 10MB)`);
+          continue;
+        }
+
+        const ext = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+        const filePath = `customer-uploads/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('order-files')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          toast.error(`Erro ao enviar ${file.name}`);
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('order-files')
+          .getPublicUrl(filePath);
+
+        setUploadedFiles(prev => [...prev, { name: file.name, url: urlData.publicUrl }]);
+        toast.success(`${file.name} enviado!`);
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error('Erro ao enviar arquivo');
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const createOrderInDB = async (state: PaymentState): Promise<string | null> => {
     // If orderId is already a UUID (came from DB), skip creation
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -201,6 +254,15 @@ const PaymentPage = () => {
     const storedPayment = sessionStorage.getItem('pending_payment');
     const cartItemsRaw = storedPayment ? JSON.parse(storedPayment) : {};
 
+    // Build production notes from custom data
+    const prodNotes: string[] = [];
+    if (customText.trim()) {
+      prodNotes.push(`📝 Texto do cliente: ${customText.trim()}`);
+    }
+    if (uploadedFiles.length > 0) {
+      prodNotes.push(`📎 Arquivos: ${uploadedFiles.map(f => f.name).join(', ')}`);
+    }
+
     const { data: order, error } = await supabase
       .from('orders')
       .insert({
@@ -208,12 +270,15 @@ const PaymentPage = () => {
         customer_name: state.customerName,
         customer_email: state.customerEmail,
         customer_phone: state.customerPhone || '',
-        items: cartItemsRaw.cartItems || [{ description: state.description, amount: state.amount }],
+        items: (cartItemsRaw.cartItems || [{ description: state.description, amount: state.amount }]) as unknown as import('@/integrations/supabase/types').Json,
         subtotal: state.amount,
         total: state.amount,
         order_status: 'pending',
         payment_status: 'pending',
         production_status: 'pending',
+        custom_text: customText.trim() || null,
+        customer_files: uploadedFiles.length > 0 ? uploadedFiles.map(f => f.url) : [],
+        production_notes: prodNotes.length > 0 ? prodNotes.join('\n') : null,
       })
       .select('id')
       .single();
@@ -466,6 +531,90 @@ const PaymentPage = () => {
                       onChange={(e) => setCustomerForm(prev => ({ ...prev, phone: e.target.value }))}
                     />
                   </div>
+
+                  <Separator />
+
+                  {/* Optional: Custom Text & File Upload */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <FileImage className="h-4 w-4" />
+                      <span>Personalização do produto <Badge variant="outline" className="text-xs">Opcional</Badge></span>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="customText" className="flex items-center gap-1.5">
+                        <Type className="h-3.5 w-3.5" />
+                        Texto para gravação
+                      </Label>
+                      <Textarea
+                        id="customText"
+                        placeholder="Ex: Nome da empresa, frase personalizada, dados do QR Code..."
+                        value={customText}
+                        onChange={(e) => setCustomText(e.target.value)}
+                        rows={3}
+                        className="resize-none"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Escreva o texto que deseja gravar no produto. Caso prefira, envie pelo WhatsApp após a compra.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="fileUpload" className="flex items-center gap-1.5">
+                        <Upload className="h-3.5 w-3.5" />
+                        Logo, imagem ou QR Code
+                      </Label>
+                      <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center hover:border-primary/50 transition-colors">
+                        <input
+                          id="fileUpload"
+                          type="file"
+                          accept="image/*,.pdf,.svg,.ai,.eps,.cdr"
+                          multiple
+                          onChange={handleFileUpload}
+                          className="hidden"
+                          disabled={isUploading}
+                        />
+                        <label htmlFor="fileUpload" className="cursor-pointer space-y-2">
+                          {isUploading ? (
+                            <Loader2 className="h-8 w-8 mx-auto text-muted-foreground animate-spin" />
+                          ) : (
+                            <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
+                          )}
+                          <p className="text-sm text-muted-foreground">
+                            {isUploading ? 'Enviando...' : 'Clique para enviar ou arraste arquivos'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            PNG, JPG, SVG, PDF, AI, EPS (máx. 10MB)
+                          </p>
+                        </label>
+                      </div>
+
+                      {/* Uploaded files list */}
+                      {uploadedFiles.length > 0 && (
+                        <div className="space-y-2 mt-2">
+                          {uploadedFiles.map((file, index) => (
+                            <div key={index} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2 text-sm">
+                              <FileImage className="h-4 w-4 text-primary shrink-0" />
+                              <span className="truncate flex-1">{file.name}</span>
+                              <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                              <button
+                                onClick={() => removeFile(index)}
+                                className="text-muted-foreground hover:text-destructive transition-colors"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <p className="text-xs text-muted-foreground">
+                        💡 Você também pode enviar esses arquivos pelo WhatsApp após finalizar a compra.
+                      </p>
+                    </div>
+                  </div>
+
+                  <Separator />
 
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <div className="flex justify-between text-sm">

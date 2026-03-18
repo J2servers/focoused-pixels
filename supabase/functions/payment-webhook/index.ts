@@ -188,11 +188,25 @@ async function sendEmailNotification(
 
           <div style="margin-top:24px;padding:16px;background:#ede9fe;border-radius:8px;">
             <p style="margin:0;font-size:14px;">🏭 <strong>Próximos passos:</strong> Seu pedido será processado e você receberá atualizações sobre a produção e envio.</p>
+            <p style="margin:8px 0 0;font-size:14px;">📦 Prazo de produção: 4 a 10 dias úteis após confirmação.</p>
+          </div>
+
+          <div style="margin-top:24px;padding:20px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0;">
+            <h3 style="color:#166534;margin:0 0 12px 0;font-size:16px;">📞 Precisa de ajuda? Fale conosco!</h3>
+            <p style="margin:4px 0;font-size:14px;color:#374151;">
+              Tem dúvidas sobre seu pedido? Quer enviar sua <strong>logo, QR Code</strong> ou informações adicionais?
+            </p>
+            <p style="margin:8px 0 4px;font-size:14px;color:#374151;">
+              ${companyWhatsapp ? `📱 <strong>WhatsApp:</strong> <a href="https://wa.me/${companyWhatsapp.replace(/\D/g, '')}" style="color:#25D366;text-decoration:none;font-weight:bold;">${companyWhatsapp}</a>` : ""}
+            </p>
+            <p style="margin:4px 0;font-size:14px;color:#374151;">
+              📧 <strong>E-mail:</strong> <a href="mailto:${companyEmail}" style="color:#7c3aed;text-decoration:none;">${companyEmail}</a>
+            </p>
           </div>
 
           ${companyWhatsapp ? `
           <div style="text-align:center;margin-top:24px;">
-            <a href="https://wa.me/${companyWhatsapp.replace(/\D/g, '')}" style="display:inline-block;background:#25D366;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">
+            <a href="https://wa.me/${companyWhatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá! Acabei de fazer o pedido #${order.order_number} e gostaria de tirar uma dúvida.`)}" style="display:inline-block;background:#25D366;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
               💬 Falar no WhatsApp
             </a>
           </div>` : ""}
