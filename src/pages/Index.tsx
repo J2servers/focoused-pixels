@@ -100,7 +100,7 @@ function CategoryProductsSection({
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5 stagger-children">
           {products.map((product, idx) => (
             <ProductCardOptimized 
               key={product.id}

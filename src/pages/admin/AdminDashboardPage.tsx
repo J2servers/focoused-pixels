@@ -29,6 +29,7 @@ import {
   TaxInfoCard,
   SiteVisitsCard,
 } from '@/components/admin/dashboard';
+import { RealActivityFeed } from '@/components/admin/dashboard/RealActivityFeed';
 import {
   CashFlowSummaryCards,
   CashTransactionsTable,
