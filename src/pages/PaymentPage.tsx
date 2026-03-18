@@ -197,6 +197,52 @@ const PaymentPage = () => {
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        if (file.size > 10 * 1024 * 1024) {
+          toast.error(`Arquivo ${file.name} é muito grande (máx. 10MB)`);
+          continue;
+        }
+
+        const ext = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+        const filePath = `customer-uploads/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('order-files')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          toast.error(`Erro ao enviar ${file.name}`);
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('order-files')
+          .getPublicUrl(filePath);
+
+        setUploadedFiles(prev => [...prev, { name: file.name, url: urlData.publicUrl }]);
+        toast.success(`${file.name} enviado!`);
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error('Erro ao enviar arquivo');
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const createOrderInDB = async (state: PaymentState): Promise<string | null> => {
     // If orderId is already a UUID (came from DB), skip creation
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -208,20 +254,42 @@ const PaymentPage = () => {
     const storedPayment = sessionStorage.getItem('pending_payment');
     const cartItemsRaw = storedPayment ? JSON.parse(storedPayment) : {};
 
+    const orderData: Record<string, unknown> = {
+      order_number: orderNumber,
+      customer_name: state.customerName,
+      customer_email: state.customerEmail,
+      customer_phone: state.customerPhone || '',
+      items: cartItemsRaw.cartItems || [{ description: state.description, amount: state.amount }],
+      subtotal: state.amount,
+      total: state.amount,
+      order_status: 'pending',
+      payment_status: 'pending',
+      production_status: 'pending',
+    };
+
+    // Add optional custom text and files
+    if (customText.trim()) {
+      orderData.custom_text = customText.trim();
+    }
+    if (uploadedFiles.length > 0) {
+      orderData.customer_files = uploadedFiles.map(f => f.url);
+    }
+
+    // Build production notes from custom data
+    const notes: string[] = [];
+    if (customText.trim()) {
+      notes.push(`📝 Texto do cliente: ${customText.trim()}`);
+    }
+    if (uploadedFiles.length > 0) {
+      notes.push(`📎 Arquivos: ${uploadedFiles.map(f => f.name).join(', ')}`);
+    }
+    if (notes.length > 0) {
+      orderData.production_notes = notes.join('\n');
+    }
+
     const { data: order, error } = await supabase
       .from('orders')
-      .insert({
-        order_number: orderNumber,
-        customer_name: state.customerName,
-        customer_email: state.customerEmail,
-        customer_phone: state.customerPhone || '',
-        items: cartItemsRaw.cartItems || [{ description: state.description, amount: state.amount }],
-        subtotal: state.amount,
-        total: state.amount,
-        order_status: 'pending',
-        payment_status: 'pending',
-        production_status: 'pending',
-      })
+      .insert(orderData)
       .select('id')
       .single();
 
