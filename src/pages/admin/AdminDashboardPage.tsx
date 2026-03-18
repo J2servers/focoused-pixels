@@ -43,6 +43,7 @@ interface DashboardStats {
   activePromotions: number;
   pendingReviews: number;
   totalQuotes: number;
+  pendingOrders: number;
 }
 
 const AdminDashboardPage = () => {
