@@ -129,6 +129,12 @@ const ProductPage = () => {
       customerCpf: '',
       customerPhone: '',
       description: `${product.name} x${quantity}`,
+      cartItems: [{
+        name: product.name,
+        quantity,
+        price: discountedPrice,
+        size: selectedSize || undefined,
+      }],
     }));
 
     navigate('/pagamento');
