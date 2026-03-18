@@ -460,7 +460,7 @@ const AdminCategoriesPage = () => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               {dialogType === 'parent' ? (
