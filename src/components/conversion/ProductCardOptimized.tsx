@@ -60,7 +60,7 @@ export function ProductCardOptimized({
     <>
       <Link 
         to={`/produto/${product.slug}`}
-        className="group flex flex-col h-full rounded-2xl overflow-hidden neu-raised hover:shadow-product-hover transition-all duration-500"
+        className="group flex flex-col h-full rounded-2xl overflow-hidden neu-raised hover:shadow-product-hover card-lift transition-all duration-500"
       >
         {/* Image */}
         <div className="relative aspect-square overflow-hidden rounded-t-2xl">
