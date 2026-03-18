@@ -103,9 +103,10 @@ async function sendWhatsAppNotification(
       },
       body: JSON.stringify({
         action: "sendText",
-        instanceName: "pinceldeluz",
         number: cleanPhone,
         text: message,
+        recipientName: order.customer_name,
+        orderNumber: order.order_number,
       }),
     });
 
