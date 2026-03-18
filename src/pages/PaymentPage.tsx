@@ -532,6 +532,90 @@ const PaymentPage = () => {
                     />
                   </div>
 
+                  <Separator />
+
+                  {/* Optional: Custom Text & File Upload */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <FileImage className="h-4 w-4" />
+                      <span>Personalização do produto <Badge variant="outline" className="text-xs">Opcional</Badge></span>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="customText" className="flex items-center gap-1.5">
+                        <Type className="h-3.5 w-3.5" />
+                        Texto para gravação
+                      </Label>
+                      <Textarea
+                        id="customText"
+                        placeholder="Ex: Nome da empresa, frase personalizada, dados do QR Code..."
+                        value={customText}
+                        onChange={(e) => setCustomText(e.target.value)}
+                        rows={3}
+                        className="resize-none"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Escreva o texto que deseja gravar no produto. Caso prefira, envie pelo WhatsApp após a compra.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="fileUpload" className="flex items-center gap-1.5">
+                        <Upload className="h-3.5 w-3.5" />
+                        Logo, imagem ou QR Code
+                      </Label>
+                      <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center hover:border-primary/50 transition-colors">
+                        <input
+                          id="fileUpload"
+                          type="file"
+                          accept="image/*,.pdf,.svg,.ai,.eps,.cdr"
+                          multiple
+                          onChange={handleFileUpload}
+                          className="hidden"
+                          disabled={isUploading}
+                        />
+                        <label htmlFor="fileUpload" className="cursor-pointer space-y-2">
+                          {isUploading ? (
+                            <Loader2 className="h-8 w-8 mx-auto text-muted-foreground animate-spin" />
+                          ) : (
+                            <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
+                          )}
+                          <p className="text-sm text-muted-foreground">
+                            {isUploading ? 'Enviando...' : 'Clique para enviar ou arraste arquivos'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            PNG, JPG, SVG, PDF, AI, EPS (máx. 10MB)
+                          </p>
+                        </label>
+                      </div>
+
+                      {/* Uploaded files list */}
+                      {uploadedFiles.length > 0 && (
+                        <div className="space-y-2 mt-2">
+                          {uploadedFiles.map((file, index) => (
+                            <div key={index} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2 text-sm">
+                              <FileImage className="h-4 w-4 text-primary shrink-0" />
+                              <span className="truncate flex-1">{file.name}</span>
+                              <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                              <button
+                                onClick={() => removeFile(index)}
+                                className="text-muted-foreground hover:text-destructive transition-colors"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <p className="text-xs text-muted-foreground">
+                        💡 Você também pode enviar esses arquivos pelo WhatsApp após finalizar a compra.
+                      </p>
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <div className="flex justify-between text-sm">
                       <span>Valor a pagar:</span>
