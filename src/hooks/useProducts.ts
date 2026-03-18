@@ -177,6 +177,15 @@ export function useSearchProducts(query: string) {
     queryFn: async () => {
       if (!query || query.length < 2) return [];
 
+      // Sanitize query to prevent SQL injection via ilike patterns
+      const sanitized = query
+        .replace(/[%_\\]/g, '') // Remove wildcard chars
+        .replace(/['"`;()]/g, '') // Remove SQL-dangerous chars
+        .trim()
+        .slice(0, 100); // Limit length
+
+      if (sanitized.length < 2) return [];
+
       const { data, error } = await supabase
         .from('products')
         .select(`
@@ -185,7 +194,7 @@ export function useSearchProducts(query: string) {
         `)
         .eq('status', 'active')
         .is('deleted_at', null)
-        .or(`name.ilike.%${query}%,short_description.ilike.%${query}%,tags.cs.{${query}}`)
+        .or(`name.ilike.%${sanitized}%,short_description.ilike.%${sanitized}%`)
         .order('created_at', { ascending: false })
         .limit(50);
 
