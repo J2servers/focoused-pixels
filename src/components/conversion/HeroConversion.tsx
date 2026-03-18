@@ -28,16 +28,22 @@ export function HeroConversion() {
 
   if (isLoading) {
     return (
-      <section>
-        <Skeleton className="w-full h-[320px] md:h-[420px] lg:h-[500px]" />
+      <section className="py-6 lg:py-8">
+        <div className="container mx-auto px-4">
+          <Skeleton className="w-full h-[280px] md:h-[340px] lg:h-[400px] rounded-2xl" />
+        </div>
       </section>
     );
   }
 
   if (heroSlides.length === 0) {
     return (
-      <section className="w-full h-[320px] md:h-[420px] lg:h-[500px] bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-        <p className="text-muted-foreground">Nenhum banner configurado. Adicione no painel admin.</p>
+      <section className="py-6 lg:py-8">
+        <div className="container mx-auto px-4">
+          <div className="w-full h-[280px] md:h-[340px] lg:h-[400px] rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-xl">
+            <p className="text-muted-foreground">Nenhum banner configurado. Adicione no painel admin.</p>
+          </div>
+        </div>
       </section>
     );
   }
@@ -47,7 +53,9 @@ export function HeroConversion() {
   const isDark = slide?.theme === 'dark';
 
   return (
-    <section className="relative w-full h-[320px] md:h-[420px] lg:h-[500px] overflow-hidden">
+    <section className="py-6 lg:py-8">
+      <div className="container mx-auto px-4">
+        <div className="relative w-full h-[280px] md:h-[340px] lg:h-[400px] overflow-hidden rounded-2xl shadow-xl">
       {/* Slides */}
       <AnimatePresence mode="wait">
         <motion.div
