@@ -126,7 +126,7 @@ async function sendEmailNotification(
       .limit(1)
       .single();
 
-    const companyName = company?.company_name || "Goat Comunicação Visual";
+    const companyName = company?.company_name || "Pincel de Luz";
     const companyEmail = company?.email || "";
     const companyWhatsapp = company?.whatsapp || "";
     
@@ -200,43 +200,76 @@ async function sendEmailNotification(
       </html>
     `;
 
-    // Store email content for sending (will be sent when email infra is ready)
-    // For now, log it and store in webhook_logs for admin visibility
-    console.log(`[Notification] Email prepared for ${order.customer_email}`);
+    // Actually send email via SMTP edge function
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+    const customerSubject = `✅ Pedido #${order.order_number} Confirmado - ${companyName}`;
+
+    // Send customer email
+    const emailResponse = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseServiceKey}`,
+      },
+      body: JSON.stringify({
+        to: order.customer_email,
+        subject: customerSubject,
+        html: emailHtml,
+        from_name: companyName,
+      }),
+    });
+
+    const emailResult = await emailResponse.json();
+    console.log(`[Notification] Customer email result:`, emailResult);
+
+    // Log to webhook_logs
     await supabase.from("webhook_logs").insert({
       direction: "outbound",
       endpoint: "email-notification",
       event_type: "order_confirmed",
       request_body: {
         to: order.customer_email,
-        subject: `✅ Pedido #${order.order_number} Confirmado - ${companyName}`,
-        html: emailHtml,
+        subject: customerSubject,
       } as Record<string, unknown>,
-      response_body: { status: "queued_for_email_setup" } as Record<string, unknown>,
-      status_code: 200,
+      response_body: emailResult as Record<string, unknown>,
+      status_code: emailResponse.status,
       source: "system",
-      processed: false,
+      processed: emailResult.success || false,
     });
 
-    // Also notify admin
-    const adminNotificationEmail = company?.email;
-    if (adminNotificationEmail) {
-      await supabase.from("webhook_logs").insert({
-        direction: "outbound",
-        endpoint: "email-notification-admin",
-        event_type: "new_sale",
-        request_body: {
-          to: adminNotificationEmail,
+    // Send admin notification email
+    if (companyEmail) {
+      const adminHtml = `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+          <h2 style="color:#7c3aed;">🎉 Nova Venda Realizada!</h2>
+          <p><strong>Pedido:</strong> #${order.order_number}</p>
+          <p><strong>Cliente:</strong> ${order.customer_name}</p>
+          <p><strong>Email:</strong> ${order.customer_email}</p>
+          <p><strong>Telefone:</strong> ${(order as { customer_phone?: string }).customer_phone || "N/A"}</p>
+          <p><strong>Total:</strong> ${formattedTotal}</p>
+          <p><strong>Método:</strong> ${order.payment_method || "PIX"}</p>
+          ${itemsHtml ? `<h3>Itens:</h3><table style="width:100%;border-collapse:collapse;"><tbody>${itemsHtml}</tbody></table>` : ""}
+        </div>
+      `;
+
+      const adminResponse = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${supabaseServiceKey}`,
+        },
+        body: JSON.stringify({
+          to: companyEmail,
           subject: `🎉 Nova Venda! Pedido #${order.order_number} - ${formattedTotal}`,
-          customer: order.customer_name,
-          phone: (order as { customer_phone?: string }).customer_phone,
-        } as Record<string, unknown>,
-        response_body: { status: "queued_for_email_setup" } as Record<string, unknown>,
-        status_code: 200,
-        source: "system",
-        processed: false,
+          html: adminHtml,
+          from_name: companyName,
+        }),
       });
+
+      const adminResult = await adminResponse.json();
+      console.log(`[Notification] Admin email result:`, adminResult);
     }
 
     return { sent: true };
