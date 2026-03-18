@@ -38,15 +38,23 @@ export function NavigationBar() {
 
   return (
     <nav
-      className="hidden lg:block relative z-50"
+      className="hidden lg:block relative z-40"
       style={{
         background: 'hsl(var(--background))',
-        boxShadow: '0 4px 14px hsl(var(--neu-dark) / 0.25), inset 0 1px 0 hsl(var(--neu-light) / 0.5), inset 0 -1px 0 hsl(var(--neu-dark) / 0.08)',
-        borderBottom: '1px solid hsl(var(--neon-primary) / 0.12)',
+        boxShadow: `0 6px 18px hsl(var(--neu-dark) / 0.28),
+                    inset 0 2px 0 hsl(var(--neu-light) / 0.6),
+                    inset 0 -1px 0 hsl(var(--neu-dark) / 0.1)`,
+        borderBottom: '1px solid hsl(var(--neon-primary) / 0.2)',
+        borderTop: '1px solid hsl(var(--neon-primary) / 0.08)',
       }}
     >
+      {/* Bottom glow line */}
+      <div className="absolute bottom-0 left-[10%] right-[10%] h-px" style={{
+        background: 'linear-gradient(90deg, transparent, hsl(var(--neon-primary) / 0.35), hsl(var(--neon-cyan) / 0.2), hsl(var(--neon-primary) / 0.35), transparent)',
+      }} />
+
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center gap-1">
           {categoryTree.map((category) => (
             <div 
               key={category.id} 
@@ -59,90 +67,122 @@ export function NavigationBar() {
                   <Link 
                     to={`/categoria/${category.slug}`}
                     className={cn(
-                      "flex h-12 items-center gap-1 px-5 text-sm font-semibold uppercase tracking-wide transition-colors duration-200 relative",
-                      hoveredCategory === category.id ? "text-primary" : "text-foreground hover:text-primary"
+                      "relative flex h-12 items-center gap-1.5 px-5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-300",
+                      hoveredCategory === category.id ? "text-primary" : "text-foreground/80 hover:text-foreground"
                     )}
                   >
                     {category.name}
                     <ChevronDown className={cn(
-                      "h-3.5 w-3.5 transition-transform duration-200",
-                      hoveredCategory === category.id && "rotate-180"
+                      "h-3.5 w-3.5 transition-transform duration-300",
+                      hoveredCategory === category.id && "rotate-180 text-primary"
                     )} />
 
-                    {/* Active underline */}
-                    {hoveredCategory === category.id && (
-                      <motion.div
-                        layoutId="navUnderline"
-                        className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full"
-                        style={{
-                          background: 'hsl(var(--primary))',
-                          boxShadow: '0 0 8px hsl(var(--neon-primary) / 0.6)',
-                        }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                      />
-                    )}
+                    {/* Active indicator - neon pill */}
+                    <AnimatePresence>
+                      {hoveredCategory === category.id && (
+                        <motion.div
+                          initial={{ scaleX: 0, opacity: 0 }}
+                          animate={{ scaleX: 1, opacity: 1 }}
+                          exit={{ scaleX: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                          className="absolute bottom-1 left-3 right-3 h-[3px] rounded-full origin-center"
+                          style={{
+                            background: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
+                            boxShadow: '0 0 10px hsl(var(--neon-primary) / 0.7), 0 0 20px hsl(var(--neon-primary) / 0.3)',
+                          }}
+                        />
+                      )}
+                    </AnimatePresence>
                   </Link>
                   
                   <AnimatePresence>
                     {hoveredCategory === category.id && (
                       <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute left-0 top-full pt-2 z-50"
+                        initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                        className="absolute left-0 top-full pt-3 z-50"
                       >
                         <div
-                          className="rounded-2xl p-4 min-w-[300px]"
+                          className="rounded-3xl p-5 min-w-[320px]"
                           style={{
                             background: 'hsl(var(--background))',
-                            boxShadow: '8px 8px 20px hsl(var(--neu-dark) / var(--neu-intensity)), -8px -8px 20px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(var(--neu-light) / 0.4)',
-                            border: '1px solid hsl(var(--neon-primary) / 0.25)',
+                            boxShadow: `10px 10px 28px hsl(var(--neu-dark) / var(--neu-intensity)),
+                                       -10px -10px 28px hsl(var(--neu-light) / var(--neu-intensity)),
+                                       inset 0 2px 0 hsl(var(--neu-light) / 0.5),
+                                       inset 0 -1px 0 hsl(var(--neu-dark) / 0.1)`,
+                            border: '1.5px solid hsl(var(--neon-primary) / 0.35)',
                           }}
                         >
+                          {/* Top accent line */}
+                          <div className="absolute top-0 left-6 right-6 h-[2px] rounded-full" style={{
+                            background: 'linear-gradient(90deg, transparent, hsl(var(--neon-primary) / 0.5), transparent)',
+                          }} />
+
                           <Link
                             to={`/categoria/${category.slug}`}
-                            className="block mb-3 pb-3"
-                            style={{ borderBottom: '1px solid hsl(var(--neon-primary) / 0.12)' }}
+                            className="block mb-4 pb-3"
+                            style={{ borderBottom: '1px solid hsl(var(--neon-primary) / 0.15)' }}
                           >
                             <span className="text-sm font-bold text-primary hover:underline">
                               Ver todos em {category.name}
                             </span>
                           </Link>
                           
-                          <div className="grid grid-cols-1 gap-1">
-                            {category.subcategories.map((sub) => (
-                              <Link
+                          <div className="grid grid-cols-1 gap-1.5">
+                            {category.subcategories.map((sub, idx) => (
+                              <motion.div
                                 key={sub.id}
-                                to={`/categoria/${category.slug}/${sub.slug}`}
-                                className="group flex items-center gap-3 p-2.5 rounded-xl transition-all duration-200 hover:bg-muted/30"
+                                initial={{ opacity: 0, x: -8 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: idx * 0.04 }}
                               >
-                                {sub.image_url && (
-                                  <div
-                                    className="w-10 h-10 rounded-xl overflow-hidden shrink-0"
-                                    style={{
-                                      boxShadow: 'inset 2px 2px 4px hsl(var(--neu-dark) / 0.4), inset -2px -2px 4px hsl(var(--neu-light) / 0.5)',
-                                      border: '1px solid hsl(var(--neon-primary) / 0.15)',
-                                    }}
-                                  >
-                                    <img 
-                                      src={sub.image_url} 
-                                      alt={sub.name}
-                                      className="w-full h-full object-cover group-hover:scale-110 transition-transform"
-                                    />
-                                  </div>
-                                )}
-                                <div>
-                                  <span className="text-sm font-medium group-hover:text-primary transition-colors">
-                                    {sub.name}
-                                  </span>
-                                  {sub.description && (
-                                    <p className="text-xs text-muted-foreground line-clamp-1">
-                                      {sub.description}
-                                    </p>
+                                <Link
+                                  to={`/categoria/${category.slug}/${sub.slug}`}
+                                  className="group flex items-center gap-3 p-3 rounded-2xl transition-all duration-300"
+                                  style={{
+                                    border: '1px solid transparent',
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'hsl(var(--background))';
+                                    e.currentTarget.style.boxShadow = `inset 3px 3px 8px hsl(var(--neu-dark) / 0.4), inset -3px -3px 8px hsl(var(--neu-light) / 0.6)`;
+                                    e.currentTarget.style.borderColor = 'hsl(var(--neon-primary) / 0.25)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'transparent';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                    e.currentTarget.style.borderColor = 'transparent';
+                                  }}
+                                >
+                                  {sub.image_url && (
+                                    <div
+                                      className="w-11 h-11 rounded-xl overflow-hidden shrink-0"
+                                      style={{
+                                        boxShadow: `inset 3px 3px 6px hsl(var(--neu-dark) / 0.5),
+                                                   inset -3px -3px 6px hsl(var(--neu-light) / 0.6)`,
+                                        border: '1.5px solid hsl(var(--neon-primary) / 0.2)',
+                                      }}
+                                    >
+                                      <img 
+                                        src={sub.image_url} 
+                                        alt={sub.name}
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                      />
+                                    </div>
                                   )}
-                                </div>
-                              </Link>
+                                  <div>
+                                    <span className="text-sm font-semibold group-hover:text-primary transition-colors duration-200">
+                                      {sub.name}
+                                    </span>
+                                    {sub.description && (
+                                      <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                                        {sub.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                </Link>
+                              </motion.div>
                             ))}
                           </div>
                         </div>
@@ -153,18 +193,24 @@ export function NavigationBar() {
               ) : (
                 <Link 
                   to={`/categoria/${category.slug}`}
-                  className="flex h-12 items-center px-5 text-sm font-semibold uppercase tracking-wide text-foreground hover:text-primary transition-colors relative group"
+                  className="relative flex h-12 items-center px-5 text-sm font-bold uppercase tracking-[0.08em] text-foreground/80 hover:text-foreground transition-all duration-300 group"
                 >
                   {category.name}
+                  <span className="absolute bottom-1 left-3 right-3 h-[2px] rounded-full bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" style={{
+                    boxShadow: '0 0 8px hsl(var(--neon-primary) / 0.5)',
+                  }} />
                 </Link>
               )}
             </div>
           ))}
           <Link 
             to="/rastreio"
-            className="flex h-12 items-center px-5 text-sm font-semibold uppercase tracking-wide text-foreground hover:text-primary transition-colors"
+            className="relative flex h-12 items-center px-5 text-sm font-bold uppercase tracking-[0.08em] text-foreground/80 hover:text-foreground transition-all duration-300 group"
           >
             Rastreio
+            <span className="absolute bottom-1 left-3 right-3 h-[2px] rounded-full bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" style={{
+              boxShadow: '0 0 8px hsl(var(--neon-primary) / 0.5)',
+            }} />
           </Link>
         </div>
       </div>
