@@ -1588,6 +1588,84 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_instances: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          instance_name: string
+          is_active: boolean
+          last_connected_at: string | null
+          phone_number: string | null
+          priority: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          instance_name: string
+          is_active?: boolean
+          last_connected_at?: string | null
+          phone_number?: string | null
+          priority?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          instance_name?: string
+          is_active?: boolean
+          last_connected_at?: string | null
+          phone_number?: string | null
+          priority?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      whatsapp_messages: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          instance_name: string
+          message_text: string
+          order_number: string | null
+          recipient_name: string | null
+          recipient_phone: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          instance_name: string
+          message_text: string
+          order_number?: string | null
+          recipient_name?: string | null
+          recipient_phone: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          instance_name?: string
+          message_text?: string
+          order_number?: string | null
+          recipient_name?: string | null
+          recipient_phone?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
