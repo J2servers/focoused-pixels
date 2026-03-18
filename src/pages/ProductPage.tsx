@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
