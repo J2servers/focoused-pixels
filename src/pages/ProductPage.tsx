@@ -37,6 +37,18 @@ const ProductPage = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
 
+  // Track recently viewed - must be before early returns
+  useEffect(() => {
+    if (product) {
+      addRecentlyViewed({
+        slug: product.slug,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+      });
+    }
+  }, [product?.slug]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
@@ -80,18 +92,6 @@ const ProductPage = () => {
       </div>
     );
   }
-
-  // Track recently viewed
-  useEffect(() => {
-    if (product) {
-      addRecentlyViewed({
-        slug: product.slug,
-        name: product.name,
-        image: product.image,
-        price: product.price,
-      });
-    }
-  }, [product?.slug]);
 
   const images = product.images?.length ? product.images : [product.image];
 
