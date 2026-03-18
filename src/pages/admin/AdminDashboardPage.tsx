@@ -68,12 +68,13 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [products, categories, promotions, reviews, quotes] = await Promise.all([
+        const [products, categories, promotions, reviews, quotes, pendingOrders] = await Promise.all([
           supabase.from('products').select('id', { count: 'exact', head: true }),
           supabase.from('categories').select('id', { count: 'exact', head: true }),
           supabase.from('promotions').select('id', { count: 'exact', head: true }).eq('status', 'active'),
           supabase.from('reviews').select('id', { count: 'exact', head: true }).eq('is_approved', false),
           supabase.from('quotes').select('id', { count: 'exact', head: true }),
+          supabase.from('orders').select('id', { count: 'exact', head: true }).in('order_status', ['pending', 'processing']),
         ]);
 
         setStats({
