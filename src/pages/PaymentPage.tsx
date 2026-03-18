@@ -61,6 +61,11 @@ const PaymentPage = () => {
     phone: '',
   });
   
+  // Custom product details (optional)
+  const [customText, setCustomText] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; url: string }[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  
   // PIX state
   const [pixData, setPixData] = useState<{
     qrCode: string;
