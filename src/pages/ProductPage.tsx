@@ -22,6 +22,8 @@ import {
 } from '@/components/product';
 import { ProductReviews } from '@/components/reviews';
 import { TrustBar, ViewingNowBadge } from '@/components/conversion';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { RecentlyViewedBar } from '@/components/product/RecentlyViewedBar';
 
 
 const ProductPage = () => {
