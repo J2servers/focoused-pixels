@@ -15,7 +15,8 @@ import {
   Eye,
   BarChart3,
   Wallet,
-  Calendar
+  Calendar,
+  FileText
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
