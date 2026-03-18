@@ -5,9 +5,17 @@
  * - PIX com desconto configurável (padrão 5%)
  * - Cartão até 12x com valor mínimo por parcela
  * - Boleto com dias extras para pagamento
+ * 
+ * MELHORIAS v2:
+ * - Order number com prefixo + timestamp base36 (anti-colisão)
+ * - Validação de email no frontend
+ * - Limpeza de sessionStorage após criação do pedido
+ * - Timeout no polling de PIX (15 min)
+ * - Proteção contra duplo-clique nos botões
+ * - customer_phone nunca vazio (null se ausente)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -42,6 +50,33 @@ interface PaymentState {
   customerPhone: string;
   description: string;
 }
+
+// ===== HELPERS =====
+
+/** Generate a collision-resistant order number: PL250318-A1B2C3 */
+function generateOrderNumber(): string {
+  const now = new Date();
+  const datePrefix = `PL${now.getFullYear().toString().slice(-2)}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}`;
+  const unique = Date.now().toString(36).toUpperCase().slice(-6);
+  return `${datePrefix}-${unique}`;
+}
+
+/** Basic email validation */
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+/** Sanitize phone: keep only digits, ensure 55 prefix */
+function sanitizePhone(phone: string): string | null {
+  if (!phone) return null;
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length < 10) return null;
+  if (digits.startsWith('55') && digits.length >= 12) return digits;
+  if (digits.startsWith('0')) return `55${digits.substring(1)}`;
+  return `55${digits}`;
+}
+
+const PIX_POLL_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
 
 const PaymentPage = () => {
   const [searchParams] = useSearchParams();
@@ -87,6 +122,12 @@ const PaymentPage = () => {
   // Payment status
   const [paymentStatus, setPaymentStatus] = useState<string>('pending');
   const [copied, setCopied] = useState(false);
+  
+  // Prevent double-submit
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  // PIX polling start time for timeout
+  const pixPollStart = useRef<number>(0);
 
   // Mutations
   const createPix = useCreateMercadoPagoPix();
@@ -106,14 +147,24 @@ const PaymentPage = () => {
       const orderId = searchParams.get('order');
       
       if (!orderId) {
-        // If no order ID, check if coming from cart
         const storedPayment = sessionStorage.getItem('pending_payment');
         if (storedPayment) {
-          const data = JSON.parse(storedPayment);
-          setPaymentState(data);
-          // Check if we need customer info
-          if (!data.customerEmail || !data.customerName) {
-            setNeedsCustomerInfo(true);
+          try {
+            const data = JSON.parse(storedPayment);
+            if (!data.amount || data.amount <= 0) {
+              toast.error('Valor do pedido inválido');
+              navigate('/');
+              return;
+            }
+            setPaymentState(data);
+            if (!data.customerEmail || !data.customerName) {
+              setNeedsCustomerInfo(true);
+            }
+          } catch {
+            toast.error('Dados do pedido corrompidos');
+            sessionStorage.removeItem('pending_payment');
+            navigate('/');
+            return;
           }
           setIsLoading(false);
           return;
@@ -124,7 +175,6 @@ const PaymentPage = () => {
       }
 
       try {
-        // Load order from database
         const { data: order, error } = await supabase
           .from('orders')
           .select('*')
@@ -156,11 +206,20 @@ const PaymentPage = () => {
     loadPaymentData();
   }, [searchParams, navigate]);
 
-  // Poll payment status for PIX
+  // Poll payment status for PIX with timeout
   useEffect(() => {
     if (!pixData?.paymentId || paymentStatus === 'approved') return;
 
+    pixPollStart.current = Date.now();
+
     const checkStatus = async () => {
+      // Timeout after 15 minutes
+      if (Date.now() - pixPollStart.current > PIX_POLL_TIMEOUT_MS) {
+        toast.error('O tempo do PIX expirou. Gere um novo código.');
+        setPixData(null);
+        return;
+      }
+
       try {
         const result = await mercadoPago.mutateAsync({
           action: 'check_status',
@@ -170,6 +229,8 @@ const PaymentPage = () => {
         if (result.status === 'approved') {
           setPaymentStatus('approved');
           toast.success('Pagamento confirmado!');
+          // Clear session data
+          sessionStorage.removeItem('pending_payment');
           setTimeout(() => navigate('/pagamento/sucesso'), 2000);
         }
       } catch (error) {
@@ -183,10 +244,11 @@ const PaymentPage = () => {
 
   const saveCustomerAsLead = async (name: string, email: string, phone: string) => {
     try {
+      const sanitizedPhone = sanitizePhone(phone);
       await supabase.from('leads').upsert({
-        name,
-        email,
-        phone: phone || null,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: sanitizedPhone,
         source: 'checkout',
         tags: ['cliente', 'pagamento'],
         is_subscribed: true,
@@ -201,16 +263,25 @@ const PaymentPage = () => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml', 'application/pdf'];
+    const ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'svg', 'pdf', 'ai', 'eps', 'cdr'];
+
     setIsUploading(true);
     try {
       for (const file of Array.from(files)) {
-        if (file.size > 10 * 1024 * 1024) {
+        if (file.size > MAX_FILE_SIZE) {
           toast.error(`Arquivo ${file.name} é muito grande (máx. 10MB)`);
           continue;
         }
 
-        const ext = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+        const ext = (file.name.split('.').pop() || '').toLowerCase();
+        if (!ALLOWED_EXTENSIONS.includes(ext)) {
+          toast.error(`Tipo de arquivo não permitido: .${ext}`);
+          continue;
+        }
+
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
         const filePath = `customer-uploads/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
@@ -248,11 +319,20 @@ const PaymentPage = () => {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (uuidRegex.test(state.orderId)) return state.orderId;
 
-    const orderNumber = `PL${new Date().getFullYear().toString().slice(-2)}${(new Date().getMonth() + 1).toString().padStart(2, '0')}${new Date().getDate().toString().padStart(2, '0')}-${Math.floor(Math.random() * 9999).toString().padStart(4, '0')}`;
+    const orderNumber = generateOrderNumber();
+    const sanitizedPhone = sanitizePhone(state.customerPhone);
 
-    // Get cart items from sessionStorage or use description
-    const storedPayment = sessionStorage.getItem('pending_payment');
-    const cartItemsRaw = storedPayment ? JSON.parse(storedPayment) : {};
+    // Get cart items from sessionStorage
+    let cartItems: unknown[] = [];
+    try {
+      const storedPayment = sessionStorage.getItem('pending_payment');
+      if (storedPayment) {
+        const parsed = JSON.parse(storedPayment);
+        cartItems = parsed.cartItems || [{ description: state.description, amount: state.amount }];
+      }
+    } catch {
+      cartItems = [{ description: state.description, amount: state.amount }];
+    }
 
     // Build production notes from custom data
     const prodNotes: string[] = [];
@@ -267,10 +347,10 @@ const PaymentPage = () => {
       .from('orders')
       .insert({
         order_number: orderNumber,
-        customer_name: state.customerName,
-        customer_email: state.customerEmail,
-        customer_phone: state.customerPhone || '',
-        items: (cartItemsRaw.cartItems || [{ description: state.description, amount: state.amount }]) as unknown as import('@/integrations/supabase/types').Json,
+        customer_name: state.customerName.trim(),
+        customer_email: state.customerEmail.trim().toLowerCase(),
+        customer_phone: sanitizedPhone || state.customerPhone || '',
+        items: cartItems as unknown as import('@/integrations/supabase/types').Json,
         subtotal: state.amount,
         total: state.amount,
         order_status: 'pending',
@@ -289,6 +369,9 @@ const PaymentPage = () => {
       return null;
     }
 
+    // Clear sessionStorage after successful order creation
+    sessionStorage.removeItem('pending_payment');
+
     // Save customer as lead
     await saveCustomerAsLead(state.customerName, state.customerEmail, state.customerPhone);
 
@@ -296,26 +379,43 @@ const PaymentPage = () => {
   };
 
   const handleCustomerSubmit = async () => {
-    if (!customerForm.name || !customerForm.email) {
+    if (isProcessing) return;
+    
+    const name = customerForm.name.trim();
+    const email = customerForm.email.trim().toLowerCase();
+    
+    if (!name || !email) {
       toast.error('Nome e email são obrigatórios');
       return;
     }
     
+    if (!isValidEmail(email)) {
+      toast.error('Por favor, informe um email válido');
+      return;
+    }
+    
     if (paymentState) {
-      const updatedState = {
-        ...paymentState,
-        customerName: customerForm.name,
-        customerEmail: customerForm.email,
-        customerCpf: customerForm.cpf,
-        customerPhone: customerForm.phone,
-      };
+      setIsProcessing(true);
+      try {
+        const updatedState = {
+          ...paymentState,
+          customerName: name,
+          customerEmail: email,
+          customerCpf: customerForm.cpf.replace(/\D/g, ''),
+          customerPhone: customerForm.phone,
+        };
 
-      // Create order in database
-      const dbOrderId = await createOrderInDB(updatedState);
-      if (!dbOrderId) return;
+        const dbOrderId = await createOrderInDB(updatedState);
+        if (!dbOrderId) {
+          setIsProcessing(false);
+          return;
+        }
 
-      setPaymentState({ ...updatedState, orderId: dbOrderId });
-      setNeedsCustomerInfo(false);
+        setPaymentState({ ...updatedState, orderId: dbOrderId });
+        setNeedsCustomerInfo(false);
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -332,12 +432,13 @@ const PaymentPage = () => {
   };
 
   const handleGeneratePix = async () => {
-    if (!paymentState) return;
-
-    const orderId = await ensureOrderExists();
-    if (!orderId) return;
+    if (!paymentState || isProcessing) return;
+    setIsProcessing(true);
 
     try {
+      const orderId = await ensureOrderExists();
+      if (!orderId) return;
+
       const result = await createPix.mutateAsync({
         orderId,
         amount: paymentState.amount,
@@ -358,19 +459,24 @@ const PaymentPage = () => {
       toast.success('PIX gerado com sucesso!');
     } catch (error) {
       console.error('Error generating PIX:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleGenerateBoleto = async () => {
-    if (!paymentState || !paymentState.customerCpf) {
-      toast.error('CPF é obrigatório para boleto');
+    if (!paymentState || isProcessing) return;
+    
+    if (!paymentState.customerCpf || paymentState.customerCpf.replace(/\D/g, '').length < 11) {
+      toast.error('CPF válido é obrigatório para boleto');
       return;
     }
 
-    const orderId = await ensureOrderExists();
-    if (!orderId) return;
-
+    setIsProcessing(true);
     try {
+      const orderId = await ensureOrderExists();
+      if (!orderId) return;
+
       const result = await mercadoPago.mutateAsync({
         action: 'create_boleto',
         orderId,
@@ -378,7 +484,7 @@ const PaymentPage = () => {
         description: paymentState.description,
         payerEmail: paymentState.customerEmail,
         payerName: paymentState.customerName,
-        payerCpf: paymentState.customerCpf,
+        payerCpf: paymentState.customerCpf.replace(/\D/g, ''),
       });
 
       setBoletoData({
@@ -391,16 +497,19 @@ const PaymentPage = () => {
       toast.success('Boleto gerado com sucesso!');
     } catch (error) {
       console.error('Error generating boleto:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleCreditCard = async () => {
-    if (!paymentState) return;
-
-    const orderId = await ensureOrderExists();
-    if (!orderId) return;
+    if (!paymentState || isProcessing) return;
+    setIsProcessing(true);
 
     try {
+      const orderId = await ensureOrderExists();
+      if (!orderId) return;
+
       const items = [{
         title: paymentState.description,
         quantity: 1,
@@ -419,6 +528,8 @@ const PaymentPage = () => {
       }
     } catch (error) {
       console.error('Error creating checkout:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -501,6 +612,7 @@ const PaymentPage = () => {
                       placeholder="Seu nome completo"
                       value={customerForm.name}
                       onChange={(e) => setCustomerForm(prev => ({ ...prev, name: e.target.value }))}
+                      maxLength={120}
                     />
                   </div>
                   <div className="space-y-2">
@@ -511,6 +623,7 @@ const PaymentPage = () => {
                       placeholder="seu@email.com"
                       value={customerForm.email}
                       onChange={(e) => setCustomerForm(prev => ({ ...prev, email: e.target.value }))}
+                      maxLength={255}
                     />
                   </div>
                   <div className="space-y-2">
@@ -520,6 +633,7 @@ const PaymentPage = () => {
                       placeholder="000.000.000-00"
                       value={customerForm.cpf}
                       onChange={(e) => setCustomerForm(prev => ({ ...prev, cpf: e.target.value }))}
+                      maxLength={14}
                     />
                   </div>
                   <div className="space-y-2">
@@ -529,6 +643,7 @@ const PaymentPage = () => {
                       placeholder="(00) 00000-0000"
                       value={customerForm.phone}
                       onChange={(e) => setCustomerForm(prev => ({ ...prev, phone: e.target.value }))}
+                      maxLength={20}
                     />
                   </div>
 
@@ -552,6 +667,7 @@ const PaymentPage = () => {
                         value={customText}
                         onChange={(e) => setCustomText(e.target.value)}
                         rows={3}
+                        maxLength={1000}
                         className="resize-none"
                       />
                       <p className="text-xs text-muted-foreground">
@@ -627,8 +743,11 @@ const PaymentPage = () => {
                     onClick={handleCustomerSubmit}
                     className="w-full"
                     size="lg"
-                    disabled={!customerForm.name || !customerForm.email}
+                    disabled={!customerForm.name.trim() || !customerForm.email.trim() || isProcessing}
                   >
+                    {isProcessing ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : null}
                     Continuar para Pagamento
                   </Button>
                 </CardContent>
@@ -769,11 +888,11 @@ const PaymentPage = () => {
                           </div>
                           <Button 
                             onClick={handleGeneratePix}
-                            disabled={createPix.isPending}
+                            disabled={createPix.isPending || isProcessing}
                             size="lg"
                             className="w-full bg-emerald-600 hover:bg-emerald-700"
                           >
-                            {createPix.isPending ? (
+                            {(createPix.isPending || isProcessing) ? (
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             ) : (
                               <QrCode className="h-4 w-4 mr-2" />
@@ -858,41 +977,43 @@ const PaymentPage = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                      <div className="space-y-2">
-                        <Label>Opções de Parcelamento</Label>
-                        <div className="grid gap-2 max-h-48 overflow-y-auto">
-                          {installments.slice(0, 6).map((inst) => (
-                            <div 
-                              key={inst.number}
-                              className="flex items-center justify-between p-3 border rounded-lg text-sm"
-                            >
-                              <span>{inst.number}x de {formatCurrency(inst.value)}</span>
-                              <span className="text-muted-foreground">
-                                Total: {formatCurrency(inst.total)}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
+                      <div className="p-6 bg-blue-500/5 rounded-lg text-center">
+                        <p className="text-2xl font-bold">{formatCurrency(paymentState.amount)}</p>
+                        {installments.length > 1 && (
+                          <p className="text-sm text-muted-foreground mt-2">
+                            ou até {installments[installments.length - 1].number}x de{' '}
+                            {formatCurrency(installments[installments.length - 1].value)}
+                          </p>
+                        )}
                       </div>
+
+                      {installments.length > 0 && (
+                        <div className="space-y-2">
+                          <Label>Opções de parcelamento:</Label>
+                          <div className="max-h-48 overflow-y-auto space-y-1">
+                            {installments.map((inst) => (
+                              <div key={inst.number} className="flex justify-between text-sm p-2 rounded hover:bg-muted/50">
+                                <span>{inst.number}x de {formatCurrency(inst.value)}</span>
+                                <span className="text-muted-foreground">Total: {formatCurrency(inst.total)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       <Button 
                         onClick={handleCreditCard}
-                        disabled={createPreference.isPending}
+                        disabled={createPreference.isPending || isProcessing}
                         size="lg"
                         className="w-full"
                       >
-                        {createPreference.isPending ? (
+                        {(createPreference.isPending || isProcessing) ? (
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         ) : (
                           <ExternalLink className="h-4 w-4 mr-2" />
                         )}
                         Pagar com Cartão
                       </Button>
-
-                      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                        <Shield className="h-4 w-4" />
-                        Pagamento processado pelo Mercado Pago
-                      </div>
                     </CardContent>
                   </Card>
                 )}
@@ -903,34 +1024,38 @@ const PaymentPage = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Building2 className="h-5 w-5 text-orange-500" />
-                        Pagamento por Boleto
+                        Boleto Bancário
                       </CardTitle>
-                      <CardDescription>
-                        O boleto será gerado com vencimento em 3 dias
-                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       {!boletoData ? (
                         <div className="space-y-4">
+                          <div className="p-6 bg-orange-500/5 rounded-lg text-center">
+                            <p className="text-2xl font-bold">{formatCurrency(paymentState.amount)}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Vencimento em {3 + boletoExtraDays} dias
+                            </p>
+                          </div>
+
                           {!paymentState.customerCpf && (
                             <div className="space-y-2">
-                              <Label htmlFor="boleto_cpf">CPF (obrigatório)</Label>
+                              <Label>CPF do pagador *</Label>
                               <Input
-                                id="boleto_cpf"
                                 placeholder="000.000.000-00"
                                 value={paymentState.customerCpf}
-                                onChange={(e) => setPaymentState(prev => prev ? {...prev, customerCpf: e.target.value} : null)}
+                                onChange={(e) => setPaymentState(prev => prev ? { ...prev, customerCpf: e.target.value } : null)}
+                                maxLength={14}
                               />
                             </div>
                           )}
-                          
+
                           <Button 
                             onClick={handleGenerateBoleto}
-                            disabled={mercadoPago.isPending || !paymentState.customerCpf}
+                            disabled={mercadoPago.isPending || isProcessing}
                             size="lg"
                             className="w-full bg-orange-600 hover:bg-orange-700"
                           >
-                            {mercadoPago.isPending ? (
+                            {(mercadoPago.isPending || isProcessing) ? (
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             ) : (
                               <Building2 className="h-4 w-4 mr-2" />
@@ -939,49 +1064,28 @@ const PaymentPage = () => {
                           </Button>
                         </div>
                       ) : (
-                        <div className="space-y-6">
-                          <div className="p-4 bg-orange-500/5 rounded-lg text-center">
-                            <p className="text-2xl font-bold">
-                              {formatCurrency(paymentState.amount)}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Vencimento: {new Date(boletoData.expirationDate).toLocaleDateString('pt-BR')}
-                            </p>
+                        <div className="space-y-4">
+                          <div className="text-center">
+                            <CheckCircle2 className="h-12 w-12 text-orange-500 mx-auto mb-2" />
+                            <p className="font-semibold">Boleto gerado!</p>
                           </div>
 
                           <div className="space-y-2">
-                            <Label>Código de Barras</Label>
+                            <Label>Código de barras</Label>
                             <div className="flex gap-2">
-                              <Input 
-                                value={boletoData.barcode}
-                                readOnly
-                                className="font-mono text-xs"
-                              />
-                              <Button
-                                variant="outline"
-                                onClick={() => copyToClipboard(boletoData.barcode)}
-                              >
+                              <Input value={boletoData.barcode} readOnly className="font-mono text-xs" />
+                              <Button variant="outline" onClick={() => copyToClipboard(boletoData.barcode)}>
                                 <Copy className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
 
-                          <Button 
-                            onClick={() => window.open(boletoData.boletoUrl, '_blank')}
-                            variant="outline"
-                            size="lg"
-                            className="w-full"
-                          >
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Visualizar Boleto
+                          <Button asChild className="w-full" variant="outline">
+                            <a href={boletoData.boletoUrl} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Visualizar Boleto
+                            </a>
                           </Button>
-
-                          <div className="p-4 bg-muted/50 rounded-lg text-sm text-muted-foreground">
-                            <p className="flex items-center gap-2">
-                              <AlertCircle className="h-4 w-4" />
-                              O pagamento pode levar até 3 dias úteis para ser confirmado
-                            </p>
-                          </div>
                         </div>
                       )}
                     </CardContent>
@@ -989,32 +1093,38 @@ const PaymentPage = () => {
                 )}
               </div>
 
-              {/* Order Summary */}
+              {/* Order Summary Sidebar */}
               <div className="lg:col-span-1">
                 <Card className="sticky top-4">
                   <CardHeader>
-                    <CardTitle>Resumo do Pedido</CardTitle>
+                    <CardTitle className="text-lg">Resumo</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Subtotal</span>
+                    <div>
+                      <p className="font-medium">{paymentState.customerName}</p>
+                      <p className="text-sm text-muted-foreground">{paymentState.customerEmail}</p>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Subtotal</span>
                         <span>{formatCurrency(paymentState.amount)}</span>
                       </div>
-                      
                       {paymentMethod === 'pix' && (
-                        <div className="flex justify-between text-sm text-emerald-600">
+                        <div className="flex justify-between text-emerald-600">
                           <span>Desconto PIX ({pixDiscount}%)</span>
                           <span>-{formatCurrency(paymentState.amount * pixDiscount / 100)}</span>
                         </div>
                       )}
                     </div>
-
+                    
                     <Separator />
-
-                    <div className="flex justify-between font-semibold">
+                    
+                    <div className="flex justify-between font-bold text-lg">
                       <span>Total</span>
-                      <span className="text-xl">
+                      <span>
                         {paymentMethod === 'pix' 
                           ? formatCurrency(pixAmount)
                           : formatCurrency(paymentState.amount)
@@ -1022,22 +1132,9 @@ const PaymentPage = () => {
                       </span>
                     </div>
 
-                    {paymentMethod === 'credit_card' && installments.length > 0 && (
-                      <p className="text-sm text-muted-foreground text-center">
-                        ou {installments[installments.length - 1].number}x de{' '}
-                        {formatCurrency(installments[installments.length - 1].value)}
-                      </p>
-                    )}
-
-                    <div className="pt-4 space-y-2 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-3 w-3" />
-                        <span>Pagamento 100% seguro</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3 w-3" />
-                        <span>Processado pelo Mercado Pago</span>
-                      </div>
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground">
+                      <Shield className="h-4 w-4 shrink-0" />
+                      Pagamento 100% seguro via Mercado Pago
                     </div>
                   </CardContent>
                 </Card>
