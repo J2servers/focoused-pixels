@@ -81,6 +81,18 @@ const ProductPage = () => {
     );
   }
 
+  // Track recently viewed
+  useEffect(() => {
+    if (product) {
+      addRecentlyViewed({
+        slug: product.slug,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+      });
+    }
+  }, [product?.slug]);
+
   const images = product.images?.length ? product.images : [product.image];
 
   const getDiscountPercent = (qty: number): number => {
