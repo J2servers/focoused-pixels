@@ -781,7 +781,9 @@ export type Database = {
       orders: {
         Row: {
           created_at: string
+          custom_text: string | null
           customer_email: string
+          customer_files: string[] | null
           customer_name: string
           customer_phone: string
           discount: number | null
@@ -806,7 +808,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          custom_text?: string | null
           customer_email: string
+          customer_files?: string[] | null
           customer_name: string
           customer_phone: string
           discount?: number | null
@@ -831,7 +835,9 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          custom_text?: string | null
           customer_email?: string
+          customer_files?: string[] | null
           customer_name?: string
           customer_phone?: string
           discount?: number | null
