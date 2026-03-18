@@ -53,6 +53,7 @@ const AdminDashboardPage = () => {
     activePromotions: 0,
     pendingReviews: 0,
     totalQuotes: 0,
+    pendingOrders: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   
