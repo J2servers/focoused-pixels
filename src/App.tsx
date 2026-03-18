@@ -53,6 +53,7 @@ import {
   AdminQuotesPage,
   AdminApiDocsPage,
 } from "./pages/admin";
+import AdminWhatsAppPage from "./pages/admin/AdminWhatsAppPage";
 
 const queryClient = new QueryClient();
 
