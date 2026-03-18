@@ -327,31 +327,7 @@ const AdminDashboardPage = () => {
 
             {/* Activity & Tips Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-lg text-white">Atividade Recente</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {[
-                      { action: 'Novo orçamento recebido', time: 'há 5 minutos', icon: ShoppingCart, color: 'text-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.15)]' },
-                      { action: 'Produto atualizado', time: 'há 1 hora', icon: Package, color: 'text-[hsl(var(--admin-accent-blue))] bg-[hsl(var(--admin-accent-blue)/0.15)]' },
-                      { action: 'Nova avaliação pendente', time: 'há 2 horas', icon: Star, color: 'text-[hsl(var(--admin-accent-orange))] bg-[hsl(var(--admin-accent-orange)/0.15)]' },
-                      { action: 'Promoção iniciada', time: 'há 3 horas', icon: Percent, color: 'text-[hsl(var(--admin-accent-pink))] bg-[hsl(var(--admin-accent-pink)/0.15)]' },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-4 p-3 rounded-lg hover:bg-[hsl(var(--admin-sidebar-hover))] transition-colors">
-                        <div className={cn("p-2 rounded-lg", item.color)}>
-                          <item.icon className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white truncate">{item.action}</p>
-                          <p className="text-xs text-[hsl(var(--admin-text-muted))]">{item.time}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <RealActivityFeed />
 
               <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
                 <CardHeader>
