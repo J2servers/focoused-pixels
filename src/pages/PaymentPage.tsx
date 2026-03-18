@@ -174,20 +174,63 @@ const PaymentPage = () => {
     return () => clearInterval(interval);
   }, [pixData, paymentStatus, mercadoPago, navigate]);
 
-  const handleCustomerSubmit = () => {
+  const createOrderInDB = async (state: PaymentState): Promise<string | null> => {
+    // If orderId is already a UUID (came from DB), skip creation
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (uuidRegex.test(state.orderId)) return state.orderId;
+
+    const orderNumber = `PL${new Date().getFullYear().toString().slice(-2)}${(new Date().getMonth() + 1).toString().padStart(2, '0')}${new Date().getDate().toString().padStart(2, '0')}-${Math.floor(Math.random() * 9999).toString().padStart(4, '0')}`;
+
+    // Get cart items from sessionStorage or use description
+    const storedPayment = sessionStorage.getItem('pending_payment');
+    const cartItemsRaw = storedPayment ? JSON.parse(storedPayment) : {};
+
+    const { data: order, error } = await supabase
+      .from('orders')
+      .insert({
+        order_number: orderNumber,
+        customer_name: state.customerName,
+        customer_email: state.customerEmail,
+        customer_phone: state.customerPhone || '',
+        items: cartItemsRaw.cartItems || [{ description: state.description, amount: state.amount }],
+        subtotal: state.amount,
+        total: state.amount,
+        order_status: 'pending',
+        payment_status: 'pending',
+        production_status: 'pending',
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('Error creating order:', error);
+      toast.error('Erro ao criar pedido. Tente novamente.');
+      return null;
+    }
+
+    return order.id;
+  };
+
+  const handleCustomerSubmit = async () => {
     if (!customerForm.name || !customerForm.email) {
       toast.error('Nome e email são obrigatórios');
       return;
     }
     
     if (paymentState) {
-      setPaymentState({
+      const updatedState = {
         ...paymentState,
         customerName: customerForm.name,
         customerEmail: customerForm.email,
         customerCpf: customerForm.cpf,
         customerPhone: customerForm.phone,
-      });
+      };
+
+      // Create order in database
+      const dbOrderId = await createOrderInDB(updatedState);
+      if (!dbOrderId) return;
+
+      setPaymentState({ ...updatedState, orderId: dbOrderId });
       setNeedsCustomerInfo(false);
     }
   };

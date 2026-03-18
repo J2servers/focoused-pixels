@@ -30,6 +30,12 @@ const CartPage = () => {
       customerCpf: '',
       customerPhone: '',
       description: `Carrinho com ${itemCount} ${itemCount === 1 ? 'item' : 'itens'}`,
+      cartItems: items.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        size: item.size,
+      })),
     };
     sessionStorage.setItem('pending_payment', JSON.stringify(paymentData));
     navigate('/pagamento');
