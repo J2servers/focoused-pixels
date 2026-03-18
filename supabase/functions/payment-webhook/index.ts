@@ -70,15 +70,34 @@ serve(async (req) => {
               : paymentData.status === "pending" ? "pending"
               : "unknown";
 
-            await supabase
-              .from("orders")
-              .update({ 
-                payment_status: newStatus,
-                updated_at: new Date().toISOString(),
-              })
-              .eq("id", paymentData.external_reference);
+            // Try matching by id first, then by order_number
+            const extRef = paymentData.external_reference;
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            
+            const updateData = { 
+              payment_status: newStatus,
+              order_status: newStatus === "paid" ? "confirmed" : undefined,
+              updated_at: new Date().toISOString(),
+            };
 
-            console.log(`[Webhook MP] Order ${paymentData.external_reference} updated to ${newStatus}`);
+            let result;
+            if (uuidRegex.test(extRef)) {
+              result = await supabase
+                .from("orders")
+                .update(updateData)
+                .eq("id", extRef);
+            } else {
+              result = await supabase
+                .from("orders")
+                .update(updateData)
+                .eq("order_number", extRef);
+            }
+
+            if (result.error) {
+              console.error(`[Webhook MP] Error updating order:`, result.error);
+            } else {
+              console.log(`[Webhook MP] Order ${extRef} updated to ${newStatus}`);
+            }
           }
         }
       }
