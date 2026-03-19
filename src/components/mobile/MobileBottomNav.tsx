@@ -9,7 +9,7 @@ const navItems = [
   { icon: Search, label: 'Buscar', path: '/busca' },
   { icon: Grid3X3, label: 'Categorias', path: '/categorias' },
   { icon: ShoppingCart, label: 'Carrinho', path: '/carrinho' },
-  { icon: User, label: 'Conta', path: '/login' },
+  { icon: User, label: 'Conta', path: '/minha-area' },
 ];
 
 export function MobileBottomNav() {
