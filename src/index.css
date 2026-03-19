@@ -615,4 +615,29 @@
   .admin-dark ::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--admin-accent-purple) / 0.5);
   }
+  /* ═══ Neumorphic Icon Buttons ═══ */
+  .neu-icon-btn {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer;
+    background: hsl(var(--background));
+    box-shadow:
+      4px 4px 10px hsl(var(--neu-dark) / 0.25),
+      -4px -4px 10px hsl(var(--neu-light) / 0.45),
+      inset 0 1px 0 hsl(var(--neu-light) / 0.3);
+    border: 1px solid hsl(var(--neon-primary) / 0.15);
+    transition: all 0.2s ease;
+  }
+  .neu-icon-btn:active {
+    box-shadow:
+      inset 2px 2px 5px hsl(var(--neu-dark) / 0.3),
+      inset -2px -2px 5px hsl(var(--neu-light) / 0.4);
+  }
+
+  .neu-icon-btn-sm {
+    @apply w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer;
+    background: hsl(var(--background));
+    box-shadow:
+      3px 3px 6px hsl(var(--neu-dark) / 0.2),
+      -3px -3px 6px hsl(var(--neu-light) / 0.4);
+    border: 1px solid hsl(var(--neon-primary) / 0.1);
+  }
 }
