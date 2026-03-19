@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, X, Menu, ChevronRight, Package, Info, HelpCircle, Sparkles, ShoppingCart, User } from 'lucide-react';
+import { Search, X, Menu, ChevronRight, Package, Info, HelpCircle, Sparkles, ShoppingCart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,14 +39,14 @@ export function MobileHeader() {
 
   return (
     <header className="sticky top-0 z-40">
-      {/* ─── Top Bar ─── */}
       <div
         className="transition-all duration-500"
         style={{
-          background: scrolled ? 'hsl(var(--background) / 0.92)' : 'hsl(var(--background))',
-          backdropFilter: scrolled ? 'blur(16px)' : 'none',
-          WebkitBackdropFilter: scrolled ? 'blur(16px)' : 'none',
-          boxShadow: scrolled ? '0 1px 12px hsl(var(--neu-dark) / 0.15)' : 'none',
+          background: 'hsl(var(--background))',
+          boxShadow: scrolled
+            ? `0 4px 16px hsl(var(--neu-dark) / 0.25), inset 0 -1px 0 hsl(var(--neu-dark) / 0.06), inset 0 1px 0 hsl(var(--neu-light) / 0.5)`
+            : `0 2px 8px hsl(var(--neu-dark) / 0.12), inset 0 1px 0 hsl(var(--neu-light) / 0.4)`,
+          borderBottom: '1px solid hsl(var(--neon-primary) / 0.2)',
         }}
       >
         <div className="flex items-center justify-between h-16 px-4">
@@ -55,15 +55,16 @@ export function MobileHeader() {
             <SheetTrigger asChild>
               <motion.button
                 whileTap={{ scale: 0.9 }}
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-foreground"
-                style={{
-                  background: 'hsl(var(--muted) / 0.5)',
-                }}
+                className="neu-icon-btn"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-5 w-5 text-foreground" />
               </motion.button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] p-0 border-r border-border bg-background">
+            <SheetContent side="left" className="w-[300px] p-0 border-r-0" style={{
+              background: 'hsl(var(--background))',
+              borderRight: '1px solid hsl(var(--neon-primary) / 0.2)',
+              boxShadow: '6px 0 24px hsl(var(--neu-dark) / 0.2)',
+            }}>
               <MobileDrawer
                 company={company}
                 categories={parentCategories}
@@ -84,31 +85,27 @@ export function MobileHeader() {
             />
           </Link>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-1">
+          {/* Right */}
+          <div className="flex items-center gap-2">
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => setSearchOpen(true)}
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-foreground"
-              style={{ background: 'hsl(var(--muted) / 0.5)' }}
+              className="neu-icon-btn"
             >
-              <Search className="h-[18px] w-[18px]" />
+              <Search className="h-[18px] w-[18px] text-foreground" />
             </motion.button>
 
             <Link to="/carrinho">
-              <motion.div
-                whileTap={{ scale: 0.9 }}
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-foreground relative"
-                style={{ background: 'hsl(var(--muted) / 0.5)' }}
-              >
-                <ShoppingCart className="h-[18px] w-[18px]" />
+              <motion.div whileTap={{ scale: 0.9 }} className="neu-icon-btn relative">
+                <ShoppingCart className="h-[18px] w-[18px] text-foreground" />
                 {itemCount > 0 && (
                   <span
-                    className="absolute -top-1 -right-1 text-[9px] font-bold rounded-full h-4 w-4 flex items-center justify-center"
+                    className="absolute -top-1.5 -right-1.5 text-[9px] font-bold rounded-full h-[18px] w-[18px] flex items-center justify-center"
                     style={{
                       background: 'hsl(var(--primary))',
                       color: 'hsl(var(--primary-foreground))',
                       border: '2px solid hsl(var(--background))',
+                      boxShadow: '0 2px 6px hsl(var(--primary) / 0.4)',
                     }}
                   >
                     {itemCount > 9 ? '9+' : itemCount}
@@ -120,7 +117,7 @@ export function MobileHeader() {
         </div>
       </div>
 
-      {/* ─── Search Overlay ─── */}
+      {/* Search Overlay */}
       <AnimatePresence>
         {searchOpen && (
           <>
@@ -128,8 +125,8 @@ export function MobileHeader() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-foreground/10"
-              style={{ backdropFilter: 'blur(6px)' }}
+              className="fixed inset-0 z-50"
+              style={{ background: 'hsl(var(--foreground) / 0.08)', backdropFilter: 'blur(6px)' }}
               onClick={() => setSearchOpen(false)}
             />
             <motion.div
@@ -137,26 +134,35 @@ export function MobileHeader() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ type: 'spring', damping: 26, stiffness: 300 }}
-              className="fixed inset-x-3 top-3 z-50 rounded-2xl p-3 bg-background border border-border"
-              style={{ boxShadow: '0 12px 40px hsl(var(--neu-dark) / 0.25)' }}
+              className="fixed inset-x-3 top-3 z-50 rounded-2xl p-3"
+              style={{
+                background: 'hsl(var(--background))',
+                boxShadow: `8px 8px 20px hsl(var(--neu-dark) / 0.35), -8px -8px 20px hsl(var(--neu-light) / 0.5), inset 0 1px 0 hsl(var(--neu-light) / 0.4)`,
+                border: '1px solid hsl(var(--neon-primary) / 0.2)',
+              }}
             >
               <form onSubmit={handleSearch} className="flex items-center gap-2">
                 <motion.button
                   type="button"
                   whileTap={{ scale: 0.85 }}
                   onClick={() => setSearchOpen(false)}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground shrink-0"
+                  className="neu-icon-btn-sm shrink-0"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-4 w-4 text-muted-foreground" />
                 </motion.button>
-                <Input
-                  type="search"
-                  placeholder="O que você procura?"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 h-10 rounded-xl border-muted bg-muted/30 text-sm"
-                  autoFocus
-                />
+                <div className="flex-1 rounded-xl overflow-hidden" style={{
+                  boxShadow: 'inset 3px 3px 6px hsl(var(--neu-dark) / 0.3), inset -3px -3px 6px hsl(var(--neu-light) / 0.5)',
+                  border: '1px solid hsl(var(--neon-primary) / 0.15)',
+                }}>
+                  <Input
+                    type="search"
+                    placeholder="O que você procura?"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="border-0 shadow-none bg-transparent h-10 text-sm"
+                    autoFocus
+                  />
+                </div>
                 <Button type="submit" size="sm" disabled={!searchQuery.trim()} className="rounded-xl shrink-0">
                   <Search className="h-4 w-4" />
                 </Button>
@@ -166,16 +172,13 @@ export function MobileHeader() {
         )}
       </AnimatePresence>
 
-      {/* ─── Promo Strip ─── */}
+      {/* Promo Strip */}
       <div className="py-1.5 text-center text-[11px] font-semibold" style={{
         background: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--purple-dark)))',
         color: 'hsl(var(--primary-foreground))',
       }}>
         🚚 {company?.free_shipping_message || 'Frete grátis acima de R$ 159'}
       </div>
-
-      {/* Thin separator */}
-      <div className="h-px bg-border" />
     </header>
   );
 }
@@ -184,9 +187,14 @@ export function MobileHeader() {
 function MobileDrawer({ company, categories, loading, searchQuery, setSearchQuery, handleSearch }: any) {
   return (
     <div className="flex flex-col p-5 pt-8 gap-5">
-      {/* Brand */}
-      <div className="flex items-center gap-3 pb-4 border-b border-border">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary">
+      <div className="flex items-center gap-3 pb-4" style={{ borderBottom: '1px solid hsl(var(--neon-primary) / 0.12)' }}>
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center"
+          style={{
+            background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--purple-dark)))',
+            boxShadow: '3px 3px 8px hsl(var(--neu-dark) / 0.3), -2px -2px 6px hsl(var(--neu-light) / 0.2)',
+          }}
+        >
           <Sparkles className="h-5 w-5 text-primary-foreground" />
         </div>
         <div>
@@ -195,19 +203,22 @@ function MobileDrawer({ company, categories, loading, searchQuery, setSearchQuer
         </div>
       </div>
 
-      {/* Search */}
       <form onSubmit={handleSearch}>
-        <Input
-          type="search"
-          placeholder="Buscar produtos..."
-          value={searchQuery}
-          onChange={(e: any) => setSearchQuery(e.target.value)}
-          className="h-10 rounded-xl bg-muted/40 border-muted text-sm"
-        />
+        <div className="rounded-xl overflow-hidden" style={{
+          boxShadow: 'inset 3px 3px 6px hsl(var(--neu-dark) / 0.3), inset -3px -3px 6px hsl(var(--neu-light) / 0.5)',
+          border: '1px solid hsl(var(--neon-primary) / 0.1)',
+        }}>
+          <Input
+            type="search"
+            placeholder="Buscar produtos..."
+            value={searchQuery}
+            onChange={(e: any) => setSearchQuery(e.target.value)}
+            className="border-0 shadow-none bg-transparent h-10 text-sm"
+          />
+        </div>
       </form>
 
-      {/* Categories */}
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-col gap-1.5">
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold px-1 mb-1">Categorias</p>
         {loading ? (
           [...Array(5)].map((_: any, i: number) => <Skeleton key={i} className="h-11 w-full rounded-xl" />)
@@ -222,9 +233,14 @@ function MobileDrawer({ company, categories, loading, searchQuery, setSearchQuer
               <SheetClose asChild>
                 <Link
                   to={`/categoria/${cat.slug}`}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-muted/50 transition-colors group"
+                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all group"
+                  style={{
+                    background: 'hsl(var(--background))',
+                    boxShadow: '3px 3px 8px hsl(var(--neu-dark) / 0.2), -3px -3px 8px hsl(var(--neu-light) / 0.4)',
+                    border: '1px solid hsl(var(--neon-primary) / 0.08)',
+                  }}
                 >
-                  <span>{cat.name}</span>
+                  <span className="group-hover:text-primary transition-colors">{cat.name}</span>
                   <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </Link>
               </SheetClose>
@@ -233,8 +249,7 @@ function MobileDrawer({ company, categories, loading, searchQuery, setSearchQuer
         )}
       </nav>
 
-      {/* Links */}
-      <div className="pt-3 border-t border-border flex flex-col gap-0.5">
+      <div className="pt-3" style={{ borderTop: '1px solid hsl(var(--neon-primary) / 0.08)' }}>
         {[
           { to: '/checkout', icon: Sparkles, label: 'Solicitar Orçamento' },
           { to: '/rastreio', icon: Package, label: 'Rastrear Pedido' },
@@ -244,7 +259,7 @@ function MobileDrawer({ company, categories, loading, searchQuery, setSearchQuer
           <SheetClose key={link.to} asChild>
             <Link
               to={link.to}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               <link.icon className="h-4 w-4" />
               <span>{link.label}</span>
