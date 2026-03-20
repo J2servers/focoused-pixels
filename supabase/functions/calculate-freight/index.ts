@@ -41,7 +41,7 @@ serve(async (req) => {
   }
 
   try {
-    const { destinationCep, originCep, productPrice, weight } = await req.json();
+    const { destinationCep, originCep, productPrice, weight, freeShippingMinimum } = await req.json();
 
     if (!destinationCep || typeof destinationCep !== 'string') {
       return new Response(JSON.stringify({ error: 'CEP de destino é obrigatório' }), {
