@@ -52,6 +52,7 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
           destinationCep: cleanCep,
           productPrice,
           weight: 0.5,
+          freeShippingMinimum,
         },
       });
 
