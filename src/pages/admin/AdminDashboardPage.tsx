@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import {
   LineChart, Line, PieChart, Pie, Cell, ResponsiveContainer,
   XAxis, YAxis, Tooltip, CartesianGrid, Legend, AreaChart, Area,
+  BarChart, Bar,
 } from 'recharts';
 import {
   DollarSign, ShoppingCart, TrendingUp, TrendingDown, Users, Package,
