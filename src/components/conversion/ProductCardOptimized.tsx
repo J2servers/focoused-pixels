@@ -164,15 +164,26 @@ export function ProductCardOptimized({
           </div>
 
           {/* CTA */}
-          <Button 
-            onClick={handleAddToCart}
-            disabled={!product.inStock}
-            size="sm"
-            className="w-full mt-3 font-semibold text-xs rounded-xl h-9"
-          >
-            <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-            {product.inStock ? 'Adicionar' : 'Indisponível'}
-          </Button>
+          <div className="flex gap-2 mt-3">
+            <Button 
+              onClick={handleBuyNow}
+              disabled={!product.inStock}
+              size="sm"
+              className="flex-1 font-semibold text-xs rounded-xl h-9"
+            >
+              <Zap className="h-3.5 w-3.5 mr-1" />
+              {product.inStock ? 'Comprar' : 'Indisponível'}
+            </Button>
+            <Button 
+              onClick={handleAddToCart}
+              disabled={!product.inStock}
+              size="sm"
+              variant="outline"
+              className="h-9 w-9 p-0 rounded-xl shrink-0"
+            >
+              <ShoppingCart className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </div>
       </Link>
 
