@@ -470,6 +470,8 @@ const LoginPage = () => {
                           </div>
                         </div>
 
+                        <FirstPurchaseBanner />
+
                         <Button
                           type="button"
                           variant="outline"
