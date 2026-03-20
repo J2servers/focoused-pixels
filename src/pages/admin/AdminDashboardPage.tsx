@@ -31,18 +31,18 @@ function M({ label, value, icon: Icon, color, href, format = 'number', trend }: 
 
   const inner = (
     <div className={cn(
-      "flex items-center gap-2 p-2.5 rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] transition-all",
+      "flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] transition-all",
       href && "hover:border-[hsl(var(--admin-accent-purple)/0.4)] cursor-pointer"
     )}>
-      <div className={cn("p-1.5 rounded-lg shrink-0", color)}>
-        <Icon className="h-3.5 w-3.5 text-white" />
+      <div className={cn("p-1 rounded-md shrink-0", color)}>
+        <Icon className="h-3 w-3 text-white" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-bold text-white truncate leading-tight">{fmt}</p>
-        <p className="text-[10px] text-[hsl(var(--admin-text-muted))] truncate leading-tight">{label}</p>
+        <p className="text-xs font-bold text-white truncate leading-tight">{fmt}</p>
+        <p className="text-[9px] text-[hsl(var(--admin-text-muted))] truncate leading-tight">{label}</p>
       </div>
       {trend !== undefined && trend !== null && (
-        <span className={cn("text-[10px] font-bold shrink-0", trend >= 0 ? "text-emerald-400" : "text-red-400")}>
+        <span className={cn("text-[9px] font-bold shrink-0", trend >= 0 ? "text-emerald-400" : "text-red-400")}>
           {trend >= 0 ? '↑' : '↓'}{Math.abs(trend).toFixed(0)}%
         </span>
       )}
