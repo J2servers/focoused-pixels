@@ -116,12 +116,12 @@ const AdminDashboardPage = () => {
 
         {/* ========== HERO KPIs - Os 4 mais importantes ========== */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { label: 'Receita Hoje', value: m.receitaHoje, icon: DollarSign, color: 'bg-gradient-to-br from-emerald-500 to-emerald-600', format: 'currency' as const, subtitle: `${m.vendasHoje} vendas` },
+          {([
+            { label: 'Receita Hoje', value: m.receitaHoje, icon: DollarSign, color: 'bg-gradient-to-br from-emerald-500 to-emerald-600', format: 'currency' as const, subtitle: `${m.vendasHoje} vendas`, trend: undefined as number | undefined },
             { label: 'Receita do Mês', value: m.receitaMes, icon: TrendingUp, color: 'bg-gradient-to-br from-blue-500 to-blue-600', format: 'currency' as const, trend: m.crescimentoReceita, subtitle: `${m.vendasMes} vendas` },
-            { label: 'Vendas Pendentes', value: m.vendasPendentes, icon: Clock, color: 'bg-gradient-to-br from-amber-500 to-amber-600', subtitle: 'Aguardando ação' },
-            { label: 'Ticket Médio', value: m.ticketMedio, icon: Target, color: 'bg-gradient-to-br from-purple-500 to-purple-600', format: 'currency' as const, subtitle: `Hoje: R$ ${m.ticketMedioHoje.toFixed(2)}` },
-          ].map((item) => (
+            { label: 'Vendas Pendentes', value: m.vendasPendentes, icon: Clock, color: 'bg-gradient-to-br from-amber-500 to-amber-600', format: 'number' as const, subtitle: 'Aguardando ação', trend: undefined as number | undefined },
+            { label: 'Ticket Médio', value: m.ticketMedio, icon: Target, color: 'bg-gradient-to-br from-purple-500 to-purple-600', format: 'currency' as const, subtitle: `Hoje: R$ ${m.ticketMedioHoje.toFixed(2)}`, trend: undefined as number | undefined },
+          ] as const).map((item) => (
             <Card key={item.label} className="overflow-hidden border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-xl">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-3">
