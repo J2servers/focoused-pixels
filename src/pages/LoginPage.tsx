@@ -31,6 +31,7 @@ import { useSubscribeLead } from '@/hooks/useLeads';
 import { toast } from 'sonner';
 import logoGoat from '@/assets/logo-goat.png';
 import { getErrorMessage, isAuthError } from '@/lib/auth-error';
+import { FirstPurchaseBanner } from '@/components/conversion/FirstPurchaseBanner';
 
 // Validation schemas
 const loginSchema = z.object({
