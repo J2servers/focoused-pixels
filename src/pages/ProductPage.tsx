@@ -364,7 +364,10 @@ const ProductPage = () => {
                 onAddToCart={handleAddToCart}
               />
               {/* Freight Calculator */}
-              <FreightCalculator productPrice={product.price * quantity} />
+              <FreightCalculator 
+                productPrice={product.price * quantity} 
+                onFreightSelect={setSelectedFreight}
+              />
             </div>
           </div>
 
