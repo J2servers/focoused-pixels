@@ -349,6 +349,8 @@ const ProductPage = () => {
                 selectedColor={selectedColor}
                 onAddToCart={handleAddToCart}
               />
+              {/* Freight Calculator */}
+              <FreightCalculator productPrice={product.price * quantity} />
             </div>
           </div>
 
