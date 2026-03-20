@@ -862,26 +862,45 @@ const AdminSettingsPage = () => {
                   </div>
                 </div>
                 <Separator />
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="free_shipping_min">Frete Grátis Acima de (R$)</Label>
-                    <Input
-                      id="free_shipping_min"
-                      type="number"
-                      value={settings.free_shipping_minimum || 159}
-                      onChange={(e) => updateSetting('free_shipping_minimum', Number(e.target.value))}
-                    />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Frete Grátis Ativo</Label>
+                    <p className="text-xs text-muted-foreground">Ativar/desativar frete grátis acima de um valor</p>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="free_shipping_msg">Mensagem Frete Grátis</Label>
-                    <Input
-                      id="free_shipping_msg"
-                      value={settings.free_shipping_message || ''}
-                      onChange={(e) => updateSetting('free_shipping_message', e.target.value)}
-                      placeholder="Frete grátis em compras acima de R$ 159"
-                    />
-                  </div>
+                  <Switch
+                    checked={(settings.free_shipping_minimum ?? 159) > 0}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        updateSetting('free_shipping_minimum', 159);
+                      } else {
+                        updateSetting('free_shipping_minimum', 0);
+                        updateSetting('free_shipping_message', '');
+                      }
+                    }}
+                  />
                 </div>
+                {(settings.free_shipping_minimum ?? 159) > 0 && (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="free_shipping_min">Frete Grátis Acima de (R$)</Label>
+                      <Input
+                        id="free_shipping_min"
+                        type="number"
+                        value={settings.free_shipping_minimum || 159}
+                        onChange={(e) => updateSetting('free_shipping_minimum', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="free_shipping_msg">Mensagem Frete Grátis</Label>
+                      <Input
+                        id="free_shipping_msg"
+                        value={settings.free_shipping_message || ''}
+                        onChange={(e) => updateSetting('free_shipping_message', e.target.value)}
+                        placeholder="Frete grátis em compras acima de R$ 159"
+                      />
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

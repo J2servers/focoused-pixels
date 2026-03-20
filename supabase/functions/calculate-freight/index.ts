@@ -41,7 +41,7 @@ serve(async (req) => {
   }
 
   try {
-    const { destinationCep, originCep, productPrice, weight } = await req.json();
+    const { destinationCep, originCep, productPrice, weight, freeShippingMinimum } = await req.json();
 
     if (!destinationCep || typeof destinationCep !== 'string') {
       return new Response(JSON.stringify({ error: 'CEP de destino é obrigatório' }), {
@@ -107,9 +107,9 @@ serve(async (req) => {
     const expressDaysMin = sameState ? 1 : Math.ceil(1 + distance / 2000);
     const expressDaysMax = expressDaysMin + 1;
 
-    // Free shipping check
-    const freeShippingMinimum = 159;
-    const hasFreeShipping = price >= freeShippingMinimum;
+    // Free shipping check (0 or null = disabled)
+    const freeMin = freeShippingMinimum ?? 159;
+    const hasFreeShipping = freeMin > 0 && price >= freeMin;
 
     const results = [
       {

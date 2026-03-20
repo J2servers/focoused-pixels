@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Truck, Loader2, MapPin, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 
 interface FreightResult {
   method: string;
@@ -25,11 +26,12 @@ interface FreightDestination {
 
 interface FreightCalculatorProps {
   productPrice: number;
-  freeShippingMinimum?: number;
   onFreightSelect?: (freight: { method: string; price: number; days: string; cep: string; city: string; state: string }) => void;
 }
 
-export function FreightCalculator({ productPrice, freeShippingMinimum = 159, onFreightSelect }: FreightCalculatorProps) {
+export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalculatorProps) {
+  const { data: companyInfo } = useCompanyInfo();
+  const freeShippingMinimum = companyInfo?.free_shipping_minimum ?? 159;
   const [cep, setCep] = useState('');
   const [results, setResults] = useState<FreightResult[] | null>(null);
   const [destination, setDestination] = useState<FreightDestination | null>(null);
@@ -50,6 +52,7 @@ export function FreightCalculator({ productPrice, freeShippingMinimum = 159, onF
           destinationCep: cleanCep,
           productPrice,
           weight: 0.5,
+          freeShippingMinimum,
         },
       });
 
