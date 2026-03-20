@@ -1,395 +1,419 @@
-import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { 
-  Package, 
-  FolderTree, 
-  Percent, 
-  Star, 
-  TrendingUp, 
-  ShoppingCart,
-  ArrowUpRight,
-  Clock,
-  Eye,
-  BarChart3,
-  Wallet,
-  Calendar,
-  FileText
-} from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  LowStockAlert,
-  ProductMarginTable,
-  FinancialSummaryCards,
-  ProductRankingCard,
-  TaxInfoCard,
-  SiteVisitsCard,
-} from '@/components/admin/dashboard';
 import { RealActivityFeed } from '@/components/admin/dashboard/RealActivityFeed';
 import {
-  CashFlowSummaryCards,
-  CashTransactionsTable,
-  StockControlCard,
-  FiscalControlCard,
-} from '@/components/admin/cashflow';
+  DollarSign, ShoppingCart, TrendingUp, TrendingDown, Users, Package,
+  Star, Eye, CreditCard, QrCode, Landmark, Clock, Truck, CheckCircle,
+  AlertTriangle, Wrench, Shield, FileText, Tag, Percent, MessageSquare,
+  Boxes, ArrowUpRight, ArrowDownRight, Wallet, BarChart3, Activity,
+  Globe, UserPlus, Heart, Image, Webhook, Layers, Target, Zap,
+  PieChart, Award, RefreshCw
+} from 'lucide-react';
 
-interface DashboardStats {
-  totalProducts: number;
-  totalCategories: number;
-  activePromotions: number;
-  pendingReviews: number;
-  totalQuotes: number;
-  pendingOrders: number;
+// ===== HELPER COMPONENTS =====
+
+function MetricCard({ label, value, icon: Icon, color, href, subtitle, trend, format = 'number', small }: {
+  label: string;
+  value: number | string;
+  icon: React.ElementType;
+  color: string;
+  href?: string;
+  subtitle?: string;
+  trend?: number | null;
+  format?: 'number' | 'currency' | 'percent' | 'text' | 'days';
+  small?: boolean;
+}) {
+  const formatted = typeof value === 'string' ? value :
+    format === 'currency' ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` :
+    format === 'percent' ? `${value.toFixed(1)}%` :
+    format === 'days' ? `${value.toFixed(1)}d` :
+    value.toLocaleString('pt-BR');
+
+  const content = (
+    <Card className={cn(
+      "overflow-hidden border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg transition-all duration-300",
+      href && "hover:shadow-2xl hover:-translate-y-0.5 hover:border-[hsl(var(--admin-accent-purple)/0.3)] cursor-pointer group"
+    )}>
+      <CardContent className={cn("flex items-center gap-3", small ? "p-3" : "p-4")}>
+        <div className={cn("rounded-xl flex items-center justify-center shrink-0 shadow-lg", color, small ? "p-2" : "p-2.5")}>
+          <Icon className={cn("text-white", small ? "h-4 w-4" : "h-5 w-5")} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className={cn("font-bold text-white truncate", small ? "text-lg" : "text-xl")}>{formatted}</p>
+          <p className="text-xs text-[hsl(var(--admin-text-muted))] truncate">{label}</p>
+          {subtitle && <p className="text-[10px] text-[hsl(var(--admin-text-muted)/0.7)] truncate">{subtitle}</p>}
+        </div>
+        {trend !== undefined && trend !== null && (
+          <div className={cn(
+            "flex items-center gap-0.5 text-xs font-semibold px-2 py-1 rounded-full shrink-0",
+            trend >= 0
+              ? "bg-[hsl(var(--admin-accent-green)/0.15)] text-[hsl(var(--admin-accent-green))]"
+              : "bg-red-500/15 text-red-400"
+          )}>
+            {trend >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+            {Math.abs(trend).toFixed(0)}%
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  if (href) return <Link to={href}>{content}</Link>;
+  return content;
 }
 
+function SectionTitle({ children, icon: Icon, color }: { children: string; icon: React.ElementType; color: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-4 mt-2">
+      <div className={cn("p-2 rounded-xl shadow-lg", color)}>
+        <Icon className="h-5 w-5 text-white" />
+      </div>
+      <h2 className="text-lg font-bold text-white tracking-wide">{children}</h2>
+    </div>
+  );
+}
+
+function MiniBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
+  const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-xs text-[hsl(var(--admin-text-muted))] w-24 truncate">{label}</span>
+      <div className="flex-1 h-2 rounded-full bg-[hsl(var(--admin-card-border))] overflow-hidden">
+        <div className={cn("h-full rounded-full transition-all duration-500", color)} style={{ width: `${pct}%` }} />
+      </div>
+      <span className="text-xs font-semibold text-white w-8 text-right">{value}</span>
+    </div>
+  );
+}
+
+// ===== MAIN DASHBOARD =====
+
 const AdminDashboardPage = () => {
-  const [stats, setStats] = useState<DashboardStats>({
-    totalProducts: 0,
-    totalCategories: 0,
-    activePromotions: 0,
-    pendingReviews: 0,
-    totalQuotes: 0,
-    pendingOrders: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Filtros de data para o caixa
-  const [cashStartDate, setCashStartDate] = useState(() => {
-    const date = new Date();
-    date.setDate(1); // Primeiro dia do mês
-    return date.toISOString().split('T')[0];
-  });
-  const [cashEndDate, setCashEndDate] = useState(() => {
-    return new Date().toISOString().split('T')[0];
-  });
+  const { data: m, isLoading } = useDashboardMetrics();
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const [products, categories, promotions, reviews, quotes, pendingOrders] = await Promise.all([
-          supabase.from('products').select('id', { count: 'exact', head: true }),
-          supabase.from('categories').select('id', { count: 'exact', head: true }),
-          supabase.from('promotions').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-          supabase.from('reviews').select('id', { count: 'exact', head: true }).eq('is_approved', false),
-          supabase.from('quotes').select('id', { count: 'exact', head: true }),
-          supabase.from('orders').select('id', { count: 'exact', head: true }).in('order_status', ['pending', 'processing']),
-        ]);
-
-        setStats({
-          totalProducts: products.count || 0,
-          totalCategories: categories.count || 0,
-          activePromotions: promotions.count || 0,
-          pendingReviews: reviews.count || 0,
-          totalQuotes: quotes.count || 0,
-          pendingOrders: pendingOrders.count || 0,
-        });
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
-
-  const statCards = [
-    { 
-      title: 'Total de Produtos', 
-      value: stats.totalProducts, 
-      icon: Package, 
-      color: 'from-blue-500 to-blue-600',
-      bgAccent: 'bg-blue-500',
-      trend: '+12%',
-      trendUp: true,
-      href: '/admin/produtos'
-    },
-    { 
-      title: 'Categorias', 
-      value: stats.totalCategories, 
-      icon: FolderTree, 
-      color: 'from-emerald-500 to-emerald-600',
-      bgAccent: 'bg-emerald-500',
-      trend: '+3',
-      trendUp: true,
-      href: '/admin/categorias'
-    },
-    { 
-      title: 'Promoções Ativas', 
-      value: stats.activePromotions, 
-      icon: Percent, 
-      color: 'from-orange-500 to-orange-600',
-      bgAccent: 'bg-orange-500',
-      trend: '2 expirando',
-      trendUp: false,
-      href: '/admin/promocoes'
-    },
-    { 
-      title: 'Avaliações Pendentes', 
-      value: stats.pendingReviews, 
-      icon: Star, 
-      color: 'from-amber-500 to-amber-600',
-      bgAccent: 'bg-amber-500',
-      trend: 'Moderar',
-      trendUp: null,
-      href: '/admin/avaliacoes'
-    },
-    { 
-      title: 'Vendas Pendentes', 
-      value: stats.pendingOrders, 
-      icon: ShoppingCart, 
-      color: 'from-rose-500 to-rose-600',
-      bgAccent: 'bg-rose-500',
-      trend: stats.pendingOrders > 0 ? 'Atenção' : 'OK',
-      trendUp: stats.pendingOrders === 0,
-      href: '/admin/pedidos'
-    },
-    { 
-      title: 'Total de Orçamentos', 
-      value: stats.totalQuotes, 
-      icon: FileText, 
-      color: 'from-purple-500 to-purple-600',
-      bgAccent: 'bg-purple-500',
-      trend: '+8%',
-      trendUp: true,
-      href: '/admin/orcamentos'
-    },
-  ];
-
-  const quickActions = [
-    { title: 'Novo Produto', icon: Package, href: '/admin/produtos', color: 'text-blue-500 bg-blue-500/10' },
-    { title: 'Nova Categoria', icon: FolderTree, href: '/admin/categorias', color: 'text-emerald-500 bg-emerald-500/10' },
-    { title: 'Nova Promoção', icon: Percent, href: '/admin/promocoes', color: 'text-orange-500 bg-orange-500/10' },
-    { title: 'Ver Avaliações', icon: Star, href: '/admin/avaliacoes', color: 'text-amber-500 bg-amber-500/10' },
-  ];
+  if (isLoading || !m) {
+    return (
+      <AdminLayout title="Dashboard">
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <Skeleton key={i} className="h-20 rounded-xl bg-[hsl(var(--admin-sidebar))]" />
+            ))}
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Dashboard">
-      <div className="space-y-6">
-        {/* Welcome Banner */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] p-6 text-white shadow-2xl shadow-[hsl(var(--admin-accent-purple)/0.3)]">
-          <div className="relative z-10">
-            <h2 className="text-2xl font-bold">Bem-vindo ao Painel Administrativo</h2>
-            <p className="mt-1 text-white/80 max-w-xl">
-              Gerencie produtos, categorias, promoções e muito mais. Acompanhe as métricas do seu catálogo em tempo real.
-            </p>
-          </div>
-          <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5" />
-          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-xl" />
-          <div className="absolute -right-5 bottom-0 h-24 w-24 rounded-full bg-white/10 blur-lg" />
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-        </div>
+      <div className="space-y-8">
 
-        {/* Site Visits Analytics */}
-        <SiteVisitsCard />
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 stagger-children">
-          {statCards.map((stat) => (
-            <Link 
-              key={stat.title} 
-              to={stat.href}
-              className="group"
-            >
-              <Card className="h-full overflow-hidden border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-1 group-hover:border-[hsl(var(--admin-accent-purple)/0.3)] admin-glow-border">
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between">
+        {/* ========== HERO KPIs - Os 4 mais importantes ========== */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {([
+            { label: 'Receita Hoje', value: m.receitaHoje, icon: DollarSign, color: 'bg-gradient-to-br from-emerald-500 to-emerald-600', format: 'currency' as const, subtitle: `${m.vendasHoje} vendas`, trend: undefined as number | undefined },
+            { label: 'Receita do Mês', value: m.receitaMes, icon: TrendingUp, color: 'bg-gradient-to-br from-blue-500 to-blue-600', format: 'currency' as const, trend: m.crescimentoReceita, subtitle: `${m.vendasMes} vendas` },
+            { label: 'Vendas Pendentes', value: m.vendasPendentes, icon: Clock, color: 'bg-gradient-to-br from-amber-500 to-amber-600', format: 'number' as const, subtitle: 'Aguardando ação', trend: undefined as number | undefined },
+            { label: 'Ticket Médio', value: m.ticketMedio, icon: Target, color: 'bg-gradient-to-br from-purple-500 to-purple-600', format: 'currency' as const, subtitle: `Hoje: R$ ${m.ticketMedioHoje.toFixed(2)}`, trend: undefined as number | undefined },
+          ] as const).map((item) => (
+            <Card key={item.label} className="overflow-hidden border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-xl">
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between mb-3">
+                  <div className={cn("p-3 rounded-xl shadow-lg", item.color)}>
+                    <item.icon className="h-6 w-6 text-white" />
+                  </div>
+                  {item.trend !== undefined && (
                     <div className={cn(
-                      "p-2.5 rounded-xl bg-gradient-to-br shadow-lg",
-                      stat.color
+                      "flex items-center gap-1 text-sm font-bold px-2.5 py-1 rounded-full",
+                      item.trend >= 0
+                        ? "bg-[hsl(var(--admin-accent-green)/0.15)] text-[hsl(var(--admin-accent-green))]"
+                        : "bg-red-500/15 text-red-400"
                     )}>
-                      <stat.icon className="h-5 w-5 text-white drop-shadow-sm" />
+                      {item.trend >= 0 ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+                      {Math.abs(item.trend).toFixed(0)}%
                     </div>
-                    {stat.trendUp !== null && (
-                      <div className={cn(
-                        "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full",
-                        stat.trendUp 
-                          ? "bg-[hsl(var(--admin-accent-green)/0.15)] text-[hsl(var(--admin-accent-green))]" 
-                          : "bg-[hsl(var(--admin-accent-orange)/0.15)] text-[hsl(var(--admin-accent-orange))]"
-                      )}>
-                        {stat.trendUp ? (
-                          <ArrowUpRight className="h-3 w-3" />
-                        ) : (
-                          <Clock className="h-3 w-3" />
-                        )}
-                        {stat.trend}
-                      </div>
-                    )}
-                    {stat.trendUp === null && (
-                      <div className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-[hsl(var(--admin-accent-purple)/0.15)] text-[hsl(var(--admin-accent-purple))]">
-                        <Eye className="h-3 w-3" />
-                        {stat.trend}
-                      </div>
-                    )}
-                  </div>
-                  <div className="mt-4">
-                    <p className="text-2xl font-bold text-white">
-                      {isLoading ? (
-                        <span className="inline-block w-12 h-7 bg-[hsl(var(--admin-sidebar))] animate-pulse rounded" />
-                      ) : (
-                        stat.value
-                      )}
-                    </p>
-                    <p className="text-sm text-[hsl(var(--admin-text-muted))] mt-0.5">{stat.title}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+                  )}
+                </div>
+                <p className="text-3xl font-bold text-white">
+                  {item.format === 'currency' ? `R$ ${item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : item.value.toLocaleString('pt-BR')}
+                </p>
+                <p className="text-sm text-[hsl(var(--admin-text-muted))] mt-1">{item.label}</p>
+                {item.subtitle && <p className="text-xs text-[hsl(var(--admin-text-muted)/0.6)] mt-0.5">{item.subtitle}</p>}
+              </CardContent>
+            </Card>
           ))}
         </div>
 
-        {/* Tabs para Catálogo vs Financeiro */}
-        <Tabs defaultValue="cashflow" className="space-y-6">
-          <TabsList className="bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))]">
-            <TabsTrigger value="cashflow" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <Wallet className="h-4 w-4" />
-              Caixa
-            </TabsTrigger>
-            <TabsTrigger value="catalog" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <Package className="h-4 w-4" />
-              Catálogo
-            </TabsTrigger>
-            <TabsTrigger value="financial" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <BarChart3 className="h-4 w-4" />
-              Financeiro
-            </TabsTrigger>
-          </TabsList>
+        {/* ========== VENDAS & RECEITA ========== */}
+        <SectionTitle icon={ShoppingCart} color="bg-gradient-to-br from-emerald-500 to-emerald-600">Vendas & Receita</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <MetricCard label="Vendas Hoje" value={m.vendasHoje} icon={ShoppingCart} color="bg-gradient-to-br from-emerald-500 to-emerald-600" href="/admin/pedidos" small />
+          <MetricCard label="Vendas Semana" value={m.vendasSemana} icon={ShoppingCart} color="bg-gradient-to-br from-emerald-500 to-teal-600" small />
+          <MetricCard label="Vendas Mês" value={m.vendasMes} icon={ShoppingCart} color="bg-gradient-to-br from-teal-500 to-teal-600" trend={m.crescimentoVendas} small />
+          <MetricCard label="Vendas Ano" value={m.vendasAno} icon={ShoppingCart} color="bg-gradient-to-br from-teal-600 to-cyan-600" small />
+          <MetricCard label="Total Geral" value={m.vendasTotal} icon={ShoppingCart} color="bg-gradient-to-br from-cyan-600 to-blue-600" small />
 
-          {/* Tab Caixa */}
-          <TabsContent value="cashflow" className="space-y-6">
-            {/* Filtro de Período */}
-            <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-              <CardContent className="p-4">
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />
-                    <span className="text-sm font-medium text-white">Período:</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="startDate" className="text-sm text-[hsl(var(--admin-text-muted))]">De</Label>
-                    <Input
-                      id="startDate"
-                      type="date"
-                      value={cashStartDate}
-                      onChange={(e) => setCashStartDate(e.target.value)}
-                      className="w-auto bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="endDate" className="text-sm text-[hsl(var(--admin-text-muted))]">Até</Label>
-                    <Input
-                      id="endDate"
-                      type="date"
-                      value={cashEndDate}
-                      onChange={(e) => setCashEndDate(e.target.value)}
-                      className="w-auto bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <MetricCard label="Receita Hoje" value={m.receitaHoje} icon={DollarSign} color="bg-gradient-to-br from-green-500 to-green-600" format="currency" small />
+          <MetricCard label="Receita Semana" value={m.receitaSemana} icon={DollarSign} color="bg-gradient-to-br from-green-500 to-emerald-600" format="currency" small />
+          <MetricCard label="Receita Mês" value={m.receitaMes} icon={DollarSign} color="bg-gradient-to-br from-emerald-600 to-teal-600" format="currency" trend={m.crescimentoReceita} small />
+          <MetricCard label="Receita Ano" value={m.receitaAno} icon={DollarSign} color="bg-gradient-to-br from-teal-600 to-cyan-600" format="currency" small />
+          <MetricCard label="Receita Total" value={m.receitaTotal} icon={DollarSign} color="bg-gradient-to-br from-cyan-600 to-blue-600" format="currency" small />
 
-            {/* Summary Cards */}
-            <CashFlowSummaryCards startDate={cashStartDate} endDate={cashEndDate} />
+          <MetricCard label="Ticket Médio Hoje" value={m.ticketMedioHoje} icon={Target} color="bg-gradient-to-br from-violet-500 to-violet-600" format="currency" small />
+          <MetricCard label="Ticket Médio Geral" value={m.ticketMedio} icon={Target} color="bg-gradient-to-br from-violet-600 to-purple-600" format="currency" small />
+          <MetricCard label="Maior Venda" value={m.maiorVenda} icon={Award} color="bg-gradient-to-br from-amber-500 to-amber-600" format="currency" small />
+          <MetricCard label="Menor Venda" value={m.menorVenda} icon={DollarSign} color="bg-gradient-to-br from-slate-500 to-slate-600" format="currency" small />
+          <MetricCard label="Mês Anterior" value={m.vendasMesAnterior} icon={RefreshCw} color="bg-gradient-to-br from-slate-600 to-gray-600" subtitle={`R$ ${m.receitaMesAnterior.toFixed(2)}`} small />
+        </div>
 
-            {/* Grid com Estoque e Fiscal */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <CashTransactionsTable startDate={cashStartDate} endDate={cashEndDate} />
+        {/* Status de Vendas */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <MetricCard label="Pendentes" value={m.vendasPendentes} icon={Clock} color="bg-yellow-500" href="/admin/pedidos" small />
+          <MetricCard label="Confirmadas" value={m.vendasConfirmadas} icon={CheckCircle} color="bg-blue-500" small />
+          <MetricCard label="Processando" value={m.vendasProcessando} icon={Wrench} color="bg-purple-500" small />
+          <MetricCard label="Enviadas" value={m.vendasEnviadas} icon={Truck} color="bg-teal-500" small />
+          <MetricCard label="Entregues" value={m.vendasEntregues} icon={CheckCircle} color="bg-green-500" small />
+          <MetricCard label="Canceladas" value={m.vendasCanceladas} icon={AlertTriangle} color="bg-red-500" small />
+        </div>
+
+        {/* ========== MINI GRÁFICO 7 DIAS ========== */}
+        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-[hsl(var(--admin-text-muted))]">Vendas dos Últimos 7 Dias</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-end gap-2 h-32">
+              {m.vendasPorDia.map((day, i) => {
+                const maxReceita = Math.max(...m.vendasPorDia.map(d => d.receita), 1);
+                const height = (day.receita / maxReceita) * 100;
+                return (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-[10px] text-[hsl(var(--admin-text-muted))]">
+                      {day.vendas > 0 && `${day.vendas}`}
+                    </span>
+                    <div className="w-full flex-1 flex items-end">
+                      <div
+                        className="w-full rounded-t-md bg-gradient-to-t from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] transition-all duration-500 min-h-[2px]"
+                        style={{ height: `${Math.max(height, 2)}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-[hsl(var(--admin-text-muted))]">{day.date}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ========== PAGAMENTOS ========== */}
+        <SectionTitle icon={CreditCard} color="bg-gradient-to-br from-indigo-500 to-indigo-600">Pagamentos</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <MetricCard label="PIX (qtd)" value={m.pixCount} icon={QrCode} color="bg-gradient-to-br from-teal-500 to-teal-600" small />
+          <MetricCard label="PIX (R$)" value={m.pixTotal} icon={QrCode} color="bg-gradient-to-br from-teal-600 to-cyan-600" format="currency" small />
+          <MetricCard label="Cartão (qtd)" value={m.cardCount} icon={CreditCard} color="bg-gradient-to-br from-blue-500 to-blue-600" small />
+          <MetricCard label="Cartão (R$)" value={m.cardTotal} icon={CreditCard} color="bg-gradient-to-br from-blue-600 to-indigo-600" format="currency" small />
+          <MetricCard label="Boleto (qtd)" value={m.boletoCount} icon={Landmark} color="bg-gradient-to-br from-slate-500 to-slate-600" small />
+          <MetricCard label="Boleto (R$)" value={m.boletoTotal} icon={Landmark} color="bg-gradient-to-br from-slate-600 to-gray-600" format="currency" small />
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <MetricCard label="Pgtos Confirmados" value={m.pagamentosPagos} icon={CheckCircle} color="bg-green-500" small />
+          <MetricCard label="Pgtos Pendentes" value={m.pagamentosPendentes} icon={Clock} color="bg-yellow-500" small />
+          <MetricCard label="Pgtos Falhados" value={m.pagamentosFalhados} icon={AlertTriangle} color="bg-red-500" small />
+        </div>
+
+        {/* ========== PRODUÇÃO ========== */}
+        <SectionTitle icon={Wrench} color="bg-gradient-to-br from-blue-500 to-blue-600">Produção</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
+          <MetricCard label="Aguardando" value={m.prodPending} icon={Clock} color="bg-gray-500" href="/admin/kanban" small />
+          <MetricCard label="Aguard. Material" value={m.prodAwaitingMaterial} icon={AlertTriangle} color="bg-yellow-500" href="/admin/kanban" small />
+          <MetricCard label="Em Produção" value={m.prodInProduction} icon={Wrench} color="bg-blue-500" href="/admin/kanban" small />
+          <MetricCard label="Qualidade" value={m.prodQualityCheck} icon={Shield} color="bg-purple-500" href="/admin/kanban" small />
+          <MetricCard label="Prontos" value={m.prodReady} icon={CheckCircle} color="bg-green-500" href="/admin/kanban" small />
+          <MetricCard label="Enviados" value={m.prodShipped} icon={Truck} color="bg-teal-500" small />
+          <MetricCard label="Tempo Médio" value={m.tempoMedioProdDias} icon={Clock} color="bg-gradient-to-br from-indigo-500 to-indigo-600" format="days" subtitle="dias para produzir" small />
+        </div>
+
+        {/* ========== CLIENTES & LEADS ========== */}
+        <SectionTitle icon={Users} color="bg-gradient-to-br from-pink-500 to-pink-600">Clientes & Leads</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <MetricCard label="Clientes Únicos" value={m.uniqueCustomers} icon={Users} color="bg-gradient-to-br from-pink-500 to-pink-600" small />
+          <MetricCard label="Clientes Hoje" value={m.newCustomersToday} icon={UserPlus} color="bg-gradient-to-br from-pink-600 to-rose-600" small />
+          <MetricCard label="Clientes no Mês" value={m.newCustomersMonth} icon={UserPlus} color="bg-gradient-to-br from-rose-500 to-rose-600" small />
+          <MetricCard label="Total Leads" value={m.totalLeads} icon={Users} color="bg-gradient-to-br from-violet-500 to-violet-600" href="/admin/leads" small />
+          <MetricCard label="Leads Hoje" value={m.leadsHoje} icon={UserPlus} color="bg-gradient-to-br from-violet-600 to-purple-600" small />
+          <MetricCard label="Leads Semana" value={m.leadsSemana} icon={UserPlus} color="bg-gradient-to-br from-purple-500 to-purple-600" small />
+          <MetricCard label="Leads Mês" value={m.leadsMes} icon={UserPlus} color="bg-gradient-to-br from-purple-600 to-fuchsia-600" small />
+          <MetricCard label="Inscritos" value={m.leadsInscritos} icon={Heart} color="bg-gradient-to-br from-green-500 to-green-600" small />
+          <MetricCard label="Desinscritos" value={m.leadsDesinscritos} icon={Users} color="bg-gradient-to-br from-gray-500 to-gray-600" small />
+          <MetricCard label="Taxa Conversão" value={m.taxaConversao} icon={Target} color="bg-gradient-to-br from-amber-500 to-amber-600" format="percent" subtitle="visitas → vendas" small />
+        </div>
+
+        {/* ========== TRÁFEGO ========== */}
+        <SectionTitle icon={Globe} color="bg-gradient-to-br from-cyan-500 to-cyan-600">Tráfego do Site</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricCard label="Visitas Hoje" value={m.visitasHoje} icon={Eye} color="bg-gradient-to-br from-cyan-500 to-cyan-600" small />
+          <MetricCard label="Visitas Semana" value={m.visitasSemana} icon={Eye} color="bg-gradient-to-br from-cyan-600 to-blue-600" small />
+          <MetricCard label="Visitas Mês" value={m.visitasMes} icon={Eye} color="bg-gradient-to-br from-blue-500 to-blue-600" small />
+          <MetricCard label="Sessões Únicas" value={m.sessoesUnicas} icon={Users} color="bg-gradient-to-br from-blue-600 to-indigo-600" small />
+        </div>
+        {m.topPages.length > 0 && (
+          <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold text-[hsl(var(--admin-text-muted))] mb-3">Páginas Mais Visitadas</p>
+              <div className="space-y-2">
+                {m.topPages.map((page, i) => (
+                  <MiniBar key={page.path} label={page.path === '/' ? 'Home' : page.path} value={page.views} max={m.topPages[0]?.views || 1} color="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))]" />
+                ))}
               </div>
-              <div className="space-y-6">
-                <StockControlCard />
-                <FiscalControlCard />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* ========== PRODUTOS ========== */}
+        <SectionTitle icon={Package} color="bg-gradient-to-br from-orange-500 to-orange-600">Produtos</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <MetricCard label="Total Produtos" value={m.totalProdutos} icon={Package} color="bg-gradient-to-br from-orange-500 to-orange-600" href="/admin/produtos" small />
+          <MetricCard label="Ativos" value={m.produtosAtivos} icon={CheckCircle} color="bg-green-500" small />
+          <MetricCard label="Inativos" value={m.produtosInativos} icon={AlertTriangle} color="bg-gray-500" small />
+          <MetricCard label="Rascunhos" value={m.produtosRascunho} icon={FileText} color="bg-slate-500" small />
+          <MetricCard label="Destaque" value={m.produtosDestaque} icon={Star} color="bg-amber-500" small />
+          <MetricCard label="Sem Estoque" value={m.produtosSemEstoque} icon={AlertTriangle} color="bg-red-500" small />
+          <MetricCard label="Estoque Baixo" value={m.produtosEstoqueBaixo} icon={AlertTriangle} color="bg-yellow-500" small />
+          <MetricCard label="Valor Estoque" value={m.valorEstoqueProdutos} icon={DollarSign} color="bg-gradient-to-br from-emerald-500 to-emerald-600" format="currency" small />
+          <MetricCard label="Mais Vendido" value={m.produtoMaisVendido} icon={Award} color="bg-gradient-to-br from-amber-500 to-amber-600" format="text" small />
+          <MetricCard label="Maior Receita" value={m.produtoMaiorReceita} icon={DollarSign} color="bg-gradient-to-br from-green-500 to-green-600" format="text" small />
+        </div>
+
+        {/* Top Products Bar */}
+        {m.topProducts.length > 0 && (
+          <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold text-[hsl(var(--admin-text-muted))] mb-3">Ranking de Produtos por Vendas</p>
+              <div className="space-y-2">
+                {m.topProducts.map((p, i) => (
+                  <MiniBar key={p.name} label={`${i + 1}. ${p.name}`} value={p.qty} max={m.topProducts[0]?.qty || 1} color="bg-gradient-to-r from-orange-500 to-amber-500" />
+                ))}
               </div>
-            </div>
-          </TabsContent>
+            </CardContent>
+          </Card>
+        )}
 
-          {/* Tab Catálogo */}
-          <TabsContent value="catalog" className="space-y-6">
-            {/* Quick Actions */}
-            <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg text-white">
-                  <TrendingUp className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
-                  Ações Rápidas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {quickActions.map((action) => (
-                    <Link 
-                      key={action.title}
-                      to={action.href} 
-                      className="group flex flex-col items-center gap-3 p-5 rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-sidebar))] hover:border-[hsl(var(--admin-accent-purple)/0.5)] hover:shadow-lg hover:shadow-[hsl(var(--admin-accent-purple)/0.1)] transition-all duration-300"
-                    >
-                      <div className={cn(
-                        "p-3 rounded-xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg",
-                        action.color
-                      )}>
-                        <action.icon className="h-6 w-6" />
-                      </div>
-                      <span className="text-sm font-semibold text-white">{action.title}</span>
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+        {/* ========== CATEGORIAS ========== */}
+        <div className="grid grid-cols-3 gap-3">
+          <MetricCard label="Total Categorias" value={m.totalCategorias} icon={Layers} color="bg-gradient-to-br from-indigo-500 to-indigo-600" href="/admin/categorias" small />
+          <MetricCard label="Ativas" value={m.categoriasAtivas} icon={CheckCircle} color="bg-green-500" small />
+          <MetricCard label="Inativas" value={m.categoriasInativas} icon={AlertTriangle} color="bg-gray-500" small />
+        </div>
 
-            {/* Activity & Tips Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <RealActivityFeed />
+        {/* ========== ORÇAMENTOS ========== */}
+        <SectionTitle icon={FileText} color="bg-gradient-to-br from-violet-500 to-violet-600">Orçamentos</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricCard label="Total Orçamentos" value={m.totalOrcamentos} icon={FileText} color="bg-gradient-to-br from-violet-500 to-violet-600" href="/admin/orcamentos" small />
+          <MetricCard label="Pendentes" value={m.orcamentosPendentes} icon={Clock} color="bg-yellow-500" small />
+          <MetricCard label="Aprovados" value={m.orcamentosAprovados} icon={CheckCircle} color="bg-green-500" small />
+          <MetricCard label="Convertidos" value={m.orcamentosConvertidos} icon={TrendingUp} color="bg-blue-500" small />
+          <MetricCard label="Rejeitados" value={m.orcamentosRejeitados} icon={AlertTriangle} color="bg-red-500" small />
+          <MetricCard label="Hoje" value={m.orcamentosHoje} icon={FileText} color="bg-gradient-to-br from-violet-600 to-purple-600" small />
+          <MetricCard label="No Mês" value={m.orcamentosMes} icon={FileText} color="bg-gradient-to-br from-purple-500 to-purple-600" small />
+          <MetricCard label="Taxa Conversão" value={m.taxaConversaoOrcamento} icon={Target} color="bg-gradient-to-br from-emerald-500 to-emerald-600" format="percent" small />
+        </div>
 
-              <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-lg text-white">Dicas do Sistema</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="p-4 rounded-xl bg-gradient-to-r from-[hsl(var(--admin-accent-blue)/0.1)] to-[hsl(var(--admin-accent-cyan)/0.1)] border border-[hsl(var(--admin-accent-blue)/0.2)]">
-                      <h4 className="font-semibold text-[hsl(var(--admin-accent-blue))] text-sm">📦 Otimize suas imagens</h4>
-                      <p className="text-xs text-[hsl(var(--admin-text-muted))] mt-1">
-                        Use imagens em formato WebP para melhor performance e SEO.
-                      </p>
-                    </div>
-                    <div className="p-4 rounded-xl bg-gradient-to-r from-[hsl(var(--admin-accent-green)/0.1)] to-[hsl(var(--admin-accent-cyan)/0.1)] border border-[hsl(var(--admin-accent-green)/0.2)]">
-                      <h4 className="font-semibold text-[hsl(var(--admin-accent-green))] text-sm">⭐ Responda avaliações</h4>
-                      <p className="text-xs text-[hsl(var(--admin-text-muted))] mt-1">
-                        Clientes que recebem respostas têm 70% mais chance de comprar novamente.
-                      </p>
-                    </div>
-                    <div className="p-4 rounded-xl bg-gradient-to-r from-[hsl(var(--admin-accent-orange)/0.1)] to-[hsl(var(--admin-accent-pink)/0.1)] border border-[hsl(var(--admin-accent-orange)/0.2)]">
-                      <h4 className="font-semibold text-[hsl(var(--admin-accent-orange))] text-sm">🏷️ Promoções sazonais</h4>
-                      <p className="text-xs text-[hsl(var(--admin-text-muted))] mt-1">
-                        Configure promoções com antecedência para datas especiais.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+        {/* ========== AVALIAÇÕES ========== */}
+        <SectionTitle icon={Star} color="bg-gradient-to-br from-amber-500 to-amber-600">Avaliações</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          <MetricCard label="Total Avaliações" value={m.totalReviews} icon={Star} color="bg-gradient-to-br from-amber-500 to-amber-600" href="/admin/avaliacoes" small />
+          <MetricCard label="Pendentes" value={m.reviewsPendentes} icon={Clock} color="bg-yellow-500" small />
+          <MetricCard label="Aprovadas" value={m.reviewsAprovadas} icon={CheckCircle} color="bg-green-500" small />
+          <MetricCard label="Média Geral" value={m.mediaGeral} icon={Star} color="bg-gradient-to-br from-amber-600 to-orange-600" format="percent" subtitle="de 5.0" small />
+          <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+            <CardContent className="p-3 space-y-1">
+              {[
+                { stars: 5, count: m.reviews5, color: 'bg-green-500' },
+                { stars: 4, count: m.reviews4, color: 'bg-emerald-500' },
+                { stars: 3, count: m.reviews3, color: 'bg-yellow-500' },
+                { stars: 2, count: m.reviews2, color: 'bg-orange-500' },
+                { stars: 1, count: m.reviews1, color: 'bg-red-500' },
+              ].map(r => (
+                <MiniBar key={r.stars} label={`${'★'.repeat(r.stars)}`} value={r.count} max={Math.max(m.reviews5, m.reviews4, m.reviews3, m.reviews2, m.reviews1, 1)} color={r.color} />
+              ))}
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* Tab Financeiro */}
-          <TabsContent value="financial" className="space-y-6">
-            {/* Financial Summary Cards */}
-            <FinancialSummaryCards />
+        {/* ========== FINANCEIRO ========== */}
+        <SectionTitle icon={BarChart3} color="bg-gradient-to-br from-emerald-500 to-emerald-600">Financeiro (12 meses)</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <MetricCard label="Receita Bruta" value={m.receitaBruta12m} icon={DollarSign} color="bg-gradient-to-br from-emerald-500 to-emerald-600" format="currency" small />
+          <MetricCard label="Custo Material" value={m.custoMaterial} icon={Boxes} color="bg-gradient-to-br from-red-500 to-red-600" format="currency" small />
+          <MetricCard label="Custo Mão de Obra" value={m.custoMaoDeObra} icon={Wrench} color="bg-gradient-to-br from-red-600 to-orange-600" format="currency" small />
+          <MetricCard label="Custo Frete" value={m.custoFrete} icon={Truck} color="bg-gradient-to-br from-orange-500 to-orange-600" format="currency" small />
+          <MetricCard label="Custos Totais" value={m.custoTotal} icon={TrendingDown} color="bg-gradient-to-br from-red-500 to-red-600" format="currency" small />
+          <MetricCard label="Impostos (Simples)" value={m.impostos} icon={Landmark} color="bg-gradient-to-br from-amber-500 to-amber-600" format="currency" subtitle={`Faixa ${m.faixaSimples} - ${m.aliquotaEfetiva.toFixed(2)}%`} small />
+          <MetricCard label="Receita Líquida" value={m.receitaLiquida} icon={TrendingUp} color="bg-gradient-to-br from-blue-500 to-blue-600" format="currency" small />
+          <MetricCard label="Margem Líquida" value={m.margemLiquida} icon={PieChart} color="bg-gradient-to-br from-blue-600 to-indigo-600" format="percent" small />
+          <MetricCard label="Alíquota Efetiva" value={m.aliquotaEfetiva} icon={Percent} color="bg-gradient-to-br from-amber-600 to-orange-600" format="percent" small />
+          <MetricCard label="Faixa Simples" value={m.faixaSimples} icon={Layers} color="bg-gradient-to-br from-slate-500 to-slate-600" subtitle={`Anexo ${m.faixaSimples <= 3 ? 'II/III' : 'IV/V'}`} small />
+        </div>
 
-            {/* Estoque e Ranking */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <LowStockAlert />
-              <ProductRankingCard />
-              <TaxInfoCard />
-            </div>
+        {/* ========== CAIXA ========== */}
+        <SectionTitle icon={Wallet} color="bg-gradient-to-br from-green-500 to-green-600">Caixa</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <MetricCard label="Entradas Hoje" value={m.entradasHoje} icon={ArrowUpRight} color="bg-green-500" format="currency" small />
+          <MetricCard label="Saídas Hoje" value={m.saidasHoje} icon={ArrowDownRight} color="bg-red-500" format="currency" small />
+          <MetricCard label="Saldo do Dia" value={m.saldoDia} icon={Wallet} color={m.saldoDia >= 0 ? "bg-green-600" : "bg-red-600"} format="currency" small />
+          <MetricCard label="Entradas Mês" value={m.entradasMes} icon={ArrowUpRight} color="bg-gradient-to-br from-green-500 to-emerald-600" format="currency" small />
+          <MetricCard label="Saídas Mês" value={m.saidasMes} icon={ArrowDownRight} color="bg-gradient-to-br from-red-500 to-rose-600" format="currency" small />
+          <MetricCard label="Saldo Mês" value={m.saldoMes} icon={Wallet} color={m.saldoMes >= 0 ? "bg-gradient-to-br from-emerald-500 to-emerald-600" : "bg-gradient-to-br from-red-600 to-red-700"} format="currency" small />
+        </div>
 
-            {/* Margem de Lucro */}
-            <ProductMarginTable />
-          </TabsContent>
-        </Tabs>
+        {/* ========== CUPONS & PROMOÇÕES ========== */}
+        <SectionTitle icon={Tag} color="bg-gradient-to-br from-fuchsia-500 to-fuchsia-600">Cupons & Promoções</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <MetricCard label="Total Cupons" value={m.totalCupons} icon={Tag} color="bg-gradient-to-br from-fuchsia-500 to-fuchsia-600" href="/admin/cupons" small />
+          <MetricCard label="Cupons Ativos" value={m.cuponsAtivos} icon={CheckCircle} color="bg-green-500" small />
+          <MetricCard label="Cupons Inativos" value={m.cuponsInativos} icon={AlertTriangle} color="bg-gray-500" small />
+          <MetricCard label="Usos de Cupons" value={m.totalUsoCupons} icon={Zap} color="bg-gradient-to-br from-purple-500 to-purple-600" small />
+          <MetricCard label="Promoções Ativas" value={m.promocoesAtivas} icon={Percent} color="bg-gradient-to-br from-orange-500 to-orange-600" href="/admin/promocoes" small />
+          <MetricCard label="Promoções Inativas" value={m.promocoesInativas} icon={Percent} color="bg-gray-500" small />
+        </div>
+
+        {/* ========== WHATSAPP ========== */}
+        <SectionTitle icon={MessageSquare} color="bg-gradient-to-br from-green-500 to-green-600">WhatsApp</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricCard label="Mensagens Enviadas" value={m.whatsappEnviadas} icon={MessageSquare} color="bg-gradient-to-br from-green-500 to-green-600" href="/admin/whatsapp" small />
+          <MetricCard label="Pendentes" value={m.whatsappPendentes} icon={Clock} color="bg-yellow-500" small />
+          <MetricCard label="Com Erros" value={m.whatsappErros} icon={AlertTriangle} color="bg-red-500" small />
+          <MetricCard label="Instâncias Online" value={m.whatsappConectadas} icon={Zap} color="bg-gradient-to-br from-emerald-500 to-emerald-600" subtitle={`de ${m.whatsappConectadas} total`} small />
+        </div>
+
+        {/* ========== ESTOQUE MATÉRIAS-PRIMAS ========== */}
+        <SectionTitle icon={Boxes} color="bg-gradient-to-br from-amber-500 to-amber-600">Estoque de Matérias-Primas</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricCard label="Total Materiais" value={m.totalMateriais} icon={Boxes} color="bg-gradient-to-br from-amber-500 to-amber-600" small />
+          <MetricCard label="Estoque Baixo" value={m.materiaisEstoqueBaixo} icon={AlertTriangle} color={m.materiaisEstoqueBaixo > 0 ? "bg-red-500" : "bg-green-500"} small />
+          <MetricCard label="Valor em Estoque" value={m.valorEstoqueMateriais} icon={DollarSign} color="bg-gradient-to-br from-amber-600 to-orange-600" format="currency" small />
+          <MetricCard label="Movim. Hoje" value={m.movimentacoesHoje} icon={RefreshCw} color="bg-gradient-to-br from-blue-500 to-blue-600" small />
+        </div>
+
+        {/* ========== SISTEMA & SEGURANÇA ========== */}
+        <SectionTitle icon={Shield} color="bg-gradient-to-br from-slate-500 to-slate-600">Sistema & Segurança</SectionTitle>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricCard label="Ações Admin Hoje" value={m.auditoriaHoje} icon={Activity} color="bg-gradient-to-br from-slate-500 to-slate-600" href="/admin/logs" small />
+          <MetricCard label="Webhooks Recebidos" value={m.webhooksRecebidos} icon={Webhook} color="bg-gradient-to-br from-indigo-500 to-indigo-600" small />
+          <MetricCard label="Webhooks com Erro" value={m.webhooksErro} icon={AlertTriangle} color={m.webhooksErro > 0 ? "bg-red-500" : "bg-green-500"} small />
+          <MetricCard label="Banners Ativos" value={m.bannersAtivos} icon={Image} color="bg-gradient-to-br from-pink-500 to-pink-600" href="/admin/hero" small />
+        </div>
+
+        {/* ========== ATIVIDADE RECENTE ========== */}
+        <SectionTitle icon={Activity} color="bg-gradient-to-br from-pink-500 to-pink-600">Atividade Recente</SectionTitle>
+        <RealActivityFeed />
+
       </div>
     </AdminLayout>
   );
