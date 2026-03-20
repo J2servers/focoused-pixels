@@ -58,6 +58,8 @@ const AdminKanbanPage = lazy(() => import("./pages/admin/AdminKanbanPage"));
 const AdminQuotesPage = lazy(() => import("./pages/admin/AdminQuotesPage"));
 const AdminApiDocsPage = lazy(() => import("./pages/admin/AdminApiDocsPage"));
 const AdminWhatsAppPage = lazy(() => import("./pages/admin/AdminWhatsAppPage"));
+const AdminEmailTemplatesPage = lazy(() => import("./pages/admin/AdminEmailTemplatesPage"));
+const AdminMediaPage = lazy(() => import("./pages/admin/AdminMediaPage"));
 
 const queryClient = new QueryClient();
 
