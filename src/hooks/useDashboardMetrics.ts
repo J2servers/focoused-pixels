@@ -473,6 +473,9 @@ export function useDashboardMetrics() {
 
         // GRÁFICOS
         receitaPorMes, paymentDistribution, statusDistribution,
+        leadsPorDia, visitasPorDia, productionDistribution,
+        reviewsDistribution, quotesDistribution, productsDistribution,
+        caixaPorDia, whatsappDistribution,
       };
     },
     refetchInterval: 60000, // Auto-refresh every minute
