@@ -121,7 +121,7 @@ const AdminOrdersPage = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left p-3 font-medium">Pedido</th>
+                      <th className="text-left p-3 font-medium">Venda</th>
                       <th className="text-left p-3 font-medium">Cliente</th>
                       <th className="text-left p-3 font-medium">Total</th>
                       <th className="text-left p-3 font-medium">Status</th>
