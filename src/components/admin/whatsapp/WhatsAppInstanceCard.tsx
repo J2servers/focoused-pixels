@@ -19,7 +19,7 @@ interface WhatsAppInstanceCardProps {
   onPhoneChange?: (instanceName: string, phone: string) => void;
 }
 
-const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusChange }: WhatsAppInstanceCardProps) => {
+const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusChange, onPhoneChange }: WhatsAppInstanceCardProps) => {
   const [status, setStatus] = useState<ConnectionStatus>('unknown');
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
