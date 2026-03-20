@@ -16,6 +16,7 @@ interface WhatsAppInstanceCardProps {
   displayName: string;
   priority: number;
   onStatusChange?: (instanceName: string, status: ConnectionStatus) => void;
+  onPhoneChange?: (instanceName: string, phone: string) => void;
 }
 
 const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusChange }: WhatsAppInstanceCardProps) => {
