@@ -18,7 +18,7 @@ import {
   Globe, UserPlus, Heart, Webhook, Layers, Target, Zap, Filter,
   PieChart as PieChartIcon, Award, RefreshCw, ShoppingBag, Repeat, XCircle
 } from 'lucide-react';
-import { FunnelChart, Funnel, LabelList } from 'recharts';
+
 
 // ===== METRIC CARD - fluid sizing =====
 function M({ label, value, icon: Icon, color, href, format = 'number', trend }: {
