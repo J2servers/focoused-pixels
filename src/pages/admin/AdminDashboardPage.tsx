@@ -150,6 +150,22 @@ function MobileDashboard({ m }: { m: any }) {
 
 // ===== DESKTOP DASHBOARD - fully fluid =====
 function DesktopDashboard({ m }: { m: any }) {
+  const funnelData = m.funnelData || [];
+  const conversaoPorDia = m.conversaoPorDia || [];
+  const ticketPorMes = m.ticketPorMes || [];
+  const paymentDistribution = m.paymentDistribution || [];
+  const statusDistribution = m.statusDistribution || [];
+  const vendasPorDia = m.vendasPorDia || [];
+  const receitaPorMes = m.receitaPorMes || [];
+  const productionDistribution = m.productionDistribution || [];
+  const leadsPorDia = m.leadsPorDia || [];
+  const visitasPorDia = m.visitasPorDia || [];
+  const productsDistribution = m.productsDistribution || [];
+  const quotesDistribution = m.quotesDistribution || [];
+  const reviewsDistribution = m.reviewsDistribution || [];
+  const whatsappDistribution = m.whatsappDistribution || [];
+  const caixaPorDia = m.caixaPorDia || [];
+  const topProducts = m.topProducts || [];
   return (
     <div className="grid grid-cols-12 gap-[0.4vw] auto-rows-min">
       {/* ROW 1: Hero KPIs */}
