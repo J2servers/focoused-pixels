@@ -63,7 +63,9 @@ export function DataTable<T>({
   onRowClick,
   emptyMessage = 'Nenhum registro encontrado',
   actions,
+  filterContent,
   pageSize = 10,
+  showAllRows = false,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
