@@ -109,7 +109,7 @@ const AdminOrdersPage = () => {
         {/* Orders Table */}
         <Card className="admin-card">
           <CardHeader>
-            <CardTitle>Lista de Pedidos</CardTitle>
+            <CardTitle>Lista de Vendas</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
