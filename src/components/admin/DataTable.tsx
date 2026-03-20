@@ -45,7 +45,9 @@ interface DataTableProps<T> {
   onRowClick?: (item: T) => void;
   emptyMessage?: string;
   actions?: ReactNode;
+  filterContent?: ReactNode;
   pageSize?: number;
+  showAllRows?: boolean;
 }
 
 export function DataTable<T>({
