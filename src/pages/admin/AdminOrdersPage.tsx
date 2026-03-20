@@ -214,7 +214,7 @@ const AdminOrdersPage = () => {
                 {/* Status Controls */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium block mb-2">Status do Pedido</label>
+                    <label className="text-sm font-medium block mb-2">Status da Venda</label>
                     <Select
                       value={selectedOrder.order_status}
                       onValueChange={(value) => handleUpdateStatus(selectedOrder.id, value)}

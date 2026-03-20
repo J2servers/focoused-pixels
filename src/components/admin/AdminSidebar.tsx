@@ -42,7 +42,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const menuItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard, end: true },
-  { title: 'Pedidos', url: '/admin/pedidos', icon: ShoppingCart },
+  { title: 'Vendas Feitas', url: '/admin/pedidos', icon: ShoppingCart },
   { title: 'Orçamentos', url: '/admin/orcamentos', icon: FileText },
   { title: 'Produção', url: '/admin/kanban', icon: Kanban },
   { title: 'Produtos', url: '/admin/produtos', icon: Package },
