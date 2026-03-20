@@ -395,6 +395,9 @@ export function useDashboardMetrics() {
 
         // TOP PRODUCTS
         topProducts: sortedProducts.slice(0, 5),
+
+        // GRÁFICOS
+        receitaPorMes, paymentDistribution, statusDistribution,
       };
     },
     refetchInterval: 60000, // Auto-refresh every minute
