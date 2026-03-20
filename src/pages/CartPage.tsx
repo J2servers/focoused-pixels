@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Trash2, Minus, Plus, MessageCircle, ShoppingBag, FileText, CreditCard } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { storeInfo } from '@/data/store';
+import { CartCrossSell } from '@/components/cart/CartCrossSell';
 
 const CartPage = () => {
   const { items, removeItem, updateQuantity, total, clearCart, itemCount } = useCart();
