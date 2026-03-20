@@ -270,10 +270,10 @@ export function DataTable<T>({
       </Card>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!showAllRows && totalPages > 1 && (
         <div className="flex items-center justify-between pt-2">
           <p className="text-sm text-[hsl(var(--admin-text-muted))]">
-            <span className="font-medium text-white">{((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, sortedData.length)}</span>
+            <span className="font-medium text-white">{((currentPage - 1) * effectivePageSize) + 1}-{Math.min(currentPage * effectivePageSize, sortedData.length)}</span>
             {' '}de{' '}
             <span className="font-medium text-white">{sortedData.length}</span> registros
           </p>
