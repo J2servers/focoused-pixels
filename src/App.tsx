@@ -128,6 +128,8 @@ const App = () => (
                 <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
                 <Route path="/admin/api" element={<AdminApiDocsPage />} />
                 <Route path="/admin/whatsapp" element={<AdminWhatsAppPage />} />
+                <Route path="/admin/email-templates" element={<AdminEmailTemplatesPage />} />
+                <Route path="/admin/midia" element={<AdminMediaPage />} />
                 
                 <Route path="/teste" element={<TestePage />} />
                 <Route path="/teste2" element={<Teste2Page />} />
