@@ -228,6 +228,7 @@ const ProductPage = () => {
                     {product.rating.toFixed(1)} ({product.reviews} avaliações)
                   </span>
                   <ViewingNowBadge productSlug={product.slug} variant="minimal" />
+                  <WishlistButton product={{ id: product.id, name: product.name, price: product.price, image: product.image, slug: product.slug }} size="sm" />
                 </div>
 
                 {/* Price */}
