@@ -58,6 +58,8 @@ const AdminKanbanPage = lazy(() => import("./pages/admin/AdminKanbanPage"));
 const AdminQuotesPage = lazy(() => import("./pages/admin/AdminQuotesPage"));
 const AdminApiDocsPage = lazy(() => import("./pages/admin/AdminApiDocsPage"));
 const AdminWhatsAppPage = lazy(() => import("./pages/admin/AdminWhatsAppPage"));
+const AdminEmailTemplatesPage = lazy(() => import("./pages/admin/AdminEmailTemplatesPage"));
+const AdminMediaPage = lazy(() => import("./pages/admin/AdminMediaPage"));
 
 const queryClient = new QueryClient();
 
@@ -126,6 +128,8 @@ const App = () => (
                 <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
                 <Route path="/admin/api" element={<AdminApiDocsPage />} />
                 <Route path="/admin/whatsapp" element={<AdminWhatsAppPage />} />
+                <Route path="/admin/email-templates" element={<AdminEmailTemplatesPage />} />
+                <Route path="/admin/midia" element={<AdminMediaPage />} />
                 
                 <Route path="/teste" element={<TestePage />} />
                 <Route path="/teste2" element={<Teste2Page />} />

@@ -11,7 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useOrders, useUpdateOrder, useUpdateProductionStatus, PRODUCTION_STATUS_LABELS, PRODUCTION_STATUS_COLORS, type ProductionStatus, type Order } from '@/hooks/useOrders';
-import { Search, Eye, Package, Truck, Clock, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { ExportButtons } from '@/components/admin/ExportButtons';
+import { Search, Eye, Package, Truck, Clock, CheckCircle, AlertCircle, XCircle, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -31,10 +32,27 @@ const PAYMENT_STATUS_CONFIG = {
   refunded: { label: 'Reembolsado', color: 'bg-gray-500' },
 };
 
+const EXPORT_COLUMNS = [
+  { key: 'order_number', header: 'Nº Pedido' },
+  { key: 'customer_name', header: 'Cliente' },
+  { key: 'customer_email', header: 'Email' },
+  { key: 'customer_phone', header: 'Telefone' },
+  { key: 'total_fmt', header: 'Total' },
+  { key: 'order_status_label', header: 'Status' },
+  { key: 'payment_status_label', header: 'Pagamento' },
+  { key: 'production_status_label', header: 'Produção' },
+  { key: 'created_at_fmt', header: 'Data' },
+  { key: 'shipping_address', header: 'Endereço' },
+  { key: 'shipping_cep', header: 'CEP' },
+  { key: 'tracking_code', header: 'Rastreio' },
+];
+
 const AdminOrdersPage = () => {
   const [search, setSearch] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const { data: orders = [], isLoading } = useOrders();
   const updateOrder = useUpdateOrder();
   const updateProductionStatus = useUpdateProductionStatus();
@@ -43,12 +61,26 @@ const AdminOrdersPage = () => {
     const matchesSearch = 
       order.order_number.toLowerCase().includes(search.toLowerCase()) ||
       order.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-      order.customer_email.toLowerCase().includes(search.toLowerCase());
+      order.customer_email.toLowerCase().includes(search.toLowerCase()) ||
+      (order.customer_phone && order.customer_phone.includes(search));
     
     const matchesStatus = statusFilter === 'all' || order.order_status === statusFilter;
     
-    return matchesSearch && matchesStatus;
+    let matchesDate = true;
+    if (dateFrom) matchesDate = matchesDate && order.created_at >= `${dateFrom}T00:00:00`;
+    if (dateTo) matchesDate = matchesDate && order.created_at <= `${dateTo}T23:59:59`;
+    
+    return matchesSearch && matchesStatus && matchesDate;
   });
+
+  const exportData = filteredOrders.map(o => ({
+    ...o,
+    total_fmt: `R$ ${o.total.toFixed(2).replace('.', ',')}`,
+    order_status_label: ORDER_STATUS_CONFIG[o.order_status as keyof typeof ORDER_STATUS_CONFIG]?.label || o.order_status,
+    payment_status_label: PAYMENT_STATUS_CONFIG[o.payment_status as keyof typeof PAYMENT_STATUS_CONFIG]?.label || o.payment_status,
+    production_status_label: PRODUCTION_STATUS_LABELS[o.production_status as ProductionStatus] || o.production_status,
+    created_at_fmt: format(new Date(o.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR }),
+  }));
 
   const handleUpdateStatus = async (orderId: string, status: string) => {
     await updateOrder.mutateAsync({ id: orderId, order_status: status });
@@ -68,7 +100,7 @@ const AdminOrdersPage = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por número, nome ou email..."
+                  placeholder="Buscar por número, nome, email ou telefone..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-9"
@@ -85,6 +117,9 @@ const AdminOrdersPage = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-[150px]" />
+              <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-[150px]" />
+              <ExportButtons data={exportData} columns={EXPORT_COLUMNS} filename="vendas" title="Relatório de Vendas" />
             </div>
           </CardContent>
         </Card>
@@ -92,10 +127,10 @@ const AdminOrdersPage = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Total', value: orders.length, color: 'text-white' },
-            { label: 'Pendentes', value: orders.filter(o => o.order_status === 'pending').length, color: 'text-yellow-400' },
-            { label: 'Em Produção', value: orders.filter(o => o.production_status === 'in_production').length, color: 'text-blue-400' },
-            { label: 'Enviados', value: orders.filter(o => o.order_status === 'shipped').length, color: 'text-green-400' },
+            { label: 'Total', value: filteredOrders.length, color: 'text-white' },
+            { label: 'Pendentes', value: filteredOrders.filter(o => o.order_status === 'pending').length, color: 'text-yellow-400' },
+            { label: 'Em Produção', value: filteredOrders.filter(o => o.production_status === 'in_production').length, color: 'text-blue-400' },
+            { label: 'Enviados', value: filteredOrders.filter(o => o.order_status === 'shipped').length, color: 'text-green-400' },
           ].map((stat) => (
             <Card key={stat.label} className="admin-card">
               <CardContent className="p-4 text-center">
@@ -199,19 +234,20 @@ const AdminOrdersPage = () => {
           {selectedOrder && (
             <ScrollArea className="max-h-[60vh]">
               <div className="space-y-6 p-1">
-                {/* Customer Info */}
                 <div>
                   <h4 className="font-semibold mb-2">Cliente</h4>
                   <div className="bg-muted/50 rounded-lg p-4 space-y-1">
                     <p><strong>Nome:</strong> {selectedOrder.customer_name}</p>
                     <p><strong>Email:</strong> {selectedOrder.customer_email}</p>
                     <p><strong>Telefone:</strong> {selectedOrder.customer_phone}</p>
+                    {(selectedOrder as any).shipping_address && <p><strong>Endereço:</strong> {(selectedOrder as any).shipping_address}</p>}
+                    {(selectedOrder as any).shipping_cep && <p><strong>CEP:</strong> {(selectedOrder as any).shipping_cep}</p>}
+                    {(selectedOrder as any).shipping_city && <p><strong>Cidade:</strong> {(selectedOrder as any).shipping_city} - {(selectedOrder as any).shipping_state}</p>}
                   </div>
                 </div>
 
                 <Separator />
 
-                {/* Status Controls */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium block mb-2">Status da Venda</label>
@@ -249,7 +285,6 @@ const AdminOrdersPage = () => {
 
                 <Separator />
 
-                {/* Order Summary */}
                 <div>
                   <h4 className="font-semibold mb-2">Resumo</h4>
                   <div className="bg-muted/50 rounded-lg p-4 space-y-2">
@@ -277,7 +312,6 @@ const AdminOrdersPage = () => {
                   </div>
                 </div>
 
-                {/* Tracking */}
                 {selectedOrder.tracking_code && (
                   <>
                     <Separator />
@@ -291,7 +325,6 @@ const AdminOrdersPage = () => {
                   </>
                 )}
 
-                {/* Notes */}
                 {selectedOrder.notes && (
                   <>
                     <Separator />
