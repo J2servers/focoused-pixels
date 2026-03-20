@@ -307,6 +307,81 @@ export function useDashboardMetrics() {
         });
       }
 
+      // ===== LEADS POR DIA (7 dias) =====
+      const leadsPorDia: { date: string; leads: number }[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const day = startOfDay(daysAgo(i));
+        const nextDay = new Date(day.getTime() + 86400000);
+        leadsPorDia.push({
+          date: day.toLocaleDateString('pt-BR', { weekday: 'short' }),
+          leads: allLeads.filter(l => { const d = new Date(l.created_at); return d >= day && d < nextDay; }).length,
+        });
+      }
+
+      // ===== VISITAS POR DIA (7 dias) =====
+      const visitasPorDia: { date: string; visitas: number }[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const day = startOfDay(daysAgo(i));
+        const nextDay = new Date(day.getTime() + 86400000);
+        visitasPorDia.push({
+          date: day.toLocaleDateString('pt-BR', { weekday: 'short' }),
+          visitas: allPageViews.filter(p => { const d = new Date(p.created_at); return d >= day && d < nextDay; }).length,
+        });
+      }
+
+      // ===== PRODUÇÃO DISTRIBUIÇÃO =====
+      const productionDistribution = [
+        { name: 'Aguardando', value: prodPending, fill: 'hsl(220,15%,50%)' },
+        { name: 'Ag. Material', value: prodAwaitingMaterial, fill: 'hsl(45,93%,47%)' },
+        { name: 'Em Produção', value: prodInProduction, fill: 'hsl(210,80%,55%)' },
+        { name: 'Qualidade', value: prodQualityCheck, fill: 'hsl(270,70%,55%)' },
+        { name: 'Prontos', value: prodReady, fill: 'hsl(145,63%,42%)' },
+        { name: 'Enviados', value: prodShipped, fill: 'hsl(170,70%,45%)' },
+      ].filter(s => s.value > 0);
+
+      // ===== REVIEWS DISTRIBUIÇÃO =====
+      const reviewsDistribution = [
+        { name: '5★', value: reviews5, fill: 'hsl(145,63%,42%)' },
+        { name: '4★', value: reviews4, fill: 'hsl(170,70%,45%)' },
+        { name: '3★', value: reviews3, fill: 'hsl(45,93%,47%)' },
+        { name: '2★', value: reviews2, fill: 'hsl(25,90%,50%)' },
+        { name: '1★', value: reviews1, fill: 'hsl(0,72%,51%)' },
+      ].filter(s => s.value > 0);
+
+      // ===== ORÇAMENTOS DISTRIBUIÇÃO =====
+      const quotesDistribution = [
+        { name: 'Pendentes', value: orcamentosPendentes, fill: 'hsl(45,93%,47%)' },
+        { name: 'Aprovados', value: orcamentosAprovados, fill: 'hsl(210,80%,55%)' },
+        { name: 'Convertidos', value: orcamentosConvertidos, fill: 'hsl(145,63%,42%)' },
+        { name: 'Rejeitados', value: orcamentosRejeitados, fill: 'hsl(0,72%,51%)' },
+      ].filter(s => s.value > 0);
+
+      // ===== PRODUTOS DISTRIBUIÇÃO =====
+      const productsDistribution = [
+        { name: 'Ativos', value: produtosAtivos, fill: 'hsl(145,63%,42%)' },
+        { name: 'Inativos', value: produtosInativos, fill: 'hsl(220,15%,50%)' },
+        { name: 'Rascunho', value: produtosRascunho, fill: 'hsl(45,93%,47%)' },
+        { name: 'Sem Estoque', value: produtosSemEstoque, fill: 'hsl(0,72%,51%)' },
+      ].filter(s => s.value > 0);
+
+      // ===== CAIXA POR DIA (7 dias) =====
+      const caixaPorDia: { date: string; entradas: number; saidas: number }[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const day = startOfDay(daysAgo(i));
+        const nextDay = new Date(day.getTime() + 86400000);
+        const dayStr = day.toLocaleDateString('pt-BR', { weekday: 'short' });
+        const ent = entradas.filter(t => { const d = new Date(t.transaction_date); return d >= day && d < nextDay; }).reduce((s, t) => s + (t.amount || 0), 0);
+        const sai = saidas.filter(t => { const d = new Date(t.transaction_date); return d >= day && d < nextDay; }).reduce((s, t) => s + (t.amount || 0), 0);
+        caixaPorDia.push({ date: dayStr, entradas: ent, saidas: sai });
+      }
+
+      // ===== WHATSAPP POR STATUS =====
+      const whatsappDistribution = [
+        { name: 'Enviadas', value: whatsappEnviadas, fill: 'hsl(145,63%,42%)' },
+        { name: 'Pendentes', value: whatsappPendentes, fill: 'hsl(45,93%,47%)' },
+        { name: 'Erros', value: whatsappErros, fill: 'hsl(0,72%,51%)' },
+      ].filter(s => s.value > 0);
+
       // ===== DISTRIBUIÇÕES (para gráficos pizza) =====
       const paymentDistribution = [
         { name: 'PIX', value: pixOrders.length, total: sum(pixOrders), fill: 'hsl(170, 70%, 45%)' },
