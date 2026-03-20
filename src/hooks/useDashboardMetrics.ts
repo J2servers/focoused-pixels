@@ -542,7 +542,7 @@ export function useDashboardMetrics() {
         // CONVERSÃO & FUNIL
         funnelData, visitToLead, leadToQuote, quoteToOrder, orderToPaid, overallConversion,
         abandonedCarts, abandonedCartsMonth, abandonedValue,
-        ticketPorMes, conversaoPorDia, repeatCustomers, repeatRate,
+        ticketPorMes, conversaoPorDia,
 
         // GRÁFICOS
         receitaPorMes, paymentDistribution, statusDistribution,
