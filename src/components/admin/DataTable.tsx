@@ -92,11 +92,14 @@ export function DataTable<T>({
     : filteredData;
 
   // Paginate
-  const totalPages = Math.ceil(sortedData.length / pageSize);
-  const paginatedData = sortedData.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const effectivePageSize = showAllRows ? sortedData.length || 1 : pageSize;
+  const totalPages = Math.ceil(sortedData.length / effectivePageSize);
+  const paginatedData = showAllRows
+    ? sortedData
+    : sortedData.slice(
+        (currentPage - 1) * effectivePageSize,
+        currentPage * effectivePageSize
+      );
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
