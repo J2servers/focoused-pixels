@@ -22,6 +22,12 @@ import {
 } from '@/components/product';
 import { ProductReviews } from '@/components/reviews';
 import { TrustBar, ViewingNowBadge } from '@/components/conversion';
+import { UrgencyBadge } from '@/components/conversion/UrgencyBadge';
+import { DynamicSocialProof } from '@/components/conversion/DynamicSocialProof';
+import { ProductShareButtons } from '@/components/product/ProductShareButtons';
+import { ProductFAQ } from '@/components/product/ProductFAQ';
+import { FreightCalculator } from '@/components/product/FreightCalculator';
+import { WishlistButton } from '@/components/product/WishlistButton';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import { RecentlyViewedBar } from '@/components/product/RecentlyViewedBar';
 
@@ -222,6 +228,7 @@ const ProductPage = () => {
                     {product.rating.toFixed(1)} ({product.reviews} avaliações)
                   </span>
                   <ViewingNowBadge productSlug={product.slug} variant="minimal" />
+                  <WishlistButton product={{ id: product.id, name: product.name, price: product.price, image: product.image, slug: product.slug }} size="sm" />
                 </div>
 
                 {/* Price */}
@@ -246,7 +253,12 @@ const ProductPage = () => {
                     <span className="text-sm font-medium">Frete Grátis</span>
                   </div>
                 )}
+
+                <UrgencyBadge productId={product.id} />
               </div>
+
+              {/* Share Buttons */}
+              <ProductShareButtons productName={product.name} productSlug={product.slug} />
 
               {/* Short Description */}
               <p className="text-sm text-muted-foreground leading-relaxed px-1">
@@ -337,6 +349,8 @@ const ProductPage = () => {
                 selectedColor={selectedColor}
                 onAddToCart={handleAddToCart}
               />
+              {/* Freight Calculator */}
+              <FreightCalculator productPrice={product.price * quantity} />
             </div>
           </div>
 
@@ -352,6 +366,9 @@ const ProductPage = () => {
             productSlug={product.slug} 
             productName={product.name} 
           />
+
+          {/* FAQ */}
+          <ProductFAQ productName={product.name} />
 
           {/* Related Products */}
           <RelatedProducts product={product} limit={4} />

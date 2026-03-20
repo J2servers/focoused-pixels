@@ -23,6 +23,7 @@ import { Link } from 'react-router-dom';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ProductCardOptimized } from '@/components/conversion/ProductCardOptimized';
+import { DynamicSocialProof } from '@/components/conversion/DynamicSocialProof';
 import {
   TrustBar,
   HeroConversion,
@@ -255,6 +256,7 @@ const Index = () => {
       <CookieBanner />
       <MiniCart open={miniCartOpen} onOpenChange={setMiniCartOpen} />
       <PromoPopupManager />
+      <DynamicSocialProof />
     </div>
   );
 };

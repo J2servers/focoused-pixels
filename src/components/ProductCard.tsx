@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Truck, ShoppingCart, Package, Eye } from 'lucide-react';
+import { Star, Truck, ShoppingCart, Package, Eye, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Product } from '@/data/products';
@@ -17,6 +17,8 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { QuickViewModal } from '@/components/storefront/QuickViewModal';
+import { WishlistButton } from '@/components/product/WishlistButton';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
   product: Product;
@@ -28,6 +30,7 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const { addItem } = useCart();
   const { showProductRatings, showProductStock } = useSiteSettings();
+  const navigate = useNavigate();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,6 +47,28 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
   const handleQuickView = (e: React.MouseEvent) => {
     e.preventDefault();
     setQuickViewOpen(true);
+  };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+    });
+    sessionStorage.setItem('pending_payment', JSON.stringify({
+      orderId: `quick-${Date.now()}`,
+      amount: product.price,
+      customerName: '',
+      customerEmail: '',
+      customerCpf: '',
+      customerPhone: '',
+      description: product.name,
+      cartItems: [{ name: product.name, quantity: 1, price: product.price }],
+    }));
+    navigate('/pagamento');
   };
 
   const badgeVariants: Record<string, { label: string; className: string }> = {
@@ -86,6 +111,10 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
             >
               <Eye className="h-4 w-4" />
             </motion.button>
+
+            <div className="absolute top-3 right-14 z-10 opacity-0 transition-opacity group-hover:opacity-100 bg-background/90 rounded-full shadow-lg">
+              <WishlistButton product={{ id: product.id, name: product.name, price: product.price, image: product.image, slug: product.slug }} size="sm" />
+            </div>
 
             <motion.img
               src={product.image}
@@ -164,8 +193,13 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
             </div>
 
             <div className="mt-auto flex flex-col gap-2">
-              <Button className="h-10 w-full font-semibold" disabled={!product.inStock}>
-                {product.inStock ? 'COMPRAR' : 'INDISPONÍVEL'}
+              <Button 
+                className="h-10 w-full font-semibold" 
+                disabled={!product.inStock}
+                onClick={handleBuyNow}
+              >
+                <Zap className="h-4 w-4 mr-1" />
+                {product.inStock ? 'COMPRAR AGORA' : 'INDISPONÍVEL'}
               </Button>
               <Button
                 variant="outline"

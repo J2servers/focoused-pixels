@@ -3,14 +3,15 @@
  */
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Star, Eye, ShoppingCart } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Star, Eye, ShoppingCart, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Product } from '@/data/products';
 import { useCart } from '@/hooks/useCart';
 import { toast } from 'sonner';
 import { QuickViewModal } from '@/components/storefront/QuickViewModal';
+import { WishlistButton } from '@/components/product/WishlistButton';
 
 interface ProductCardOptimizedProps {
   product: Product;
@@ -27,6 +28,7 @@ export function ProductCardOptimized({
 }: ProductCardOptimizedProps) {
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const { addItem } = useCart();
+  const navigate = useNavigate();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,6 +52,28 @@ export function ProductCardOptimized({
     e.preventDefault();
     e.stopPropagation();
     setQuickViewOpen(true);
+  };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+    });
+    sessionStorage.setItem('pending_payment', JSON.stringify({
+      orderId: `quick-${Date.now()}`,
+      amount: product.price,
+      customerName: '',
+      customerEmail: '',
+      customerCpf: '',
+      customerPhone: '',
+      description: product.name,
+      cartItems: [{ name: product.name, quantity: 1, price: product.price }],
+    }));
+    navigate('/pagamento');
   };
 
   const savings = product.originalPrice 
@@ -83,6 +107,10 @@ export function ProductCardOptimized({
           >
             <Eye className="h-4 w-4 text-foreground/70" />
           </button>
+
+          <div className="absolute top-2.5 right-12 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-background/90 rounded-full shadow">
+            <WishlistButton product={{ id: product.id, name: product.name, price: product.price, image: product.image, slug: product.slug }} size="sm" />
+          </div>
 
           <img
             src={product.image}
@@ -136,15 +164,26 @@ export function ProductCardOptimized({
           </div>
 
           {/* CTA */}
-          <Button 
-            onClick={handleAddToCart}
-            disabled={!product.inStock}
-            size="sm"
-            className="w-full mt-3 font-semibold text-xs rounded-xl h-9"
-          >
-            <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-            {product.inStock ? 'Adicionar' : 'Indisponível'}
-          </Button>
+          <div className="flex gap-2 mt-3">
+            <Button 
+              onClick={handleBuyNow}
+              disabled={!product.inStock}
+              size="sm"
+              className="flex-1 font-semibold text-xs rounded-xl h-9"
+            >
+              <Zap className="h-3.5 w-3.5 mr-1" />
+              {product.inStock ? 'Comprar' : 'Indisponível'}
+            </Button>
+            <Button 
+              onClick={handleAddToCart}
+              disabled={!product.inStock}
+              size="sm"
+              variant="outline"
+              className="h-9 w-9 p-0 rounded-xl shrink-0"
+            >
+              <ShoppingCart className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </div>
       </Link>
 
