@@ -433,7 +433,7 @@ function DesktopDashboard({ m }: { m: any }) {
       </div>
 
       {/* ROW 6: extras */}
-      <div className="col-span-12 grid grid-cols-10 gap-[0.3vw]">
+      <div className="col-span-12 grid grid-cols-12 gap-[0.3vw]">
         <M label="Boleto (R$)" value={m.boletoTotal} icon={Landmark} color="bg-slate-600" format="currency" />
         <M label="Leads Semana" value={m.leadsSemana} icon={UserPlus} color="bg-violet-600" />
         <M label="Leads Mês" value={m.leadsMes} icon={UserPlus} color="bg-purple-600" />
@@ -442,8 +442,10 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="Orç. Hoje" value={m.orcamentosHoje} icon={FileText} color="bg-violet-700" />
         <M label="Orç. Mês" value={m.orcamentosMes} icon={FileText} color="bg-purple-700" />
         <M label="Mov. Hoje" value={m.movimentacoesHoje} icon={RefreshCw} color="bg-blue-600" />
-        <M label="Rascunhos" value={m.produtosRascunho} icon={FileText} color="bg-slate-600" />
-        <M label="Inativos" value={m.produtosInativos} icon={AlertTriangle} color="bg-gray-600" />
+        <M label="Webhooks" value={m.webhooksRecebidos} icon={Webhook} color="bg-indigo-600" />
+        <M label="WH Erros" value={m.webhooksErro} icon={AlertTriangle} color={m.webhooksErro > 0 ? "bg-red-600" : "bg-green-600"} />
+        <M label="Inscritos" value={m.leadsInscritos} icon={Heart} color="bg-green-600" />
+        <M label="Categorias" value={m.totalCategorias} icon={Layers} color="bg-indigo-600" href="/admin/categorias" />
       </div>
     </div>
   );
