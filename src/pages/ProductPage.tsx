@@ -253,7 +253,12 @@ const ProductPage = () => {
                     <span className="text-sm font-medium">Frete Grátis</span>
                   </div>
                 )}
+
+                <UrgencyBadge productId={product.id} stock={product.stock} />
               </div>
+
+              {/* Share Buttons */}
+              <ProductShareButtons productName={product.name} productSlug={product.slug} />
 
               {/* Short Description */}
               <p className="text-sm text-muted-foreground leading-relaxed px-1">
