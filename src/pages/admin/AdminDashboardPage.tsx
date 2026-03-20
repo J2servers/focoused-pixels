@@ -127,7 +127,7 @@ function MobileDashboard({ m }: { m: any }) {
         <CardHeader className="pb-1 pt-3 px-3"><CardTitle className="text-xs text-[hsl(var(--admin-text-muted))]">Receita 7 dias</CardTitle></CardHeader>
         <CardContent className="p-2 h-36">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={m.vendasPorDia}>
+            <AreaChart data={m.vendasPorDia || []}>
               <defs><linearGradient id="mRecGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(270,70%,55%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(270,70%,55%)" stopOpacity={0} /></linearGradient></defs>
               <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
@@ -150,6 +150,22 @@ function MobileDashboard({ m }: { m: any }) {
 
 // ===== DESKTOP DASHBOARD - fully fluid =====
 function DesktopDashboard({ m }: { m: any }) {
+  const funnelData = m.funnelData || [];
+  const conversaoPorDia = m.conversaoPorDia || [];
+  const ticketPorMes = m.ticketPorMes || [];
+  const paymentDistribution = m.paymentDistribution || [];
+  const statusDistribution = m.statusDistribution || [];
+  const vendasPorDia = m.vendasPorDia || [];
+  const receitaPorMes = m.receitaPorMes || [];
+  const productionDistribution = m.productionDistribution || [];
+  const leadsPorDia = m.leadsPorDia || [];
+  const visitasPorDia = m.visitasPorDia || [];
+  const productsDistribution = m.productsDistribution || [];
+  const quotesDistribution = m.quotesDistribution || [];
+  const reviewsDistribution = m.reviewsDistribution || [];
+  const whatsappDistribution = m.whatsappDistribution || [];
+  const caixaPorDia = m.caixaPorDia || [];
+  const topProducts = m.topProducts || [];
   return (
     <div className="grid grid-cols-12 gap-[0.4vw] auto-rows-min">
       {/* ROW 1: Hero KPIs */}
@@ -164,10 +180,10 @@ function DesktopDashboard({ m }: { m: any }) {
         <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
           <div className="h-full flex items-center">
             <div className="w-full space-y-[0.4vh]">
-              {m.funnelData.map((stage: any, i: number) => {
-                const maxVal = m.funnelData[0]?.value || 1;
+              {funnelData.map((stage: any, i: number) => {
+                const maxVal = funnelData[0]?.value || 1;
                 const pct = maxVal > 0 ? (stage.value / maxVal * 100) : 0;
-                const nextStage = m.funnelData[i + 1];
+                const nextStage = funnelData[i + 1];
                 const convRate = nextStage && stage.value > 0 ? (nextStage.value / stage.value * 100) : null;
                 return (
                   <div key={stage.stage} className="flex items-center gap-[0.4vw]">
@@ -191,7 +207,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Conversão Diária (7 dias)</CardTitle></CardHeader>
         <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={m.conversaoPorDia}>
+            <BarChart data={conversaoPorDia}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
               <YAxis yAxisId="left" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={30} />
@@ -211,7 +227,7 @@ function DesktopDashboard({ m }: { m: any }) {
           <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Ticket Médio (6 meses)</CardTitle></CardHeader>
           <CardContent className="p-[0.3vw] h-[12vh] min-h-[80px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={m.ticketPorMes}>
+              <AreaChart data={ticketPorMes}>
                 <defs><linearGradient id="ticketGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(145,63%,42%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(145,63%,42%)" stopOpacity={0} /></linearGradient></defs>
                 <XAxis dataKey="mes" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} tickFormatter={(v: number) => `R$${v.toFixed(0)}`} />
@@ -235,7 +251,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Receita vs Custos (6 meses)</CardTitle></CardHeader>
         <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={m.receitaPorMes}>
+            <LineChart data={receitaPorMes}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
               <XAxis dataKey="mes" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
               <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickFormatter={(v: number) => `${(v/1000).toFixed(0)}k`} width={35} />
@@ -252,7 +268,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Vendas & Receita (7 dias)</CardTitle></CardHeader>
         <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={m.vendasPorDia}>
+            <AreaChart data={vendasPorDia}>
               <defs><linearGradient id="recGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(270,70%,55%)" stopOpacity={0.3} /><stop offset="100%" stopColor="hsl(270,70%,55%)" stopOpacity={0} /></linearGradient></defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
@@ -269,15 +285,15 @@ function DesktopDashboard({ m }: { m: any }) {
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
           <CardContent className="p-[0.4vw] flex items-center h-full min-h-[10vh]">
             <div className="w-[6vw] min-w-[60px] h-full shrink-0">
-              {m.paymentDistribution.length > 0 ? (
+              {paymentDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart><Pie data={m.paymentDistribution} cx="50%" cy="50%" innerRadius="40%" outerRadius="75%" paddingAngle={3} dataKey="value">{m.paymentDistribution.map((_: any, i: number) => <Cell key={i} fill={PIE_COLORS[i]} />)}</Pie></PieChart>
+                  <PieChart><Pie data={paymentDistribution} cx="50%" cy="50%" innerRadius="40%" outerRadius="75%" paddingAngle={3} dataKey="value">{paymentDistribution.map((_: any, i: number) => <Cell key={i} fill={PIE_COLORS[i]} />)}</Pie></PieChart>
                 </ResponsiveContainer>
               ) : null}
             </div>
             <div className="flex-1 min-w-0 pl-[0.3vw]">
               <p className="text-[clamp(8px,0.6vw,11px)] font-bold text-[hsl(var(--admin-text-muted))] mb-1">Pagamentos</p>
-              {m.paymentDistribution.map((p: any, i: number) => (
+              {paymentDistribution.map((p: any, i: number) => (
                 <div key={p.name} className="flex items-center gap-1 mb-0.5"><div className="w-2 h-2 rounded-full shrink-0" style={{ background: PIE_COLORS[i] }} /><span className="text-[clamp(8px,0.55vw,11px)] text-white truncate">{p.name}: {p.value}</span></div>
               ))}
             </div>
@@ -286,15 +302,15 @@ function DesktopDashboard({ m }: { m: any }) {
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
           <CardContent className="p-[0.4vw] flex items-center h-full min-h-[10vh]">
             <div className="w-[6vw] min-w-[60px] h-full shrink-0">
-              {m.statusDistribution.length > 0 ? (
+              {statusDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart><Pie data={m.statusDistribution} cx="50%" cy="50%" innerRadius="40%" outerRadius="75%" paddingAngle={3} dataKey="value">{m.statusDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie></PieChart>
+                  <PieChart><Pie data={statusDistribution} cx="50%" cy="50%" innerRadius="40%" outerRadius="75%" paddingAngle={3} dataKey="value">{statusDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie></PieChart>
                 </ResponsiveContainer>
               ) : null}
             </div>
             <div className="flex-1 min-w-0 pl-[0.3vw]">
               <p className="text-[clamp(8px,0.6vw,11px)] font-bold text-[hsl(var(--admin-text-muted))] mb-1">Status Pedidos</p>
-              {m.statusDistribution.slice(0, 5).map((s: any) => (
+              {statusDistribution.slice(0, 5).map((s: any) => (
                 <div key={s.name} className="flex items-center gap-1 mb-0.5"><div className="w-2 h-2 rounded-full shrink-0" style={{ background: s.fill }} /><span className="text-[clamp(8px,0.55vw,11px)] text-white truncate">{s.name}: {s.value}</span></div>
               ))}
             </div>
@@ -344,9 +360,9 @@ function DesktopDashboard({ m }: { m: any }) {
         <Sec icon={Wrench} color="bg-blue-600">Produção</Sec>
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
           <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            {m.productionDistribution.length > 0 ? (
+            {productionDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart><Pie data={m.productionDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{m.productionDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+                <PieChart><Pie data={productionDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{productionDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
               </ResponsiveContainer>
             ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
           </CardContent>
@@ -364,7 +380,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
           <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={m.leadsPorDia}>
+              <AreaChart data={leadsPorDia}>
                 <defs><linearGradient id="leadsGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(330,70%,55%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(330,70%,55%)" stopOpacity={0} /></linearGradient></defs>
                 <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
@@ -386,7 +402,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
           <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={m.visitasPorDia}>
+              <BarChart data={visitasPorDia}>
                 <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="visitas" fill="hsl(190,70%,50%)" radius={[3,3,0,0]} name="Visitas" />
@@ -406,9 +422,9 @@ function DesktopDashboard({ m }: { m: any }) {
         <Sec icon={Package} color="bg-orange-600">Produtos & Estoque</Sec>
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
           <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            {m.productsDistribution.length > 0 ? (
+            {productsDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart><Pie data={m.productsDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{m.productsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+                <PieChart><Pie data={productsDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{productsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
               </ResponsiveContainer>
             ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
           </CardContent>
@@ -426,9 +442,9 @@ function DesktopDashboard({ m }: { m: any }) {
         <Sec icon={FileText} color="bg-violet-600">Orçamentos</Sec>
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
           <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            {m.quotesDistribution.length > 0 ? (
+            {quotesDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart><Pie data={m.quotesDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{m.quotesDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+                <PieChart><Pie data={quotesDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{quotesDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
               </ResponsiveContainer>
             ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
           </CardContent>
@@ -445,12 +461,12 @@ function DesktopDashboard({ m }: { m: any }) {
         <Sec icon={Star} color="bg-amber-600">Avaliações</Sec>
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
           <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            {m.reviewsDistribution.length > 0 ? (
+            {reviewsDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={m.reviewsDistribution}>
+                <BarChart data={reviewsDistribution}>
                   <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="value" name="Avaliações" radius={[3,3,0,0]}>{m.reviewsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Bar>
+                  <Bar dataKey="value" name="Avaliações" radius={[3,3,0,0]}>{reviewsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Bar>
                 </BarChart>
               </ResponsiveContainer>
             ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
@@ -468,9 +484,9 @@ function DesktopDashboard({ m }: { m: any }) {
         <Sec icon={MessageSquare} color="bg-green-600">WhatsApp</Sec>
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
           <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            {m.whatsappDistribution.length > 0 ? (
+            {whatsappDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart><Pie data={m.whatsappDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{m.whatsappDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+                <PieChart><Pie data={whatsappDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{whatsappDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
               </ResponsiveContainer>
             ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
           </CardContent>
@@ -488,7 +504,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
           <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={m.caixaPorDia}>
+              <BarChart data={caixaPorDia}>
                 <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="entradas" fill="hsl(145,63%,42%)" radius={[3,3,0,0]} name="Entradas" />
