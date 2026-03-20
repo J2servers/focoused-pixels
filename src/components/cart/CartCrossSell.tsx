@@ -22,11 +22,7 @@ export function CartCrossSell({ cartItems }: CartCrossSellProps) {
     // Pick products not in cart, prioritize featured
     return allProducts
       .filter(p => !cartIds.has(p.id) && p.inStock)
-      .sort((a, b) => {
-        if (a.isFeatured && !b.isFeatured) return -1;
-        if (!a.isFeatured && b.isFeatured) return 1;
-        return b.rating - a.rating;
-      })
+      .sort((a, b) => b.rating - a.rating)
       .slice(0, 4);
   }, [allProducts, cartItems]);
 
