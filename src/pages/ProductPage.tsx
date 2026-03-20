@@ -42,6 +42,9 @@ const ProductPage = () => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [selectedFreight, setSelectedFreight] = useState<{
+    method: string; price: number; days: string; cep: string; city: string; state: string;
+  } | null>(null);
 
   // Track recently viewed - must be before early returns
   useEffect(() => {
