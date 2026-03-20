@@ -168,6 +168,9 @@ const CartPage = () => {
                 >
                   Limpar carrinho
                 </Button>
+
+                {/* Cross-sell Recommendations */}
+                <CartCrossSell cartItems={items} />
               </div>
 
               {/* Order Summary */}
