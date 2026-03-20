@@ -287,6 +287,42 @@ export function useDashboardMetrics() {
         });
       }
 
+      // ===== RECEITA POR MÊS (últimos 6 meses) =====
+      const receitaPorMes: { mes: string; receita: number; vendas: number; custos: number }[] = [];
+      for (let i = 5; i >= 0; i--) {
+        const mStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const mEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
+        const mOrders = activeOrders.filter(o => { const d = new Date(o.created_at); return d >= mStart && d <= mEnd; });
+        const mItems = allOrderItems.filter(item => {
+          const order = allOrders.find(o => o.id === item.order_id);
+          if (!order) return false;
+          const d = new Date(order.created_at);
+          return d >= mStart && d <= mEnd;
+        });
+        receitaPorMes.push({
+          mes: mStart.toLocaleDateString('pt-BR', { month: 'short' }),
+          receita: sum(mOrders),
+          vendas: mOrders.length,
+          custos: mItems.reduce((s, it) => s + (it.cost_material || 0) + (it.cost_labor || 0) + (it.cost_shipping || 0), 0),
+        });
+      }
+
+      // ===== DISTRIBUIÇÕES (para gráficos pizza) =====
+      const paymentDistribution = [
+        { name: 'PIX', value: pixOrders.length, total: sum(pixOrders), fill: 'hsl(170, 70%, 45%)' },
+        { name: 'Cartão', value: cardOrders.length, total: sum(cardOrders), fill: 'hsl(210, 80%, 55%)' },
+        { name: 'Boleto', value: boletoOrders.length, total: sum(boletoOrders), fill: 'hsl(220, 15%, 50%)' },
+      ].filter(p => p.value > 0);
+
+      const statusDistribution = [
+        { name: 'Pendentes', value: vendasPendentes, fill: 'hsl(45, 93%, 47%)' },
+        { name: 'Confirmadas', value: vendasConfirmadas, fill: 'hsl(210, 80%, 55%)' },
+        { name: 'Processando', value: vendasProcessando, fill: 'hsl(270, 70%, 55%)' },
+        { name: 'Enviadas', value: vendasEnviadas, fill: 'hsl(170, 70%, 45%)' },
+        { name: 'Entregues', value: vendasEntregues, fill: 'hsl(145, 63%, 42%)' },
+        { name: 'Canceladas', value: vendasCanceladas, fill: 'hsl(0, 72%, 51%)' },
+      ].filter(s => s.value > 0);
+
       return {
         // VENDAS
         vendasHoje, vendasSemana, vendasMes, vendasAno, vendasTotal,
@@ -359,6 +395,9 @@ export function useDashboardMetrics() {
 
         // TOP PRODUCTS
         topProducts: sortedProducts.slice(0, 5),
+
+        // GRÁFICOS
+        receitaPorMes, paymentDistribution, statusDistribution,
       };
     },
     refetchInterval: 60000, // Auto-refresh every minute
