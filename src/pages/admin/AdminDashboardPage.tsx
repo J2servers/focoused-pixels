@@ -158,7 +158,79 @@ function DesktopDashboard({ m }: { m: any }) {
       <div className="col-span-3"><HeroKPI label="Ticket Médio" value={m.ticketMedio} icon={Target} color="bg-gradient-to-br from-purple-500 to-purple-600" subtitle={`Hoje: R$ ${m.ticketMedioHoje.toFixed(2)}`} /></div>
       <div className="col-span-3"><HeroKPI label="Receita Líquida 12m" value={m.receitaLiquida} icon={TrendingUp} color="bg-gradient-to-br from-teal-500 to-teal-600" subtitle={`Margem: ${m.margemLiquida.toFixed(1)}%`} /></div>
 
-      {/* ROW 2: Charts - fluid height */}
+      {/* ROW 1.5: Conversion Analytics & Sales Funnel */}
+      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Funil de Vendas (Mês)</CardTitle></CardHeader>
+        <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
+          <div className="h-full flex items-center">
+            <div className="w-full space-y-[0.4vh]">
+              {m.funnelData.map((stage: any, i: number) => {
+                const maxVal = m.funnelData[0]?.value || 1;
+                const pct = maxVal > 0 ? (stage.value / maxVal * 100) : 0;
+                const nextStage = m.funnelData[i + 1];
+                const convRate = nextStage && stage.value > 0 ? (nextStage.value / stage.value * 100) : null;
+                return (
+                  <div key={stage.stage} className="flex items-center gap-[0.4vw]">
+                    <span className="text-[clamp(8px,0.6vw,11px)] text-[hsl(var(--admin-text-muted))] w-[4vw] text-right shrink-0">{stage.stage}</span>
+                    <div className="flex-1 h-[2vh] min-h-[14px] bg-[hsl(var(--admin-sidebar))] rounded-md overflow-hidden relative">
+                      <div className="h-full rounded-md transition-all duration-500" style={{ width: `${Math.max(pct, 3)}%`, background: stage.color }} />
+                      <span className="absolute inset-0 flex items-center justify-center text-[clamp(8px,0.55vw,10px)] font-bold text-white">{stage.value.toLocaleString('pt-BR')}</span>
+                    </div>
+                    {convRate !== null && (
+                      <span className="text-[clamp(7px,0.5vw,9px)] text-[hsl(var(--admin-text-muted))] w-[2.5vw] shrink-0">→{convRate.toFixed(0)}%</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Conversão Diária (7 dias)</CardTitle></CardHeader>
+        <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={m.conversaoPorDia}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
+              <YAxis yAxisId="left" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={30} />
+              <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={30} tickFormatter={(v: number) => `${v.toFixed(0)}%`} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Bar yAxisId="left" dataKey="visitas" fill="hsl(210,80%,55%)" radius={[3,3,0,0]} name="Visitas" opacity={0.6} />
+              <Bar yAxisId="left" dataKey="pedidos" fill="hsl(145,63%,42%)" radius={[3,3,0,0]} name="Pedidos" />
+              <Line yAxisId="right" type="monotone" dataKey="taxa" stroke="hsl(45,93%,47%)" strokeWidth={2} dot={{ r: 3 }} name="Taxa %" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <div className="col-span-4 grid grid-cols-2 gap-[0.3vw]">
+        <Card className="col-span-2 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+          <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Ticket Médio (6 meses)</CardTitle></CardHeader>
+          <CardContent className="p-[0.3vw] h-[12vh] min-h-[80px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={m.ticketPorMes}>
+                <defs><linearGradient id="ticketGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(145,63%,42%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(145,63%,42%)" stopOpacity={0} /></linearGradient></defs>
+                <XAxis dataKey="mes" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} tickFormatter={(v: number) => `R$${v.toFixed(0)}`} />
+                <Tooltip content={<CustomTooltip />} />
+                <Area type="monotone" dataKey="ticket" stroke="hsl(145,63%,42%)" fill="url(#ticketGrad)" strokeWidth={2} name="Ticket Médio (R$)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        <M label="Conv. Geral" value={m.overallConversion} icon={Target} color="bg-emerald-600" format="percent" />
+        <M label="Visita→Lead" value={m.visitToLead} icon={UserPlus} color="bg-blue-600" format="percent" />
+        <M label="Lead→Orç." value={m.leadToQuote} icon={FileText} color="bg-violet-600" format="percent" />
+        <M label="Orç.→Pedido" value={m.quoteToOrder} icon={ShoppingCart} color="bg-teal-600" format="percent" />
+        <M label="Abandonos" value={m.abandonedCarts} icon={XCircle} color="bg-red-600" />
+        <M label="R$ Abandonado" value={m.abandonedValue} icon={DollarSign} color="bg-red-700" format="currency" />
+        <M label="Recorrentes" value={m.repeatCustomers} icon={Repeat} color="bg-purple-600" />
+        <M label="Taxa Recorr." value={m.repeatRate} icon={Repeat} color="bg-purple-700" format="percent" />
+      </div>
+
       <Card className="col-span-5 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
         <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Receita vs Custos (6 meses)</CardTitle></CardHeader>
         <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
