@@ -256,6 +256,7 @@ const Index = () => {
       <CookieBanner />
       <MiniCart open={miniCartOpen} onOpenChange={setMiniCartOpen} />
       <PromoPopupManager />
+      <DynamicSocialProof />
     </div>
   );
 };
