@@ -66,6 +66,11 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
+/** Generate a client-side UUID so anonymous inserts don't need a protected SELECT */
+function generateClientOrderId(): string {
+  return crypto.randomUUID();
+}
+
 /** Sanitize phone: keep only digits, ensure 55 prefix */
 function sanitizePhone(phone: string): string | null {
   if (!phone) return null;
@@ -319,6 +324,7 @@ const PaymentPage = () => {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (uuidRegex.test(state.orderId)) return state.orderId;
 
+    const orderId = generateClientOrderId();
     const orderNumber = generateOrderNumber();
     const sanitizedPhone = sanitizePhone(state.customerPhone);
 
@@ -343,9 +349,10 @@ const PaymentPage = () => {
       prodNotes.push(`📎 Arquivos: ${uploadedFiles.map(f => f.name).join(', ')}`);
     }
 
-    const { data: order, error } = await supabase
+    const { error } = await supabase
       .from('orders')
       .insert({
+        id: orderId,
         order_number: orderNumber,
         customer_name: state.customerName.trim(),
         customer_email: state.customerEmail.trim().toLowerCase(),
@@ -360,8 +367,7 @@ const PaymentPage = () => {
         customer_files: uploadedFiles.length > 0 ? uploadedFiles.map(f => f.url) : [],
         production_notes: prodNotes.length > 0 ? prodNotes.join('\n') : null,
       })
-      .select('id')
-      .single();
+      ;
 
     if (error) {
       console.error('Error creating order:', error);
@@ -375,7 +381,7 @@ const PaymentPage = () => {
     // Save customer as lead
     await saveCustomerAsLead(state.customerName, state.customerEmail, state.customerPhone);
 
-    return order.id;
+    return orderId;
   };
 
   const handleCustomerSubmit = async () => {
