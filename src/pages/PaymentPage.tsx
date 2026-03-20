@@ -1067,7 +1067,7 @@ const PaymentPage = () => {
                         ) : (
                           <ExternalLink className="h-4 w-4 mr-2" />
                         )}
-                        Pagar com Cartão
+                        Pagar com Cartão de Crédito ou Débito
                       </Button>
                     </CardContent>
                   </Card>
