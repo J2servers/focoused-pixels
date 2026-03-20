@@ -108,6 +108,10 @@ export function ProductCardOptimized({
             <Eye className="h-4 w-4 text-foreground/70" />
           </button>
 
+          <div className="absolute top-2.5 right-12 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-background/90 rounded-full shadow">
+            <WishlistButton product={{ id: product.id, name: product.name, price: product.price, image: product.image, slug: product.slug }} size="sm" />
+          </div>
+
           <img
             src={product.image}
             alt={product.name}
