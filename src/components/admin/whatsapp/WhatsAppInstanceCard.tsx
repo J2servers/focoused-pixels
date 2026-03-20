@@ -16,9 +16,10 @@ interface WhatsAppInstanceCardProps {
   displayName: string;
   priority: number;
   onStatusChange?: (instanceName: string, status: ConnectionStatus) => void;
+  onPhoneChange?: (instanceName: string, phone: string) => void;
 }
 
-const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusChange }: WhatsAppInstanceCardProps) => {
+const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusChange, onPhoneChange }: WhatsAppInstanceCardProps) => {
   const [status, setStatus] = useState<ConnectionStatus>('unknown');
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -35,10 +36,23 @@ const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusCha
     try {
       const result = await callEvolution('status');
       const state = result?.data?.instance?.state || result?.data?.state;
+      const phone = result?.data?.instance?.owner || result?.data?.owner || result?.data?.instance?.profilePictureUrl ? '' : '';
+      const profileName = result?.data?.instance?.profileName || result?.data?.profileName;
+      const ownerJid = result?.data?.instance?.ownerJid || result?.data?.ownerJid || '';
+      
+      // Extract phone from ownerJid (format: 5511999999999@s.whatsapp.net)
+      const extractedPhone = ownerJid ? ownerJid.split('@')[0] : '';
+      
       let newStatus: ConnectionStatus = 'disconnected';
       if (state === 'open' || state === 'connected') {
         newStatus = 'connected';
         setQrCode(null);
+        if (extractedPhone) {
+          const formatted = extractedPhone.replace(/^(\d{2})(\d{2})(\d{4,5})(\d{4})$/, '+$1 ($2) $3-$4');
+          onPhoneChange?.(instanceName, formatted || extractedPhone);
+        } else if (profileName) {
+          onPhoneChange?.(instanceName, profileName);
+        }
       } else if (state === 'connecting') {
         newStatus = 'connecting';
       }
@@ -48,7 +62,7 @@ const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusCha
       setStatus('unknown');
       onStatusChange?.(instanceName, 'unknown');
     }
-  }, [callEvolution, instanceName, onStatusChange]);
+  }, [callEvolution, instanceName, onStatusChange, onPhoneChange]);
 
   useEffect(() => { checkStatus(); }, [checkStatus]);
 
