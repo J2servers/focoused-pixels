@@ -15,9 +15,10 @@ import {
   Star, Eye, CreditCard, QrCode, Landmark, Clock, Truck, CheckCircle,
   AlertTriangle, Wrench, Shield, FileText, Tag, Percent, MessageSquare,
   Boxes, ArrowUpRight, ArrowDownRight, Wallet, BarChart3, Activity,
-  Globe, UserPlus, Heart, Webhook, Layers, Target, Zap,
-  PieChart as PieChartIcon, Award, RefreshCw
+  Globe, UserPlus, Heart, Webhook, Layers, Target, Zap, Filter,
+  PieChart as PieChartIcon, Award, RefreshCw, ShoppingBag, Repeat, XCircle
 } from 'lucide-react';
+import { FunnelChart, Funnel, LabelList } from 'recharts';
 
 // ===== METRIC CARD - fluid sizing =====
 function M({ label, value, icon: Icon, color, href, format = 'number', trend }: {

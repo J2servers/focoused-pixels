@@ -398,6 +398,73 @@ export function useDashboardMetrics() {
         { name: 'Canceladas', value: vendasCanceladas, fill: 'hsl(0, 72%, 51%)' },
       ].filter(s => s.value > 0);
 
+      // ===== FUNIL DE VENDAS =====
+      const funnelData = [
+        { stage: 'Visitas', value: visitasMes, color: 'hsl(210,80%,55%)' },
+        { stage: 'Leads', value: leadsMes, color: 'hsl(270,70%,55%)' },
+        { stage: 'Orçamentos', value: orcamentosMes, color: 'hsl(45,93%,47%)' },
+        { stage: 'Pedidos', value: vendasMes, color: 'hsl(170,70%,45%)' },
+        { stage: 'Pagos', value: allOrders.filter(o => o.payment_status === 'paid' && new Date(o.created_at) >= monthStart).length, color: 'hsl(145,63%,42%)' },
+      ];
+
+      // Taxas de conversão entre etapas
+      const visitToLead = visitasMes > 0 ? (leadsMes / visitasMes * 100) : 0;
+      const leadToQuote = leadsMes > 0 ? (orcamentosMes / leadsMes * 100) : 0;
+      const quoteToOrder = orcamentosMes > 0 ? (vendasMes / orcamentosMes * 100) : 0;
+      const orderToPaid = vendasMes > 0 ? (funnelData[4].value / vendasMes * 100) : 0;
+      const overallConversion = visitasMes > 0 ? (funnelData[4].value / visitasMes * 100) : 0;
+
+      // Carrinhos abandonados (pedidos pendentes sem pagamento por mais de 1h)
+      const oneHourAgo = new Date(Date.now() - 3600000);
+      const abandonedCarts = allOrders.filter(o =>
+        o.payment_status === 'pending' && 
+        o.order_status === 'pending' &&
+        new Date(o.created_at) < oneHourAgo
+      ).length;
+      const abandonedCartsMonth = allOrders.filter(o => {
+        const d = new Date(o.created_at);
+        return d >= monthStart && o.payment_status === 'pending' && o.order_status === 'pending' && d < oneHourAgo;
+      }).length;
+      const abandonedValue = allOrders.filter(o =>
+        o.payment_status === 'pending' && o.order_status === 'pending' && new Date(o.created_at) < oneHourAgo
+      ).reduce((s, o) => s + (o.total || 0), 0);
+
+      // Ticket médio por período (6 meses)
+      const ticketPorMes: { mes: string; ticket: number }[] = [];
+      for (let i = 5; i >= 0; i--) {
+        const mStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const mEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
+        const mOrders = activeOrders.filter(o => { const d = new Date(o.created_at); return d >= mStart && d <= mEnd; });
+        ticketPorMes.push({
+          mes: mStart.toLocaleDateString('pt-BR', { month: 'short' }),
+          ticket: mOrders.length > 0 ? sum(mOrders) / mOrders.length : 0,
+        });
+      }
+
+      // Conversão por dia (7 dias) - visitas vs pedidos
+      const conversaoPorDia: { date: string; visitas: number; pedidos: number; taxa: number }[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const day = startOfDay(daysAgo(i));
+        const nextDay = new Date(day.getTime() + 86400000);
+        const dVisitas = allPageViews.filter(p => { const d = new Date(p.created_at); return d >= day && d < nextDay; }).length;
+        const dPedidos = activeOrders.filter(o => { const d = new Date(o.created_at); return d >= day && d < nextDay; }).length;
+        conversaoPorDia.push({
+          date: day.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' }),
+          visitas: dVisitas,
+          pedidos: dPedidos,
+          taxa: dVisitas > 0 ? (dPedidos / dVisitas * 100) : 0,
+        });
+      }
+
+      // Clientes recorrentes
+      const customerOrderCount = new Map<string, number>();
+      allOrders.forEach(o => {
+        const email = o.customer_email?.toLowerCase();
+        if (email) customerOrderCount.set(email, (customerOrderCount.get(email) || 0) + 1);
+      });
+      const repeatCustomers = Array.from(customerOrderCount.values()).filter(c => c > 1).length;
+      const repeatRate = uniqueCustomers > 0 ? (repeatCustomers / uniqueCustomers * 100) : 0;
+
       return {
         // VENDAS
         vendasHoje, vendasSemana, vendasMes, vendasAno, vendasTotal,
@@ -424,6 +491,7 @@ export function useDashboardMetrics() {
         totalLeads: allLeads.length, leadsHoje, leadsSemana, leadsMes,
         leadsInscritos, leadsDesinscritos,
         uniqueCustomers, newCustomersToday, newCustomersMonth,
+        repeatCustomers, repeatRate,
 
         // PRODUTOS
         totalProdutos: allProducts.length, produtosAtivos, produtosInativos,
@@ -470,6 +538,11 @@ export function useDashboardMetrics() {
 
         // TOP PRODUCTS
         topProducts: sortedProducts.slice(0, 5),
+
+        // CONVERSÃO & FUNIL
+        funnelData, visitToLead, leadToQuote, quoteToOrder, orderToPaid, overallConversion,
+        abandonedCarts, abandonedCartsMonth, abandonedValue,
+        ticketPorMes, conversaoPorDia, repeatCustomers, repeatRate,
 
         // GRÁFICOS
         receitaPorMes, paymentDistribution, statusDistribution,
