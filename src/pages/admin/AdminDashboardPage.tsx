@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import {
   LineChart, Line, PieChart, Pie, Cell, ResponsiveContainer,
   XAxis, YAxis, Tooltip, CartesianGrid, Legend, AreaChart, Area,
+  BarChart, Bar,
 } from 'recharts';
 import {
   DollarSign, ShoppingCart, TrendingUp, TrendingDown, Users, Package,
@@ -265,90 +266,174 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="Cartão (R$)" value={m.cardTotal} icon={CreditCard} color="bg-blue-600" format="currency" />
       </div>
 
-      {/* ROW 4: 4 sections */}
-      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
+      {/* ROW 4: Produção + Leads com gráficos */}
+      <div className="col-span-3">
         <Sec icon={Wrench} color="bg-blue-600">Produção</Sec>
-        <M label="Aguardando" value={m.prodPending} icon={Clock} color="bg-gray-600" href="/admin/kanban" />
-        <M label="Ag. Material" value={m.prodAwaitingMaterial} icon={AlertTriangle} color="bg-yellow-600" href="/admin/kanban" />
-        <M label="Em Produção" value={m.prodInProduction} icon={Wrench} color="bg-blue-600" href="/admin/kanban" />
-        <M label="Qualidade" value={m.prodQualityCheck} icon={Shield} color="bg-purple-600" />
-        <M label="Prontos" value={m.prodReady} icon={CheckCircle} color="bg-green-600" />
-        <M label="Tempo Médio" value={m.tempoMedioProdDias} icon={Clock} color="bg-indigo-600" format="days" />
+        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
+          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
+            {m.productionDistribution.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart><Pie data={m.productionDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{m.productionDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+              </ResponsiveContainer>
+            ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+          </CardContent>
+        </Card>
+        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+          <M label="Aguardando" value={m.prodPending} icon={Clock} color="bg-gray-600" href="/admin/kanban" />
+          <M label="Em Produção" value={m.prodInProduction} icon={Wrench} color="bg-blue-600" href="/admin/kanban" />
+          <M label="Prontos" value={m.prodReady} icon={CheckCircle} color="bg-green-600" />
+          <M label="Tempo Médio" value={m.tempoMedioProdDias} icon={Clock} color="bg-indigo-600" format="days" />
+        </div>
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
+      <div className="col-span-3">
         <Sec icon={Users} color="bg-pink-600">Clientes & Leads</Sec>
-        <M label="Clientes Únicos" value={m.uniqueCustomers} icon={Users} color="bg-pink-600" />
-        <M label="Clientes Hoje" value={m.newCustomersToday} icon={UserPlus} color="bg-pink-700" />
-        <M label="Total Leads" value={m.totalLeads} icon={Users} color="bg-violet-600" href="/admin/leads" />
-        <M label="Leads Hoje" value={m.leadsHoje} icon={UserPlus} color="bg-violet-700" />
-        <M label="Inscritos" value={m.leadsInscritos} icon={Heart} color="bg-green-600" />
-        <M label="Taxa Conv." value={m.taxaConversao} icon={Target} color="bg-amber-600" format="percent" />
+        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
+          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={m.leadsPorDia}>
+                <defs><linearGradient id="leadsGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(330,70%,55%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(330,70%,55%)" stopOpacity={0} /></linearGradient></defs>
+                <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Area type="monotone" dataKey="leads" stroke="hsl(330,70%,55%)" fill="url(#leadsGrad)" strokeWidth={2} name="Leads" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+          <M label="Total Leads" value={m.totalLeads} icon={Users} color="bg-violet-600" href="/admin/leads" />
+          <M label="Leads Hoje" value={m.leadsHoje} icon={UserPlus} color="bg-violet-700" />
+          <M label="Clientes Únicos" value={m.uniqueCustomers} icon={Users} color="bg-pink-600" />
+          <M label="Taxa Conv." value={m.taxaConversao} icon={Target} color="bg-amber-600" format="percent" />
+        </div>
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
-        <Sec icon={Eye} color="bg-cyan-600">Tráfego & Sistema</Sec>
-        <M label="Visitas Hoje" value={m.visitasHoje} icon={Eye} color="bg-cyan-600" />
-        <M label="Visitas Semana" value={m.visitasSemana} icon={Eye} color="bg-cyan-700" />
-        <M label="Visitas Mês" value={m.visitasMes} icon={Eye} color="bg-blue-600" />
-        <M label="Sessões Únicas" value={m.sessoesUnicas} icon={Users} color="bg-blue-700" />
-        <M label="Admin Hoje" value={m.auditoriaHoje} icon={Activity} color="bg-slate-600" href="/admin/logs" />
-        <M label="Webhooks" value={m.webhooksRecebidos} icon={Webhook} color="bg-indigo-600" />
+      <div className="col-span-3">
+        <Sec icon={Eye} color="bg-cyan-600">Tráfego</Sec>
+        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
+          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={m.visitasPorDia}>
+                <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="visitas" fill="hsl(190,70%,50%)" radius={[3,3,0,0]} name="Visitas" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+          <M label="Visitas Hoje" value={m.visitasHoje} icon={Eye} color="bg-cyan-600" />
+          <M label="Visitas Mês" value={m.visitasMes} icon={Eye} color="bg-blue-600" />
+          <M label="Sessões Únicas" value={m.sessoesUnicas} icon={Users} color="bg-blue-700" />
+          <M label="Auditoria Hoje" value={m.auditoriaHoje} icon={Activity} color="bg-slate-600" href="/admin/logs" />
+        </div>
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
+      <div className="col-span-3">
         <Sec icon={Package} color="bg-orange-600">Produtos & Estoque</Sec>
-        <M label="Total Produtos" value={m.totalProdutos} icon={Package} color="bg-orange-600" href="/admin/produtos" />
-        <M label="Ativos" value={m.produtosAtivos} icon={CheckCircle} color="bg-green-600" />
-        <M label="Sem Estoque" value={m.produtosSemEstoque} icon={AlertTriangle} color="bg-red-600" />
-        <M label="Estoque Baixo" value={m.produtosEstoqueBaixo} icon={AlertTriangle} color="bg-yellow-600" />
-        <M label="Valor Estoque" value={m.valorEstoqueProdutos} icon={DollarSign} color="bg-emerald-600" format="currency" />
-        <M label="Categorias" value={m.totalCategorias} icon={Layers} color="bg-indigo-600" href="/admin/categorias" />
+        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
+          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
+            {m.productsDistribution.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart><Pie data={m.productsDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{m.productsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+              </ResponsiveContainer>
+            ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+          </CardContent>
+        </Card>
+        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+          <M label="Total" value={m.totalProdutos} icon={Package} color="bg-orange-600" href="/admin/produtos" />
+          <M label="Sem Estoque" value={m.produtosSemEstoque} icon={AlertTriangle} color="bg-red-600" />
+          <M label="Estoque Baixo" value={m.produtosEstoqueBaixo} icon={AlertTriangle} color="bg-yellow-600" />
+          <M label="Valor Estoque" value={m.valorEstoqueProdutos} icon={DollarSign} color="bg-emerald-600" format="currency" />
+        </div>
       </div>
 
-      {/* ROW 5: 4 sections */}
-      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
+      {/* ROW 5: Orçamentos + Avaliações + WhatsApp + Caixa com gráficos */}
+      <div className="col-span-3">
         <Sec icon={FileText} color="bg-violet-600">Orçamentos</Sec>
-        <M label="Total" value={m.totalOrcamentos} icon={FileText} color="bg-violet-600" href="/admin/orcamentos" />
-        <M label="Pendentes" value={m.orcamentosPendentes} icon={Clock} color="bg-yellow-600" />
-        <M label="Aprovados" value={m.orcamentosAprovados} icon={CheckCircle} color="bg-green-600" />
-        <M label="Convertidos" value={m.orcamentosConvertidos} icon={TrendingUp} color="bg-blue-600" />
-        <M label="Rejeitados" value={m.orcamentosRejeitados} icon={AlertTriangle} color="bg-red-600" />
-        <M label="Conv. %" value={m.taxaConversaoOrcamento} icon={Target} color="bg-emerald-600" format="percent" />
+        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
+          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
+            {m.quotesDistribution.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart><Pie data={m.quotesDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{m.quotesDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+              </ResponsiveContainer>
+            ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+          </CardContent>
+        </Card>
+        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+          <M label="Total" value={m.totalOrcamentos} icon={FileText} color="bg-violet-600" href="/admin/orcamentos" />
+          <M label="Pendentes" value={m.orcamentosPendentes} icon={Clock} color="bg-yellow-600" />
+          <M label="Convertidos" value={m.orcamentosConvertidos} icon={TrendingUp} color="bg-blue-600" />
+          <M label="Conv. %" value={m.taxaConversaoOrcamento} icon={Target} color="bg-emerald-600" format="percent" />
+        </div>
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
+      <div className="col-span-3">
         <Sec icon={Star} color="bg-amber-600">Avaliações</Sec>
-        <M label="Total" value={m.totalReviews} icon={Star} color="bg-amber-600" href="/admin/avaliacoes" />
-        <M label="Pendentes" value={m.reviewsPendentes} icon={Clock} color="bg-yellow-600" />
-        <M label="Aprovadas" value={m.reviewsAprovadas} icon={CheckCircle} color="bg-green-600" />
-        <M label="Média" value={m.mediaGeral.toFixed(1)} icon={Star} color="bg-amber-700" format="text" />
-        <M label="5★" value={m.reviews5} icon={Star} color="bg-green-600" />
-        <M label="1★" value={m.reviews1} icon={Star} color="bg-red-600" />
+        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
+          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
+            {m.reviewsDistribution.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={m.reviewsDistribution}>
+                  <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="value" name="Avaliações" radius={[3,3,0,0]}>{m.reviewsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+          </CardContent>
+        </Card>
+        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+          <M label="Total" value={m.totalReviews} icon={Star} color="bg-amber-600" href="/admin/avaliacoes" />
+          <M label="Média" value={m.mediaGeral.toFixed(1)} icon={Star} color="bg-amber-700" format="text" />
+          <M label="Pendentes" value={m.reviewsPendentes} icon={Clock} color="bg-yellow-600" />
+          <M label="Aprovadas" value={m.reviewsAprovadas} icon={CheckCircle} color="bg-green-600" />
+        </div>
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
+      <div className="col-span-3">
         <Sec icon={MessageSquare} color="bg-green-600">WhatsApp</Sec>
-        <M label="Enviadas" value={m.whatsappEnviadas} icon={MessageSquare} color="bg-green-600" href="/admin/whatsapp" />
-        <M label="Pendentes" value={m.whatsappPendentes} icon={Clock} color="bg-yellow-600" />
-        <M label="Erros" value={m.whatsappErros} icon={AlertTriangle} color="bg-red-600" />
-        <M label="Online" value={m.whatsappConectadas} icon={Zap} color="bg-emerald-600" />
-        <M label="Banners" value={m.bannersAtivos} icon={Globe} color="bg-pink-600" href="/admin/hero" />
-        <M label="WH Erros" value={m.webhooksErro} icon={AlertTriangle} color={m.webhooksErro > 0 ? "bg-red-600" : "bg-green-600"} />
+        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
+          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
+            {m.whatsappDistribution.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart><Pie data={m.whatsappDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{m.whatsappDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+              </ResponsiveContainer>
+            ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+          </CardContent>
+        </Card>
+        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+          <M label="Enviadas" value={m.whatsappEnviadas} icon={MessageSquare} color="bg-green-600" href="/admin/whatsapp" />
+          <M label="Erros" value={m.whatsappErros} icon={AlertTriangle} color="bg-red-600" />
+          <M label="Online" value={m.whatsappConectadas} icon={Zap} color="bg-emerald-600" />
+          <M label="Banners" value={m.bannersAtivos} icon={Globe} color="bg-pink-600" href="/admin/hero" />
+        </div>
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
-        <Sec icon={Tag} color="bg-fuchsia-600">Cupons & Promoções</Sec>
-        <M label="Cupons Ativos" value={m.cuponsAtivos} icon={Tag} color="bg-fuchsia-600" href="/admin/cupons" />
-        <M label="Usos" value={m.totalUsoCupons} icon={Zap} color="bg-purple-600" />
-        <M label="Promoções" value={m.promocoesAtivas} icon={Percent} color="bg-orange-600" href="/admin/promocoes" />
-        <M label="Destaque" value={m.produtosDestaque} icon={Star} color="bg-amber-600" />
-        <M label="Val. Est. MP" value={m.valorEstoqueMateriais} icon={DollarSign} color="bg-amber-700" format="currency" />
-        <M label="Mat. Baixos" value={m.materiaisEstoqueBaixo} icon={Boxes} color={m.materiaisEstoqueBaixo > 0 ? "bg-red-600" : "bg-green-600"} />
+      <div className="col-span-3">
+        <Sec icon={Wallet} color="bg-fuchsia-600">Fluxo de Caixa</Sec>
+        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
+          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={m.caixaPorDia}>
+                <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="entradas" fill="hsl(145,63%,42%)" radius={[3,3,0,0]} name="Entradas" />
+                <Bar dataKey="saidas" fill="hsl(0,72%,51%)" radius={[3,3,0,0]} name="Saídas" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+          <M label="Cupons Ativos" value={m.cuponsAtivos} icon={Tag} color="bg-fuchsia-600" href="/admin/cupons" />
+          <M label="Promoções" value={m.promocoesAtivas} icon={Percent} color="bg-orange-600" href="/admin/promocoes" />
+          <M label="Val. Est. MP" value={m.valorEstoqueMateriais} icon={DollarSign} color="bg-amber-700" format="currency" />
+          <M label="Mat. Baixos" value={m.materiaisEstoqueBaixo} icon={Boxes} color={m.materiaisEstoqueBaixo > 0 ? "bg-red-600" : "bg-green-600"} />
+        </div>
       </div>
 
       {/* ROW 6: extras */}
-      <div className="col-span-12 grid grid-cols-10 gap-[0.3vw]">
+      <div className="col-span-12 grid grid-cols-12 gap-[0.3vw]">
         <M label="Boleto (R$)" value={m.boletoTotal} icon={Landmark} color="bg-slate-600" format="currency" />
         <M label="Leads Semana" value={m.leadsSemana} icon={UserPlus} color="bg-violet-600" />
         <M label="Leads Mês" value={m.leadsMes} icon={UserPlus} color="bg-purple-600" />
@@ -357,8 +442,10 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="Orç. Hoje" value={m.orcamentosHoje} icon={FileText} color="bg-violet-700" />
         <M label="Orç. Mês" value={m.orcamentosMes} icon={FileText} color="bg-purple-700" />
         <M label="Mov. Hoje" value={m.movimentacoesHoje} icon={RefreshCw} color="bg-blue-600" />
-        <M label="Rascunhos" value={m.produtosRascunho} icon={FileText} color="bg-slate-600" />
-        <M label="Inativos" value={m.produtosInativos} icon={AlertTriangle} color="bg-gray-600" />
+        <M label="Webhooks" value={m.webhooksRecebidos} icon={Webhook} color="bg-indigo-600" />
+        <M label="WH Erros" value={m.webhooksErro} icon={AlertTriangle} color={m.webhooksErro > 0 ? "bg-red-600" : "bg-green-600"} />
+        <M label="Inscritos" value={m.leadsInscritos} icon={Heart} color="bg-green-600" />
+        <M label="Categorias" value={m.totalCategorias} icon={Layers} color="bg-indigo-600" href="/admin/categorias" />
       </div>
     </div>
   );
