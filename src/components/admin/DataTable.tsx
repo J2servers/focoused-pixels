@@ -142,21 +142,24 @@ export function DataTable<T>({
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
-        {searchable && (
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
-            <Input
-              type="search"
-              placeholder={searchPlaceholder}
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="pl-10 h-10 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-1 focus-visible:ring-[hsl(var(--admin-accent-purple))]"
-            />
-          </div>
-        )}
+        <div className="flex flex-col sm:flex-row gap-3 flex-1">
+          {searchable && (
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
+              <Input
+                type="search"
+                placeholder={searchPlaceholder}
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="pl-10 h-10 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-1 focus-visible:ring-[hsl(var(--admin-accent-purple))]"
+              />
+            </div>
+          )}
+          {filterContent}
+        </div>
         {actions && <div className="flex gap-2">{actions}</div>}
       </div>
 
