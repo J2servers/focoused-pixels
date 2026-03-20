@@ -81,10 +81,10 @@ export const AdminLayout = ({
       >
         <AdminHeader title={title} />
         <main className={cn(
-          "flex-1 overflow-y-auto p-4 md:p-6",
-          isMobile && "pt-16" // Extra padding for mobile menu button
+          "flex-1 overflow-y-auto p-3 md:p-4",
+          isMobile && "pt-16"
         )}>
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full">
             {children}
           </div>
         </main>
