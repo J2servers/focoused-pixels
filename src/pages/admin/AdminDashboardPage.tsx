@@ -127,7 +127,7 @@ function MobileDashboard({ m }: { m: any }) {
         <CardHeader className="pb-1 pt-3 px-3"><CardTitle className="text-xs text-[hsl(var(--admin-text-muted))]">Receita 7 dias</CardTitle></CardHeader>
         <CardContent className="p-2 h-36">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={m.vendasPorDia}>
+            <AreaChart data={m.vendasPorDia || []}>
               <defs><linearGradient id="mRecGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(270,70%,55%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(270,70%,55%)" stopOpacity={0} /></linearGradient></defs>
               <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
