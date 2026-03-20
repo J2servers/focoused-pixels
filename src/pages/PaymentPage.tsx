@@ -880,9 +880,11 @@ const PaymentPage = () => {
                                   <CreditCard className="h-5 w-5 text-blue-500" />
                                 </div>
                                 <div>
-                                  <p className="font-medium">Cartão de Crédito</p>
+                                  <p className="font-medium">Cartão de Crédito / Débito</p>
                                   <p className="text-sm text-muted-foreground">
-                                    Até {maxInstallments}x de {formatCurrency(minInstallmentValue)}
+                                    {installments.length > 1
+                                      ? `Até ${installments[installments.length - 1].number}x de ${formatCurrency(installments[installments.length - 1].value)}`
+                                      : `${formatCurrency(paymentState.amount)} à vista`}
                                   </p>
                                 </div>
                               </div>
@@ -1023,7 +1025,7 @@ const PaymentPage = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <CreditCard className="h-5 w-5 text-blue-500" />
-                        Pagamento com Cartão
+                        Pagamento com Cartão de Crédito ou Débito
                       </CardTitle>
                       <CardDescription>
                         Você será redirecionado para o checkout seguro do Mercado Pago
@@ -1065,7 +1067,7 @@ const PaymentPage = () => {
                         ) : (
                           <ExternalLink className="h-4 w-4 mr-2" />
                         )}
-                        Pagar com Cartão
+                        Pagar com Cartão de Crédito ou Débito
                       </Button>
                     </CardContent>
                   </Card>
