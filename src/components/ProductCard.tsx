@@ -193,8 +193,13 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
             </div>
 
             <div className="mt-auto flex flex-col gap-2">
-              <Button className="h-10 w-full font-semibold" disabled={!product.inStock}>
-                {product.inStock ? 'COMPRAR' : 'INDISPONÍVEL'}
+              <Button 
+                className="h-10 w-full font-semibold" 
+                disabled={!product.inStock}
+                onClick={handleBuyNow}
+              >
+                <Zap className="h-4 w-4 mr-1" />
+                {product.inStock ? 'COMPRAR AGORA' : 'INDISPONÍVEL'}
               </Button>
               <Button
                 variant="outline"
