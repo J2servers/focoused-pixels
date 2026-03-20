@@ -157,7 +157,7 @@ const CheckoutPage = () => {
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1:
-        return !!(formData.customerName && formData.customerEmail && formData.customerPhone);
+        return !!(formData.customerName && formData.customerEmail && formData.customerPhone && formData.deliveryAddress && formData.deliveryCep);
       case 2:
         return formData.productTypes.length > 0 || items.length > 0;
       case 3:
@@ -247,6 +247,9 @@ const CheckoutPage = () => {
         payment_method: formData.paymentMethod || null,
         quote_id: quoteResult?.id || null,
         custom_text: formData.customText || null,
+        shipping_address: formData.deliveryAddress || null,
+        shipping_cep: formData.deliveryCep || null,
+        shipping_method: formData.shippingMethod || null,
         notes: [
           formData.additionalNotes,
           formData.purpose ? `Finalidade: ${formData.purpose}` : null,

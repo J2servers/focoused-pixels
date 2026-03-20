@@ -769,8 +769,13 @@ export type Database = {
           production_started_at: string | null
           production_status: string | null
           quote_id: string | null
+          shipping_address: string | null
+          shipping_cep: string | null
+          shipping_city: string | null
           shipping_company: string | null
           shipping_cost: number | null
+          shipping_method: string | null
+          shipping_state: string | null
           subtotal: number
           total: number
           tracking_code: string | null
@@ -796,8 +801,13 @@ export type Database = {
           production_started_at?: string | null
           production_status?: string | null
           quote_id?: string | null
+          shipping_address?: string | null
+          shipping_cep?: string | null
+          shipping_city?: string | null
           shipping_company?: string | null
           shipping_cost?: number | null
+          shipping_method?: string | null
+          shipping_state?: string | null
           subtotal?: number
           total?: number
           tracking_code?: string | null
@@ -823,8 +833,13 @@ export type Database = {
           production_started_at?: string | null
           production_status?: string | null
           quote_id?: string | null
+          shipping_address?: string | null
+          shipping_cep?: string | null
+          shipping_city?: string | null
           shipping_company?: string | null
           shipping_cost?: number | null
+          shipping_method?: string | null
+          shipping_state?: string | null
           subtotal?: number
           total?: number
           tracking_code?: string | null

@@ -99,6 +99,8 @@ const PaymentPage = () => {
     email: '',
     cpf: '',
     phone: '',
+    address: '',
+    cep: '',
   });
   
   // Custom product details (optional)
@@ -366,6 +368,8 @@ const PaymentPage = () => {
         custom_text: customText.trim() || null,
         customer_files: uploadedFiles.length > 0 ? uploadedFiles.map(f => f.url) : [],
         production_notes: prodNotes.length > 0 ? prodNotes.join('\n') : null,
+        shipping_address: customerForm.address?.trim() || null,
+        shipping_cep: customerForm.cep?.trim() || null,
       })
       ;
 
@@ -389,9 +393,17 @@ const PaymentPage = () => {
     
     const name = customerForm.name.trim();
     const email = customerForm.email.trim().toLowerCase();
+    const address = customerForm.address.trim();
+    const cep = customerForm.cep.trim();
+    const phone = customerForm.phone.trim();
     
-    if (!name || !email) {
-      toast.error('Nome e email são obrigatórios');
+    if (!name || !email || !phone) {
+      toast.error('Nome, email e telefone são obrigatórios');
+      return;
+    }
+
+    if (!address || !cep) {
+      toast.error('Endereço e CEP são obrigatórios para envio');
       return;
     }
     
@@ -643,13 +655,34 @@ const PaymentPage = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Telefone</Label>
+                    <Label htmlFor="phone">Telefone / WhatsApp *</Label>
                     <Input
                       id="phone"
                       placeholder="(00) 00000-0000"
                       value={customerForm.phone}
                       onChange={(e) => setCustomerForm(prev => ({ ...prev, phone: e.target.value }))}
                       maxLength={20}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Endereço de Entrega *</Label>
+                    <Textarea
+                      id="address"
+                      placeholder="Rua, número, complemento, bairro, cidade, estado"
+                      value={customerForm.address}
+                      onChange={(e) => setCustomerForm(prev => ({ ...prev, address: e.target.value }))}
+                      rows={2}
+                      maxLength={500}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cep">CEP *</Label>
+                    <Input
+                      id="cep"
+                      placeholder="00000-000"
+                      value={customerForm.cep}
+                      onChange={(e) => setCustomerForm(prev => ({ ...prev, cep: e.target.value }))}
+                      maxLength={10}
                     />
                   </div>
 

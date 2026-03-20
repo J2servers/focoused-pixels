@@ -124,24 +124,26 @@ export function CheckoutStepCustomer({ formData, updateFormData }: CheckoutStepC
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="deliveryAddress">Endereço Completo</Label>
+            <Label htmlFor="deliveryAddress">Endereço Completo *</Label>
             <Textarea
               id="deliveryAddress"
               value={formData.deliveryAddress}
               onChange={(e) => updateFormData({ deliveryAddress: e.target.value })}
               placeholder="Rua, número, complemento, bairro, cidade, estado"
               rows={2}
+              required
             />
           </div>
 
           <div className="grid sm:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="deliveryCep">CEP</Label>
+              <Label htmlFor="deliveryCep">CEP *</Label>
               <Input
                 id="deliveryCep"
                 value={formData.deliveryCep}
                 onChange={(e) => updateFormData({ deliveryCep: e.target.value })}
                 placeholder="00000-000"
+                required
               />
             </div>
             
