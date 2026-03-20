@@ -193,7 +193,7 @@ const AdminOrdersPage = () => {
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle>Pedido {selectedOrder?.order_number}</DialogTitle>
+            <DialogTitle>Venda {selectedOrder?.order_number}</DialogTitle>
           </DialogHeader>
           
           {selectedOrder && (
