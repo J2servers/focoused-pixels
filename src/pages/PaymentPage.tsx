@@ -880,9 +880,11 @@ const PaymentPage = () => {
                                   <CreditCard className="h-5 w-5 text-blue-500" />
                                 </div>
                                 <div>
-                                  <p className="font-medium">Cartão de Crédito</p>
+                                  <p className="font-medium">Cartão de Crédito / Débito</p>
                                   <p className="text-sm text-muted-foreground">
-                                    Até {maxInstallments}x de {formatCurrency(minInstallmentValue)}
+                                    {installments.length > 1
+                                      ? `Até ${installments[installments.length - 1].number}x de ${formatCurrency(installments[installments.length - 1].value)}`
+                                      : `${formatCurrency(paymentState.amount)} à vista`}
                                   </p>
                                 </div>
                               </div>
