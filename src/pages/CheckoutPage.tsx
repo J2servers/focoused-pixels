@@ -247,6 +247,9 @@ const CheckoutPage = () => {
         payment_method: formData.paymentMethod || null,
         quote_id: quoteResult?.id || null,
         custom_text: formData.customText || null,
+        shipping_address: formData.deliveryAddress || null,
+        shipping_cep: formData.deliveryCep || null,
+        shipping_method: formData.shippingMethod || null,
         notes: [
           formData.additionalNotes,
           formData.purpose ? `Finalidade: ${formData.purpose}` : null,
