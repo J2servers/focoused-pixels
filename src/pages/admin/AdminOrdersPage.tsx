@@ -59,7 +59,7 @@ const AdminOrdersPage = () => {
   };
 
   return (
-    <AdminLayout title="Pedidos" requireEditor>
+    <AdminLayout title="Vendas Feitas" requireEditor>
       <div className="space-y-6">
         {/* Filters */}
         <Card className="admin-card">
@@ -109,19 +109,19 @@ const AdminOrdersPage = () => {
         {/* Orders Table */}
         <Card className="admin-card">
           <CardHeader>
-            <CardTitle>Lista de Pedidos</CardTitle>
+            <CardTitle>Lista de Vendas</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8 text-muted-foreground">Carregando...</div>
             ) : filteredOrders.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">Nenhum pedido encontrado</div>
+              <div className="text-center py-8 text-muted-foreground">Nenhuma venda encontrada</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left p-3 font-medium">Pedido</th>
+                      <th className="text-left p-3 font-medium">Venda</th>
                       <th className="text-left p-3 font-medium">Cliente</th>
                       <th className="text-left p-3 font-medium">Total</th>
                       <th className="text-left p-3 font-medium">Status</th>
@@ -193,7 +193,7 @@ const AdminOrdersPage = () => {
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle>Pedido {selectedOrder?.order_number}</DialogTitle>
+            <DialogTitle>Venda {selectedOrder?.order_number}</DialogTitle>
           </DialogHeader>
           
           {selectedOrder && (
@@ -214,7 +214,7 @@ const AdminOrdersPage = () => {
                 {/* Status Controls */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium block mb-2">Status do Pedido</label>
+                    <label className="text-sm font-medium block mb-2">Status da Venda</label>
                     <Select
                       value={selectedOrder.order_status}
                       onValueChange={(value) => handleUpdateStatus(selectedOrder.id, value)}

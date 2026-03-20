@@ -204,13 +204,13 @@ export function useFinancialSummary() {
   const { data: quotesApproved } = useQuotesApproved();
   const { data: taxSettings } = useTaxSettings();
   
-  // Calcular receita dos últimos 12 meses
+  // Calcular receita dos últimos 12 meses (todas as vendas, exceto canceladas)
   const now = new Date();
   const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 12, 1);
   
   const ordersLast12Months = orders?.filter(o => 
     new Date(o.created_at) >= twelveMonthsAgo && 
-    ['completed', 'delivered'].includes(o.order_status)
+    o.order_status !== 'cancelled'
   ) || [];
   
   const receitaBruta = ordersLast12Months.reduce((sum, o) => sum + (o.total || 0), 0);

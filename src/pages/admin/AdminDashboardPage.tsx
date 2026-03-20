@@ -140,7 +140,7 @@ const AdminDashboardPage = () => {
       href: '/admin/avaliacoes'
     },
     { 
-      title: 'Pedidos Pendentes', 
+      title: 'Vendas Pendentes', 
       value: stats.pendingOrders, 
       icon: ShoppingCart, 
       color: 'from-rose-500 to-rose-600',

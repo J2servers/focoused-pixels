@@ -118,10 +118,10 @@ export function useUpdateOrder() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Pedido atualizado!');
+      toast.success('Venda atualizada!');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Erro ao atualizar pedido');
+      toast.error(error.message || 'Erro ao atualizar venda');
     },
   });
 }
