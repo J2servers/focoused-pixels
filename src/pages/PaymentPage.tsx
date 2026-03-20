@@ -647,13 +647,34 @@ const PaymentPage = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Telefone</Label>
+                    <Label htmlFor="phone">Telefone / WhatsApp *</Label>
                     <Input
                       id="phone"
                       placeholder="(00) 00000-0000"
                       value={customerForm.phone}
                       onChange={(e) => setCustomerForm(prev => ({ ...prev, phone: e.target.value }))}
                       maxLength={20}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Endereço de Entrega *</Label>
+                    <Textarea
+                      id="address"
+                      placeholder="Rua, número, complemento, bairro, cidade, estado"
+                      value={customerForm.address}
+                      onChange={(e) => setCustomerForm(prev => ({ ...prev, address: e.target.value }))}
+                      rows={2}
+                      maxLength={500}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cep">CEP *</Label>
+                    <Input
+                      id="cep"
+                      placeholder="00000-000"
+                      value={customerForm.cep}
+                      onChange={(e) => setCustomerForm(prev => ({ ...prev, cep: e.target.value }))}
+                      maxLength={10}
                     />
                   </div>
 
