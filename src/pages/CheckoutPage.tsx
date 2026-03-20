@@ -157,7 +157,7 @@ const CheckoutPage = () => {
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1:
-        return !!(formData.customerName && formData.customerEmail && formData.customerPhone);
+        return !!(formData.customerName && formData.customerEmail && formData.customerPhone && formData.deliveryAddress && formData.deliveryCep);
       case 2:
         return formData.productTypes.length > 0 || items.length > 0;
       case 3:
