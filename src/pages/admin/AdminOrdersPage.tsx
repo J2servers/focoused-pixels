@@ -115,7 +115,7 @@ const AdminOrdersPage = () => {
             {isLoading ? (
               <div className="text-center py-8 text-muted-foreground">Carregando...</div>
             ) : filteredOrders.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">Nenhum pedido encontrado</div>
+              <div className="text-center py-8 text-muted-foreground">Nenhuma venda encontrada</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
