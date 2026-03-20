@@ -18,7 +18,7 @@ import {
   PieChart as PieChartIcon, Award, RefreshCw
 } from 'lucide-react';
 
-// ===== COMPACT METRIC =====
+// ===== METRIC CARD - fluid sizing =====
 function M({ label, value, icon: Icon, color, href, format = 'number', trend }: {
   label: string; value: number | string; icon: React.ElementType; color: string;
   href?: string; format?: 'number' | 'currency' | 'percent' | 'text' | 'days'; trend?: number | null;
@@ -31,18 +31,18 @@ function M({ label, value, icon: Icon, color, href, format = 'number', trend }: 
 
   const inner = (
     <div className={cn(
-      "flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] transition-all h-full",
+      "flex items-center gap-[0.4vw] px-[0.5vw] py-[0.4vh] rounded-lg border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] transition-all h-full min-h-[3.5vh]",
       href && "hover:border-[hsl(var(--admin-accent-purple)/0.4)] cursor-pointer"
     )}>
-      <div className={cn("p-1 rounded-md shrink-0", color)}>
-        <Icon className="h-3 w-3 text-white" />
+      <div className={cn("p-[0.3vw] rounded-md shrink-0", color)}>
+        <Icon className="h-[1.2vw] w-[1.2vw] min-h-3 min-w-3 text-white" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-bold text-white truncate leading-tight">{fmt}</p>
-        <p className="text-[9px] text-[hsl(var(--admin-text-muted))] truncate leading-tight">{label}</p>
+        <p className="text-[clamp(10px,0.85vw,14px)] font-bold text-white truncate leading-tight">{fmt}</p>
+        <p className="text-[clamp(8px,0.6vw,11px)] text-[hsl(var(--admin-text-muted))] truncate leading-tight">{label}</p>
       </div>
       {trend !== undefined && trend !== null && (
-        <span className={cn("text-[9px] font-bold shrink-0", trend >= 0 ? "text-emerald-400" : "text-red-400")}>
+        <span className={cn("text-[clamp(8px,0.55vw,10px)] font-bold shrink-0", trend >= 0 ? "text-emerald-400" : "text-red-400")}>
           {trend >= 0 ? '↑' : '↓'}{Math.abs(trend).toFixed(0)}%
         </span>
       )}
@@ -52,7 +52,7 @@ function M({ label, value, icon: Icon, color, href, format = 'number', trend }: 
   return inner;
 }
 
-// ===== HERO KPI =====
+// ===== HERO KPI - fluid =====
 function HeroKPI({ label, value, icon: Icon, color, format = 'currency', subtitle, trend }: {
   label: string; value: number; icon: React.ElementType; color: string;
   format?: 'currency' | 'number'; subtitle?: string; trend?: number;
@@ -62,24 +62,24 @@ function HeroKPI({ label, value, icon: Icon, color, format = 'currency', subtitl
     : value.toLocaleString('pt-BR');
   return (
     <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-xl overflow-hidden h-full">
-      <CardContent className="p-3">
-        <div className="flex items-start justify-between mb-1">
-          <div className={cn("p-2 rounded-lg shadow-lg", color)}>
-            <Icon className="h-4 w-4 text-white" />
+      <CardContent className="p-[0.8vw]">
+        <div className="flex items-start justify-between mb-[0.3vh]">
+          <div className={cn("p-[0.5vw] rounded-lg shadow-lg", color)}>
+            <Icon className="h-[1.5vw] w-[1.5vw] min-h-4 min-w-4 text-white" />
           </div>
           {trend !== undefined && (
             <span className={cn(
-              "flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full",
+              "flex items-center gap-0.5 text-[clamp(9px,0.65vw,12px)] font-bold px-[0.4vw] py-[0.2vh] rounded-full",
               trend >= 0 ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
             )}>
-              {trend >= 0 ? <ArrowUpRight className="h-2.5 w-2.5" /> : <ArrowDownRight className="h-2.5 w-2.5" />}
+              {trend >= 0 ? <ArrowUpRight className="h-[0.8vw] w-[0.8vw] min-h-2.5 min-w-2.5" /> : <ArrowDownRight className="h-[0.8vw] w-[0.8vw] min-h-2.5 min-w-2.5" />}
               {Math.abs(trend).toFixed(0)}%
             </span>
           )}
         </div>
-        <p className="text-xl font-bold text-white leading-tight">{fmt}</p>
-        <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">{label}</p>
-        {subtitle && <p className="text-[9px] text-[hsl(var(--admin-text-muted)/0.6)]">{subtitle}</p>}
+        <p className="text-[clamp(16px,1.6vw,28px)] font-bold text-white leading-tight">{fmt}</p>
+        <p className="text-[clamp(9px,0.7vw,13px)] text-[hsl(var(--admin-text-muted))]">{label}</p>
+        {subtitle && <p className="text-[clamp(8px,0.55vw,11px)] text-[hsl(var(--admin-text-muted)/0.6)]">{subtitle}</p>}
       </CardContent>
     </Card>
   );
@@ -88,9 +88,9 @@ function HeroKPI({ label, value, icon: Icon, color, format = 'currency', subtitl
 // ===== SECTION LABEL =====
 function Sec({ children, icon: Icon, color }: { children: string; icon: React.ElementType; color: string }) {
   return (
-    <div className="flex items-center gap-1.5 col-span-full py-0.5">
-      <div className={cn("p-1 rounded-md", color)}><Icon className="h-3 w-3 text-white" /></div>
-      <h2 className="text-xs font-bold text-white tracking-wide">{children}</h2>
+    <div className="flex items-center gap-[0.4vw] col-span-full py-[0.3vh]">
+      <div className={cn("p-[0.3vw] rounded-md", color)}><Icon className="h-[1vw] w-[1vw] min-h-3 min-w-3 text-white" /></div>
+      <h2 className="text-[clamp(10px,0.75vw,14px)] font-bold text-white tracking-wide">{children}</h2>
     </div>
   );
 }
@@ -146,90 +146,90 @@ function MobileDashboard({ m }: { m: any }) {
   );
 }
 
-// ===== DESKTOP DASHBOARD =====
+// ===== DESKTOP DASHBOARD - fully fluid =====
 function DesktopDashboard({ m }: { m: any }) {
   return (
-    <div className="grid grid-cols-12 gap-1.5 auto-rows-min">
+    <div className="grid grid-cols-12 gap-[0.4vw] auto-rows-min">
       {/* ROW 1: Hero KPIs */}
       <div className="col-span-3"><HeroKPI label="Receita Hoje" value={m.receitaHoje} icon={DollarSign} color="bg-gradient-to-br from-emerald-500 to-emerald-600" subtitle={`${m.vendasHoje} vendas`} /></div>
       <div className="col-span-3"><HeroKPI label="Receita do Mês" value={m.receitaMes} icon={TrendingUp} color="bg-gradient-to-br from-blue-500 to-blue-600" trend={m.crescimentoReceita} subtitle={`${m.vendasMes} vendas`} /></div>
       <div className="col-span-3"><HeroKPI label="Ticket Médio" value={m.ticketMedio} icon={Target} color="bg-gradient-to-br from-purple-500 to-purple-600" subtitle={`Hoje: R$ ${m.ticketMedioHoje.toFixed(2)}`} /></div>
       <div className="col-span-3"><HeroKPI label="Receita Líquida 12m" value={m.receitaLiquida} icon={TrendingUp} color="bg-gradient-to-br from-teal-500 to-teal-600" subtitle={`Margem: ${m.margemLiquida.toFixed(1)}%`} /></div>
 
-      {/* ROW 2: Charts */}
+      {/* ROW 2: Charts - fluid height */}
       <Card className="col-span-5 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-        <CardHeader className="pb-0 pt-2 px-3"><CardTitle className="text-[10px] text-[hsl(var(--admin-text-muted))]">Receita vs Custos (6 meses)</CardTitle></CardHeader>
-        <CardContent className="p-1 h-36">
+        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Receita vs Custos (6 meses)</CardTitle></CardHeader>
+        <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={m.receitaPorMes}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-              <XAxis dataKey="mes" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
-              <YAxis tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickFormatter={(v: number) => `${(v/1000).toFixed(0)}k`} width={28} />
+              <XAxis dataKey="mes" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickFormatter={(v: number) => `${(v/1000).toFixed(0)}k`} width={35} />
               <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 9 }} />
-              <Line type="monotone" dataKey="receita" stroke="hsl(145,63%,42%)" strokeWidth={2} dot={{ r: 2 }} name="Receita" />
-              <Line type="monotone" dataKey="custos" stroke="hsl(0,72%,51%)" strokeWidth={2} dot={{ r: 2 }} name="Custos" />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Line type="monotone" dataKey="receita" stroke="hsl(145,63%,42%)" strokeWidth={2.5} dot={{ r: 3 }} name="Receita" />
+              <Line type="monotone" dataKey="custos" stroke="hsl(0,72%,51%)" strokeWidth={2} dot={{ r: 3 }} name="Custos" />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
       <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-        <CardHeader className="pb-0 pt-2 px-3"><CardTitle className="text-[10px] text-[hsl(var(--admin-text-muted))]">Vendas & Receita (7 dias)</CardTitle></CardHeader>
-        <CardContent className="p-1 h-36">
+        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Vendas & Receita (7 dias)</CardTitle></CardHeader>
+        <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={m.vendasPorDia}>
               <defs><linearGradient id="recGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(270,70%,55%)" stopOpacity={0.3} /><stop offset="100%" stopColor="hsl(270,70%,55%)" stopOpacity={0} /></linearGradient></defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
-              <YAxis tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={28} />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} />
               <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="receita" stroke="hsl(270,70%,55%)" fill="url(#recGrad)" strokeWidth={2} name="Receita (R$)" />
+              <Area type="monotone" dataKey="receita" stroke="hsl(270,70%,55%)" fill="url(#recGrad)" strokeWidth={2.5} name="Receita (R$)" />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      {/* Pie charts compact */}
-      <div className="col-span-3 grid grid-rows-2 gap-1.5">
+      {/* Pie charts - fluid */}
+      <div className="col-span-3 grid grid-rows-2 gap-[0.4vw]">
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-          <CardContent className="p-1.5 h-[70px] flex items-center">
-            <div className="w-16 h-full shrink-0">
+          <CardContent className="p-[0.4vw] flex items-center h-full min-h-[10vh]">
+            <div className="w-[6vw] min-w-[60px] h-full shrink-0">
               {m.paymentDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart><Pie data={m.paymentDistribution} cx="50%" cy="50%" innerRadius={16} outerRadius={26} paddingAngle={2} dataKey="value">{m.paymentDistribution.map((_: any, i: number) => <Cell key={i} fill={PIE_COLORS[i]} />)}</Pie></PieChart>
+                  <PieChart><Pie data={m.paymentDistribution} cx="50%" cy="50%" innerRadius="40%" outerRadius="75%" paddingAngle={3} dataKey="value">{m.paymentDistribution.map((_: any, i: number) => <Cell key={i} fill={PIE_COLORS[i]} />)}</Pie></PieChart>
                 </ResponsiveContainer>
               ) : null}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[9px] font-bold text-[hsl(var(--admin-text-muted))] mb-0.5">Pagamentos</p>
+            <div className="flex-1 min-w-0 pl-[0.3vw]">
+              <p className="text-[clamp(8px,0.6vw,11px)] font-bold text-[hsl(var(--admin-text-muted))] mb-1">Pagamentos</p>
               {m.paymentDistribution.map((p: any, i: number) => (
-                <div key={p.name} className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: PIE_COLORS[i] }} /><span className="text-[8px] text-white truncate">{p.name}: {p.value}</span></div>
+                <div key={p.name} className="flex items-center gap-1 mb-0.5"><div className="w-2 h-2 rounded-full shrink-0" style={{ background: PIE_COLORS[i] }} /><span className="text-[clamp(8px,0.55vw,11px)] text-white truncate">{p.name}: {p.value}</span></div>
               ))}
             </div>
           </CardContent>
         </Card>
         <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-          <CardContent className="p-1.5 h-[70px] flex items-center">
-            <div className="w-16 h-full shrink-0">
+          <CardContent className="p-[0.4vw] flex items-center h-full min-h-[10vh]">
+            <div className="w-[6vw] min-w-[60px] h-full shrink-0">
               {m.statusDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart><Pie data={m.statusDistribution} cx="50%" cy="50%" innerRadius={16} outerRadius={26} paddingAngle={2} dataKey="value">{m.statusDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie></PieChart>
+                  <PieChart><Pie data={m.statusDistribution} cx="50%" cy="50%" innerRadius="40%" outerRadius="75%" paddingAngle={3} dataKey="value">{m.statusDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie></PieChart>
                 </ResponsiveContainer>
               ) : null}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[9px] font-bold text-[hsl(var(--admin-text-muted))] mb-0.5">Status</p>
-              {m.statusDistribution.slice(0, 4).map((s: any) => (
-                <div key={s.name} className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: s.fill }} /><span className="text-[8px] text-white truncate">{s.name}: {s.value}</span></div>
+            <div className="flex-1 min-w-0 pl-[0.3vw]">
+              <p className="text-[clamp(8px,0.6vw,11px)] font-bold text-[hsl(var(--admin-text-muted))] mb-1">Status Pedidos</p>
+              {m.statusDistribution.slice(0, 5).map((s: any) => (
+                <div key={s.name} className="flex items-center gap-1 mb-0.5"><div className="w-2 h-2 rounded-full shrink-0" style={{ background: s.fill }} /><span className="text-[clamp(8px,0.55vw,11px)] text-white truncate">{s.name}: {s.value}</span></div>
               ))}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* ROW 3: Vendas + Financeiro dense grids */}
-      <div className="col-span-6 grid grid-cols-5 gap-1">
+      {/* ROW 3: Vendas + Financeiro */}
+      <div className="col-span-6 grid grid-cols-5 gap-[0.3vw]">
         <M label="Vendas Hoje" value={m.vendasHoje} icon={ShoppingCart} color="bg-emerald-600" href="/admin/pedidos" />
         <M label="Vendas Semana" value={m.vendasSemana} icon={ShoppingCart} color="bg-emerald-700" />
         <M label="Vendas Mês" value={m.vendasMes} icon={ShoppingCart} color="bg-teal-600" trend={m.crescimentoVendas} />
@@ -247,7 +247,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="Pgtos Falhados" value={m.pagamentosFalhados} icon={AlertTriangle} color="bg-red-700" />
       </div>
 
-      <div className="col-span-6 grid grid-cols-5 gap-1">
+      <div className="col-span-6 grid grid-cols-5 gap-[0.3vw]">
         <M label="Receita Bruta 12m" value={m.receitaBruta12m} icon={DollarSign} color="bg-emerald-600" format="currency" />
         <M label="Custos Totais" value={m.custoTotal} icon={TrendingDown} color="bg-red-600" format="currency" />
         <M label="Custo Material" value={m.custoMaterial} icon={Boxes} color="bg-red-700" format="currency" />
@@ -265,8 +265,8 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="Cartão (R$)" value={m.cardTotal} icon={CreditCard} color="bg-blue-600" format="currency" />
       </div>
 
-      {/* ROW 4: 4 sections side by side */}
-      <div className="col-span-3 grid grid-cols-2 gap-1">
+      {/* ROW 4: 4 sections */}
+      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
         <Sec icon={Wrench} color="bg-blue-600">Produção</Sec>
         <M label="Aguardando" value={m.prodPending} icon={Clock} color="bg-gray-600" href="/admin/kanban" />
         <M label="Ag. Material" value={m.prodAwaitingMaterial} icon={AlertTriangle} color="bg-yellow-600" href="/admin/kanban" />
@@ -276,7 +276,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="Tempo Médio" value={m.tempoMedioProdDias} icon={Clock} color="bg-indigo-600" format="days" />
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-1">
+      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
         <Sec icon={Users} color="bg-pink-600">Clientes & Leads</Sec>
         <M label="Clientes Únicos" value={m.uniqueCustomers} icon={Users} color="bg-pink-600" />
         <M label="Clientes Hoje" value={m.newCustomersToday} icon={UserPlus} color="bg-pink-700" />
@@ -286,7 +286,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="Taxa Conv." value={m.taxaConversao} icon={Target} color="bg-amber-600" format="percent" />
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-1">
+      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
         <Sec icon={Eye} color="bg-cyan-600">Tráfego & Sistema</Sec>
         <M label="Visitas Hoje" value={m.visitasHoje} icon={Eye} color="bg-cyan-600" />
         <M label="Visitas Semana" value={m.visitasSemana} icon={Eye} color="bg-cyan-700" />
@@ -296,7 +296,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="Webhooks" value={m.webhooksRecebidos} icon={Webhook} color="bg-indigo-600" />
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-1">
+      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
         <Sec icon={Package} color="bg-orange-600">Produtos & Estoque</Sec>
         <M label="Total Produtos" value={m.totalProdutos} icon={Package} color="bg-orange-600" href="/admin/produtos" />
         <M label="Ativos" value={m.produtosAtivos} icon={CheckCircle} color="bg-green-600" />
@@ -307,7 +307,7 @@ function DesktopDashboard({ m }: { m: any }) {
       </div>
 
       {/* ROW 5: 4 sections */}
-      <div className="col-span-3 grid grid-cols-2 gap-1">
+      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
         <Sec icon={FileText} color="bg-violet-600">Orçamentos</Sec>
         <M label="Total" value={m.totalOrcamentos} icon={FileText} color="bg-violet-600" href="/admin/orcamentos" />
         <M label="Pendentes" value={m.orcamentosPendentes} icon={Clock} color="bg-yellow-600" />
@@ -317,7 +317,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="Conv. %" value={m.taxaConversaoOrcamento} icon={Target} color="bg-emerald-600" format="percent" />
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-1">
+      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
         <Sec icon={Star} color="bg-amber-600">Avaliações</Sec>
         <M label="Total" value={m.totalReviews} icon={Star} color="bg-amber-600" href="/admin/avaliacoes" />
         <M label="Pendentes" value={m.reviewsPendentes} icon={Clock} color="bg-yellow-600" />
@@ -327,7 +327,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="1★" value={m.reviews1} icon={Star} color="bg-red-600" />
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-1">
+      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
         <Sec icon={MessageSquare} color="bg-green-600">WhatsApp</Sec>
         <M label="Enviadas" value={m.whatsappEnviadas} icon={MessageSquare} color="bg-green-600" href="/admin/whatsapp" />
         <M label="Pendentes" value={m.whatsappPendentes} icon={Clock} color="bg-yellow-600" />
@@ -337,7 +337,7 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="WH Erros" value={m.webhooksErro} icon={AlertTriangle} color={m.webhooksErro > 0 ? "bg-red-600" : "bg-green-600"} />
       </div>
 
-      <div className="col-span-3 grid grid-cols-2 gap-1">
+      <div className="col-span-3 grid grid-cols-2 gap-[0.3vw]">
         <Sec icon={Tag} color="bg-fuchsia-600">Cupons & Promoções</Sec>
         <M label="Cupons Ativos" value={m.cuponsAtivos} icon={Tag} color="bg-fuchsia-600" href="/admin/cupons" />
         <M label="Usos" value={m.totalUsoCupons} icon={Zap} color="bg-purple-600" />
@@ -347,8 +347,8 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="Mat. Baixos" value={m.materiaisEstoqueBaixo} icon={Boxes} color={m.materiaisEstoqueBaixo > 0 ? "bg-red-600" : "bg-green-600"} />
       </div>
 
-      {/* ROW 6: Boleto + extras */}
-      <div className="col-span-12 grid grid-cols-10 gap-1">
+      {/* ROW 6: extras */}
+      <div className="col-span-12 grid grid-cols-10 gap-[0.3vw]">
         <M label="Boleto (R$)" value={m.boletoTotal} icon={Landmark} color="bg-slate-600" format="currency" />
         <M label="Leads Semana" value={m.leadsSemana} icon={UserPlus} color="bg-violet-600" />
         <M label="Leads Mês" value={m.leadsMes} icon={UserPlus} color="bg-purple-600" />
@@ -372,9 +372,9 @@ const AdminDashboardPage = () => {
   if (isLoading || !m) {
     return (
       <AdminLayout title="Dashboard">
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-[0.4vw]">
           {Array.from({ length: 16 }).map((_, i) => (
-            <Skeleton key={i} className="h-16 rounded-lg bg-[hsl(var(--admin-sidebar))]" />
+            <Skeleton key={i} className="h-[8vh] rounded-lg bg-[hsl(var(--admin-sidebar))]" />
           ))}
         </div>
       </AdminLayout>
