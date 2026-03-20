@@ -222,9 +222,38 @@ const CheckoutPage = () => {
         status: 'pending' as const,
       };
 
-      const { error } = await supabase.from('quotes').insert(quoteData);
+      const { data: quoteResult, error } = await supabase.from('quotes').insert(quoteData).select('id').single();
 
       if (error) throw error;
+
+      // Also create an order so it appears in production tracking
+      const orderNumber = `PL${new Date().getFullYear().toString().slice(-2)}${(new Date().getMonth() + 1).toString().padStart(2, '0')}${new Date().getDate().toString().padStart(2, '0')}-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+      
+      const orderItems = items.length > 0
+        ? JSON.parse(JSON.stringify(items))
+        : formData.productTypes.map(pt => ({ product_type: pt, quantity: formData.quantity }));
+
+      await supabase.from('orders').insert({
+        order_number: orderNumber,
+        customer_name: formData.customerName,
+        customer_email: formData.customerEmail,
+        customer_phone: formData.customerPhone,
+        items: orderItems as unknown as import('@/integrations/supabase/types').Json,
+        subtotal: total > 0 ? total : 0,
+        total: total > 0 ? total : 0,
+        order_status: 'pending',
+        payment_status: 'pending',
+        production_status: 'pending',
+        payment_method: formData.paymentMethod || null,
+        quote_id: quoteResult?.id || null,
+        custom_text: formData.customText || null,
+        notes: [
+          formData.additionalNotes,
+          formData.purpose ? `Finalidade: ${formData.purpose}` : null,
+          formData.dimensions ? `Dimensões: ${formData.dimensions}` : null,
+          formData.material ? `Material: ${formData.material}` : null,
+        ].filter(Boolean).join('\n') || null,
+      });
 
       // Save lead for marketing
       try {
@@ -236,7 +265,6 @@ const CheckoutPage = () => {
           tags: ['orcamento', ...formData.productTypes],
         });
       } catch {
-        // Lead save is not critical, just log
         console.log('Lead already exists or failed to save');
       }
 
