@@ -42,6 +42,9 @@ const ProductPage = () => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [selectedFreight, setSelectedFreight] = useState<{
+    method: string; price: number; days: string; cep: string; city: string; state: string;
+  } | null>(null);
 
   // Track recently viewed - must be before early returns
   useEffect(() => {
@@ -141,7 +144,10 @@ const ProductPage = () => {
     if (!added) return;
 
     // Save payment data to sessionStorage for PaymentPage
-    const totalAmount = discountedPrice * quantity;
+    const subtotal = discountedPrice * quantity;
+    const shippingCost = selectedFreight?.price || 0;
+    const totalAmount = subtotal + shippingCost;
+    
     sessionStorage.setItem('pending_payment', JSON.stringify({
       orderId: `quick-${Date.now()}`,
       amount: totalAmount,
@@ -156,6 +162,14 @@ const ProductPage = () => {
         price: discountedPrice,
         size: selectedSize || undefined,
       }],
+      shipping: selectedFreight ? {
+        method: selectedFreight.method,
+        cost: shippingCost,
+        days: selectedFreight.days,
+        cep: selectedFreight.cep,
+        city: selectedFreight.city,
+        state: selectedFreight.state,
+      } : null,
     }));
 
     navigate('/pagamento');
@@ -350,7 +364,10 @@ const ProductPage = () => {
                 onAddToCart={handleAddToCart}
               />
               {/* Freight Calculator */}
-              <FreightCalculator productPrice={product.price * quantity} />
+              <FreightCalculator 
+                productPrice={product.price * quantity} 
+                onFreightSelect={setSelectedFreight}
+              />
             </div>
           </div>
 

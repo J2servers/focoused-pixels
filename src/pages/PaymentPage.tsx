@@ -351,6 +351,16 @@ const PaymentPage = () => {
       prodNotes.push(`📎 Arquivos: ${uploadedFiles.map(f => f.name).join(', ')}`);
     }
 
+    // Extract shipping info from sessionStorage
+    let shippingInfo: { method?: string; cost?: number; cep?: string; city?: string; state?: string } = {};
+    try {
+      const storedPayment = sessionStorage.getItem('pending_payment');
+      if (storedPayment) {
+        const parsed = JSON.parse(storedPayment);
+        shippingInfo = parsed.shipping || {};
+      }
+    } catch {}
+
     const { error } = await supabase
       .from('orders')
       .insert({
@@ -360,16 +370,20 @@ const PaymentPage = () => {
         customer_email: state.customerEmail.trim().toLowerCase(),
         customer_phone: sanitizedPhone || state.customerPhone || '',
         items: cartItems as unknown as import('@/integrations/supabase/types').Json,
-        subtotal: state.amount,
+        subtotal: state.amount - (shippingInfo.cost || 0),
         total: state.amount,
+        shipping_cost: shippingInfo.cost || 0,
+        shipping_method: shippingInfo.method || null,
+        shipping_cep: shippingInfo.cep || customerForm.cep?.trim() || null,
+        shipping_city: shippingInfo.city || null,
+        shipping_state: shippingInfo.state || null,
+        shipping_address: customerForm.address?.trim() || null,
         order_status: 'pending',
         payment_status: 'pending',
         production_status: 'pending',
         custom_text: customText.trim() || null,
         customer_files: uploadedFiles.length > 0 ? uploadedFiles.map(f => f.url) : [],
         production_notes: prodNotes.length > 0 ? prodNotes.join('\n') : null,
-        shipping_address: customerForm.address?.trim() || null,
-        shipping_cep: customerForm.cep?.trim() || null,
       })
       ;
 

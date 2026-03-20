@@ -1,52 +1,99 @@
 /**
- * FreightCalculator - CEP-based freight estimate on product page
+ * FreightCalculator - CEP-based freight estimate using real API
  */
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Truck, Loader2, MapPin } from 'lucide-react';
-
-interface FreightCalculatorProps {
-  productPrice: number;
-  freeShippingMinimum?: number;
-}
+import { Truck, Loader2, MapPin, Check } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface FreightResult {
   method: string;
   price: number;
+  originalPrice: number;
   days: string;
+  daysMin: number;
+  daysMax: number;
 }
 
-export function FreightCalculator({ productPrice, freeShippingMinimum = 159 }: FreightCalculatorProps) {
+interface FreightDestination {
+  city: string;
+  state: string;
+  cep: string;
+}
+
+interface FreightCalculatorProps {
+  productPrice: number;
+  freeShippingMinimum?: number;
+  onFreightSelect?: (freight: { method: string; price: number; days: string; cep: string; city: string; state: string }) => void;
+}
+
+export function FreightCalculator({ productPrice, freeShippingMinimum = 159, onFreightSelect }: FreightCalculatorProps) {
   const [cep, setCep] = useState('');
   const [results, setResults] = useState<FreightResult[] | null>(null);
+  const [destination, setDestination] = useState<FreightDestination | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
 
-  const hasFreeShipping = productPrice >= freeShippingMinimum;
-
-  const calculateFreight = () => {
-    if (cep.replace(/\D/g, '').length < 8) return;
+  const calculateFreight = async () => {
+    const cleanCep = cep.replace(/\D/g, '');
+    if (cleanCep.length < 8) return;
 
     setIsLoading(true);
-    // Simulated freight calculation
-    setTimeout(() => {
-      const basePAC = 15 + Math.random() * 10;
-      const baseSEDEX = basePAC * 1.8;
-      
-      setResults([
-        {
-          method: 'PAC',
-          price: hasFreeShipping ? 0 : Math.round(basePAC * 100) / 100,
-          days: '8 a 12 dias úteis',
+    setResults(null);
+    setSelectedMethod(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('calculate-freight', {
+        body: {
+          destinationCep: cleanCep,
+          productPrice,
+          weight: 0.5,
         },
-        {
-          method: 'SEDEX',
-          price: hasFreeShipping ? 0 : Math.round(baseSEDEX * 100) / 100,
-          days: '3 a 5 dias úteis',
-        },
-      ]);
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setResults(data.results);
+      setDestination(data.destination);
+
+      // Auto-select cheapest option
+      if (data.results?.length > 0) {
+        const cheapest = data.results[0];
+        setSelectedMethod(cheapest.method);
+        onFreightSelect?.({
+          method: cheapest.method,
+          price: cheapest.price,
+          days: cheapest.days,
+          cep: cleanCep,
+          city: data.destination.city,
+          state: data.destination.state,
+        });
+      }
+    } catch (err) {
+      console.error('Freight error:', err);
+      toast.error('Erro ao calcular frete. Tente novamente.');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
+  };
+
+  const handleSelect = (r: FreightResult) => {
+    setSelectedMethod(r.method);
+    onFreightSelect?.({
+      method: r.method,
+      price: r.price,
+      days: r.days,
+      cep: cep.replace(/\D/g, ''),
+      city: destination?.city || '',
+      state: destination?.state || '',
+    });
   };
 
   return (
@@ -67,6 +114,12 @@ export function FreightCalculator({ productPrice, freeShippingMinimum = 159 }: F
             }}
             className="pl-9 h-9 text-sm"
             maxLength={9}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                calculateFreight();
+              }
+            }}
           />
         </div>
         <Button
@@ -79,18 +132,37 @@ export function FreightCalculator({ productPrice, freeShippingMinimum = 159 }: F
         </Button>
       </div>
 
+      {destination && (
+        <p className="text-xs text-muted-foreground">
+          📍 {destination.city} - {destination.state}
+        </p>
+      )}
+
       {results && (
         <div className="space-y-2">
           {results.map((r) => (
-            <div key={r.method} className="flex items-center justify-between text-sm py-2 px-3 rounded-lg bg-muted/50">
-              <div>
-                <span className="font-medium">{r.method}</span>
-                <span className="text-xs text-muted-foreground ml-2">{r.days}</span>
+            <button
+              key={r.method}
+              onClick={() => handleSelect(r)}
+              className={`w-full flex items-center justify-between text-sm py-2.5 px-3 rounded-lg transition-all duration-200 text-left ${
+                selectedMethod === r.method
+                  ? 'bg-primary/10 ring-1 ring-primary/30'
+                  : 'bg-muted/50 hover:bg-muted/80'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {selectedMethod === r.method && (
+                  <Check className="h-3.5 w-3.5 text-primary shrink-0" />
+                )}
+                <div>
+                  <span className="font-medium">{r.method}</span>
+                  <span className="text-xs text-muted-foreground ml-2">{r.days}</span>
+                </div>
               </div>
-              <span className={`font-bold ${r.price === 0 ? 'text-success' : ''}`}>
+              <span className={`font-bold ${r.price === 0 ? 'text-green-600' : ''}`}>
                 {r.price === 0 ? 'Grátis' : `R$ ${r.price.toFixed(2)}`}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       )}
