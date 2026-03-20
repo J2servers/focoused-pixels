@@ -59,7 +59,7 @@ const AdminOrdersPage = () => {
   };
 
   return (
-    <AdminLayout title="Pedidos" requireEditor>
+    <AdminLayout title="Vendas Feitas" requireEditor>
       <div className="space-y-6">
         {/* Filters */}
         <Card className="admin-card">
