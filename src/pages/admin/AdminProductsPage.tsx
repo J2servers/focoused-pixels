@@ -77,11 +77,13 @@ const AdminProductsPage = () => {
     min_stock: '5',
   });
 
+  const [filterCategoryId, setFilterCategoryId] = useState<string>('all');
+
   const fetchData = async () => {
     setIsLoading(true);
     const [productsRes, categoriesRes] = await Promise.all([
       supabase.from('products').select('*').is('deleted_at', null).order('created_at', { ascending: false }),
-      supabase.from('categories').select('id, name').eq('status', 'active'),
+      supabase.from('categories').select('id, name, parent_id').eq('status', 'active').order('name'),
     ]);
 
     if (productsRes.data) setProducts(productsRes.data);
