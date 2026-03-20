@@ -367,6 +367,9 @@ const ProductPage = () => {
             productName={product.name} 
           />
 
+          {/* FAQ */}
+          <ProductFAQ productName={product.name} />
+
           {/* Related Products */}
           <RelatedProducts product={product} limit={4} />
 
