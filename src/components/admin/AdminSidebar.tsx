@@ -20,7 +20,9 @@ import {
   Menu,
   X,
   Webhook,
-  MessageSquare
+  MessageSquare,
+  Mail,
+  ImageIcon
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
