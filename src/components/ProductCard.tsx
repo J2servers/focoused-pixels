@@ -49,6 +49,28 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
     setQuickViewOpen(true);
   };
 
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+    });
+    sessionStorage.setItem('pending_payment', JSON.stringify({
+      orderId: `quick-${Date.now()}`,
+      amount: product.price,
+      customerName: '',
+      customerEmail: '',
+      customerCpf: '',
+      customerPhone: '',
+      description: product.name,
+      cartItems: [{ name: product.name, quantity: 1, price: product.price }],
+    }));
+    navigate('/pagamento');
+  };
+
   const badgeVariants: Record<string, { label: string; className: string }> = {
     lancamento: { label: 'LANÇAMENTO', className: 'bg-primary text-primary-foreground' },
     desconto: { label: `ATÉ ${product.discount}% OFF`, className: 'bg-primary text-primary-foreground' },
