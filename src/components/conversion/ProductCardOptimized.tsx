@@ -3,14 +3,15 @@
  */
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Star, Eye, ShoppingCart } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Star, Eye, ShoppingCart, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Product } from '@/data/products';
 import { useCart } from '@/hooks/useCart';
 import { toast } from 'sonner';
 import { QuickViewModal } from '@/components/storefront/QuickViewModal';
+import { WishlistButton } from '@/components/product/WishlistButton';
 
 interface ProductCardOptimizedProps {
   product: Product;
