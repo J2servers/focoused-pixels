@@ -393,9 +393,17 @@ const PaymentPage = () => {
     
     const name = customerForm.name.trim();
     const email = customerForm.email.trim().toLowerCase();
+    const address = customerForm.address.trim();
+    const cep = customerForm.cep.trim();
+    const phone = customerForm.phone.trim();
     
-    if (!name || !email) {
-      toast.error('Nome e email são obrigatórios');
+    if (!name || !email || !phone) {
+      toast.error('Nome, email e telefone são obrigatórios');
+      return;
+    }
+
+    if (!address || !cep) {
+      toast.error('Endereço e CEP são obrigatórios para envio');
       return;
     }
     
