@@ -30,6 +30,7 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const { addItem } = useCart();
   const { showProductRatings, showProductStock } = useSiteSettings();
+  const navigate = useNavigate();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
