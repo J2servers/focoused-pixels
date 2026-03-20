@@ -368,6 +368,8 @@ const PaymentPage = () => {
         custom_text: customText.trim() || null,
         customer_files: uploadedFiles.length > 0 ? uploadedFiles.map(f => f.url) : [],
         production_notes: prodNotes.length > 0 ? prodNotes.join('\n') : null,
+        shipping_address: customerForm.address?.trim() || null,
+        shipping_cep: customerForm.cep?.trim() || null,
       })
       ;
 
