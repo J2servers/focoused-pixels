@@ -62,24 +62,24 @@ function HeroKPI({ label, value, icon: Icon, color, format = 'currency', subtitl
     : value.toLocaleString('pt-BR');
   return (
     <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-xl overflow-hidden">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-2">
-          <div className={cn("p-2.5 rounded-xl shadow-lg", color)}>
-            <Icon className="h-5 w-5 text-white" />
+      <CardContent className="p-3">
+        <div className="flex items-start justify-between mb-1">
+          <div className={cn("p-2 rounded-lg shadow-lg", color)}>
+            <Icon className="h-4 w-4 text-white" />
           </div>
           {trend !== undefined && (
             <span className={cn(
-              "flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full",
+              "flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full",
               trend >= 0 ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
             )}>
-              {trend >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+              {trend >= 0 ? <ArrowUpRight className="h-2.5 w-2.5" /> : <ArrowDownRight className="h-2.5 w-2.5" />}
               {Math.abs(trend).toFixed(0)}%
             </span>
           )}
         </div>
-        <p className="text-2xl font-bold text-white">{fmt}</p>
-        <p className="text-xs text-[hsl(var(--admin-text-muted))]">{label}</p>
-        {subtitle && <p className="text-[10px] text-[hsl(var(--admin-text-muted)/0.6)]">{subtitle}</p>}
+        <p className="text-xl font-bold text-white leading-tight">{fmt}</p>
+        <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">{label}</p>
+        {subtitle && <p className="text-[9px] text-[hsl(var(--admin-text-muted)/0.6)]">{subtitle}</p>}
       </CardContent>
     </Card>
   );
