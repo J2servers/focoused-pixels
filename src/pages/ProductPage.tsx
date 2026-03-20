@@ -22,6 +22,12 @@ import {
 } from '@/components/product';
 import { ProductReviews } from '@/components/reviews';
 import { TrustBar, ViewingNowBadge } from '@/components/conversion';
+import { UrgencyBadge } from '@/components/conversion/UrgencyBadge';
+import { DynamicSocialProof } from '@/components/conversion/DynamicSocialProof';
+import { ProductShareButtons } from '@/components/product/ProductShareButtons';
+import { ProductFAQ } from '@/components/product/ProductFAQ';
+import { FreightCalculator } from '@/components/product/FreightCalculator';
+import { WishlistButton } from '@/components/product/WishlistButton';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import { RecentlyViewedBar } from '@/components/product/RecentlyViewedBar';
 
