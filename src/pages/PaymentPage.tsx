@@ -1025,7 +1025,7 @@ const PaymentPage = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <CreditCard className="h-5 w-5 text-blue-500" />
-                        Pagamento com Cartão
+                        Pagamento com Cartão de Crédito ou Débito
                       </CardTitle>
                       <CardDescription>
                         Você será redirecionado para o checkout seguro do Mercado Pago
