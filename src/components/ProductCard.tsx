@@ -112,6 +112,10 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
               <Eye className="h-4 w-4" />
             </motion.button>
 
+            <div className="absolute top-3 right-14 z-10 opacity-0 transition-opacity group-hover:opacity-100 bg-background/90 rounded-full shadow-lg">
+              <WishlistButton product={{ id: product.id, name: product.name, price: product.price, image: product.image, slug: product.slug }} size="sm" />
+            </div>
+
             <motion.img
               src={product.image}
               alt={product.name}
