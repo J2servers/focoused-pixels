@@ -240,9 +240,9 @@ const AdminOrdersPage = () => {
                     <p><strong>Nome:</strong> {selectedOrder.customer_name}</p>
                     <p><strong>Email:</strong> {selectedOrder.customer_email}</p>
                     <p><strong>Telefone:</strong> {selectedOrder.customer_phone}</p>
-                    {selectedOrder.shipping_address && <p><strong>Endereço:</strong> {selectedOrder.shipping_address}</p>}
-                    {selectedOrder.shipping_cep && <p><strong>CEP:</strong> {selectedOrder.shipping_cep}</p>}
-                    {selectedOrder.shipping_city && <p><strong>Cidade:</strong> {selectedOrder.shipping_city} - {selectedOrder.shipping_state}</p>}
+                    {(selectedOrder as any).shipping_address && <p><strong>Endereço:</strong> {(selectedOrder as any).shipping_address}</p>}
+                    {(selectedOrder as any).shipping_cep && <p><strong>CEP:</strong> {(selectedOrder as any).shipping_cep}</p>}
+                    {(selectedOrder as any).shipping_city && <p><strong>Cidade:</strong> {(selectedOrder as any).shipping_city} - {(selectedOrder as any).shipping_state}</p>}
                   </div>
                 </div>
 
