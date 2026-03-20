@@ -99,6 +99,8 @@ const PaymentPage = () => {
     email: '',
     cpf: '',
     phone: '',
+    address: '',
+    cep: '',
   });
   
   // Custom product details (optional)
