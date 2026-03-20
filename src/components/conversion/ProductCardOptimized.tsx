@@ -28,6 +28,7 @@ export function ProductCardOptimized({
 }: ProductCardOptimizedProps) {
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const { addItem } = useCart();
+  const navigate = useNavigate();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
