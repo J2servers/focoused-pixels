@@ -45,6 +45,7 @@ interface Product {
 interface Category {
   id: string;
   name: string;
+  parent_id: string | null;
 }
 
 const AdminProductsPage = () => {
@@ -76,11 +77,13 @@ const AdminProductsPage = () => {
     min_stock: '5',
   });
 
+  const [filterCategoryId, setFilterCategoryId] = useState<string>('all');
+
   const fetchData = async () => {
     setIsLoading(true);
     const [productsRes, categoriesRes] = await Promise.all([
       supabase.from('products').select('*').is('deleted_at', null).order('created_at', { ascending: false }),
-      supabase.from('categories').select('id, name').eq('status', 'active'),
+      supabase.from('categories').select('id, name, parent_id').eq('status', 'active').order('name'),
     ]);
 
     if (productsRes.data) setProducts(productsRes.data);
@@ -285,13 +288,53 @@ const AdminProductsPage = () => {
     },
   ];
 
+  const parentCategories = categories.filter(c => !c.parent_id);
+  const subCategories = categories.filter(c => c.parent_id);
+
+  const filteredProducts = filterCategoryId === 'all'
+    ? products
+    : products.filter(p => {
+        if (p.category_id === filterCategoryId) return true;
+        // Also include products from subcategories of the selected parent
+        const childIds = categories.filter(c => c.parent_id === filterCategoryId).map(c => c.id);
+        return childIds.includes(p.category_id || '');
+      });
+
   return (
     <AdminLayout title="Produtos" requireEditor>
       <DataTable
-        data={products}
+        data={filteredProducts}
         columns={columns}
         isLoading={isLoading}
         searchPlaceholder="Buscar produtos..."
+        showAllRows
+        filterContent={
+          <Select value={filterCategoryId} onValueChange={setFilterCategoryId}>
+            <SelectTrigger className="w-full sm:w-56 h-10 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
+              <SelectValue placeholder="Filtrar por categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as categorias</SelectItem>
+              {parentCategories.map(cat => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+              {subCategories.length > 0 && parentCategories.length > 0 && (
+                <>
+                  {subCategories.map(sub => {
+                    const parent = categories.find(c => c.id === sub.parent_id);
+                    return (
+                      <SelectItem key={sub.id} value={sub.id}>
+                        &nbsp;&nbsp;↳ {sub.name} {parent ? `(${parent.name})` : ''}
+                      </SelectItem>
+                    );
+                  })}
+                </>
+              )}
+            </SelectContent>
+          </Select>
+        }
         actions={
           <Button onClick={openCreateDialog} disabled={!canEdit()} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)] hover:shadow-xl">
             <Plus className="h-4 w-4 mr-2" />

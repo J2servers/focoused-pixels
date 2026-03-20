@@ -45,7 +45,9 @@ interface DataTableProps<T> {
   onRowClick?: (item: T) => void;
   emptyMessage?: string;
   actions?: ReactNode;
+  filterContent?: ReactNode;
   pageSize?: number;
+  showAllRows?: boolean;
 }
 
 export function DataTable<T>({
@@ -61,7 +63,9 @@ export function DataTable<T>({
   onRowClick,
   emptyMessage = 'Nenhum registro encontrado',
   actions,
+  filterContent,
   pageSize = 10,
+  showAllRows = false,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -88,11 +92,14 @@ export function DataTable<T>({
     : filteredData;
 
   // Paginate
-  const totalPages = Math.ceil(sortedData.length / pageSize);
-  const paginatedData = sortedData.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const effectivePageSize = showAllRows ? sortedData.length || 1 : pageSize;
+  const totalPages = Math.ceil(sortedData.length / effectivePageSize);
+  const paginatedData = showAllRows
+    ? sortedData
+    : sortedData.slice(
+        (currentPage - 1) * effectivePageSize,
+        currentPage * effectivePageSize
+      );
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -135,21 +142,24 @@ export function DataTable<T>({
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
-        {searchable && (
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
-            <Input
-              type="search"
-              placeholder={searchPlaceholder}
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="pl-10 h-10 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-1 focus-visible:ring-[hsl(var(--admin-accent-purple))]"
-            />
-          </div>
-        )}
+        <div className="flex flex-col sm:flex-row gap-3 flex-1">
+          {searchable && (
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
+              <Input
+                type="search"
+                placeholder={searchPlaceholder}
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="pl-10 h-10 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-1 focus-visible:ring-[hsl(var(--admin-accent-purple))]"
+              />
+            </div>
+          )}
+          {filterContent}
+        </div>
         {actions && <div className="flex gap-2">{actions}</div>}
       </div>
 
@@ -260,10 +270,10 @@ export function DataTable<T>({
       </Card>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!showAllRows && totalPages > 1 && (
         <div className="flex items-center justify-between pt-2">
           <p className="text-sm text-[hsl(var(--admin-text-muted))]">
-            <span className="font-medium text-white">{((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, sortedData.length)}</span>
+            <span className="font-medium text-white">{((currentPage - 1) * effectivePageSize) + 1}-{Math.min(currentPage * effectivePageSize, sortedData.length)}</span>
             {' '}de{' '}
             <span className="font-medium text-white">{sortedData.length}</span> registros
           </p>
