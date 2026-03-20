@@ -254,7 +254,7 @@ const ProductPage = () => {
                   </div>
                 )}
 
-                <UrgencyBadge productId={product.id} stock={product.stock} />
+                <UrgencyBadge productId={product.id} />
               </div>
 
               {/* Share Buttons */}
