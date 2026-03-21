@@ -7,7 +7,7 @@ import { useCart } from './useCart';
  * Should be mounted once in App.tsx.
  */
 export const useAbandonedCartTracker = () => {
-  const { items, getTotal } = useCart();
+  const { items, total } = useCart();
   const sessionIdRef = useRef<string>(
     sessionStorage.getItem('cart_session_id') || crypto.randomUUID()
   );
