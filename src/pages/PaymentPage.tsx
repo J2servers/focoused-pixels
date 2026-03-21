@@ -235,6 +235,7 @@ const PaymentPage = () => {
         setPaymentState({
           orderId: order.id,
           amount: order.total,
+          shippingCost: order.shipping_cost || 0,
           customerName: order.customer_name,
           customerEmail: order.customer_email,
           customerCpf: '',
