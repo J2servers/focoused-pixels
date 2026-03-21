@@ -42,6 +42,7 @@ interface PaymentState {
   orderId: string;
   amount: number;
   shippingCost: number;
+  shippingMethod: string;
   customerName: string;
   customerEmail: string;
   customerCpf: string;
