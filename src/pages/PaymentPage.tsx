@@ -984,9 +984,15 @@ const PaymentPage = () => {
                       <Separator />
                       <div className="space-y-1.5 text-sm">
                         <div className="flex justify-between">
-                          <span>Subtotal</span>
-                          <span>{formatCurrency(paymentState.amount)}</span>
+                          <span>Subtotal (itens)</span>
+                          <span>{formatCurrency(paymentState.amount - paymentState.shippingCost)}</span>
                         </div>
+                        {paymentState.shippingCost > 0 && (
+                          <div className="flex justify-between">
+                            <span>Frete</span>
+                            <span>{formatCurrency(paymentState.shippingCost)}</span>
+                          </div>
+                        )}
                         {paymentMethod === 'pix' && (
                           <div className="flex justify-between text-emerald-600">
                             <span>Desconto PIX ({pixDiscount}%)</span>
