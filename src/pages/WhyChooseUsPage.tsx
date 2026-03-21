@@ -341,12 +341,12 @@ const WhyChooseUsPage = () => {
                 </div>
               </div>
 
-              <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-8 sm:flex-row">
+              <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row">
                 <Link to={safeHref(config.finalCta.primaryCtaHref, '/checkout')}>
-                  <Button size="lg" className="min-w-[200px]">{config.finalCta.primaryCtaLabel}</Button>
+                  <Button size="lg" className="min-w-[220px]">{config.finalCta.primaryCtaLabel}</Button>
                 </Link>
                 <Link to={safeHref(config.finalCta.secondaryCtaHref, '/minha-area')}>
-                  <Button size="lg" variant="outline" className="min-w-[200px] border-white/20 text-background hover:bg-white/10 group">
+                  <Button size="lg" variant="outline" className="min-w-[220px] border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 group">
                     {config.finalCta.secondaryCtaLabel}
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                   </Button>
