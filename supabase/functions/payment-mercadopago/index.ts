@@ -36,6 +36,13 @@ interface PaymentRequest {
   paymentMethodId?: string;
   // Boleto specific
   expirationDays?: number;
+  // Address fields
+  payerZipCode?: string;
+  payerStreetName?: string;
+  payerStreetNumber?: string;
+  payerNeighborhood?: string;
+  payerCity?: string;
+  payerState?: string;
   // For installments calculation
   bin?: string;
 }
