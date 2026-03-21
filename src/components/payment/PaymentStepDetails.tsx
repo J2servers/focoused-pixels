@@ -101,9 +101,9 @@ export function PaymentStepDetails({
       const { data, error } = await supabase.functions.invoke('calculate-freight', {
         body: {
           destinationCep: cleanCep,
-          productPrice: amount - shippingCost, // subtotal only
-          weight: 0.5,
-          freeShippingMinimum: 0, // let backend decide
+          productPrice: amount - shippingCost,
+          weight: cartWeight,
+          freeShippingMinimum: 0,
         },
       });
 
