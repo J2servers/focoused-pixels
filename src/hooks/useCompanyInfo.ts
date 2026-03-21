@@ -242,7 +242,7 @@ const stripOptionalCompanyColumns = (data: Partial<CompanyInfo>) => {
   delete retryPayload.header_logo_height;
   delete retryPayload.header_logo_mobile_height;
   delete retryPayload.footer_logo_height;
-  delete retryPayload.why_choose_us_config;
+  // why_choose_us_config is a confirmed JSONB column — never strip it
   return retryPayload;
 };
 
