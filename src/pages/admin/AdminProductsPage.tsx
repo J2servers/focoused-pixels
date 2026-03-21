@@ -192,6 +192,10 @@ const AdminProductsPage = () => {
       cost_labor: formData.cost_labor ? parseFloat(formData.cost_labor) : 0,
       cost_shipping: formData.cost_shipping ? parseFloat(formData.cost_shipping) : 0,
       min_stock: parseInt(formData.min_stock) || 5,
+      weight_kg: parseFloat(formData.weight_kg) || 0.5,
+      length_cm: parseFloat(formData.length_cm) || 20,
+      width_cm: parseFloat(formData.width_cm) || 15,
+      height_cm: parseFloat(formData.height_cm) || 10,
     };
 
     try {
