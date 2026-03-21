@@ -218,7 +218,14 @@ const AdminEmailTemplatesPage = () => {
   };
 
   const installSuggestedWhatsTemplates = async () => {
-    const { error } = await supabase.from('whatsapp_templates').upsert(SUGGESTED_WHATSAPP_TEMPLATES, {
+    const mapped = SUGGESTED_WHATSAPP_TEMPLATES.map(t => ({
+      name: t.name,
+      category: t.category,
+      message_text: t.content,
+      variables: t.variables,
+      is_active: true,
+    }));
+    const { error } = await supabase.from('whatsapp_templates').upsert(mapped as any, {
       onConflict: 'name',
       ignoreDuplicates: false,
     });
