@@ -124,6 +124,22 @@ serve(async (req) => {
     const config = await getPaymentConfig(supabase);
     const baseUrl = "https://api.mercadopago.com";
 
+    // Helper: fire-and-forget notification
+    const notifyCustomer = async (payload: Record<string, unknown>) => {
+      try {
+        await fetch(`${supabaseUrl}/functions/v1/notify-customer`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${supabaseServiceKey}`,
+          },
+          body: JSON.stringify(payload),
+        });
+      } catch (e) {
+        console.error("[MercadoPago] Notification error (non-blocking):", e);
+      }
+    };
+
     // Test connection
     if (action === "test_connection") {
       const testResponse = await fetch(`${baseUrl}/users/me`, {
@@ -322,6 +338,20 @@ serve(async (req) => {
 
       console.log("[MercadoPago] PIX created:", data.id);
 
+      // Notify customer (fire-and-forget)
+      notifyCustomer({
+        event: "pix_generated",
+        customer: { name: payerName || "Cliente", email: payerEmail, phone: payerPhone || "" },
+        order: { orderId, amount, description },
+        pix: {
+          qrCode: data.point_of_interaction?.transaction_data?.qr_code,
+          ticketUrl: data.point_of_interaction?.transaction_data?.ticket_url,
+          expirationDate: data.date_of_expiration,
+          finalAmount: discountedAmount,
+          discountPercent: config.pixDiscountPercent,
+        },
+      });
+
       return new Response(
         JSON.stringify({
           success: true,
@@ -393,34 +423,17 @@ serve(async (req) => {
 
       console.log("[MercadoPago] Boleto created:", data.id);
 
-      // Send WhatsApp notification (fire-and-forget)
-      if (payerPhone) {
-        const cleanPhone = payerPhone.replace(/\D/g, "");
-        const formattedPhone = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
-        const expirationFormatted = data.date_of_expiration 
-          ? new Date(data.date_of_expiration).toLocaleDateString("pt-BR") 
-          : "—";
-        const boletoMessage = `🧾 *Boleto Gerado - Pincel de Luz*\n\nOlá, ${payerName || "Cliente"}! Seu boleto foi gerado com sucesso.\n\n💰 *Valor:* R$ ${amount?.toFixed(2).replace(".", ",")}\n📅 *Vencimento:* ${expirationFormatted}\n\n📋 *Código de barras:*\n${data.barcode?.content || "Não disponível"}\n\n🔗 *Link do boleto:*\n${data.transaction_details?.external_resource_url || "Não disponível"}\n\nQualquer dúvida, estamos à disposição! ✨`;
-
-        try {
-          const whatsappResponse = await fetch(`${supabaseUrl}/functions/v1/whatsapp-evolution`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${supabaseServiceKey}`,
-            },
-            body: JSON.stringify({
-              action: "send_message",
-              phone: formattedPhone,
-              message: boletoMessage,
-            }),
-          });
-          const whatsappResult = await whatsappResponse.json();
-          console.log("[MercadoPago] WhatsApp boleto notification:", whatsappResult.success ? "sent" : "failed");
-        } catch (whatsappError) {
-          console.error("[MercadoPago] WhatsApp notification error (non-blocking):", whatsappError);
-        }
-      }
+      // Notify customer via centralized function (fire-and-forget)
+      notifyCustomer({
+        event: "boleto_generated",
+        customer: { name: payerName || "Cliente", email: payerEmail, phone: payerPhone || "" },
+        order: { orderId, amount, description },
+        boleto: {
+          barcode: data.barcode?.content,
+          boletoUrl: data.transaction_details?.external_resource_url,
+          expirationDate: data.date_of_expiration,
+        },
+      });
 
       return new Response(
         JSON.stringify({
@@ -481,6 +494,27 @@ serve(async (req) => {
       }
 
       console.log("[MercadoPago] Card payment created:", data.id, "Status:", data.status);
+
+      // Notify customer (fire-and-forget)
+      if (data.status === "approved") {
+        notifyCustomer({
+          event: "card_approved",
+          customer: { name: payerName || "Cliente", email: payerEmail || "", phone: payerPhone || "" },
+          order: { orderId, amount, description },
+          card: {
+            lastFourDigits: data.card?.last_four_digits,
+            brand: data.payment_method_id,
+            installments: installments || 1,
+            installmentAmount: data.transaction_details?.installment_amount,
+          },
+        });
+      } else if (data.status === "in_process") {
+        notifyCustomer({
+          event: "card_pending",
+          customer: { name: payerName || "Cliente", email: payerEmail || "", phone: payerPhone || "" },
+          order: { orderId, amount, description },
+        });
+      }
 
       return new Response(
         JSON.stringify({
