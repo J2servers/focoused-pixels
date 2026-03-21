@@ -329,6 +329,7 @@ const AdminEmailTemplatesPage = () => {
             )}
           </CardContent>
         </Card>
+        <WorkflowBuilder />
       </div>
 
       <Dialog open={!!editEmail} onOpenChange={() => setEditEmail(null)}>
