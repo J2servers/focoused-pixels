@@ -190,6 +190,48 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_workflows: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          last_run_at: string | null
+          name: string
+          run_count: number
+          steps: Json
+          trigger_delay_minutes: number
+          trigger_event: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_run_at?: string | null
+          name: string
+          run_count?: number
+          steps?: Json
+          trigger_delay_minutes?: number
+          trigger_event?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_run_at?: string | null
+          name?: string
+          run_count?: number
+          steps?: Json
+          trigger_delay_minutes?: number
+          trigger_event?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cash_transactions: {
         Row: {
           amount: number
