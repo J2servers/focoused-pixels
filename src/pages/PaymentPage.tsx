@@ -123,6 +123,7 @@ const PaymentPage = () => {
   // Custom product details
   const [customText, setCustomText] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; url: string }[]>([]);
+  const [cartWeight, setCartWeight] = useState(0.5);
 
   // PIX state
   const [pixData, setPixData] = useState<{
