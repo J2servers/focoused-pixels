@@ -28,7 +28,7 @@ const AdminWhyChooseUsPage = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateCompany.mutateAsync({ why_choose_us_config: config as any });
+      await updateCompany.mutateAsync({ id: company?.id || null, data: { why_choose_us_config: config as any } });
       toast.success('Página salva com sucesso!');
     } catch {
       toast.error('Erro ao salvar');
