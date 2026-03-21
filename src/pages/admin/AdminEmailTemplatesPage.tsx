@@ -200,13 +200,13 @@ const AdminEmailTemplatesPage = () => {
     const payload = {
       name: editWhats.name,
       category: editWhats.category || 'promocao',
-      content: editWhats.content,
+      message_text: editWhats.content,
       variables: editWhats.variables || [],
       is_active: editWhats.is_active ?? true,
     };
     const action = editWhats.id
       ? supabase.from('whatsapp_templates').update(payload).eq('id', editWhats.id)
-      : supabase.from('whatsapp_templates').insert(payload);
+      : supabase.from('whatsapp_templates').insert(payload as any);
     const { error } = await action;
     if (error) {
       if (error.code === 'PGRST205') return toast.error('A tabela de templates de WhatsApp ainda não foi publicada no Supabase.');
