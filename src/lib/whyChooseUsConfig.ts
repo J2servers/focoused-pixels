@@ -107,27 +107,40 @@ export interface WhyChooseUsConfig {
   };
 }
 
+/**
+ * Default config — cores alinhadas ao tema Neumorphism da loja
+ * (roxo vibrante #7E23B6 / fundo cinza claro)
+ */
 export const defaultWhyChooseUsConfig: WhyChooseUsConfig = {
   theme: {
-    pageBackground: '#fcfaf6',
-    sectionBackground: '#f4ede3',
-    darkSectionBackground: '#1d1812',
-    cardBackground: '#ffffff',
-    cardBorder: '#e6dccd',
-    textPrimary: '#1f1a14',
-    textSecondary: '#5f564b',
-    textOnDark: '#fffaf2',
-    textMutedOnDark: '#e2d3bf',
-    accent: '#9f6f2c',
-    accentSoft: '#f5e4c6',
-    buttonPrimaryBackground: '#1f1a14',
-    buttonPrimaryText: '#fffaf2',
-    buttonSecondaryBackground: '#fff8ec',
-    buttonSecondaryText: '#714d1f',
-    headingFont: 'Georgia, "Times New Roman", serif',
-    bodyFont: '"Trebuchet MS", "Segoe UI", sans-serif',
-    heroTitleSize: 'clamp(2.5rem, 5vw, 5.5rem)',
-    sectionTitleSize: 'clamp(2rem, 4vw, 4rem)',
+    /* Backgrounds — neumorphism light gray */
+    pageBackground: '#e6e6f0',
+    sectionBackground: '#dddde8',
+    darkSectionBackground: '#22222a',
+    cardBackground: '#ebebf2',
+    cardBorder: '#d3d3e1',
+
+    /* Texts */
+    textPrimary: '#22222a',
+    textSecondary: '#67677e',
+    textOnDark: '#f0f0f8',
+    textMutedOnDark: '#a0a0b8',
+
+    /* Accent — roxo vibrante Pincel de Luz */
+    accent: '#7E23B6',
+    accentSoft: '#ede0f5',
+
+    /* Buttons */
+    buttonPrimaryBackground: '#7E23B6',
+    buttonPrimaryText: '#ffffff',
+    buttonSecondaryBackground: '#ebebf2',
+    buttonSecondaryText: '#7E23B6',
+
+    /* Typography */
+    headingFont: 'Montserrat, "Segoe UI", sans-serif',
+    bodyFont: 'Inter, "Segoe UI", sans-serif',
+    heroTitleSize: 'clamp(2.2rem, 4.5vw, 4.5rem)',
+    sectionTitleSize: 'clamp(1.8rem, 3.5vw, 3.5rem)',
   },
   hero: {
     badge: 'Produção personalizada com efeito de marca e memória',
@@ -141,9 +154,9 @@ export const defaultWhyChooseUsConfig: WhyChooseUsConfig = {
     primaryCtaHref: '/checkout',
     secondaryCtaLabel: 'Ver catálogo completo',
     secondaryCtaHref: '/categorias',
-    imageMain: '@/assets/hero/hero-neon.jpg',
-    imageSecondary: '@/assets/hero/hero-qrcode.jpg',
-    imageTertiary: '@/assets/hero/hero-crachas.jpg',
+    imageMain: '',
+    imageSecondary: '',
+    imageTertiary: '',
     imageMainTitle: 'Produtos que viram vitrine da marca',
     imageSecondaryTitle: 'Personalização que também ajuda a vender',
     imageTertiaryTitle: 'Acabamento que sustenta uma percepção premium',
