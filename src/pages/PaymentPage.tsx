@@ -192,12 +192,23 @@ const PaymentPage = () => {
         if (storedPayment) {
           try {
             const data = JSON.parse(storedPayment);
-            if (!data.amount || data.amount <= 0) {
+            const shippingCost = data.shipping?.cost || 0;
+            const itemsAmount = data.amount || 0;
+            if (!itemsAmount || itemsAmount <= 0) {
               toast.error('Valor do pedido inválido');
               navigate('/');
               return;
             }
-            setPaymentState(data);
+            setPaymentState({
+              orderId: data.orderId,
+              amount: itemsAmount + shippingCost,
+              shippingCost,
+              customerName: data.customerName || '',
+              customerEmail: data.customerEmail || '',
+              customerCpf: data.customerCpf || '',
+              customerPhone: data.customerPhone || '',
+              description: data.description || '',
+            });
           } catch {
             toast.error('Dados do pedido corrompidos');
             sessionStorage.removeItem('pending_payment');
