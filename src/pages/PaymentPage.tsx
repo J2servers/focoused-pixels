@@ -471,6 +471,7 @@ const PaymentPage = () => {
         payerNeighborhood: customerForm.neighborhood,
         payerCity: customerForm.city,
         payerState: customerForm.state,
+        payerPhone: paymentState.customerPhone,
       });
       setBoletoData({
         barcode: result.barcode,
