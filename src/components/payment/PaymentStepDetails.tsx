@@ -302,10 +302,57 @@ export function PaymentStepDetails({
         </CardContent>
       </Card>
 
+      {/* Freight Calculator */}
+      {shippingCost === 0 && (
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Truck className="h-5 w-5" />
+              Calcular Frete
+            </CardTitle>
+            <CardDescription>Calcule o frete usando o CEP de entrega</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FreightCalculator
+              productPrice={amount}
+              onFreightSelect={(freight) => {
+                onShippingChange(freight.price);
+                setCustomerForm(prev => ({
+                  ...prev,
+                  cep: freight.cep,
+                  city: freight.city,
+                  state: freight.state,
+                }));
+              }}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {shippingCost > 0 && (
+        <div className="p-3 bg-primary/5 rounded-lg flex items-center justify-between text-sm">
+          <span className="flex items-center gap-2"><Truck className="h-4 w-4" /> Frete selecionado</span>
+          <span className="font-bold">{formatCurrency(shippingCost)}</span>
+        </div>
+      )}
+
       {/* Summary + Continue */}
-      <div className="p-4 bg-muted/50 rounded-lg flex items-center justify-between">
-        <span className="text-sm">Valor a pagar:</span>
-        <span className="font-bold text-lg">{formatCurrency(amount)}</span>
+      <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+        <div className="flex items-center justify-between text-sm">
+          <span>Subtotal (itens)</span>
+          <span>{formatCurrency(amount - shippingCost)}</span>
+        </div>
+        {shippingCost > 0 && (
+          <div className="flex items-center justify-between text-sm">
+            <span>Frete</span>
+            <span>{formatCurrency(shippingCost)}</span>
+          </div>
+        )}
+        <Separator />
+        <div className="flex items-center justify-between">
+          <span className="font-medium">Total</span>
+          <span className="font-bold text-lg">{formatCurrency(amount)}</span>
+        </div>
       </div>
 
       <Button
