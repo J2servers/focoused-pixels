@@ -177,7 +177,6 @@ const PaymentPage = () => {
       name: prev.name || savedProfile.fullName || '',
       email: prev.email || savedProfile.email || '',
       phone: prev.phone || savedProfile.phone || '',
-      address: prev.address || savedProfile.address || '',
       cep: prev.cep || savedProfile.cep || '',
     }));
   }, [savedProfile]);
