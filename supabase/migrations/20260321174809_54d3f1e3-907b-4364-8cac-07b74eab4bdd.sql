@@ -1,0 +1,1 @@
+ALTER TABLE public.abandoned_cart_sessions ADD CONSTRAINT abandoned_cart_sessions_session_id_key UNIQUE (session_id);
