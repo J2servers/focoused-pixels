@@ -110,7 +110,7 @@ const AdminWhyChooseUsPage = () => {
                 </div>
                 <div>
                   <Label>Imagem de Fundo</Label>
-                  <ImageUpload value={config.hero.backgroundImage} onChange={v => updateHero('backgroundImage', v)} bucket="admin-uploads" folder="why-choose" />
+                  <ImageUpload value={config.hero.backgroundImage} onChange={v => updateHero('backgroundImage', v || '')} folder="why-choose" />
                 </div>
               </CardContent>
             </Card>
