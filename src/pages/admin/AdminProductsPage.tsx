@@ -79,6 +79,10 @@ const AdminProductsPage = () => {
     cost_labor: '',
     cost_shipping: '',
     min_stock: '5',
+    weight_kg: '0.5',
+    length_cm: '20',
+    width_cm: '15',
+    height_cm: '10',
   });
 
   const [filterCategoryId, setFilterCategoryId] = useState<string>('all');
