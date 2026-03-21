@@ -17,7 +17,12 @@ interface CustomerFormData {
   email: string;
   cpf: string;
   phone: string;
-  address: string;
+  street: string;
+  number: string;
+  complement: string;
+  neighborhood: string;
+  city: string;
+  state: string;
   cep: string;
 }
 
@@ -91,7 +96,7 @@ export function PaymentStepDetails({
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const isValid = customerForm.name.trim() && customerForm.phone.trim() && customerForm.address.trim() && customerForm.cep.trim();
+  const isValid = customerForm.name.trim() && customerForm.phone.trim() && customerForm.street.trim() && customerForm.cep.trim() && customerForm.city.trim() && customerForm.state.trim();
 
   return (
     <div className="space-y-4">
@@ -150,16 +155,73 @@ export function PaymentStepDetails({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="det-address">Endereço Completo *</Label>
-            <Textarea
-              id="det-address"
-              placeholder="Rua, número, complemento, bairro, cidade, estado"
-              value={customerForm.address}
-              onChange={(e) => setCustomerForm(prev => ({ ...prev, address: e.target.value }))}
-              rows={2}
-              maxLength={500}
-            />
+          <div className="grid sm:grid-cols-3 gap-4">
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="det-street">Rua *</Label>
+              <Input
+                id="det-street"
+                placeholder="Nome da rua"
+                value={customerForm.street}
+                onChange={(e) => setCustomerForm(prev => ({ ...prev, street: e.target.value }))}
+                maxLength={200}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="det-number">Número *</Label>
+              <Input
+                id="det-number"
+                placeholder="Nº"
+                value={customerForm.number}
+                onChange={(e) => setCustomerForm(prev => ({ ...prev, number: e.target.value }))}
+                maxLength={10}
+              />
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="det-complement">Complemento</Label>
+              <Input
+                id="det-complement"
+                placeholder="Apto, bloco, sala..."
+                value={customerForm.complement}
+                onChange={(e) => setCustomerForm(prev => ({ ...prev, complement: e.target.value }))}
+                maxLength={100}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="det-neighborhood">Bairro *</Label>
+              <Input
+                id="det-neighborhood"
+                placeholder="Bairro"
+                value={customerForm.neighborhood}
+                onChange={(e) => setCustomerForm(prev => ({ ...prev, neighborhood: e.target.value }))}
+                maxLength={100}
+              />
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="det-city">Cidade *</Label>
+              <Input
+                id="det-city"
+                placeholder="Cidade"
+                value={customerForm.city}
+                onChange={(e) => setCustomerForm(prev => ({ ...prev, city: e.target.value }))}
+                maxLength={100}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="det-state">Estado (UF) *</Label>
+              <Input
+                id="det-state"
+                placeholder="SP"
+                value={customerForm.state}
+                onChange={(e) => setCustomerForm(prev => ({ ...prev, state: e.target.value.toUpperCase() }))}
+                maxLength={2}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -109,7 +109,12 @@ const PaymentPage = () => {
     email: '',
     cpf: '',
     phone: '',
-    address: '',
+    street: '',
+    number: '',
+    complement: '',
+    neighborhood: '',
+    city: '',
+    state: '',
     cep: '',
   });
 
@@ -172,7 +177,6 @@ const PaymentPage = () => {
       name: prev.name || savedProfile.fullName || '',
       email: prev.email || savedProfile.email || '',
       phone: prev.phone || savedProfile.phone || '',
-      address: prev.address || savedProfile.address || '',
       cep: prev.cep || savedProfile.cep || '',
     }));
   }, [savedProfile]);
@@ -335,9 +339,9 @@ const PaymentPage = () => {
       shipping_cost: shippingInfo.cost || 0,
       shipping_method: shippingInfo.method || null,
       shipping_cep: shippingInfo.cep || customerForm.cep?.trim() || null,
-      shipping_city: shippingInfo.city || null,
-      shipping_state: shippingInfo.state || null,
-      shipping_address: customerForm.address?.trim() || null,
+      shipping_city: shippingInfo.city || customerForm.city?.trim() || null,
+      shipping_state: shippingInfo.state || customerForm.state?.trim() || null,
+      shipping_address: [customerForm.street, customerForm.number, customerForm.complement, customerForm.neighborhood].filter(Boolean).join(', ') || null,
       order_status: 'pending',
       payment_status: 'pending',
       production_status: 'pending',
@@ -365,14 +369,14 @@ const PaymentPage = () => {
       const name = customerForm.name.trim();
       const email = user?.email || customerForm.email.trim().toLowerCase();
       const phone = customerForm.phone.trim();
-      const address = customerForm.address.trim();
+      const street = customerForm.street.trim();
       const cep = customerForm.cep.trim();
 
       if (!name || !phone) {
         toast.error('Nome e telefone são obrigatórios');
         return;
       }
-      if (!address || !cep) {
+      if (!street || !cep) {
         toast.error('Endereço e CEP são obrigatórios');
         return;
       }
@@ -388,11 +392,12 @@ const PaymentPage = () => {
       const dbOrderId = await createOrderInDB(updatedState);
       if (!dbOrderId) return;
 
+      const fullAddress = [street, customerForm.number, customerForm.complement, customerForm.neighborhood, customerForm.city, customerForm.state].filter(Boolean).join(', ');
       await saveProfile({
         fullName: name,
         email,
         phone,
-        address,
+        address: fullAddress,
         cep,
       });
 
@@ -460,6 +465,12 @@ const PaymentPage = () => {
         payerEmail: paymentState.customerEmail,
         payerName: paymentState.customerName,
         payerCpf: paymentState.customerCpf.replace(/\D/g, ''),
+        payerZipCode: customerForm.cep,
+        payerStreetName: customerForm.street,
+        payerStreetNumber: customerForm.number || 'S/N',
+        payerNeighborhood: customerForm.neighborhood,
+        payerCity: customerForm.city,
+        payerState: customerForm.state,
       });
       setBoletoData({
         barcode: result.barcode,
@@ -545,7 +556,6 @@ const PaymentPage = () => {
       name: savedProfile.fullName || prev.name,
       email: (user?.email || savedProfile.email || prev.email),
       phone: savedProfile.phone || prev.phone,
-      address: savedProfile.address || prev.address,
       cep: savedProfile.cep || prev.cep,
     }));
     toast.success('Dados de entrega preenchidos em 1 clique.');

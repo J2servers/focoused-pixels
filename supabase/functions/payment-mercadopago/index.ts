@@ -36,6 +36,13 @@ interface PaymentRequest {
   paymentMethodId?: string;
   // Boleto specific
   expirationDays?: number;
+  // Address fields
+  payerZipCode?: string;
+  payerStreetName?: string;
+  payerStreetNumber?: string;
+  payerNeighborhood?: string;
+  payerCity?: string;
+  payerState?: string;
   // For installments calculation
   bin?: string;
 }
@@ -108,7 +115,8 @@ serve(async (req) => {
     const requestData = await req.json() as PaymentRequest;
     const { 
       action, orderId, amount, description, payerEmail, payerName, payerCpf, payerPhone,
-      paymentId, items, token, installments, issuerId, paymentMethodId, expirationDays, bin
+      paymentId, items, token, installments, issuerId, paymentMethodId, expirationDays, bin,
+      payerZipCode, payerStreetName, payerStreetNumber, payerNeighborhood, payerCity, payerState
     } = requestData;
 
     console.log(`[MercadoPago] Action: ${action}, OrderId: ${orderId}`);
@@ -351,6 +359,14 @@ serve(async (req) => {
           identification: {
             type: "CPF",
             number: payerCpf.replace(/\D/g, ""),
+          },
+          address: {
+            zip_code: payerZipCode?.replace(/\D/g, "") || "",
+            street_name: payerStreetName || "",
+            street_number: payerStreetNumber || "S/N",
+            neighborhood: payerNeighborhood || "",
+            city: payerCity || "",
+            federal_unit: payerState || "",
           },
         },
         external_reference: orderId,

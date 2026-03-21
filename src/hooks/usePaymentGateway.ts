@@ -26,6 +26,13 @@ interface MercadoPagoPaymentRequest {
   paymentMethodId?: string;
   // For installments
   bin?: string;
+  // Address fields
+  payerZipCode?: string;
+  payerStreetName?: string;
+  payerStreetNumber?: string;
+  payerNeighborhood?: string;
+  payerCity?: string;
+  payerState?: string;
 }
 
 interface EfiPaymentRequest {
