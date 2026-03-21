@@ -44,6 +44,7 @@ interface PaymentStepDetailsProps {
   setUploadedFiles: React.Dispatch<React.SetStateAction<{ name: string; url: string }[]>>;
   amount: number;
   shippingCost: number;
+  cartWeight?: number;
   onShippingChange: (cost: number, method: string, city: string, state: string) => void;
   onSubmit: () => void;
   isProcessing: boolean;
