@@ -495,6 +495,27 @@ serve(async (req) => {
 
       console.log("[MercadoPago] Card payment created:", data.id, "Status:", data.status);
 
+      // Notify customer (fire-and-forget)
+      if (data.status === "approved") {
+        notifyCustomer({
+          event: "card_approved",
+          customer: { name: payerName || "Cliente", email: payerEmail || "", phone: payerPhone || "" },
+          order: { orderId, amount, description },
+          card: {
+            lastFourDigits: data.card?.last_four_digits,
+            brand: data.payment_method_id,
+            installments: installments || 1,
+            installmentAmount: data.transaction_details?.installment_amount,
+          },
+        });
+      } else if (data.status === "in_process") {
+        notifyCustomer({
+          event: "card_pending",
+          customer: { name: payerName || "Cliente", email: payerEmail || "", phone: payerPhone || "" },
+          order: { orderId, amount, description },
+        });
+      }
+
       return new Response(
         JSON.stringify({
           success: true,
