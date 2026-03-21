@@ -73,6 +73,7 @@ export function PaymentStepDetails({
   setUploadedFiles,
   amount,
   shippingCost,
+  cartWeight = 0.5,
   onShippingChange,
   onSubmit,
   isProcessing,
