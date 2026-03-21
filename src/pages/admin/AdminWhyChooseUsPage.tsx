@@ -129,7 +129,7 @@ const AdminWhyChooseUsPage = () => {
                   <div key={i} className="border rounded-xl p-4 space-y-3">
                     <div><Label>Título</Label><Input value={tech.title} onChange={e => updateTech(i, 'title', e.target.value)} /></div>
                     <div><Label>Descrição</Label><Textarea value={tech.description} onChange={e => updateTech(i, 'description', e.target.value)} /></div>
-                    <div><Label>Imagem</Label><ImageUpload value={tech.image} onChange={v => updateTech(i, 'image', v)} bucket="admin-uploads" folder="why-choose" /></div>
+                    <div><Label>Imagem</Label><ImageUpload value={tech.image} onChange={v => updateTech(i, 'image', v || '')} folder="why-choose" /></div>
                   </div>
                 ))}
               </CardContent>
