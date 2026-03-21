@@ -8,14 +8,6 @@ const corsHeaders = {
   "Access-Control-Max-Age": "86400",
 };
 
-interface ProductInsight {
-  key: string;
-  name: string;
-  quantity: number;
-  value: number;
-  sessions: number;
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -61,64 +53,60 @@ serve(async (req) => {
       );
     }
 
-    const { data: isAdmin, error: adminError } = await supabase.rpc("has_admin_access", {
+    const { data: isAdmin } = await supabase.rpc("has_admin_access", {
       _user_id: userData.user.id,
     });
 
-    if (adminError || !isAdmin) {
+    if (!isAdmin) {
       return new Response(
-        JSON.stringify({ success: false, error: "Forbidden: admin access required" }),
+        JSON.stringify({ success: false, error: "Forbidden" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
+    // Actual columns: id, session_id, user_email, user_name, user_phone, cart_items, cart_total, last_activity_at, recovered, recovered_at, reminder_sent, reminder_sent_at, coupon_code, created_at
     const { data, error } = await supabase
       .from("abandoned_cart_sessions")
-      .select("id, status, cart_total, item_count, cart_items, reminder_count")
-      .order("updated_at", { ascending: false })
+      .select("id, cart_total, cart_items, recovered, reminder_sent")
+      .order("last_activity_at", { ascending: false })
       .limit(500);
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     const sessions = Array.isArray(data) ? data : [];
 
-    const abandonedSessions = sessions.filter((s) => {
-      const status = String(s.status || "");
-      return status === "active" || status === "abandoned";
-    });
+    // "abandoned" = not recovered sessions with items
+    const abandonedSessions = sessions.filter((s) => !s.recovered);
+    const recoveredSessions = sessions.filter((s) => s.recovered);
+    const withReminder = sessions.filter((s) => s.reminder_sent);
+    const recoveredAfterReminder = recoveredSessions.filter((s) => s.reminder_sent);
 
-    const recoveredSessions = sessions.filter((s) => String(s.status || "") === "recovered");
-    const remindersSent = sessions.filter((s) => Number(s.reminder_count || 0) > 0);
-    const recoveredAfterReminder = recoveredSessions.filter((s) => Number(s.reminder_count || 0) > 0);
+    // Top products analysis
+    interface ProductInsight {
+      key: string;
+      name: string;
+      quantity: number;
+      value: number;
+      sessions: number;
+    }
 
     const productMap = new Map<string, ProductInsight>();
-
     for (const session of abandonedSessions) {
-      const sessionItems = Array.isArray(session.cart_items)
+      const items = Array.isArray(session.cart_items)
         ? session.cart_items as Array<Record<string, unknown>>
         : [];
-
-      for (const item of sessionItems) {
+      for (const item of items) {
         const id = typeof item.id === "string" ? item.id : "unknown";
         const name = typeof item.name === "string" ? item.name : "Produto";
         const quantity = Math.max(1, Number(item.quantity || 1));
         const price = Math.max(0, Number(item.price || 0));
-
         const existing = productMap.get(id);
         if (existing) {
           existing.quantity += quantity;
           existing.value += quantity * price;
           existing.sessions += 1;
         } else {
-          productMap.set(id, {
-            key: id,
-            name,
-            quantity,
-            value: quantity * price,
-            sessions: 1,
-          });
+          productMap.set(id, { key: id, name, quantity, value: quantity * price, sessions: 1 });
         }
       }
     }
@@ -127,16 +115,16 @@ serve(async (req) => {
       .sort((a, b) => b.quantity - a.quantity)
       .slice(0, 5);
 
-    const totalAbandonedValue = abandonedSessions.reduce((sum, session) => {
-      const value = Number(session.cart_total || 0);
-      return sum + (Number.isFinite(value) ? value : 0);
+    const totalAbandonedValue = abandonedSessions.reduce((sum, s) => {
+      const v = Number(s.cart_total || 0);
+      return sum + (Number.isFinite(v) ? v : 0);
     }, 0);
 
     const insights = {
       sessionsAbandoned: abandonedSessions.length,
       sessionsRecovered: recoveredSessions.length,
-      remindersSent: remindersSent.length,
-      recoveryRate: remindersSent.length > 0 ? (recoveredAfterReminder.length / remindersSent.length) * 100 : 0,
+      remindersSent: withReminder.length,
+      recoveryRate: withReminder.length > 0 ? (recoveredAfterReminder.length / withReminder.length) * 100 : 0,
       totalAbandonedValue: Number(totalAbandonedValue.toFixed(2)),
       topProductName: topProducts[0]?.name || "N/A",
       topProducts,
