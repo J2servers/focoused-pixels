@@ -14,24 +14,13 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground shadow-[4px_4px_8px_hsl(var(--neu-dark)/var(--neu-intensity)),-4px_-4px_8px_hsl(var(--neu-light)/var(--neu-intensity))] border border-[hsl(0_70%_50%/0.5)] hover:border-[hsl(0_70%_50%/1)] hover:brightness-110 hover:-translate-y-0.5",
         outline:
-          "neu-btn bg-background text-foreground hover:text-primary",
+          "neu-btn bg-background text-foreground dark:text-foreground [color-scheme:light] dark:[color-scheme:dark] !text-[hsl(var(--foreground))] hover:text-primary",
         secondary:
           "bg-secondary text-secondary-foreground shadow-[4px_4px_8px_hsl(var(--neu-dark)/var(--neu-intensity)),-4px_-4px_8px_hsl(var(--neu-light)/var(--neu-intensity)),inset_0_1px_0_hsl(var(--neu-light)/0.4)] border border-[hsl(var(--neon-cyan)/var(--neon-opacity))] hover:border-[hsl(var(--neon-cyan)/var(--neon-opacity-hover))] hover:brightness-105 hover:-translate-y-0.5",
         ghost:
           "hover:bg-muted/60 hover:text-foreground border border-transparent hover:border-[hsl(var(--neon-primary)/0.3)]",
         link: "text-primary underline-offset-4 hover:underline",
       },
-      size: {
-        default: "h-10 px-5 py-2",
-        sm: "h-9 rounded-xl px-3",
-        lg: "h-12 rounded-2xl px-8",
-        icon: "h-10 w-10",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
   },
 );
 
