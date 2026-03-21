@@ -576,6 +576,76 @@ const AdminProductsPage = () => {
               </div>
             </div>
 
+
+            <Separator />
+
+            {/* Seção: Peso e Dimensões */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                📦 Peso e Dimensões
+              </h3>
+              <p className="text-xs text-muted-foreground">Usado para cálculo automático do frete. Quanto mais preciso, melhor o valor cobrado.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <FormFieldInfo 
+                  label="Peso (kg)" 
+                  description="Peso do produto embalado em quilogramas"
+                  showsIn="Cálculo de frete no checkout"
+                />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={formData.weight_kg}
+                  onChange={(e) => setFormData({ ...formData, weight_kg: e.target.value })}
+                  placeholder="0.5"
+                />
+              </div>
+              <div className="space-y-2">
+                <FormFieldInfo 
+                  label="Comprimento (cm)" 
+                  description="Comprimento da embalagem"
+                  showsIn="Cálculo de frete"
+                />
+                <Input
+                  type="number"
+                  step="1"
+                  value={formData.length_cm}
+                  onChange={(e) => setFormData({ ...formData, length_cm: e.target.value })}
+                  placeholder="20"
+                />
+              </div>
+              <div className="space-y-2">
+                <FormFieldInfo 
+                  label="Largura (cm)" 
+                  description="Largura da embalagem"
+                  showsIn="Cálculo de frete"
+                />
+                <Input
+                  type="number"
+                  step="1"
+                  value={formData.width_cm}
+                  onChange={(e) => setFormData({ ...formData, width_cm: e.target.value })}
+                  placeholder="15"
+                />
+              </div>
+              <div className="space-y-2">
+                <FormFieldInfo 
+                  label="Altura (cm)" 
+                  description="Altura da embalagem"
+                  showsIn="Cálculo de frete"
+                />
+                <Input
+                  type="number"
+                  step="1"
+                  value={formData.height_cm}
+                  onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })}
+                  placeholder="10"
+                />
+              </div>
+            </div>
+
             <Separator />
 
             {/* Seção: Organização */}
