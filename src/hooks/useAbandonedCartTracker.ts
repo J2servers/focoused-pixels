@@ -49,7 +49,7 @@ export const useAbandonedCartTracker = () => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [items, getTotal]);
+  }, [items, total]);
 
   /** Call this when customer provides contact info during checkout */
   const updateContactInfo = async (name: string, email: string, phone: string) => {
