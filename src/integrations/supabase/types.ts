@@ -1199,8 +1199,10 @@ export type Database = {
           deleted_at: string | null
           full_description: string | null
           gallery_images: string[] | null
+          height_cm: number | null
           id: string
           is_featured: boolean | null
+          length_cm: number | null
           min_stock: number | null
           name: string
           price: number
@@ -1212,6 +1214,8 @@ export type Database = {
           stock: number | null
           tags: string[] | null
           updated_at: string
+          weight_kg: number | null
+          width_cm: number | null
         }
         Insert: {
           attributes?: Json | null
@@ -1224,8 +1228,10 @@ export type Database = {
           deleted_at?: string | null
           full_description?: string | null
           gallery_images?: string[] | null
+          height_cm?: number | null
           id?: string
           is_featured?: boolean | null
+          length_cm?: number | null
           min_stock?: number | null
           name: string
           price: number
@@ -1237,6 +1243,8 @@ export type Database = {
           stock?: number | null
           tags?: string[] | null
           updated_at?: string
+          weight_kg?: number | null
+          width_cm?: number | null
         }
         Update: {
           attributes?: Json | null
@@ -1249,8 +1257,10 @@ export type Database = {
           deleted_at?: string | null
           full_description?: string | null
           gallery_images?: string[] | null
+          height_cm?: number | null
           id?: string
           is_featured?: boolean | null
+          length_cm?: number | null
           min_stock?: number | null
           name?: string
           price?: number
@@ -1262,6 +1272,8 @@ export type Database = {
           stock?: number | null
           tags?: string[] | null
           updated_at?: string
+          weight_kg?: number | null
+          width_cm?: number | null
         }
         Relationships: [
           {
