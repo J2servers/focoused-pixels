@@ -353,7 +353,7 @@ const PaymentPage = () => {
       subtotal: state.amount - state.shippingCost,
       total: state.amount,
       shipping_cost: state.shippingCost,
-      shipping_method: shippingInfo.method || null,
+      shipping_method: state.shippingMethod || shippingInfo.method || null,
       shipping_cep: shippingInfo.cep || customerForm.cep?.trim() || null,
       shipping_city: shippingInfo.city || customerForm.city?.trim() || null,
       shipping_state: shippingInfo.state || customerForm.state?.trim() || null,
