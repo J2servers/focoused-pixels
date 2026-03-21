@@ -119,12 +119,13 @@ export function useCreateMercadoPagoPix() {
   const mutation = useMercadoPago();
   
   return useMutation({
-    mutationFn: async ({ orderId, amount, description, payerEmail, payerName }: {
+    mutationFn: async ({ orderId, amount, description, payerEmail, payerName, payerPhone }: {
       orderId: string;
       amount: number;
       description?: string;
       payerEmail: string;
       payerName?: string;
+      payerPhone?: string;
     }) => {
       return mutation.mutateAsync({
         action: 'create_pix',
@@ -133,6 +134,7 @@ export function useCreateMercadoPagoPix() {
         description,
         payerEmail,
         payerName,
+        payerPhone,
       });
     },
   });
