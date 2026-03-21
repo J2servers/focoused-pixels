@@ -158,6 +158,10 @@ const AdminProductsPage = () => {
       cost_labor: product.cost_labor?.toString() || '',
       cost_shipping: product.cost_shipping?.toString() || '',
       min_stock: product.min_stock?.toString() || '5',
+      weight_kg: product.weight_kg?.toString() || '0.5',
+      length_cm: product.length_cm?.toString() || '20',
+      width_cm: product.width_cm?.toString() || '15',
+      height_cm: product.height_cm?.toString() || '10',
     });
     setIsDialogOpen(true);
   };
