@@ -197,7 +197,7 @@ const AdminWhyChooseUsPage = () => {
                 </div>
                 <ImageUpload value="" onChange={v => {
                   if (v) setConfig(p => ({ ...p, gallery: { ...p.gallery, images: [...p.gallery.images, v] } }));
-                }} bucket="admin-uploads" folder="why-choose" />
+                }} folder="why-choose" />
               </CardContent>
             </Card>
           </TabsContent>
