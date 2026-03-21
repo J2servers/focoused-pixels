@@ -54,7 +54,7 @@ export const useAbandonedCartTracker = () => {
   /** Call this when customer provides contact info during checkout */
   const updateContactInfo = async (name: string, email: string, phone: string) => {
     try {
-      await supabase
+      await (supabase as any)
         .from('abandoned_cart_sessions')
         .update({
           user_name: name,
