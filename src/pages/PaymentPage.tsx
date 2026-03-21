@@ -550,7 +550,6 @@ const PaymentPage = () => {
       name: savedProfile.fullName || prev.name,
       email: (user?.email || savedProfile.email || prev.email),
       phone: savedProfile.phone || prev.phone,
-      address: savedProfile.address || prev.address,
       cep: savedProfile.cep || prev.cep,
     }));
     toast.success('Dados de entrega preenchidos em 1 clique.');
