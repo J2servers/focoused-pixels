@@ -70,7 +70,7 @@ export const useAbandonedCartTracker = () => {
   /** Call this when the order is completed to mark session as recovered */
   const markRecovered = async () => {
     try {
-      await supabase
+      await (supabase as any)
         .from('abandoned_cart_sessions')
         .update({
           recovered: true,
