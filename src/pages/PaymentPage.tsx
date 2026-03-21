@@ -465,6 +465,12 @@ const PaymentPage = () => {
         payerEmail: paymentState.customerEmail,
         payerName: paymentState.customerName,
         payerCpf: paymentState.customerCpf.replace(/\D/g, ''),
+        payerZipCode: customerForm.cep,
+        payerStreetName: customerForm.street,
+        payerStreetNumber: customerForm.number || 'S/N',
+        payerNeighborhood: customerForm.neighborhood,
+        payerCity: customerForm.city,
+        payerState: customerForm.state,
       });
       setBoletoData({
         barcode: result.barcode,
