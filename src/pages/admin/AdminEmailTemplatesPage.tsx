@@ -165,7 +165,7 @@ const AdminEmailTemplatesPage = () => {
     }
 
     setEmailTemplates((emails || []) as EmailTemplate[]);
-    setWhatsTemplates((whats || []) as WhatsAppTemplate[]);
+    setWhatsTemplates((whats || []).map((w: any) => ({ ...w, content: w.message_text || w.content || '' })) as WhatsAppTemplate[]);
     setLoading(false);
   };
 
