@@ -41,6 +41,7 @@ import { useCheckoutProfile } from '@/hooks/useCheckoutProfile';
 interface PaymentState {
   orderId: string;
   amount: number;
+  shippingCost: number;
   customerName: string;
   customerEmail: string;
   customerCpf: string;
