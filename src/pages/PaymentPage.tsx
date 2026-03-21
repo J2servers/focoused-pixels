@@ -676,12 +676,18 @@ const PaymentPage = () => {
                     setUploadedFiles={setUploadedFiles}
                     amount={paymentState.amount}
                     shippingCost={paymentState.shippingCost}
-                    onShippingChange={(cost) => {
+                    onShippingChange={(cost, method, city, state) => {
                       setPaymentState(prev => prev ? {
                         ...prev,
                         amount: (prev.amount - prev.shippingCost) + cost,
                         shippingCost: cost,
+                        shippingMethod: method,
                       } : null);
+                      setCustomerForm(prev => ({
+                        ...prev,
+                        city: city || prev.city,
+                        state: state || prev.state,
+                      }));
                     }}
                     onSubmit={handleDetailsSubmit}
                     isProcessing={isProcessing}
