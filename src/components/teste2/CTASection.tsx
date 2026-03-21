@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { ArrowRight, Phone } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 
@@ -48,3 +48,4 @@ export function CTASection() {
     </section>
   );
 }
+

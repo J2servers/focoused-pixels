@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Mail, Phone } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 
@@ -82,3 +82,4 @@ export function DarkFooter() {
     </footer>
   );
 }
+

@@ -16,6 +16,10 @@ interface CartCrossSellProps {
 export function CartCrossSell({ cartItems }: CartCrossSellProps) {
   const { data: allProducts = [] } = useProducts();
   const { addItem } = useCart();
+  const specialDiscountPercent = 10;
+
+  const getSpecialPrice = (price: number) =>
+    Number((price * (1 - specialDiscountPercent / 100)).toFixed(2));
 
   const recommendations = useMemo(() => {
     const cartIds = new Set(cartItems.map(i => i.id));
@@ -29,20 +33,22 @@ export function CartCrossSell({ cartItems }: CartCrossSellProps) {
   if (recommendations.length === 0) return null;
 
   const handleAdd = (product: typeof recommendations[0]) => {
+    const specialPrice = getSpecialPrice(product.price);
+
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: specialPrice,
       image: product.image,
     });
-    toast.success(`${product.name} adicionado!`);
+    toast.success(`${product.name} adicionado com ${specialDiscountPercent}% OFF!`);
   };
 
   return (
     <div className="mt-8">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="h-5 w-5 text-accent" />
-        <h3 className="font-bold text-base">Clientes também compraram</h3>
+        <h3 className="font-bold text-base">Clientes tambem levaram com preco especial</h3>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {recommendations.map((product) => (
@@ -61,8 +67,14 @@ export function CartCrossSell({ cartItems }: CartCrossSellProps) {
             >
               {product.name}
             </Link>
-            <span className="text-sm font-bold text-primary mt-auto">
+            <span className="text-[11px] text-muted-foreground line-through mt-auto">
               R$ {product.price.toFixed(2).replace('.', ',')}
+            </span>
+            <span className="text-sm font-bold text-primary">
+              R$ {getSpecialPrice(product.price).toFixed(2).replace('.', ',')}
+            </span>
+            <span className="text-[11px] text-emerald-600 font-medium">
+              {specialDiscountPercent}% OFF no carrinho
             </span>
             <Button
               size="sm"

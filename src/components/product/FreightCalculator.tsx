@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FreightCalculator - CEP-based freight estimate using real API
  */
 import { useState } from 'react';
@@ -181,3 +181,4 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
     </div>
   );
 }
+

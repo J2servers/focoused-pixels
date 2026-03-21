@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AIChatWidget - Assistente virtual com IA
  * 
  * CONFIGURAÇÕES USADAS (Admin > Configurações > IA):
@@ -398,3 +398,4 @@ export function AIChatWidget() {
     </>
   );
 }
+

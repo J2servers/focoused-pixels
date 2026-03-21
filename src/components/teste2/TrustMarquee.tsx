@@ -1,4 +1,4 @@
-import { Shield, Truck, CreditCard, RefreshCw, Award, Lock } from 'lucide-react';
+﻿import { Shield, Truck, CreditCard, RefreshCw, Award, Lock } from 'lucide-react';
 
 const trustItems = [
   { icon: <Shield className="h-4 w-4" />, text: 'Compra Segura' },
@@ -31,3 +31,4 @@ export function TrustMarquee() {
     </div>
   );
 }
+

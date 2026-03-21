@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+﻿import { Link, useNavigate } from 'react-router-dom';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { TrustBar } from '@/components/conversion';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
@@ -6,19 +6,40 @@ import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Button } from '@/components/ui/button';
 import { Trash2, Minus, Plus, MessageCircle, ShoppingBag, FileText, CreditCard } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { storeInfo } from '@/data/store';
 import { CartCrossSell } from '@/components/cart/CartCrossSell';
 
 const CartPage = () => {
   const { items, removeItem, updateQuantity, total, clearCart, itemCount } = useCart();
+  const siteSettings = useSiteSettings();
   const navigate = useNavigate();
 
   const handleCheckoutWhatsApp = () => {
     if (items.length === 0) return;
+
+    const whatsappNumber = (siteSettings.whatsapp || '').replace(/\D/g, '');
     const itemsList = items
-      .map(item => `• ${item.name}${item.size ? ` (${item.size})` : ''} - Qtd: ${item.quantity} - R$ ${(item.price * item.quantity).toFixed(2)}`)
+      .map(item => `- ${item.name}${item.size ? ` (${item.size})` : ''} | Qtd: ${item.quantity} | R$ ${(item.price * item.quantity).toFixed(2)}`)
       .join('\n');
-    const message = `Olá! Gostaria de finalizar meu pedido:\n\n${itemsList}\n\n*Total: R$ ${total.toFixed(2)}*\n\nPoderia me ajudar?`;
+
+    const message = [
+      'Olá! Quero finalizar meu carrinho na Pincel de Luz.',
+      '',
+      'Resumo do carrinho:',
+      itemsList,
+      '',
+      `Total parcial: R$ ${total.toFixed(2)}`,
+      `Quantidade de itens: ${itemCount}`,
+      '',
+      'Pode me ajudar com o fechamento e prazo de produção?',
+    ].join('\n');
+
+    if (whatsappNumber) {
+      window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+      return;
+    }
+
     window.open(`${storeInfo.whatsappLink}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -256,3 +277,7 @@ const CartPage = () => {
 };
 
 export default CartPage;
+
+
+
+

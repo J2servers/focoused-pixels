@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Youtube, Mail, Phone, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ export function DynamicFooter() {
   );
 
   const footerLogo = company?.footer_logo || logoPincelDeLuz;
+  const footerLogoHeight = Math.min(Math.max(company?.footer_logo_height ?? 48, 20), 160);
 
   const institutionalLinks = [
     { name: 'Sobre Nós', href: '/sobre' },
@@ -64,7 +65,8 @@ export function DynamicFooter() {
             <img 
               src={footerLogo} 
               alt={company?.company_name || 'Logo'} 
-              className="h-12 mb-4 object-contain"
+              className="mb-4 w-auto object-contain"
+              style={{ height: `${footerLogoHeight}px` }}
             />
             <p className="text-muted-foreground text-sm mb-4">
               Especialistas em comunicação visual personalizada. Letreiros LED, displays QR Code, 
@@ -184,3 +186,4 @@ export function DynamicFooter() {
     </footer>
   );
 }
+

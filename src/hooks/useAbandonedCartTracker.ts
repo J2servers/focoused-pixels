@@ -1,86 +1,101 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useCart, type CartItem } from '@/hooks/useCart';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useCart } from './useCart';
+import {
+  ABANDONED_CONTACT_UPDATED_EVENT,
+  getAbandonedCartContact,
+  getOrCreateAbandonedCartToken,
+} from '@/lib/abandoned-cart';
 
-/**
- * Tracks cart activity and persists abandoned cart sessions to the database.
- * Should be mounted once in App.tsx.
- */
-export const useAbandonedCartTracker = () => {
-  const { items, total } = useCart();
-  const sessionIdRef = useRef<string>(
-    sessionStorage.getItem('cart_session_id') || crypto.randomUUID()
-  );
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+const SYNC_DEBOUNCE_MS = 1200;
+
+function sanitizeSnapshotItems(items: CartItem[]) {
+  return items.slice(0, 100).map((item) => ({
+    id: item.id,
+    name: item.name,
+    price: Number(item.price.toFixed(2)),
+    quantity: item.quantity,
+    size: item.size || null,
+    image: item.image || null,
+  }));
+}
+
+export function useAbandonedCartTracker() {
+  const { items, itemCount, total } = useCart();
+  const { user } = useAuthContext();
+  const [contactVersion, setContactVersion] = useState(0);
+  const userFullName =
+    typeof user?.user_metadata?.full_name === 'string'
+      ? user.user_metadata.full_name
+      : undefined;
+
+  const cartTokenRef = useRef<string>('');
+  const lastFingerprintRef = useRef<string>('');
+  const syncTimeoutRef = useRef<number | null>(null);
+  const disabledRef = useRef(false);
 
   useEffect(() => {
-    sessionStorage.setItem('cart_session_id', sessionIdRef.current);
+    cartTokenRef.current = getOrCreateAbandonedCartToken();
   }, []);
 
   useEffect(() => {
-    if (items.length === 0) return;
+    if (typeof window === 'undefined') return;
 
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const cartItems = items.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          image: item.image,
-        }));
-
-        await (supabase as any)
-          .from('abandoned_cart_sessions')
-          .upsert({
-            session_id: sessionIdRef.current,
-            cart_items: cartItems,
-            cart_total: total,
-            last_activity_at: new Date().toISOString(),
-          }, { onConflict: 'session_id' });
-      } catch (error) {
-        // Silent fail — tracking should never block UX
-        console.debug('Cart tracking error:', error);
-      }
-    }, 5000); // Debounce 5s
+    const handleContactUpdated = () => setContactVersion((prev) => prev + 1);
+    window.addEventListener(ABANDONED_CONTACT_UPDATED_EVENT, handleContactUpdated as EventListener);
 
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
+      window.removeEventListener(ABANDONED_CONTACT_UPDATED_EVENT, handleContactUpdated as EventListener);
     };
-  }, [items, total]);
+  }, []);
 
-  /** Call this when customer provides contact info during checkout */
-  const updateContactInfo = async (name: string, email: string, phone: string) => {
-    try {
-      await (supabase as any)
-        .from('abandoned_cart_sessions')
-        .update({
-          user_name: name,
-          user_email: email,
-          user_phone: phone,
-        })
-        .eq('session_id', sessionIdRef.current);
-    } catch {
-      // Silent fail
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!cartTokenRef.current) return;
+    if (disabledRef.current) return;
+    if (window.location.hostname === 'localhost') return;
+
+    if (syncTimeoutRef.current !== null) {
+      window.clearTimeout(syncTimeoutRef.current);
     }
-  };
 
-  /** Call this when the order is completed to mark session as recovered */
-  const markRecovered = async () => {
-    try {
-      await (supabase as any)
-        .from('abandoned_cart_sessions')
-        .update({
-          recovered: true,
-          recovered_at: new Date().toISOString(),
-        })
-        .eq('session_id', sessionIdRef.current);
-    } catch {
-      // Silent fail
-    }
-  };
+    syncTimeoutRef.current = window.setTimeout(async () => {
+      const contact = getAbandonedCartContact();
 
-  return { sessionId: sessionIdRef.current, updateContactInfo, markRecovered };
-};
+      const payload = {
+        cartToken: cartTokenRef.current,
+        items: sanitizeSnapshotItems(items),
+        itemCount,
+        total: Number(total.toFixed(2)),
+        sourcePath: window.location.pathname,
+        customer: {
+          userId: user?.id,
+          name: contact?.name || userFullName,
+          email: contact?.email || user?.email,
+          phone: contact?.phone,
+        },
+      };
+
+      const fingerprint = JSON.stringify(payload);
+      if (fingerprint === lastFingerprintRef.current) return;
+
+      const { error } = await supabase.functions.invoke('upsert-abandoned-cart', {
+        body: payload,
+      });
+
+      if (error) {
+        disabledRef.current = true;
+        return;
+      }
+
+      lastFingerprintRef.current = fingerprint;
+    }, SYNC_DEBOUNCE_MS);
+
+    return () => {
+      if (syncTimeoutRef.current !== null) {
+        window.clearTimeout(syncTimeoutRef.current);
+      }
+    };
+  }, [items, itemCount, total, user?.id, user?.email, userFullName, contactVersion]);
+}

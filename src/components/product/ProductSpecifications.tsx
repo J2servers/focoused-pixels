@@ -1,4 +1,4 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+﻿import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Product } from '@/data/products';
 import { storeInfo } from '@/data/store';
@@ -151,3 +151,4 @@ export const ProductSpecifications = ({ product }: ProductSpecificationsProps) =
     </div>
   );
 };
+

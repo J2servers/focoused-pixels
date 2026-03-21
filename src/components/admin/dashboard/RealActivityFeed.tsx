@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, ShoppingCart, Package, Star, UserPlus, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -93,3 +93,4 @@ export function RealActivityFeed() {
     </Card>
   );
 }
+

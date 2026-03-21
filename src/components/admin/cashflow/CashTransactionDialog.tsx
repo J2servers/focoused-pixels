@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -233,3 +233,4 @@ export function CashTransactionDialog({
     </Dialog>
   );
 }
+

@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
-import { AdminLayout, ImageUpload } from '@/components/admin';
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,1597 +9,1319 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCompanyInfo, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
 import { usePaymentCredentials, useUpdatePaymentCredentials, PaymentCredentials } from '@/hooks/usePaymentCredentials';
+import { useEmailCredentials, useUpdateEmailCredentials, EmailCredentials } from '@/hooks/useEmailCredentials';
+import { useSendTestEmail, useTestEmailConnection } from '@/hooks/useEmailGateway';
 import { useTestMercadoPago, useTestEfiBank, useTestStripe } from '@/hooks/usePaymentGateway';
+import { supabase } from '@/integrations/supabase/client';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { 
-  Loader2, Save, User, Lock, Search, Palette, ShoppingCart, 
-  Bell, Bot, Truck, AlertTriangle, Shield, CreditCard,
-  Eye, MessageSquare, Cookie, Wallet, QrCode, Building2, Landmark,
-  CheckCircle2, XCircle, Zap
+import {
+  AlertTriangle,
+  ArrowRight,
+  Bug,
+  CheckCircle2,
+  CreditCard,
+  FolderOpen,
+  Loader2,
+  Lock,
+  Mail,
+  MessageSquare,
+  Save,
+  ScrollText,
+  Send,
+  Settings2,
+  ShieldCheck,
+  Store,
+  Users,
+  Webhook,
+  XCircle,
+  type LucideIcon,
 } from 'lucide-react';
 
+type SettingsTab = 'geral' | 'pagamentos' | 'email' | 'seguranca' | 'operacoes';
+
+interface OperationsSummary {
+  whatsappConnected: number;
+  whatsappErrors: number;
+  whatsappSent: number;
+  apiKeysActive: number;
+  apiKeysTotal: number;
+  webhookErrors: number;
+  webhookToday: number;
+  auditToday: number;
+  auditTotal: number;
+  usersTotal: number;
+  adminUsers: number;
+  editorUsers: number;
+}
+
+interface SectionMeta {
+  value: SettingsTab;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  accent: string;
+  accentSoft: string;
+  accentText: string;
+}
+
+interface GatewayField {
+  key: keyof PaymentCredentials;
+  label: string;
+  type?: string;
+  placeholder?: string;
+}
+
+interface GatewayCardConfig {
+  id: string;
+  label: string;
+  description: string;
+  enabledKey: keyof PaymentCredentials;
+  sandboxKey?: keyof PaymentCredentials;
+  fields: GatewayField[];
+  accentClass: string;
+  accentTextClass: string;
+}
+
+const surfaceCardClass = 'rounded-[28px] border border-slate-300/90 bg-white/96 shadow-[0_20px_54px_rgba(60,64,67,0.14)] backdrop-blur';
+const softBlockClass = 'rounded-[24px] border border-slate-300 bg-white shadow-[0_12px_30px_rgba(60,64,67,0.10)]';
+const inputClassName = 'h-11 rounded-2xl border-slate-300 bg-white text-slate-950 shadow-none placeholder:text-slate-700 focus-visible:ring-[#1a73e8]/45';
+const textareaClassName = 'min-h-[112px] rounded-2xl border-slate-300 bg-white text-slate-950 shadow-none placeholder:text-slate-700 focus-visible:ring-[#1a73e8]/45';
+const selectClassName = 'h-11 rounded-2xl border-slate-300 bg-white text-slate-950 shadow-none';
+const primaryButtonClass = 'border-[#1a73e8] bg-[#1a73e8] text-white shadow-[0_14px_28px_rgba(26,115,232,0.28)] hover:border-[#1558b0] hover:bg-[#1558b0]';
+const secondaryButtonClass = 'border-slate-300 bg-white text-slate-800 shadow-none hover:border-slate-400 hover:bg-slate-50 hover:text-slate-950';
+
+const sectionMeta: Record<SettingsTab, SectionMeta> = {
+  geral: {
+    value: 'geral',
+    title: 'Workspace Geral',
+    description: 'Status da loja, checkout e mensagens principais.',
+    icon: Store,
+    accent: 'from-[#1a73e8] via-[#8ab4f8] to-[#d2e3fc]',
+    accentSoft: 'bg-[#e8f0fe]',
+    accentText: 'text-[#174ea6]',
+  },
+  pagamentos: {
+    value: 'pagamentos',
+    title: 'Pagamentos e Bancos',
+    description: 'Gateways, credenciais, boleto e testes de conexão.',
+    icon: CreditCard,
+    accent: 'from-[#188038] via-[#34a853] to-[#d7f8dd]',
+    accentSoft: 'bg-[#e6f4ea]',
+    accentText: 'text-[#137333]',
+  },
+  email: {
+    value: 'email',
+    title: 'Email Business',
+    description: 'SMTP Hostinger, testes e modo de seguranca.',
+    icon: Mail,
+    accent: 'from-[#f29900] via-[#fbbc04] to-[#feefc3]',
+    accentSoft: 'bg-[#fef7e0]',
+    accentText: 'text-[#b06000]',
+  },
+  seguranca: {
+    value: 'seguranca',
+    title: 'Conta e Alertas',
+    description: 'Alertas operacionais e seguranca da conta.',
+    icon: ShieldCheck,
+    accent: 'from-[#d93025] via-[#ea4335] to-[#f9dedc]',
+    accentSoft: 'bg-[#fce8e6]',
+    accentText: 'text-[#c5221f]',
+  },
+  operacoes: {
+    value: 'operacoes',
+    title: 'Operacoes Tecnicas',
+    description: 'WhatsApp, API, logs, usuários e atalhos do sistema.',
+    icon: Settings2,
+    accent: 'from-[#9334e6] via-[#a142f4] to-[#eadcff]',
+    accentSoft: 'bg-[#f3e8ff]',
+    accentText: 'text-[#7b1fa2]',
+  },
+};
+
+const sectionOrder: SettingsTab[] = ['geral', 'pagamentos', 'email', 'seguranca', 'operacoes'];
+
+const storeStatusLabel = (status?: string | null) => {
+  switch (status) {
+    case 'closed':
+      return 'Fechada';
+    case 'vacation':
+      return 'Ferias';
+    case 'coming_soon':
+      return 'Em breve';
+    default:
+      return 'Aberta';
+  }
+};
+
+const paymentMethodLabel = (method: string) => {
+  switch (method) {
+    case 'pix':
+      return 'PIX';
+    case 'credit_card':
+      return 'Cartao';
+    case 'boleto':
+      return 'Boleto';
+    default:
+      return method;
+  }
+};
+
 const AdminSettingsPage = () => {
-  const { profile, updatePassword, canEdit } = useAuthContext();
-  const { data: companyInfo, isLoading: isLoadingCompany } = useCompanyInfo();
-  const { data: paymentCreds, isLoading: isLoadingPayment } = usePaymentCredentials();
+  const { profile, updatePassword, canEdit, isAdmin } = useAuthContext();
+  const { data: companyInfo, isLoading: loadingCompany } = useCompanyInfo();
+  const { data: paymentCreds, isLoading: loadingPayment } = usePaymentCredentials();
+  const { data: emailCreds, isLoading: loadingEmail } = useEmailCredentials();
   const updateCompany = useUpdateCompanyInfo();
   const updatePayment = useUpdatePaymentCredentials();
-  
-  // Payment gateway test mutations
-  const testMercadoPago = useTestMercadoPago();
-  const testEfiBank = useTestEfiBank();
+  const updateEmail = useUpdateEmailCredentials();
+  const testEmailConnection = useTestEmailConnection();
+  const sendTestEmail = useSendTestEmail();
+  const testMP = useTestMercadoPago();
+  const testEFI = useTestEfiBank();
   const testStripe = useTestStripe();
-  
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [passwords, setPasswords] = useState({
-    newPassword: '',
-    confirmPassword: '',
-  });
 
   const [settings, setSettings] = useState<Partial<CompanyInfo>>({});
-  const [paymentSettings, setPaymentSettings] = useState<Partial<PaymentCredentials>>({});
+  const [payment, setPayment] = useState<Partial<PaymentCredentials>>({});
+  const [emailSettings, setEmailSettings] = useState<Partial<EmailCredentials>>({});
+  const [pass, setPass] = useState({ n: '', c: '' });
+  const [changingPass, setChangingPass] = useState(false);
+  const [activeTab, setActiveTab] = useState<SettingsTab>('geral');
 
   useEffect(() => {
-    if (companyInfo) {
-      setSettings(companyInfo);
-    }
+    if (companyInfo) setSettings(companyInfo);
   }, [companyInfo]);
 
   useEffect(() => {
-    if (paymentCreds) {
-      setPaymentSettings(paymentCreds);
-    }
+    if (paymentCreds) setPayment(paymentCreds);
   }, [paymentCreds]);
 
-  const handleChangePassword = async () => {
-    if (passwords.newPassword.length < 6) {
-      toast.error('A senha deve ter pelo menos 6 caracteres');
-      return;
-    }
+  useEffect(() => {
+    if (emailCreds) setEmailSettings(emailCreds);
+  }, [emailCreds]);
 
-    if (passwords.newPassword !== passwords.confirmPassword) {
-      toast.error('As senhas não coincidem');
-      return;
-    }
+  const u = <K extends keyof CompanyInfo>(key: K, value: CompanyInfo[K]) => setSettings((prev) => ({ ...prev, [key]: value }));
+  const up = <K extends keyof PaymentCredentials>(key: K, value: PaymentCredentials[K]) => setPayment((prev) => ({ ...prev, [key]: value }));
+  const ue = <K extends keyof EmailCredentials>(key: K, value: EmailCredentials[K]) => setEmailSettings((prev) => ({ ...prev, [key]: value }));
 
-    setIsChangingPassword(true);
-    try {
-      const { error } = await updatePassword(passwords.newPassword);
-      if (error) throw error;
-      
-      toast.success('Senha alterada com sucesso!');
-      setPasswords({ newPassword: '', confirmPassword: '' });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao alterar senha';
-      toast.error(message);
-    } finally {
-      setIsChangingPassword(false);
-    }
+  const { data: operationsSummary, isLoading: loadingOperations } = useQuery<OperationsSummary>({
+    queryKey: ['settings-operations-summary'],
+    queryFn: async () => {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      const [whatsappInstances, whatsappMessages, apiKeys, webhookLogs, auditLogs, userRoles] = await Promise.all([
+        supabase.from('whatsapp_instances').select('id, status'),
+        supabase.from('whatsapp_messages').select('id, status').order('created_at', { ascending: false }).limit(200),
+        supabase.from('api_keys').select('id, is_active'),
+        supabase.from('webhook_logs').select('id, error_message, created_at').order('created_at', { ascending: false }).limit(200),
+        supabase.from('audit_logs').select('id, created_at').order('created_at', { ascending: false }).limit(300),
+        supabase.from('user_roles').select('user_id, role'),
+      ]);
+
+      const instances = whatsappInstances.data || [];
+      const messages = whatsappMessages.data || [];
+      const keys = apiKeys.data || [];
+      const webhooks = webhookLogs.data || [];
+      const audits = auditLogs.data || [];
+      const roles = userRoles.data || [];
+
+      return {
+        whatsappConnected: instances.filter((item) => item.status === 'connected' || item.status === 'open').length,
+        whatsappErrors: messages.filter((item) => item.status === 'error' || item.status === 'failed').length,
+        whatsappSent: messages.filter((item) => item.status === 'sent').length,
+        apiKeysActive: keys.filter((item) => item.is_active).length,
+        apiKeysTotal: keys.length,
+        webhookErrors: webhooks.filter((item) => item.error_message).length,
+        webhookToday: webhooks.filter((item) => new Date(item.created_at) >= todayStart).length,
+        auditToday: audits.filter((item) => new Date(item.created_at) >= todayStart).length,
+        auditTotal: audits.length,
+        usersTotal: roles.length,
+        adminUsers: roles.filter((item) => item.role === 'admin').length,
+        editorUsers: roles.filter((item) => item.role === 'editor').length,
+      };
+    },
+    refetchInterval: 30000,
+  });
+
+  const isSavingAny = updateCompany.isPending || updatePayment.isPending || updateEmail.isPending;
+  const canMutate = canEdit();
+  const adminAccess = isAdmin();
+  const activeSection = sectionMeta[activeTab];
+
+  const toggleMethod = (method: string) => {
+    const current = payment.payment_methods_enabled || ['pix', 'credit_card', 'boleto'];
+    up(
+      'payment_methods_enabled',
+      current.includes(method) ? current.filter((item) => item !== method) : [...current, method],
+    );
   };
 
-  const handleSaveSettings = async () => {
+  const saveAll = async () => {
     try {
       await Promise.all([
-        updateCompany.mutateAsync({
-          id: companyInfo?.id || null,
-          data: settings,
-        }),
-        updatePayment.mutateAsync({
-          id: paymentCreds?.id || null,
-          data: paymentSettings,
-        }),
+        updateCompany.mutateAsync({ id: companyInfo?.id || null, data: settings }),
+        updatePayment.mutateAsync({ id: paymentCreds?.id || null, data: payment }),
+        updateEmail.mutateAsync({ id: emailCreds?.id || null, data: emailSettings }),
       ]);
       toast.success('Configurações salvas com sucesso!');
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao salvar';
-      toast.error(message);
+      toast.error(error instanceof Error ? error.message : 'Erro ao salvar');
     }
   };
 
-  const updateSetting = <K extends keyof CompanyInfo>(key: K, value: CompanyInfo[K]) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+  const persistEmailSettings = async () => {
+    await updateEmail.mutateAsync({ id: emailCreds?.id || null, data: emailSettings });
   };
 
-  const updatePaymentSetting = <K extends keyof PaymentCredentials>(key: K, value: PaymentCredentials[K]) => {
-    setPaymentSettings(prev => ({ ...prev, [key]: value }));
-  };
-
-  const togglePaymentMethod = (method: string) => {
-    const current = paymentSettings.payment_methods_enabled || ['pix', 'credit_card', 'boleto'];
-    if (current.includes(method)) {
-      updatePaymentSetting('payment_methods_enabled', current.filter(m => m !== method));
-    } else {
-      updatePaymentSetting('payment_methods_enabled', [...current, method]);
+  const handleTestEmailConnection = async () => {
+    try {
+      await persistEmailSettings();
+      const result = await testEmailConnection.mutateAsync();
+      toast.success(`SMTP conectado em ${result.provider}:${result.port}`);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Falha no teste SMTP');
     }
   };
 
-  if (isLoadingCompany) {
+  const handleSendTestEmail = async () => {
+    try {
+      await persistEmailSettings();
+      const result = await sendTestEmail.mutateAsync({
+        to: emailSettings.test_recipient || undefined,
+        subject: 'Teste de envio - Hostinger Business',
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:24px;background:#eff6ff;">
+            <div style="background:#ffffff;border:1px solid #bfdbfe;border-radius:16px;padding:24px;">
+              <h2 style="margin:0 0 12px;color:#1d4ed8;">Teste de email da area administrativa</h2>
+              <p style="margin:0 0 8px;color:#1e3a8a;">Se voce recebeu esta mensagem, o Hostinger Business esta configurado corretamente.</p>
+              <p style="margin:0;color:#334155;">A loja Pincel de Luz acabou de validar o envio por SMTP.</p>
+            </div>
+          </div>
+        `,
+        from_name: emailSettings.sender_name || undefined,
+      });
+      toast.success(`Email de teste enviado para ${result.effectiveTo}`);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Falha ao enviar email de teste');
+    }
+  };
+
+  const changePassword = async () => {
+    if (pass.n.length < 6) return toast.error('Senha minima de 6 caracteres');
+    if (pass.n !== pass.c) return toast.error('As senhas não coincidem');
+
+    setChangingPass(true);
+    try {
+      const { error } = await updatePassword(pass.n);
+      if (error) throw error;
+      setPass({ n: '', c: '' });
+      toast.success('Senha alterada com sucesso!');
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Erro ao alterar senha');
+    } finally {
+      setChangingPass(false);
+    }
+  };
+
+  const runMercadoPagoTest = async () => {
+    try {
+      const result = await testMP.mutateAsync();
+      if (result?.success) {
+        toast.success('Mercado Pago OK');
+      } else {
+        toast.error('Mercado Pago falhou');
+      }
+    } catch {
+      toast.error('Mercado Pago falhou');
+    }
+  };
+
+  const runEfiTest = async () => {
+    try {
+      const result = await testEFI.mutateAsync();
+      if (result?.success) {
+        toast.success('EFI OK');
+      } else {
+        toast.error('EFI falhou');
+      }
+    } catch {
+      toast.error('EFI falhou');
+    }
+  };
+
+  const runStripeTest = async () => {
+    try {
+      const result = await testStripe.mutateAsync();
+      if (result?.success) {
+        toast.success('Stripe OK');
+      } else {
+        toast.error('Stripe falhou');
+      }
+    } catch {
+      toast.error('Stripe falhou');
+    }
+  };
+
+  const paymentStatusMap = {
+    mercadopago: { success: testMP.isSuccess, pending: testMP.isPending, action: runMercadoPagoTest },
+    efi: { success: testEFI.isSuccess, pending: testEFI.isPending, action: runEfiTest },
+    stripe: { success: testStripe.isSuccess, pending: testStripe.isPending, action: runStripeTest },
+  };
+
+  const methodsEnabled = payment.payment_methods_enabled || [];
+  const paymentCredentialsFilled = [
+    payment.mercadopago_public_key,
+    payment.mercadopago_access_token,
+    payment.efi_client_id,
+    payment.efi_client_secret,
+    payment.efi_pix_key,
+    payment.pagseguro_email,
+    payment.pagseguro_token,
+    payment.stripe_public_key,
+    payment.stripe_secret_key,
+    payment.asaas_api_key,
+  ].filter(Boolean).length;
+
+  const emailChecklist = useMemo(
+    () => [
+      !!emailSettings.business_email,
+      !!emailSettings.smtp_host,
+      !!emailSettings.smtp_username,
+      !!emailSettings.smtp_password,
+      !!emailSettings.test_recipient,
+    ].filter(Boolean).length,
+    [emailSettings.business_email, emailSettings.smtp_host, emailSettings.smtp_password, emailSettings.smtp_username, emailSettings.test_recipient],
+  );
+
+  const heroStats = [
+    { label: 'Loja', value: storeStatusLabel(settings.store_status), tone: 'bg-[#e8f0fe] text-[#174ea6]' },
+    { label: 'Gateway', value: payment.payment_gateway_primary || 'mercadopago', tone: 'bg-[#e6f4ea] text-[#137333]' },
+    { label: 'Email', value: emailSettings.email_enabled ? (emailSettings.test_mode ? 'Teste ativo' : 'Envio real') : 'Desligado', tone: 'bg-[#fef7e0] text-[#b06000]' },
+    { label: 'Operações', value: loadingOperations ? 'Atualizando' : `${operationsSummary?.whatsappConnected || 0} instâncias online`, tone: 'bg-[#f3e8ff] text-[#7b1fa2]' },
+  ];
+
+  const gatewayCards: GatewayCardConfig[] = [
+    {
+      id: 'mercadopago',
+      label: 'Mercado Pago',
+      description: 'PIX, boleto e cartao com checkout principal.',
+      enabledKey: 'mercadopago_enabled',
+      sandboxKey: 'mercadopago_sandbox',
+      accentClass: 'bg-[#e8f0fe]',
+      accentTextClass: 'text-[#174ea6]',
+      fields: [
+        { key: 'mercadopago_public_key', label: 'Public Key', placeholder: 'APP_USR-...' },
+        { key: 'mercadopago_access_token', label: 'Access Token', type: 'password', placeholder: 'APP_USR-...' },
+      ],
+    },
+    {
+      id: 'efi',
+      label: 'EFI Bank',
+      description: 'PIX direto via EFI com chave propria.',
+      enabledKey: 'efi_enabled',
+      sandboxKey: 'efi_sandbox',
+      accentClass: 'bg-[#e6f4ea]',
+      accentTextClass: 'text-[#137333]',
+      fields: [
+        { key: 'efi_client_id', label: 'Client ID' },
+        { key: 'efi_client_secret', label: 'Client Secret', type: 'password' },
+        { key: 'efi_pix_key', label: 'Chave PIX', placeholder: 'email, telefone ou chave aleatoria' },
+      ],
+    },
+    {
+      id: 'pagseguro',
+      label: 'PagSeguro',
+      description: 'Conta e token para homologacao ou reserva.',
+      enabledKey: 'pagseguro_enabled',
+      sandboxKey: 'pagseguro_sandbox',
+      accentClass: 'bg-[#fef7e0]',
+      accentTextClass: 'text-[#b06000]',
+      fields: [
+        { key: 'pagseguro_email', label: 'Email da conta', type: 'email' },
+        { key: 'pagseguro_token', label: 'Token', type: 'password' },
+      ],
+    },
+    {
+      id: 'stripe',
+      label: 'Stripe',
+      description: 'Cartao internacional e checkout cloud.',
+      enabledKey: 'stripe_enabled',
+      sandboxKey: 'stripe_sandbox',
+      accentClass: 'bg-[#f3e8ff]',
+      accentTextClass: 'text-[#7b1fa2]',
+      fields: [
+        { key: 'stripe_public_key', label: 'Public Key' },
+        { key: 'stripe_secret_key', label: 'Secret Key', type: 'password' },
+      ],
+    },
+    {
+      id: 'asaas',
+      label: 'Asaas',
+      description: 'Cobrancas recorrentes e conta reserva.',
+      enabledKey: 'asaas_enabled',
+      sandboxKey: 'asaas_sandbox',
+      accentClass: 'bg-[#fce8e6]',
+      accentTextClass: 'text-[#c5221f]',
+      fields: [{ key: 'asaas_api_key', label: 'API Key', type: 'password' }],
+    },
+  ];
+
+  if (loadingCompany || loadingPayment || loadingEmail) {
     return (
       <AdminLayout title="Configurações">
-        <div className="flex items-center justify-center h-64">
+        <div className="flex h-64 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </AdminLayout>
     );
   }
 
-  return (
-    <AdminLayout title="Configurações Avançadas">
-      <div className="space-y-6">
-        {/* Save Button - Fixed at top */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-white">Central de Configurações</h2>
-            <p className="text-sm text-[hsl(var(--admin-text-muted))]">
-              Gerencie todas as configurações do site em um só lugar
-            </p>
+  const renderGeneralSection = () => (
+    <div className="space-y-6">
+      <div className="grid gap-6 xl:grid-cols-[1.05fr,0.95fr]">
+        <Card className={surfaceCardClass}>
+          <CardHeader>
+            <CardTitle className="text-[28px] text-slate-900">Workspace da operação</CardTitle>
+            <CardDescription className="text-slate-700">
+              Controle a disponibilidade da loja, mensagens do cliente e regras base do checkout em um painel visual unico.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-slate-700">Status da loja</Label>
+              <Select value={settings.store_status || 'open'} onValueChange={(value) => u('store_status', value)}>
+                <SelectTrigger className={selectClassName}><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="open">Aberta</SelectItem>
+                  <SelectItem value="closed">Fechada</SelectItem>
+                  <SelectItem value="vacation">Ferias</SelectItem>
+                  <SelectItem value="coming_soon">Em breve</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-slate-700">Mensagem de status</Label>
+              <Input className={inputClassName} value={settings.store_closed_message || ''} onChange={(event) => u('store_closed_message', event.target.value)} placeholder="Ex.: voltamos em algumas horas" />
+            </div>
+            <div className="md:col-span-2 rounded-[24px] border border-slate-300 bg-[#f2f6ff] p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-medium text-slate-900">Modo manutenção</p>
+                  <p className="text-sm text-slate-700">Bloqueia a loja temporariamente enquanto a equipe corrige ou publica novidades.</p>
+                </div>
+                <Switch checked={settings.maintenance_mode ?? false} onCheckedChange={(value) => u('maintenance_mode', value)} />
+              </div>
+              <div className="mt-4 space-y-2">
+                <Label className="text-slate-700">Mensagem de manutenção</Label>
+                <Textarea className={textareaClassName} value={settings.maintenance_message || ''} onChange={(event) => u('maintenance_message', event.target.value)} placeholder="Explique o motivo e quando a loja volta a operar." />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={cn(surfaceCardClass, 'overflow-hidden')}>
+          <div className="h-1.5 bg-gradient-to-r from-[#1a73e8] via-[#34a853] via-[52%] to-[#fbbc04]" />
+          <CardHeader>
+            <CardTitle className="text-xl text-slate-900">Leitura rápida da jornada</CardTitle>
+            <CardDescription className="text-slate-700">Resumo vivo do que o cliente encontra antes, durante e depois do checkout.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-[22px] bg-[#e8f0fe] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#174ea6]">Checkout</p>
+                <p className="mt-2 text-2xl font-semibold text-slate-900">{settings.enable_guest_checkout ? 'Convidado liberado' : 'Login exigido'}</p>
+                <p className="mt-2 text-sm text-slate-700">Telefone {settings.require_phone_on_checkout ? 'obrigatório' : 'opcional'} na finalização.</p>
+              </div>
+              <div className="rounded-[22px] bg-[#e6f4ea] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#137333]">Pedido minimo</p>
+                <p className="mt-2 text-2xl font-semibold text-slate-900">R$ {Number(settings.min_order_value || 0).toFixed(2)}</p>
+                <p className="mt-2 text-sm text-slate-700">Abaixo deste valor a compra não fecha.</p>
+              </div>
+            </div>
+            <div className="rounded-[24px] border border-slate-300 bg-white p-4">
+              <p className="text-sm font-medium text-slate-900">Mensagem de sucesso atual</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{settings.checkout_success_message || 'Ainda não configurada. Defina uma mensagem clara para confirmar ao cliente que o pedido entrou na fila.'}</p>
+            </div>
+            <div className="rounded-[24px] border border-[#fbbc04]/40 bg-[#fef7e0] p-4 text-sm text-[#7c4a03]">
+              Receita, ticket médio e gráficos financeiros só consideram pedidos com pagamento confirmado. Pedidos aguardando boleto ou outra confirmação continuam no sistema, mas não viram faturamento.
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className={surfaceCardClass}>
+        <CardHeader>
+          <CardTitle className="text-slate-900">Checkout e conversão</CardTitle>
+          <CardDescription className="text-slate-700">Defina políticas comerciais, automações e a mensagem-padrão do WhatsApp.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="space-y-2">
+              <Label className="text-slate-700">Pedido mínimo (R$)</Label>
+              <Input className={inputClassName} type="number" value={settings.min_order_value || 0} onChange={(event) => u('min_order_value', Number(event.target.value))} />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-slate-700">Recuperação de carrinho (horas)</Label>
+              <Input className={inputClassName} type="number" value={settings.abandoned_cart_reminder_hours || 24} onChange={(event) => u('abandoned_cart_reminder_hours', Number(event.target.value))} />
+            </div>
+            <div className="space-y-2 xl:col-span-2">
+              <Label className="text-slate-700">Mensagem de sucesso</Label>
+              <Input className={inputClassName} value={settings.checkout_success_message || ''} onChange={(event) => u('checkout_success_message', event.target.value)} placeholder="Seu pedido foi recebido e esta sendo processado." />
+            </div>
           </div>
-          <Button 
-            onClick={handleSaveSettings} 
-            disabled={updateCompany.isPending || !canEdit()}
-            size="lg"
-            className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)] hover:shadow-xl"
-          >
-            {updateCompany.isPending ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
-            )}
-            Salvar Todas as Alterações
-          </Button>
-        </div>
-
-        <Tabs defaultValue="payments" className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 h-auto p-2 bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))]">
-            <TabsTrigger value="payments" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <CreditCard className="h-4 w-4" />
-              <span className="hidden sm:inline">Pagamentos</span>
-            </TabsTrigger>
-            <TabsTrigger value="checkout" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <ShoppingCart className="h-4 w-4" />
-              <span className="hidden sm:inline">Checkout</span>
-            </TabsTrigger>
-            <TabsTrigger value="shipping" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <Truck className="h-4 w-4" />
-              <span className="hidden sm:inline">Frete</span>
-            </TabsTrigger>
-            <TabsTrigger value="seo" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <Search className="h-4 w-4" />
-              <span className="hidden sm:inline">SEO</span>
-            </TabsTrigger>
-            <TabsTrigger value="appearance" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <Palette className="h-4 w-4" />
-              <span className="hidden sm:inline">Aparência</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 h-auto p-2 bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))]">
-            <TabsTrigger value="ai" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <Bot className="h-4 w-4" />
-              <span className="hidden sm:inline">IA</span>
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">Alertas</span>
-            </TabsTrigger>
-            <TabsTrigger value="maintenance" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <AlertTriangle className="h-4 w-4" />
-              <span className="hidden sm:inline">Manutenção</span>
-            </TabsTrigger>
-            <TabsTrigger value="legal" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">LGPD</span>
-            </TabsTrigger>
-            <TabsTrigger value="account" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--admin-accent-purple))] data-[state=active]:to-[hsl(var(--admin-accent-pink))] data-[state=active]:text-white">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Conta</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Payments Tab */}
-          <TabsContent value="payments" className="space-y-6">
-            {/* Payment Methods */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Wallet className="h-5 w-5" />
-                  Métodos de Pagamento
-                </CardTitle>
-                <CardDescription>
-                  Configure quais formas de pagamento estarão disponíveis
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                    <Checkbox
-                      id="pix"
-                      checked={(paymentSettings.payment_methods_enabled || []).includes('pix')}
-                      onCheckedChange={() => togglePaymentMethod('pix')}
-                    />
-                    <div className="flex items-center gap-2">
-                      <QrCode className="h-5 w-5 text-emerald-500" />
-                      <Label htmlFor="pix" className="font-medium cursor-pointer">PIX</Label>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                    <Checkbox
-                      id="credit_card"
-                      checked={(paymentSettings.payment_methods_enabled || []).includes('credit_card')}
-                      onCheckedChange={() => togglePaymentMethod('credit_card')}
-                    />
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5 text-blue-500" />
-                      <Label htmlFor="credit_card" className="font-medium cursor-pointer">Cartão de Crédito</Label>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                    <Checkbox
-                      id="boleto"
-                      checked={(paymentSettings.payment_methods_enabled || []).includes('boleto')}
-                      onCheckedChange={() => togglePaymentMethod('boleto')}
-                    />
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5 text-orange-500" />
-                      <Label htmlFor="boleto" className="font-medium cursor-pointer">Boleto Bancário</Label>
-                    </div>
-                  </div>
+          <div className="space-y-2">
+            <Label className="text-slate-700">Template geral de WhatsApp</Label>
+            <Textarea className={textareaClassName} rows={4} value={settings.whatsapp_message_template || ''} onChange={(event) => u('whatsapp_message_template', event.target.value)} placeholder="Use variaveis e um texto acolhedor para a confirmacao do pedido." />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-[24px] border border-slate-300 bg-[#f2f6ff] p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-medium text-slate-900">Checkout convidado</p>
+                  <p className="text-sm text-slate-700">Permite compra sem criar conta antes do pagamento.</p>
                 </div>
-                <Separator />
-                <div className="grid gap-4 md:grid-cols-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="pix_discount">Desconto PIX (%)</Label>
-                    <Input
-                      id="pix_discount"
-                      type="number"
-                      value={paymentSettings.pix_discount_percent || 5}
-                      onChange={(e) => updatePaymentSetting('pix_discount_percent', Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="boleto_days">Dias extras Boleto</Label>
-                    <Input
-                      id="boleto_days"
-                      type="number"
-                      value={paymentSettings.boleto_extra_days || 3}
-                      onChange={(e) => updatePaymentSetting('boleto_extra_days', Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="max_installments">Máx. Parcelas</Label>
-                    <Input
-                      id="max_installments"
-                      type="number"
-                      value={paymentSettings.max_installments || 12}
-                      onChange={(e) => updatePaymentSetting('max_installments', Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="min_installment">Parcela Mín. (R$)</Label>
-                    <Input
-                      id="min_installment"
-                      type="number"
-                      value={paymentSettings.min_installment_value || 50}
-                      onChange={(e) => updatePaymentSetting('min_installment_value', Number(e.target.value))}
-                    />
-                  </div>
+                <Switch checked={settings.enable_guest_checkout ?? true} onCheckedChange={(value) => u('enable_guest_checkout', value)} />
+              </div>
+            </div>
+            <div className="rounded-[24px] border border-slate-300 bg-[#f2f6ff] p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-medium text-slate-900">Telefone obrigatório</p>
+                  <p className="text-sm text-slate-700">Mantém WhatsApp e suporte prontos no pós-venda.</p>
                 </div>
-              </CardContent>
-            </Card>
+                <Switch checked={settings.require_phone_on_checkout ?? true} onCheckedChange={(value) => u('require_phone_on_checkout', value)} />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-            {/* Gateway Principal */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Landmark className="h-5 w-5" />
-                  Gateway Principal
-                </CardTitle>
-                <CardDescription>
-                  Selecione qual gateway será usado para processar pagamentos
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Select
-                  value={paymentSettings.payment_gateway_primary || 'mercadopago'}
-                  onValueChange={(value) => updatePaymentSetting('payment_gateway_primary', value)}
-                >
-                  <SelectTrigger className="w-full md:w-80">
-                    <SelectValue />
-                  </SelectTrigger>
+  const renderPaymentsSection = () => (
+    <div className="space-y-6">
+      <div className="grid gap-6 xl:grid-cols-[0.95fr,1.05fr]">
+        <Card className={surfaceCardClass}>
+          <CardHeader>
+            <CardTitle className="text-[28px] text-slate-900">Matriz de pagamentos</CardTitle>
+            <CardDescription className="text-slate-700">Escolha o gateway principal, libere meios de pagamento e veja o pulso do financeiro técnico.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-slate-700">Gateway principal</Label>
+                <Select value={payment.payment_gateway_primary || 'mercadopago'} onValueChange={(value) => up('payment_gateway_primary', value)}>
+                  <SelectTrigger className={selectClassName}><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="mercadopago">Mercado Pago</SelectItem>
-                    <SelectItem value="efi">EFI Bank (Gerencianet)</SelectItem>
-                    <SelectItem value="pagseguro">PagSeguro</SelectItem>
+                    <SelectItem value="efi">EFI</SelectItem>
                     <SelectItem value="stripe">Stripe</SelectItem>
+                    <SelectItem value="pagseguro">PagSeguro</SelectItem>
                     <SelectItem value="asaas">Asaas</SelectItem>
                   </SelectContent>
                 </Select>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="rounded-[22px] bg-[#e6f4ea] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#137333]">Credenciais preenchidas</p>
+                <p className="mt-2 text-3xl font-semibold text-slate-900">{paymentCredentialsFilled}</p>
+                <p className="mt-2 text-sm text-slate-700">Campos sensíveis prontos para conexões e homologações.</p>
+              </div>
+            </div>
 
-            {/* Mercado Pago */}
-            <Card className={paymentSettings.mercadopago_enabled ? 'border-emerald-500/50' : ''}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#009ee3] flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">MP</span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">Mercado Pago</CardTitle>
-                      <CardDescription>Gateway mais popular do Brasil</CardDescription>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={paymentSettings.mercadopago_enabled ?? false}
-                    onCheckedChange={(checked) => updatePaymentSetting('mercadopago_enabled', checked)}
-                  />
+            <div className="rounded-[24px] border border-slate-300 bg-white p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-medium text-slate-900">Formas habilitadas no checkout</p>
+                  <p className="text-sm text-slate-700">Ative somente o que está pronto para uso em produção ou em testes internos.</p>
                 </div>
-              </CardHeader>
-              {paymentSettings.mercadopago_enabled && (
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
-                    <div className="space-y-0.5">
-                      <Label>Modo Sandbox (Testes)</Label>
-                      <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
-                    </div>
-                    <Switch
-                      checked={paymentSettings.mercadopago_sandbox ?? true}
-                      onCheckedChange={(checked) => updatePaymentSetting('mercadopago_sandbox', checked)}
-                    />
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="mp_public_key">Public Key</Label>
-                      <Input
-                        id="mp_public_key"
-                        value={paymentSettings.mercadopago_public_key || ''}
-                        onChange={(e) => updatePaymentSetting('mercadopago_public_key', e.target.value)}
-                        placeholder="APP_USR-xxxx..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="mp_access_token">Access Token</Label>
-                      <Input
-                        id="mp_access_token"
-                        type="password"
-                        value={paymentSettings.mercadopago_access_token || ''}
-                        onChange={(e) => updatePaymentSetting('mercadopago_access_token', e.target.value)}
-                        placeholder="APP_USR-xxxx..."
-                      />
-                    </div>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
-                      Salve as configurações antes de testar a conexão
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={async () => {
-                        try {
-                          const result = await testMercadoPago.mutateAsync();
-                          if (result.success) {
-                            toast.success('Mercado Pago conectado com sucesso!', {
-                              description: `Conta: ${result.account?.email || 'Verificada'}`,
-                            });
-                          } else {
-                            toast.error('Falha na conexão', { description: result.message });
-                          }
-                        } catch (error) {
-                          toast.error('Erro ao testar conexão');
-                        }
-                      }}
-                      disabled={testMercadoPago.isPending || !paymentSettings.mercadopago_access_token}
-                    >
-                      {testMercadoPago.isPending ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <Zap className="h-4 w-4 mr-2" />
-                      )}
-                      Testar Conexão
-                    </Button>
-                  </div>
-                </CardContent>
-              )}
-            </Card>
+                <div className="rounded-full bg-[#e8f0fe] px-3 py-1 text-xs font-medium text-[#174ea6]">{methodsEnabled.length} ativas</div>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                {['pix', 'credit_card', 'boleto'].map((method) => (
+                  <label key={method} className="flex cursor-pointer items-center gap-3 rounded-[20px] border border-slate-300 bg-[#f2f6ff] px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white">
+                    <Checkbox checked={methodsEnabled.includes(method)} onCheckedChange={() => toggleMethod(method)} />
+                    <span>{paymentMethodLabel(method)}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
 
-            {/* EFI Bank */}
-            <Card className={paymentSettings.efi_enabled ? 'border-emerald-500/50' : ''}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#00b4e6] flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">EFI</span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">EFI Bank (Gerencianet)</CardTitle>
-                      <CardDescription>PIX instantâneo e boletos</CardDescription>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={paymentSettings.efi_enabled ?? false}
-                    onCheckedChange={(checked) => updatePaymentSetting('efi_enabled', checked)}
-                  />
-                </div>
-              </CardHeader>
-              {paymentSettings.efi_enabled && (
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
-                    <div className="space-y-0.5">
-                      <Label>Modo Sandbox (Testes)</Label>
-                      <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
-                    </div>
-                    <Switch
-                      checked={paymentSettings.efi_sandbox ?? true}
-                      onCheckedChange={(checked) => updatePaymentSetting('efi_sandbox', checked)}
-                    />
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="efi_client_id">Client ID</Label>
-                      <Input
-                        id="efi_client_id"
-                        value={paymentSettings.efi_client_id || ''}
-                        onChange={(e) => updatePaymentSetting('efi_client_id', e.target.value)}
-                        placeholder="Client_Id_xxxxx..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="efi_client_secret">Client Secret</Label>
-                      <Input
-                        id="efi_client_secret"
-                        type="password"
-                        value={paymentSettings.efi_client_secret || ''}
-                        onChange={(e) => updatePaymentSetting('efi_client_secret', e.target.value)}
-                        placeholder="Client_Secret_xxxxx..."
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="efi_pix_key">Chave PIX</Label>
-                    <Input
-                      id="efi_pix_key"
-                      value={paymentSettings.efi_pix_key || ''}
-                      onChange={(e) => updatePaymentSetting('efi_pix_key', e.target.value)}
-                      placeholder="email@empresa.com ou CNPJ"
-                    />
-                    <p className="text-xs text-muted-foreground">Chave PIX cadastrada na EFI</p>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
-                      Salve as configurações antes de testar a conexão
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={async () => {
-                        try {
-                          const result = await testEfiBank.mutateAsync();
-                          if (result.success) {
-                            toast.success('EFI Bank conectado com sucesso!', {
-                              description: result.sandbox ? 'Modo Sandbox' : 'Modo Produção',
-                            });
-                          } else {
-                            toast.error('Falha na conexão', { description: result.message });
-                          }
-                        } catch (error) {
-                          toast.error('Erro ao testar conexão');
-                        }
-                      }}
-                      disabled={testEfiBank.isPending || !paymentSettings.efi_client_id || !paymentSettings.efi_client_secret}
-                    >
-                      {testEfiBank.isPending ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <Zap className="h-4 w-4 mr-2" />
-                      )}
-                      Testar Conexão
-                    </Button>
-                  </div>
-                </CardContent>
-              )}
-            </Card>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="space-y-2">
+                <Label className="text-slate-700">Desconto no PIX (%)</Label>
+                <Input className={inputClassName} type="number" value={payment.pix_discount_percent ?? 5} onChange={(event) => up('pix_discount_percent', Number(event.target.value))} />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Dias extras do boleto</Label>
+                <Input className={inputClassName} type="number" value={payment.boleto_extra_days ?? 3} onChange={(event) => up('boleto_extra_days', Number(event.target.value))} />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Parcelamento máximo</Label>
+                <Input className={inputClassName} type="number" value={payment.max_installments ?? 12} onChange={(event) => up('max_installments', Number(event.target.value))} />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Parcela mínima (R$)</Label>
+                <Input className={inputClassName} type="number" value={payment.min_installment_value ?? 50} onChange={(event) => up('min_installment_value', Number(event.target.value))} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* PagSeguro */}
-            <Card className={paymentSettings.pagseguro_enabled ? 'border-emerald-500/50' : ''}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#ffc107] flex items-center justify-center">
-                      <span className="text-black font-bold text-sm">PS</span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">PagSeguro</CardTitle>
-                      <CardDescription>Solução completa do UOL</CardDescription>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={paymentSettings.pagseguro_enabled ?? false}
-                    onCheckedChange={(checked) => updatePaymentSetting('pagseguro_enabled', checked)}
-                  />
+        <Card className={cn(surfaceCardClass, 'overflow-hidden')}>
+          <div className="grid gap-px bg-slate-200 md:grid-cols-3">
+            {[
+              { label: 'Mercado Pago', success: testMP.isSuccess },
+              { label: 'EFI', success: testEFI.isSuccess },
+              { label: 'Stripe', success: testStripe.isSuccess },
+            ].map((item) => (
+              <div key={item.label} className="bg-white p-5">
+                <div className="flex items-center justify-between text-sm font-medium text-slate-700">
+                  <span>{item.label}</span>
+                  {item.success ? <CheckCircle2 className="h-4 w-4 text-[#137333]" /> : <XCircle className="h-4 w-4 text-slate-400" />}
                 </div>
-              </CardHeader>
-              {paymentSettings.pagseguro_enabled && (
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
-                    <div className="space-y-0.5">
-                      <Label>Modo Sandbox (Testes)</Label>
-                      <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
-                    </div>
-                    <Switch
-                      checked={paymentSettings.pagseguro_sandbox ?? true}
-                      onCheckedChange={(checked) => updatePaymentSetting('pagseguro_sandbox', checked)}
-                    />
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="ps_email">Email da Conta</Label>
-                      <Input
-                        id="ps_email"
-                        type="email"
-                        value={paymentSettings.pagseguro_email || ''}
-                        onChange={(e) => updatePaymentSetting('pagseguro_email', e.target.value)}
-                        placeholder="email@empresa.com"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="ps_token">Token</Label>
-                      <Input
-                        id="ps_token"
-                        type="password"
-                        value={paymentSettings.pagseguro_token || ''}
-                        onChange={(e) => updatePaymentSetting('pagseguro_token', e.target.value)}
-                        placeholder="xxxxx-xxxxx-xxxxx..."
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              )}
-            </Card>
+                <p className="mt-3 text-2xl font-semibold text-slate-900">{item.success ? 'Conectado' : 'Pendente'}</p>
+                <p className="mt-2 text-sm text-slate-700">Use os testes abaixo para validar credenciais antes de liberar o checkout.</p>
+              </div>
+            ))}
+          </div>
+          <CardContent className="pt-6">
+            <div className="grid gap-3 md:grid-cols-3">
+              <Button variant="outline" className={secondaryButtonClass} onClick={runMercadoPagoTest} disabled={!canMutate || testMP.isPending}>
+                {testMP.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                Testar Mercado Pago
+              </Button>
+              <Button variant="outline" className={secondaryButtonClass} onClick={runEfiTest} disabled={!canMutate || testEFI.isPending}>
+                {testEFI.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                Testar EFI
+              </Button>
+              <Button variant="outline" className={secondaryButtonClass} onClick={runStripeTest} disabled={!canMutate || testStripe.isPending}>
+                {testStripe.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                Testar Stripe
+              </Button>
+            </div>
+            <div className="mt-4 rounded-[24px] border border-[#fbbc04]/40 bg-[#fef7e0] p-4 text-sm text-[#7c4a03]">
+              Boleto só libera o pedido após compensação. Quando o sistema reconhecer o pagamento confirmado, ele envia a mensagem de liberação e o pedido segue para produção ou envio.
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-            {/* Stripe */}
-            <Card className={paymentSettings.stripe_enabled ? 'border-emerald-500/50' : ''}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#635bff] flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">S</span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">Stripe</CardTitle>
-                      <CardDescription>Gateway internacional</CardDescription>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={paymentSettings.stripe_enabled ?? false}
-                    onCheckedChange={(checked) => updatePaymentSetting('stripe_enabled', checked)}
-                  />
-                </div>
-              </CardHeader>
-              {paymentSettings.stripe_enabled && (
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
-                    <div className="space-y-0.5">
-                      <Label>Modo Sandbox (Testes)</Label>
-                      <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
-                    </div>
-                    <Switch
-                      checked={paymentSettings.stripe_sandbox ?? true}
-                      onCheckedChange={(checked) => updatePaymentSetting('stripe_sandbox', checked)}
-                    />
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="stripe_pk">Publishable Key</Label>
-                      <Input
-                        id="stripe_pk"
-                        value={paymentSettings.stripe_public_key || ''}
-                        onChange={(e) => updatePaymentSetting('stripe_public_key', e.target.value)}
-                        placeholder="pk_test_xxxxx..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="stripe_sk">Secret Key</Label>
-                      <Input
-                        id="stripe_sk"
-                        type="password"
-                        value={paymentSettings.stripe_secret_key || ''}
-                        onChange={(e) => updatePaymentSetting('stripe_secret_key', e.target.value)}
-                        placeholder="sk_test_xxxxx..."
-                      />
-                    </div>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
-                      Salve as configurações antes de testar a conexão
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={async () => {
-                        try {
-                          const result = await testStripe.mutateAsync();
-                          if (result.success) {
-                            toast.success('Stripe conectado com sucesso!', {
-                              description: `Conta: ${result.account?.email || 'Verificada'}`,
-                            });
-                          } else {
-                            toast.error('Falha na conexão', { description: result.message });
-                          }
-                        } catch (error) {
-                          toast.error('Erro ao testar conexão');
-                        }
-                      }}
-                      disabled={testStripe.isPending || !paymentSettings.stripe_secret_key}
-                    >
-                      {testStripe.isPending ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <Zap className="h-4 w-4 mr-2" />
-                      )}
-                      Testar Conexão
-                    </Button>
-                  </div>
-                </CardContent>
-              )}
-            </Card>
+      <div className="grid gap-5 xl:grid-cols-2">
+        {gatewayCards.map((gateway) => {
+          const status = paymentStatusMap[gateway.id as keyof typeof paymentStatusMap];
+          const enabled = Boolean(payment[gateway.enabledKey]);
+          const sandboxEnabled = gateway.sandboxKey ? Boolean(payment[gateway.sandboxKey]) : false;
 
-            {/* Asaas */}
-            <Card className={paymentSettings.asaas_enabled ? 'border-emerald-500/50' : ''}>
+          return (
+            <Card key={gateway.id} className={surfaceCardClass}>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#0d6efd] flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">A</span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">Asaas</CardTitle>
-                      <CardDescription>Cobranças e assinaturas</CardDescription>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={paymentSettings.asaas_enabled ?? false}
-                    onCheckedChange={(checked) => updatePaymentSetting('asaas_enabled', checked)}
-                  />
-                </div>
-              </CardHeader>
-              {paymentSettings.asaas_enabled && (
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-lg">
-                    <div className="space-y-0.5">
-                      <Label>Modo Sandbox (Testes)</Label>
-                      <p className="text-xs text-muted-foreground">Ativar para ambiente de testes</p>
-                    </div>
-                    <Switch
-                      checked={paymentSettings.asaas_sandbox ?? true}
-                      onCheckedChange={(checked) => updatePaymentSetting('asaas_sandbox', checked)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="asaas_key">API Key</Label>
-                    <Input
-                      id="asaas_key"
-                      type="password"
-                      value={paymentSettings.asaas_api_key || ''}
-                      onChange={(e) => updatePaymentSetting('asaas_api_key', e.target.value)}
-                      placeholder="$aact_xxxxx..."
-                    />
-                  </div>
-                </CardContent>
-              )}
-            </Card>
-          </TabsContent>
-
-          {/* Checkout Tab */}
-          <TabsContent value="checkout" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5" />
-                  Carrinho e Checkout
-                </CardTitle>
-                <CardDescription>
-                  Configure regras de compra e checkout
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="min_order_value">Pedido Mínimo (R$)</Label>
-                    <Input
-                      id="min_order_value"
-                      type="number"
-                      value={settings.min_order_value || 0}
-                      onChange={(e) => updateSetting('min_order_value', Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="max_order_value">Pedido Máximo (R$)</Label>
-                    <Input
-                      id="max_order_value"
-                      type="number"
-                      value={settings.max_order_value || ''}
-                      onChange={(e) => updateSetting('max_order_value', e.target.value ? Number(e.target.value) : null)}
-                      placeholder="Sem limite"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="abandoned_cart">Lembrete Carrinho (horas)</Label>
-                    <Input
-                      id="abandoned_cart"
-                      type="number"
-                      value={settings.abandoned_cart_reminder_hours || 24}
-                      onChange={(e) => updateSetting('abandoned_cart_reminder_hours', Number(e.target.value))}
-                    />
-                  </div>
-                </div>
-                <Separator />
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Checkout como Visitante</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Permitir compras sem login
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.enable_guest_checkout ?? true}
-                      onCheckedChange={(checked) => updateSetting('enable_guest_checkout', checked)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Telefone Obrigatório</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Exigir telefone no checkout
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.require_phone_on_checkout ?? true}
-                      onCheckedChange={(checked) => updateSetting('require_phone_on_checkout', checked)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Cupons de Desconto</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Permitir uso de códigos promocionais
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.enable_coupon_codes ?? true}
-                      onCheckedChange={(checked) => updateSetting('enable_coupon_codes', checked)}
-                    />
-                  </div>
-                </div>
-                <Separator />
-                <div className="space-y-2">
-                  <Label htmlFor="checkout_success_message">Mensagem de Sucesso</Label>
-                  <Textarea
-                    id="checkout_success_message"
-                    value={settings.checkout_success_message || ''}
-                    onChange={(e) => updateSetting('checkout_success_message', e.target.value)}
-                    placeholder="Mensagem exibida após envio do orçamento"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Shipping Tab */}
-          <TabsContent value="shipping" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Truck className="h-5 w-5" />
-                  Configurações de Frete
-                </CardTitle>
-                <CardDescription>
-                  Configure cálculo e valores de frete
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="shipping_origin_cep">CEP de Origem</Label>
-                    <Input
-                      id="shipping_origin_cep"
-                      value={settings.shipping_origin_cep || ''}
-                      onChange={(e) => updateSetting('shipping_origin_cep', e.target.value)}
-                      placeholder="00000-000"
-                      maxLength={9}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="shipping_method">Método de Cálculo</Label>
-                    <Select
-                      value={settings.shipping_calculation_method || 'fixed'}
-                      onValueChange={(value) => updateSetting('shipping_calculation_method', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="fixed">Valor Fixo</SelectItem>
-                        <SelectItem value="weight">Por Peso</SelectItem>
-                        <SelectItem value="distance">Por Distância</SelectItem>
-                        <SelectItem value="free">Sempre Grátis</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="fixed_shipping">Valor Fixo do Frete (R$)</Label>
-                    <Input
-                      id="fixed_shipping"
-                      type="number"
-                      value={settings.fixed_shipping_value || 15}
-                      onChange={(e) => updateSetting('fixed_shipping_value', Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="express_multiplier">Multiplicador Frete Expresso</Label>
-                    <Input
-                      id="express_multiplier"
-                      type="number"
-                      step="0.1"
-                      value={settings.express_shipping_multiplier || 2}
-                      onChange={(e) => updateSetting('express_shipping_multiplier', Number(e.target.value))}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Ex: 2 = frete expresso custa 2x o normal
-                    </p>
-                  </div>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between gap-4">
                   <div>
-                    <Label>Frete Grátis Ativo</Label>
-                    <p className="text-xs text-muted-foreground">Ativar/desativar frete grátis acima de um valor</p>
+                    <div className={cn('inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]', gateway.accentClass, gateway.accentTextClass)}>
+                      {gateway.label}
+                    </div>
+                    <CardTitle className="mt-3 text-xl text-slate-900">Credenciais {gateway.label}</CardTitle>
+                    <CardDescription className="mt-2 text-slate-700">{gateway.description}</CardDescription>
                   </div>
-                  <Switch
-                    checked={(settings.free_shipping_minimum ?? 159) > 0}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        updateSetting('free_shipping_minimum', 159);
-                      } else {
-                        updateSetting('free_shipping_minimum', 0);
-                        updateSetting('free_shipping_message', '');
-                      }
-                    }}
-                  />
+                  {status ? (
+                    <div className={cn('inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium', status.success ? 'bg-[#e6f4ea] text-[#137333]' : 'bg-slate-100 text-slate-700')}>
+                      {status.success ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                      {status.success ? 'validado' : 'não testado'}
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">manual</div>
+                  )}
                 </div>
-                {(settings.free_shipping_minimum ?? 159) > 0 && (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="free_shipping_min">Frete Grátis Acima de (R$)</Label>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="rounded-[24px] border border-slate-300 bg-[#f2f6ff] p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="font-medium text-slate-900">Ativar {gateway.label}</p>
+                      <p className="text-sm text-slate-700">Libera este gateway para aparecer e ser escolhido na operação.</p>
+                    </div>
+                    <Switch checked={enabled} onCheckedChange={(value) => up(gateway.enabledKey, value as PaymentCredentials[keyof PaymentCredentials])} />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  {gateway.fields.map((field) => (
+                    <div key={String(field.key)} className={field.key === 'efi_pix_key' ? 'space-y-2 md:col-span-2' : 'space-y-2'}>
+                      <Label className="text-slate-700">{field.label}</Label>
                       <Input
-                        id="free_shipping_min"
-                        type="number"
-                        value={settings.free_shipping_minimum || 159}
-                        onChange={(e) => updateSetting('free_shipping_minimum', Number(e.target.value))}
+                        className={inputClassName}
+                        type={field.type || 'text'}
+                        value={String(payment[field.key] || '')}
+                        onChange={(event) => up(field.key, event.target.value as PaymentCredentials[keyof PaymentCredentials])}
+                        placeholder={field.placeholder}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="free_shipping_msg">Mensagem Frete Grátis</Label>
-                      <Input
-                        id="free_shipping_msg"
-                        value={settings.free_shipping_message || ''}
-                        onChange={(e) => updateSetting('free_shipping_message', e.target.value)}
-                        placeholder="Frete grátis em compras acima de R$ 159"
-                      />
+                  ))}
+                </div>
+
+                {gateway.sandboxKey && (
+                  <div className="rounded-[24px] border border-slate-300 bg-white p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="font-medium text-slate-900">Modo sandbox</p>
+                        <p className="text-sm text-slate-700">Use para homologação e testes controlados.</p>
+                      </div>
+                      <Switch checked={sandboxEnabled} onCheckedChange={(value) => up(gateway.sandboxKey!, value as PaymentCredentials[keyof PaymentCredentials])} />
                     </div>
                   </div>
                 )}
+
+                {status && (
+                  <Button variant="outline" className={secondaryButtonClass} onClick={status.action} disabled={!canMutate || status.pending}>
+                    {status.pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                    Testar agora
+                  </Button>
+                )}
               </CardContent>
             </Card>
-          </TabsContent>
+          );
+        })}
+      </div>
+    </div>
+  );
 
-          {/* SEO Tab */}
-          <TabsContent value="seo" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Search className="h-5 w-5" />
-                  SEO e Metadados
-                  <Badge variant="outline" className="ml-2">Google</Badge>
-                </CardTitle>
-                <CardDescription>
-                  Configure como seu site aparece nos resultados de busca
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="seo_title">Título do Site (SEO)</Label>
-                    <Input
-                      id="seo_title"
-                      value={settings.seo_title || ''}
-                      onChange={(e) => updateSetting('seo_title', e.target.value)}
-                      placeholder="Pincel de Luz Personalizados"
-                      maxLength={60}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      {(settings.seo_title?.length || 0)}/60 caracteres
-                    </p>
+  const renderEmailSection = () => (
+    <div className="space-y-6">
+      <div className="grid gap-6 xl:grid-cols-[1.05fr,0.95fr]">
+        <Card className={surfaceCardClass}>
+          <CardHeader>
+            <CardTitle className="text-[28px] text-slate-900">Email Business Hostinger</CardTitle>
+            <CardDescription className="text-slate-700">Configure SMTP com rota segura, testes internos e liberação gradual para emails transacionais.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-slate-700">Email Business</Label>
+                <Input className={inputClassName} type="email" value={emailSettings.business_email || ''} onChange={(event) => ue('business_email', event.target.value)} placeholder="contato@sualoja.com.br" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Nome do remetente</Label>
+                <Input className={inputClassName} value={emailSettings.sender_name || ''} onChange={(event) => ue('sender_name', event.target.value)} placeholder="Pincel de Luz" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Host SMTP</Label>
+                <Input className={inputClassName} value={emailSettings.smtp_host || ''} onChange={(event) => ue('smtp_host', event.target.value)} placeholder="smtp.hostinger.com" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Porta</Label>
+                <Input className={inputClassName} type="number" value={emailSettings.smtp_port || 465} onChange={(event) => ue('smtp_port', Number(event.target.value))} />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Usuário SMTP</Label>
+                <Input className={inputClassName} value={emailSettings.smtp_username || ''} onChange={(event) => ue('smtp_username', event.target.value)} placeholder="contato@sualoja.com.br" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Senha SMTP</Label>
+                <Input className={inputClassName} type="password" value={emailSettings.smtp_password || ''} onChange={(event) => ue('smtp_password', event.target.value)} placeholder="Senha do email business" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Reply-to</Label>
+                <Input className={inputClassName} type="email" value={emailSettings.reply_to_email || ''} onChange={(event) => ue('reply_to_email', event.target.value)} placeholder="respostas@sualoja.com.br" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Destinatário de teste</Label>
+                <Input className={inputClassName} type="email" value={emailSettings.test_recipient || ''} onChange={(event) => ue('test_recipient', event.target.value)} placeholder="voce@seudominio.com" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={cn(surfaceCardClass, 'overflow-hidden')}>
+          <div className="grid gap-px bg-slate-200 md:grid-cols-3">
+            {[
+              { label: 'Checklist', value: `${emailChecklist}/5`, description: 'Base SMTP pronta para testes.' },
+              { label: 'Modo', value: emailSettings.test_mode ? 'Teste' : 'Real', description: 'Roteamento atual dos emails.' },
+              { label: 'Envio', value: emailSettings.email_enabled ? 'Ativo' : 'Desligado', description: 'Disparos automáticos do sistema.' },
+            ].map((item) => (
+              <div key={item.label} className="bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#b06000]">{item.label}</p>
+                <p className="mt-2 text-3xl font-semibold text-slate-900">{item.value}</p>
+                <p className="mt-2 text-sm text-slate-700">{item.description}</p>
+              </div>
+            ))}
+          </div>
+          <CardContent className="space-y-4 pt-6">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-[24px] border border-slate-300 bg-[#f2f6ff] p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-medium text-slate-900">Habilitar envio real</p>
+                    <p className="text-sm text-slate-700">Liga emails automáticos da loja.</p>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="seo_keywords">Palavras-chave</Label>
-                    <Input
-                      id="seo_keywords"
-                      value={settings.seo_keywords || ''}
-                      onChange={(e) => updateSetting('seo_keywords', e.target.value)}
-                      placeholder="acrílico, letreiro, personalizado"
-                    />
-                  </div>
+                  <Switch checked={emailSettings.email_enabled ?? false} onCheckedChange={(value) => ue('email_enabled', value)} />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="seo_description">Meta Descrição</Label>
-                  <Textarea
-                    id="seo_description"
-                    value={settings.seo_description || ''}
-                    onChange={(e) => updateSetting('seo_description', e.target.value)}
-                    placeholder="Descrição do site para buscadores"
-                    maxLength={160}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {(settings.seo_description?.length || 0)}/160 caracteres
-                  </p>
-                </div>
-                <Separator />
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>Imagem de Compartilhamento (OG Image)</Label>
-                    <ImageUpload
-                      value={settings.og_image || ''}
-                      onChange={(url) => updateSetting('og_image', url || null)}
-                      folder="seo"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Recomendado: 1200x630px
-                    </p>
+              </div>
+              <div className="rounded-[24px] border border-slate-300 bg-[#f2f6ff] p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-medium text-slate-900">Modo de teste</p>
+                    <p className="text-sm text-slate-700">Redireciona tudo para o email de teste.</p>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Favicon</Label>
-                    <ImageUpload
-                      value={settings.favicon_url || ''}
-                      onChange={(url) => updateSetting('favicon_url', url || null)}
-                      folder="seo"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Recomendado: 32x32px ou 64x64px
-                    </p>
-                  </div>
+                  <Switch checked={emailSettings.test_mode ?? true} onCheckedChange={(value) => ue('test_mode', value)} />
                 </div>
-                <Separator />
+              </div>
+              <div className="rounded-[24px] border border-slate-300 bg-[#f2f6ff] p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-medium text-slate-900">Conexão segura</p>
+                    <p className="text-sm text-slate-700">Ative para Hostinger na porta 465.</p>
+                  </div>
+                  <Switch checked={emailSettings.smtp_secure ?? true} onCheckedChange={(value) => ue('smtp_secure', value)} />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[24px] border border-[#fbbc04]/40 bg-[#fef7e0] p-4 text-sm text-[#7c4a03]">
+              Quando o modo de teste estiver ativo, emails transacionais tambem serao redirecionados para o destinatario de teste. Isso protege clientes durante homologacao.
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <Button variant="outline" className={secondaryButtonClass} onClick={handleTestEmailConnection} disabled={!canMutate || testEmailConnection.isPending || updateEmail.isPending}>
+                {testEmailConnection.isPending || updateEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                Testar conexão SMTP
+              </Button>
+              <Button variant="outline" className={secondaryButtonClass} onClick={handleSendTestEmail} disabled={!canMutate || sendTestEmail.isPending || updateEmail.isPending}>
+                {sendTestEmail.isPending || updateEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                Enviar email de teste
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const renderSecuritySection = () => (
+    <div className="space-y-6">
+      <div className="grid gap-6 xl:grid-cols-[0.95fr,1.05fr]">
+        <Card className={surfaceCardClass}>
+          <CardHeader>
+            <CardTitle className="text-[28px] text-slate-900">Alertas operacionais</CardTitle>
+            <CardDescription className="text-slate-700">Defina quem recebe avisos críticos e quanto tempo o time tem para reagir.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-slate-700">Limite de estoque baixo</Label>
+                <Input className={inputClassName} type="number" value={settings.low_stock_threshold || 5} onChange={(event) => u('low_stock_threshold', Number(event.target.value))} />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Email para alertas</Label>
+                <Input className={inputClassName} type="email" value={settings.notification_email || ''} onChange={(event) => u('notification_email', event.target.value)} placeholder="financeiro@sualoja.com.br" />
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-[24px] border border-slate-300 bg-[#f2f6ff] p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-medium text-slate-900">Alerta de estoque</p>
+                    <p className="text-sm text-slate-700">Dispara aviso quando itens entram na zona crítica.</p>
+                  </div>
+                  <Switch checked={settings.enable_stock_alerts ?? true} onCheckedChange={(value) => u('enable_stock_alerts', value)} />
+                </div>
+              </div>
+              <div className="rounded-[24px] border border-slate-300 bg-[#f2f6ff] p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-medium text-slate-900">Alerta de pedidos</p>
+                    <p className="text-sm text-slate-700">Notifica a equipe quando entram novos pedidos ou mudanças relevantes.</p>
+                  </div>
+                  <Switch checked={settings.enable_order_notifications ?? true} onCheckedChange={(value) => u('enable_order_notifications', value)} />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={surfaceCardClass}>
+          <CardHeader>
+            <CardTitle className="text-[28px] text-slate-900">Conta e acesso</CardTitle>
+            <CardDescription className="text-slate-700">Seu perfil visível, senha segura e orientações rápidas para manter o admin protegido.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-[24px] bg-[#e8f0fe] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#174ea6]">Usuario</p>
+                <p className="mt-2 text-xl font-semibold text-slate-900">{profile?.full_name || 'Sem nome'}</p>
+                <p className="mt-2 text-sm text-slate-700">{profile?.email || 'sem-email'}</p>
+              </div>
+              <div className="rounded-[24px] bg-[#fce8e6] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c5221f]">Proteção</p>
+                <p className="mt-2 text-xl font-semibold text-slate-900">Senha forte</p>
+                <p className="mt-2 text-sm text-slate-700">Recomende troca periódica para manter o painel seguro.</p>
+              </div>
+            </div>
+            <Separator className="bg-slate-200" />
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-slate-700">Nova senha</Label>
+                <Input className={inputClassName} type="password" value={pass.n} onChange={(event) => setPass({ ...pass, n: event.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-700">Confirmar senha</Label>
+                <Input className={inputClassName} type="password" value={pass.c} onChange={(event) => setPass({ ...pass, c: event.target.value })} />
+              </div>
+            </div>
+            <Button className={primaryButtonClass} onClick={changePassword} disabled={changingPass}>
+              {changingPass ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+              Alterar senha
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const renderOperationsSection = () => (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Card className={surfaceCardClass}>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base text-slate-900">
+              <MessageSquare className="h-5 w-5 text-[#137333]" />
+              WhatsApp
+            </CardTitle>
+            <CardDescription className="text-slate-700">Instâncias, filas e failover.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {loadingOperations ? (
+              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+            ) : (
+              <>
+                <div className="rounded-[22px] border border-slate-300 bg-[#f2f6ff] p-4 text-sm text-slate-700">
+                  <div className="flex justify-between"><span>Online</span><strong>{operationsSummary?.whatsappConnected || 0}</strong></div>
+                  <div className="mt-2 flex justify-between"><span>Enviadas</span><strong>{operationsSummary?.whatsappSent || 0}</strong></div>
+                  <div className="mt-2 flex justify-between"><span>Erros</span><strong>{operationsSummary?.whatsappErrors || 0}</strong></div>
+                </div>
+                <Button asChild className={primaryButtonClass}>
+                  <Link to="/admin/whatsapp">Abrir central do WhatsApp</Link>
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className={surfaceCardClass}>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base text-slate-900">
+              <Webhook className="h-5 w-5 text-[#174ea6]" />
+              API e CRM
+            </CardTitle>
+            <CardDescription className="text-slate-700">Chaves, integrações e webhooks.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {loadingOperations ? (
+              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+            ) : (
+              <>
+                <div className="rounded-[22px] border border-slate-300 bg-[#f2f6ff] p-4 text-sm text-slate-700">
+                  <div className="flex justify-between"><span>Chaves ativas</span><strong>{operationsSummary?.apiKeysActive || 0}</strong></div>
+                  <div className="mt-2 flex justify-between"><span>Total</span><strong>{operationsSummary?.apiKeysTotal || 0}</strong></div>
+                  <div className="mt-2 flex justify-between"><span>Erros webhook</span><strong>{operationsSummary?.webhookErrors || 0}</strong></div>
+                </div>
+                <Button asChild className={primaryButtonClass}>
+                  <Link to="/admin/api">Abrir API e CRM</Link>
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className={surfaceCardClass}>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base text-slate-900">
+              <ScrollText className="h-5 w-5 text-[#b06000]" />
+              Logs
+            </CardTitle>
+            <CardDescription className="text-slate-700">Auditoria técnica e histórico vivo.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {loadingOperations ? (
+              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+            ) : (
+              <>
+                <div className="rounded-[22px] border border-slate-300 bg-[#f2f6ff] p-4 text-sm text-slate-700">
+                  <div className="flex justify-between"><span>Auditoria hoje</span><strong>{operationsSummary?.auditToday || 0}</strong></div>
+                  <div className="mt-2 flex justify-between"><span>Webhooks hoje</span><strong>{operationsSummary?.webhookToday || 0}</strong></div>
+                  <div className="mt-2 flex justify-between"><span>Linhas carregadas</span><strong>{operationsSummary?.auditTotal || 0}</strong></div>
+                </div>
+                <Button asChild className={primaryButtonClass}>
+                  <Link to="/admin/logs">Abrir logs</Link>
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className={surfaceCardClass}>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base text-slate-900">
+              <Users className="h-5 w-5 text-[#7b1fa2]" />
+              Usuários
+            </CardTitle>
+            <CardDescription className="text-slate-700">Perfis, papéis e acesso da equipe.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {loadingOperations ? (
+              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+            ) : (
+              <>
+                <div className="rounded-[22px] border border-slate-300 bg-[#f2f6ff] p-4 text-sm text-slate-700">
+                  <div className="flex justify-between"><span>Total</span><strong>{operationsSummary?.usersTotal || 0}</strong></div>
+                  <div className="mt-2 flex justify-between"><span>Admins</span><strong>{operationsSummary?.adminUsers || 0}</strong></div>
+                  <div className="mt-2 flex justify-between"><span>Editores</span><strong>{operationsSummary?.editorUsers || 0}</strong></div>
+                </div>
+                <Button asChild className={primaryButtonClass} disabled={!adminAccess}>
+                  <Link to="/admin/usuarios">Abrir usuários</Link>
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[1.1fr,0.9fr]">
+        <Card className={surfaceCardClass}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-slate-900">
+              <ShieldCheck className="h-5 w-5 text-[#174ea6]" />
+              Garantia de acesso operacional
+            </CardTitle>
+            <CardDescription className="text-slate-700">Mesmo com a nova organização, tudo o que era vital continua acessível em algum ponto do sistema.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 md:grid-cols-2">
+            {[
+              ['Central técnica', 'WhatsApp, API, logs e usuários estão organizados nesta página para manutenção rápida.'],
+              ['Branding separado', 'Empresa continua dedicada à identidade, cores, logos e configurações institucionais.'],
+              ['Comunicação viva', 'Templates segue dedicado a mensagens, modelos e automações de comunicação.'],
+              ['Financeiro fiel', 'Receita e gráficos ignoram pedidos sem pagamento confirmado para evitar distorção.'],
+            ].map(([title, description]) => (
+              <div key={title} className="rounded-[22px] border border-slate-300 bg-[#f2f6ff] p-4">
+                <p className="font-medium text-slate-900">{title}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{description}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <div className="space-y-6">
+          <Card className={surfaceCardClass}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-slate-900">
+                <FolderOpen className="h-5 w-5 text-[#137333]" />
+                Atalhos externos
+              </CardTitle>
+              <CardDescription className="text-slate-700">Rotas que continuam fora desta tela para preservar contexto de uso.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {[
+                ['/admin/empresa', 'Empresa'],
+                ['/admin/templates', 'Templates'],
+                ['/admin/midia', 'Midia'],
+                ['/admin/pedidos', 'Pedidos'],
+              ].map(([href, label]) => (
+                <Button key={href} variant="outline" asChild className={cn(secondaryButtonClass, 'w-full justify-between')}>
+                  <Link to={href}>
+                    {label}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-[28px] border border-[#fbbc04]/40 bg-[#fef7e0] shadow-[0_18px_50px_rgba(251,188,4,0.14)]">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-[#7c4a03]">
+                <AlertTriangle className="h-5 w-5" />
+                Pontos de atenção
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm text-[#7c4a03]">
+              <p>Use a central do WhatsApp para validar failover real entre instâncias antes de depender da redundância em produção.</p>
+              <p>Se houver erro de webhook ou SMTP, revise API/CRM e Email Business antes de publicar a nova build.</p>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-[28px] border border-[#d2e3fc] bg-[#e8f0fe] shadow-[0_18px_50px_rgba(26,115,232,0.12)]">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-[#174ea6]">
+                <Bug className="h-5 w-5" />
+                Checklist rápido
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm text-[#174ea6]">
+              <p>1. Testar gateways e SMTP.</p>
+              <p>2. Confirmar que o faturamento s? mostra pedidos pagos.</p>
+              <p>3. Validar boleto, WhatsApp e logs antes da build final.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderActiveSection = () => {
+    switch (activeTab) {
+      case 'pagamentos':
+        return renderPaymentsSection();
+      case 'email':
+        return renderEmailSection();
+      case 'seguranca':
+        return renderSecuritySection();
+      case 'operacoes':
+        return renderOperationsSection();
+      case 'geral':
+      default:
+        return renderGeneralSection();
+    }
+  };
+
+  return (
+    <AdminLayout title="Configurações">
+      <div className="relative overflow-hidden rounded-[36px] border border-white/10 bg-[#f1f5ff] p-4 text-slate-900 shadow-[0_22px_84px_rgba(15,23,42,0.26)] md:p-6 xl:p-8">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[36px]">
+          <div className="absolute -left-20 top-0 h-56 w-56 rounded-full bg-[#1a73e8]/15 blur-3xl" />
+          <div className="absolute right-0 top-16 h-64 w-64 rounded-full bg-[#34a853]/12 blur-3xl" />
+          <div className="absolute bottom-0 left-1/3 h-60 w-60 rounded-full bg-[#fbbc04]/12 blur-3xl" />
+          <div className="absolute bottom-8 right-12 h-48 w-48 rounded-full bg-[#ea4335]/10 blur-3xl" />
+        </div>
+
+        <div className="relative space-y-6">
+          <Card className="overflow-hidden rounded-[32px] border border-slate-300 bg-white/96 shadow-[0_24px_70px_rgba(60,64,67,0.12)]">
+            <div className={cn('h-2 bg-gradient-to-r', activeSection.accent)} />
+            <CardContent className="p-6 md:p-7">
+              <div className="grid gap-6 xl:grid-cols-[1.05fr,0.95fr]">
                 <div className="space-y-4">
-                  <h4 className="font-medium">Analytics e Rastreamento</h4>
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="ga_id">Google Analytics ID</Label>
-                      <Input
-                        id="ga_id"
-                        value={settings.google_analytics_id || ''}
-                        onChange={(e) => updateSetting('google_analytics_id', e.target.value)}
-                        placeholder="G-XXXXXXXXXX"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="gtm_id">Google Tag Manager</Label>
-                      <Input
-                        id="gtm_id"
-                        value={settings.google_tag_manager_id || ''}
-                        onChange={(e) => updateSetting('google_tag_manager_id', e.target.value)}
-                        placeholder="GTM-XXXXXXX"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="fb_pixel">Facebook Pixel</Label>
-                      <Input
-                        id="fb_pixel"
-                        value={settings.facebook_pixel_id || ''}
-                        onChange={(e) => updateSetting('facebook_pixel_id', e.target.value)}
-                        placeholder="XXXXXXXXXXXXXXX"
-                      />
-                    </div>
+                  <div className={cn('inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold', activeSection.accentSoft, activeSection.accentText)}>
+                    <activeSection.icon className="h-4 w-4" />
+                    Tema Google Workspace para configurações
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Appearance Tab */}
-          <TabsContent value="appearance" className="space-y-6">
-            {/* Dark Mode Card */}
-            <Card className={settings.dark_mode_enabled ? 'border-[hsl(var(--admin-accent-purple))]' : ''}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-5 w-5" />
-                  Tema da Loja
-                </CardTitle>
-                <CardDescription>
-                  Escolha entre tema claro ou escuro para a página de vendas
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Theme Toggle with Preview */}
-                <div className="grid gap-6 md:grid-cols-2">
-                  {/* Light Theme Option */}
-                  <div 
-                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      !settings.dark_mode_enabled 
-                        ? 'border-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.1)]' 
-                        : 'border-[hsl(var(--admin-card-border))] hover:border-[hsl(var(--admin-accent-purple)/0.5)]'
-                    }`}
-                    onClick={() => updateSetting('dark_mode_enabled', false)}
-                  >
-                    {!settings.dark_mode_enabled && (
-                      <div className="absolute top-2 right-2">
-                        <CheckCircle2 className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
-                      </div>
-                    )}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-200 to-yellow-400 flex items-center justify-center">
-                          <Zap className="h-4 w-4 text-amber-800" />
-                        </div>
-                        <span className="font-semibold text-white">Tema Claro</span>
-                      </div>
-                      {/* Light Theme Preview */}
-                      <div className="rounded-lg overflow-hidden border bg-white p-3 space-y-2">
-                        <div className="h-3 w-20 bg-gray-200 rounded" />
-                        <div className="flex gap-2">
-                          <div className="h-8 w-8 bg-purple-500 rounded" />
-                          <div className="flex-1 space-y-1">
-                            <div className="h-2 w-full bg-gray-200 rounded" />
-                            <div className="h-2 w-2/3 bg-gray-100 rounded" />
-                          </div>
-                        </div>
-                        <div className="h-6 w-16 bg-purple-500 rounded text-[10px] text-white flex items-center justify-center">
-                          Comprar
-                        </div>
-                      </div>
-                      <p className="text-xs text-[hsl(var(--admin-text-muted))]">
-                        Fundo claro com elementos vibrantes. Ideal para lojas tradicionais.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Dark Theme Option */}
-                  <div 
-                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      settings.dark_mode_enabled 
-                        ? 'border-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.1)]' 
-                        : 'border-[hsl(var(--admin-card-border))] hover:border-[hsl(var(--admin-accent-purple)/0.5)]'
-                    }`}
-                    onClick={() => updateSetting('dark_mode_enabled', true)}
-                  >
-                    {settings.dark_mode_enabled && (
-                      <div className="absolute top-2 right-2">
-                        <CheckCircle2 className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
-                      </div>
-                    )}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-indigo-800 flex items-center justify-center">
-                          <Zap className="h-4 w-4 text-white" />
-                        </div>
-                        <span className="font-semibold text-white">Tema Escuro</span>
-                        <Badge className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white text-[10px]">
-                          Premium
-                        </Badge>
-                      </div>
-                      {/* Dark Theme Preview */}
-                      <div className="rounded-lg overflow-hidden border border-gray-700 bg-gray-900 p-3 space-y-2">
-                        <div className="h-3 w-20 bg-gray-700 rounded" />
-                        <div className="flex gap-2">
-                          <div className="h-8 w-8 bg-purple-500 rounded" />
-                          <div className="flex-1 space-y-1">
-                            <div className="h-2 w-full bg-gray-700 rounded" />
-                            <div className="h-2 w-2/3 bg-gray-800 rounded" />
-                          </div>
-                        </div>
-                        <div className="h-6 w-16 bg-purple-500 rounded text-[10px] text-white flex items-center justify-center">
-                          Comprar
-                        </div>
-                      </div>
-                      <p className="text-xs text-[hsl(var(--admin-text-muted))]">
-                        Visual moderno e elegante. Destaca produtos e reduz fadiga visual.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Colors Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-5 w-5" />
-                  Cores do Tema
-                </CardTitle>
-                <CardDescription>
-                  Personalize as cores principais do site
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="primary_color">Cor Primária</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="primary_color"
-                        type="color"
-                        value={settings.primary_color || '#7c3aed'}
-                        onChange={(e) => updateSetting('primary_color', e.target.value)}
-                        className="w-16 h-10 p-1 cursor-pointer"
-                      />
-                      <Input
-                        value={settings.primary_color || '#7c3aed'}
-                        onChange={(e) => updateSetting('primary_color', e.target.value)}
-                        placeholder="#7c3aed"
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">Botões, links e destaques</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="secondary_color">Cor Secundária</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="secondary_color"
-                        type="color"
-                        value={settings.secondary_color || '#10b981'}
-                        onChange={(e) => updateSetting('secondary_color', e.target.value)}
-                        className="w-16 h-10 p-1 cursor-pointer"
-                      />
-                      <Input
-                        value={settings.secondary_color || '#10b981'}
-                        onChange={(e) => updateSetting('secondary_color', e.target.value)}
-                        placeholder="#10b981"
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">Elementos secundários</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="accent_color">Cor de Destaque</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="accent_color"
-                        type="color"
-                        value={settings.accent_color || '#f59e0b'}
-                        onChange={(e) => updateSetting('accent_color', e.target.value)}
-                        className="w-16 h-10 p-1 cursor-pointer"
-                      />
-                      <Input
-                        value={settings.accent_color || '#f59e0b'}
-                        onChange={(e) => updateSetting('accent_color', e.target.value)}
-                        placeholder="#f59e0b"
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">Promoções e alertas</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Display Options Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Eye className="h-5 w-5" />
-                  Opções de Exibição
-                </CardTitle>
-                <CardDescription>
-                  Configure o que é exibido na loja
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="flex items-center justify-between p-4 rounded-lg border">
-                    <div className="space-y-0.5">
-                      <Label className="flex items-center gap-2">
-                        <Eye className="h-4 w-4" />
-                        Mostrar Avaliações
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        Exibir estrelas nos produtos
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.show_product_ratings ?? true}
-                      onCheckedChange={(checked) => updateSetting('show_product_ratings', checked)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between p-4 rounded-lg border">
-                    <div className="space-y-0.5">
-                      <Label>Mostrar Estoque</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Exibir quantidade disponível
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.show_product_stock ?? false}
-                      onCheckedChange={(checked) => updateSetting('show_product_stock', checked)}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Custom CSS Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  CSS Personalizado
-                  <Badge variant="outline">Avançado</Badge>
-                </CardTitle>
-                <CardDescription>
-                  Adicione estilos customizados para personalização avançada
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Textarea
-                    id="custom_css"
-                    value={settings.custom_css || ''}
-                    onChange={(e) => updateSetting('custom_css', e.target.value)}
-                    placeholder="/* Adicione seu CSS customizado aqui */&#10;&#10;/* Exemplo: */&#10;.hero-section {&#10;  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);&#10;}"
-                    className="font-mono text-sm min-h-[200px]"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* AI Tab */}
-          <TabsContent value="ai" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bot className="h-5 w-5" />
-                  Assistente IA
-                  <Badge className="ml-2">Luna</Badge>
-                </CardTitle>
-                <CardDescription>
-                  Configure o chatbot de atendimento
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Ativar Assistente IA</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Mostrar chatbot no site
+                  <div>
+                    <h2 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">Central de configurações recriada por completo</h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700 md:text-base">
+                      A nova tela foi pensada como um workspace interativo: navegação lateral viva, módulos coloridos por contexto e leitura rápida do que está ativo, pendente ou em teste.
                     </p>
                   </div>
-                  <Switch
-                    checked={settings.ai_assistant_enabled ?? true}
-                    onCheckedChange={(checked) => updateSetting('ai_assistant_enabled', checked)}
-                  />
-                </div>
-                <Separator />
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="ai_name">Nome da Assistente</Label>
-                    <Input
-                      id="ai_name"
-                      value={settings.ai_assistant_name || ''}
-                      onChange={(e) => updateSetting('ai_assistant_name', e.target.value)}
-                      placeholder="Luna"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Avatar da Assistente</Label>
-                    <ImageUpload
-                      value={settings.ai_assistant_avatar || ''}
-                      onChange={(url) => updateSetting('ai_assistant_avatar', url || null)}
-                      folder="ai"
-                    />
+                  <div className="flex flex-wrap gap-3">
+                    {heroStats.map((item) => (
+                      <div key={item.label} className={cn('rounded-full px-4 py-2 text-sm font-medium', item.tone)}>
+                        <span className="opacity-80">{item.label}: </span>
+                        <strong>{item.value}</strong>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ai_greeting">Mensagem de Boas-vindas</Label>
-                  <Textarea
-                    id="ai_greeting"
-                    value={settings.ai_assistant_greeting || ''}
-                    onChange={(e) => updateSetting('ai_assistant_greeting', e.target.value)}
-                    placeholder="Olá! Sou a Luna, como posso ajudar?"
-                  />
-                </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  WhatsApp
-                </CardTitle>
-                <CardDescription>
-                  Configure mensagens automáticas do WhatsApp
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="whatsapp_template">Mensagem Padrão do WhatsApp</Label>
-                  <Textarea
-                    id="whatsapp_template"
-                    value={settings.whatsapp_message_template || ''}
-                    onChange={(e) => updateSetting('whatsapp_message_template', e.target.value)}
-                    placeholder="Olá! Gostaria de saber mais sobre..."
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Notifications Tab */}
-          <TabsContent value="notifications" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="h-5 w-5" />
-                  Notificações e Alertas
-                </CardTitle>
-                <CardDescription>
-                  Configure alertas do sistema
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="low_stock_threshold">Limite Estoque Baixo</Label>
-                    <Input
-                      id="low_stock_threshold"
-                      type="number"
-                      value={settings.low_stock_threshold || 5}
-                      onChange={(e) => updateSetting('low_stock_threshold', Number(e.target.value))}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Alertar quando estoque ficar abaixo deste valor
-                    </p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className={cn(softBlockClass, 'bg-gradient-to-br from-white to-[#edf4ff] p-5')}>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#174ea6]">Seção ativa</p>
+                    <p className="mt-3 text-2xl font-semibold text-slate-900">{activeSection.title}</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-700">{activeSection.description}</p>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="notification_email">Email para Notificações</Label>
-                    <Input
-                      id="notification_email"
-                      type="email"
-                      value={settings.notification_email || ''}
-                      onChange={(e) => updateSetting('notification_email', e.target.value)}
-                      placeholder="admin@empresa.com"
-                    />
+                  <div className={cn(softBlockClass, 'bg-gradient-to-br from-white to-[#eef9f1] p-5')}>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#137333]">Permissão</p>
+                    <p className="mt-3 text-2xl font-semibold text-slate-900">{canMutate ? 'Edição liberada' : 'Leitura somente'}</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-700">Use o botão salvar para persistir empresa, pagamentos e email em uma única ação.</p>
                   </div>
-                </div>
-                <Separator />
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Alertas de Estoque</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Notificar quando produtos estiverem com estoque baixo
-                      </p>
+                  <div className={cn(softBlockClass, 'bg-gradient-to-br from-white to-[#fff8e5] p-5 sm:col-span-2')}>
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b06000]">Ação principal</p>
+                        <p className="mt-2 text-lg font-semibold text-slate-900">Salvar tudo sem perder contexto</p>
+                        <p className="mt-2 text-sm leading-6 text-slate-700">Os formulários continuam unificados. Empresa e Templates seguem em páginas próprias, mas todos os caminhos permanecem acessíveis.</p>
+                      </div>
+                      <Button className={primaryButtonClass} onClick={saveAll} disabled={isSavingAny || !canMutate}>
+                        {isSavingAny ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        Salvar tudo
+                      </Button>
                     </div>
-                    <Switch
-                      checked={settings.enable_stock_alerts ?? true}
-                      onCheckedChange={(checked) => updateSetting('enable_stock_alerts', checked)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Notificações de Pedidos</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Receber email a cada novo pedido/orçamento
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.enable_order_notifications ?? true}
-                      onCheckedChange={(checked) => updateSetting('enable_order_notifications', checked)}
-                    />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Maintenance Tab */}
-          <TabsContent value="maintenance" className="space-y-6">
-            <Card className={settings.maintenance_mode ? 'border-destructive' : ''}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  Modo Manutenção
-                  {settings.maintenance_mode && (
-                    <Badge variant="destructive">ATIVO</Badge>
-                  )}
-                </CardTitle>
-                <CardDescription>
-                  Ative para bloquear acesso ao site
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Ativar Modo Manutenção</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Visitantes verão apenas a mensagem de manutenção
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.maintenance_mode ?? false}
-                    onCheckedChange={(checked) => updateSetting('maintenance_mode', checked)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="maintenance_message">Mensagem de Manutenção</Label>
-                  <Textarea
-                    id="maintenance_message"
-                    value={settings.maintenance_message || ''}
-                    onChange={(e) => updateSetting('maintenance_message', e.target.value)}
-                    placeholder="Estamos em manutenção. Voltamos em breve!"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Status da Loja</CardTitle>
-                <CardDescription>
-                  Configure o status de funcionamento
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="store_status">Status da Loja</Label>
-                  <Select
-                    value={settings.store_status || 'open'}
-                    onValueChange={(value) => updateSetting('store_status', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="open">Aberta</SelectItem>
-                      <SelectItem value="closed">Fechada Temporariamente</SelectItem>
-                      <SelectItem value="vacation">Em Férias</SelectItem>
-                      <SelectItem value="coming_soon">Em Breve</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="closed_message">Mensagem de Loja Fechada</Label>
-                  <Textarea
-                    id="closed_message"
-                    value={settings.store_closed_message || ''}
-                    onChange={(e) => updateSetting('store_closed_message', e.target.value)}
-                    placeholder="Nossa loja está temporariamente fechada."
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Legal Tab */}
-          <TabsContent value="legal" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Cookie className="h-5 w-5" />
-                  Cookies e LGPD
-                </CardTitle>
-                <CardDescription>
-                  Configure conformidade com a lei de proteção de dados
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Banner de Cookies</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Exibir aviso de uso de cookies
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.cookie_consent_enabled ?? true}
-                    onCheckedChange={(checked) => updateSetting('cookie_consent_enabled', checked)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cookie_message">Mensagem do Banner</Label>
-                  <Textarea
-                    id="cookie_message"
-                    value={settings.cookie_consent_message || ''}
-                    onChange={(e) => updateSetting('cookie_consent_message', e.target.value)}
-                    placeholder="Utilizamos cookies para melhorar sua experiência."
-                  />
-                </div>
-                <Separator />
-                <div className="space-y-2">
-                  <Label htmlFor="lgpd_email">Email DPO (LGPD)</Label>
-                  <Input
-                    id="lgpd_email"
-                    type="email"
-                    value={settings.lgpd_contact_email || ''}
-                    onChange={(e) => updateSetting('lgpd_contact_email', e.target.value)}
-                    placeholder="dpo@empresa.com"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Email do responsável pela proteção de dados
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Account Tab */}
-          <TabsContent value="account" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
+          <div className="grid gap-6 xl:grid-cols-[320px,minmax(0,1fr)]">
+            <div className="space-y-6 xl:sticky xl:top-4 xl:self-start">
+              <Card className={surfaceCardClass}>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    Meu Perfil
-                  </CardTitle>
-                  <CardDescription>Informações da sua conta</CardDescription>
+                  <CardTitle className="text-slate-900">Navegação por workspace</CardTitle>
+                  <CardDescription className="text-slate-700">Cada bloco reorganiza um conjunto de configurações com visual e feedback próprios.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Nome</Label>
-                    <Input value={profile?.full_name || ''} disabled />
-                  </div>
+                <CardContent className="space-y-3">
+                  {sectionOrder.map((tab) => {
+                    const meta = sectionMeta[tab];
+                    const Icon = meta.icon;
+                    const isActive = activeTab === tab;
+
+                    return (
+                      <button
+                        key={tab}
+                        type="button"
+                        onClick={() => setActiveTab(tab)}
+                        className={cn(
+                          'flex w-full items-start gap-3 rounded-[24px] border px-4 py-4 text-left transition-all duration-200',
+                          isActive
+                            ? 'border-transparent bg-slate-900 text-white shadow-[0_18px_40px_rgba(15,23,42,0.16)]'
+                            : 'border-slate-300 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50',
+                        )}
+                      >
+                        <div className={cn('mt-0.5 rounded-2xl p-2.5', isActive ? 'bg-white/12 text-white' : `${meta.accentSoft} ${meta.accentText}`)}>
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold">{meta.title}</p>
+                            {isActive && <span className="rounded-full bg-white/12 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em]">ativo</span>}
+                          </div>
+                          <p className={cn('mt-1 text-sm leading-6', isActive ? 'text-slate-200' : 'text-slate-700')}>{meta.description}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className={surfaceCardClass}>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Lock className="h-5 w-5" />
-                    Alterar Senha
-                  </CardTitle>
-                  <CardDescription>Atualize sua senha de acesso</CardDescription>
+                  <CardTitle className="text-slate-900">Áreas preservadas</CardTitle>
+                  <CardDescription className="text-slate-700">Nada foi perdido. Apenas redistribuído para o contexto certo.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="newPassword">Nova Senha</Label>
-                    <Input
-                      id="newPassword"
-                      type="password"
-                      value={passwords.newPassword}
-                      onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
-                      placeholder="Mínimo 6 caracteres"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={passwords.confirmPassword}
-                      onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
-                    />
-                  </div>
-                  <Button onClick={handleChangePassword} disabled={isChangingPassword}>
-                    {isChangingPassword && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                    Alterar Senha
-                  </Button>
+                <CardContent className="space-y-2">
+                  {[
+                    ['/admin/empresa', 'Empresa'],
+                    ['/admin/templates', 'Templates'],
+                    ['/admin/whatsapp', 'WhatsApp'],
+                    ['/admin/api', 'API e CRM'],
+                    ['/admin/logs', 'Logs'],
+                    ['/admin/usuarios', 'Usuários'],
+                  ].map(([href, label]) => (
+                    <Button key={href} variant="outline" asChild className={cn(secondaryButtonClass, 'w-full justify-between')}>
+                      <Link to={href}>
+                        {label}
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  ))}
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-        </Tabs>
+
+            <div className="min-w-0">{renderActiveSection()}</div>
+          </div>
+        </div>
       </div>
     </AdminLayout>
   );

@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from 'react-router-dom';
+﻿import { Link, useSearchParams } from 'react-router-dom';
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -85,3 +85,4 @@ const PaymentErrorPage = () => {
 };
 
 export default PaymentErrorPage;
+

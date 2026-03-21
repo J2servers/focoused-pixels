@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+﻿import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CheckCircle2 } from 'lucide-react';
 import { ReviewStars } from './ReviewStars';
@@ -99,3 +99,4 @@ export const ReviewCard = ({ review }: ReviewCardProps) => {
     </FadeInView>
   );
 };
+

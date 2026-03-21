@@ -1,4 +1,4 @@
-/**
+﻿/**
  * WhatsAppButton - Botão flutuante do WhatsApp
  * 
  * CONFIGURAÇÕES USADAS (Admin > Configurações > IA > WhatsApp):
@@ -47,3 +47,4 @@ export function WhatsAppButton() {
     </motion.a>
   );
 }
+

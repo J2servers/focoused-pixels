@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Star, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -148,3 +148,4 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
     </motion.div>
   );
 }
+

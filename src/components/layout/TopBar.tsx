@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Youtube, Mail, Phone } from 'lucide-react';
 import { storeInfo } from '@/data/store';
 
@@ -82,3 +82,4 @@ export function TopBar() {
     </div>
   );
 }
+

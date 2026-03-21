@@ -1,4 +1,4 @@
-import { MessageCircle, ShoppingCart, Truck, Shield, Clock, Check } from 'lucide-react';
+﻿import { MessageCircle, ShoppingCart, Truck, Shield, Clock, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { storeInfo, discountTiers } from '@/data/store';
 import { Product } from '@/data/products';
@@ -125,3 +125,4 @@ export const ProductWhatsAppQuote = ({
     </div>
   );
 };
+

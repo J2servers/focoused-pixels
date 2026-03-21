@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+﻿import { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, User, ShoppingCart, Menu, X, Sparkles, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -43,6 +43,7 @@ export function DynamicMainHeader() {
   };
 
   const headerLogo = company?.header_logo || logoPincelDeLuz;
+  const headerLogoHeight = Math.min(Math.max(company?.header_logo_height ?? 64, 24), 180);
 
   return (
     <header className="sticky top-0 z-50">
@@ -101,7 +102,8 @@ export function DynamicMainHeader() {
             <motion.img
               src={headerLogo}
               alt={company?.company_name || 'Logo'}
-              className="h-12 md:h-14 lg:h-16 w-auto max-w-[200px] object-contain"
+              className="w-auto max-w-[240px] object-contain"
+              style={{ height: `${headerLogoHeight}px` }}
               whileHover={{ scale: 1.03 }}
               transition={{ type: 'spring', stiffness: 300 }}
             />
@@ -359,3 +361,4 @@ function DrawerContent({ company, categoryTree, categoriesLoading, searchQuery, 
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-// Informações da loja Pincel de Luz Personalizados
+﻿// Informações da loja Pincel de Luz Personalizados
 export const storeInfo = {
   name: 'Pincel de Luz',
   tagline: 'Personalizados',
@@ -119,3 +119,4 @@ export const discountTiers = [
   { quantity: 50, discount: 15 },
   { quantity: 100, discount: 20 },
 ];
+

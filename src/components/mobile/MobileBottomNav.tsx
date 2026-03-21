@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+﻿import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, Grid3X3, ShoppingCart, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -109,3 +109,4 @@ export function MobileBottomNav() {
     </nav>
   );
 }
+

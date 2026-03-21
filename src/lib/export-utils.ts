@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+﻿import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 /**
@@ -93,3 +93,4 @@ function downloadBlob(blob: Blob, filename: string) {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+﻿import { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, X, Menu, ChevronRight, Package, Info, HelpCircle, Sparkles, ShoppingCart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -27,11 +27,27 @@ export function MobileHeader() {
   }, []);
 
   const parentCategories = useMemo(() => categories.filter(c => !c.parent_id), [categories]);
+  const mobileLogoHeight = Math.min(Math.max(company?.header_logo_mobile_height ?? 36, 20), 140);
+  const categorySuggestions = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return parentCategories.slice(0, 6);
+    return parentCategories
+      .filter((cat) => cat.name.toLowerCase().includes(query))
+      .slice(0, 8);
+  }, [parentCategories, searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/busca?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
+
+  const handleCategorySelect = (slug: string, closeSearch = true) => {
+    navigate(`/categoria/${slug}`);
+    if (closeSearch) {
       setSearchOpen(false);
       setSearchQuery('');
     }
@@ -72,6 +88,7 @@ export function MobileHeader() {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 handleSearch={handleSearch}
+                handleCategorySelect={handleCategorySelect}
               />
             </SheetContent>
           </Sheet>
@@ -81,7 +98,8 @@ export function MobileHeader() {
             <img
               src={company?.header_logo || logoPincel}
               alt="Logo"
-              className="h-9 w-auto max-w-[140px] object-contain"
+              className="w-auto max-w-[160px] object-contain"
+              style={{ height: `${mobileLogoHeight}px` }}
             />
           </Link>
 
@@ -167,6 +185,27 @@ export function MobileHeader() {
                   <Search className="h-4 w-4" />
                 </Button>
               </form>
+
+              <div className="mt-3">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2 px-1">
+                  {searchQuery.trim() ? 'Categorias sugeridas' : 'Categorias populares'}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {categorySuggestions.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => handleCategorySelect(cat.slug)}
+                      className="px-3 py-1.5 rounded-xl text-xs font-medium transition-colors border border-primary/20 hover:bg-primary/10"
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                  {categorySuggestions.length === 0 && (
+                    <span className="text-xs text-muted-foreground px-1">Nenhuma categoria encontrada.</span>
+                  )}
+                </div>
+              </div>
             </motion.div>
           </>
         )}
@@ -184,7 +223,15 @@ export function MobileHeader() {
 }
 
 /* ─── Drawer ─── */
-function MobileDrawer({ company, categories, loading, searchQuery, setSearchQuery, handleSearch }: any) {
+function MobileDrawer({
+  company,
+  categories,
+  loading,
+  searchQuery,
+  setSearchQuery,
+  handleSearch,
+  handleCategorySelect,
+}: any) {
   return (
     <div className="flex flex-col p-5 pt-8 gap-5">
       <div className="flex items-center gap-3 pb-4" style={{ borderBottom: '1px solid hsl(var(--neon-primary) / 0.12)' }}>
@@ -217,6 +264,20 @@ function MobileDrawer({ company, categories, loading, searchQuery, setSearchQuer
           />
         </div>
       </form>
+
+      <div className="flex flex-wrap gap-2">
+        {categories.slice(0, 6).map((cat: any) => (
+          <SheetClose key={cat.id} asChild>
+            <button
+              type="button"
+              onClick={() => handleCategorySelect(cat.slug, false)}
+              className="px-2.5 py-1.5 rounded-lg text-xs border border-primary/20 hover:bg-primary/10 transition-colors"
+            >
+              {cat.name}
+            </button>
+          </SheetClose>
+        ))}
+      </div>
 
       <nav className="flex flex-col gap-1.5">
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold px-1 mb-1">Categorias</p>
@@ -270,3 +331,4 @@ function MobileDrawer({ company, categories, loading, searchQuery, setSearchQuer
     </div>
   );
 }
+

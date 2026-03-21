@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TrustBar - Barra de confiança neumorphism
  */
 
@@ -44,3 +44,4 @@ export function TrustBar() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TestePage - Nova página de vendas com UX totalmente redesenhado
  * Busca todos os dados do backend (hero_slides, products, categories, company_info)
  */
@@ -570,3 +570,4 @@ export default function TestePage() {
     </div>
   );
 }
+

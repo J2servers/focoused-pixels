@@ -1,4 +1,4 @@
-import { Calculator, Building2, FileText } from 'lucide-react';
+﻿import { Calculator, Building2, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useTaxSettings, useFinancialSummary } from '@/hooks/useFinancialData';
@@ -104,3 +104,4 @@ export function TaxInfoCard() {
     </Card>
   );
 }
+

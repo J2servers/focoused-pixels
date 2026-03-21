@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ProductCard - Card de exibição de produto
  * 
  * CONFIGURAÇÕES USADAS (Admin > Configurações > Layout):
@@ -6,7 +6,7 @@
  * - show_product_stock: Exibir quantidade em estoque
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Truck, ShoppingCart, Package, Eye, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,8 @@ import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { QuickViewModal } from '@/components/storefront/QuickViewModal';
 import { WishlistButton } from '@/components/product/WishlistButton';
 import { useNavigate } from 'react-router-dom';
+import { useActivePromotions } from '@/hooks/usePromotions';
+import { PromotionCountdown } from '@/components/conversion/PromotionCountdown';
 
 interface ProductCardProps {
   product: Product;
@@ -30,7 +32,23 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const { addItem } = useCart();
   const { showProductRatings, showProductStock } = useSiteSettings();
+  const { data: promotions = [] } = useActivePromotions();
   const navigate = useNavigate();
+  const categoryId = (product as { categoryId?: string }).categoryId;
+
+  const activePromotion = useMemo(() => {
+    return promotions.find((promo) => {
+      if (promo.rule === 'general') return true;
+      if (promo.rule === 'product') return promo.product_ids?.includes(product.id);
+      if (promo.rule === 'category') {
+        return Boolean(
+          promo.category_ids?.includes(product.category) ||
+            (categoryId && promo.category_ids?.includes(categoryId))
+        );
+      }
+      return false;
+    });
+  }, [categoryId, product.category, product.id, promotions]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -192,6 +210,12 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
               </div>
             </div>
 
+            {activePromotion?.end_date && (
+              <div className="mb-3">
+                <PromotionCountdown endDate={activePromotion.end_date} />
+              </div>
+            )}
+
             <div className="mt-auto flex flex-col gap-2">
               <Button 
                 className="h-10 w-full font-semibold" 
@@ -224,3 +248,4 @@ export function ProductCard({ product, index = 0, onAddToCart }: ProductCardProp
     </>
   );
 }
+

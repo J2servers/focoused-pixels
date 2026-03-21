@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MaintenancePage
  * 
  * Exibida quando o modo manutenção está ativo no admin.
@@ -108,3 +108,4 @@ export function MaintenancePage({ message = 'Estamos em manutenção. Voltamos e
     </div>
   );
 }
+

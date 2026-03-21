@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GuaranteesSection - Garantias com design neumorphism
  */
 
@@ -34,3 +34,4 @@ export function GuaranteesSection() {
     </section>
   );
 }
+

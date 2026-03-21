@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Package, ShoppingCart, Users, Tag, FileText, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -150,3 +150,4 @@ export const UniversalSearch = ({ open, onOpenChange }: { open: boolean; onOpenC
     </Dialog>
   );
 };
+

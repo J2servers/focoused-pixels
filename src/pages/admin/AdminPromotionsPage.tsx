@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { AdminLayout, DataTable, Column } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -284,7 +284,7 @@ const AdminPromotionsPage = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="type">Tipo de Desconto</Label>
                 <Select value={formData.type} onValueChange={(v) => setFormData({ ...formData, type: v })}>
@@ -310,7 +310,7 @@ const AdminPromotionsPage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="rule">Regra de Aplicação</Label>
                 <Select value={formData.rule} onValueChange={(v) => setFormData({ ...formData, rule: v })}>
@@ -335,7 +335,7 @@ const AdminPromotionsPage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="start_date">Data Início *</Label>
                 <Input
@@ -356,7 +356,7 @@ const AdminPromotionsPage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}>
@@ -419,3 +419,4 @@ const AdminPromotionsPage = () => {
 };
 
 export default AdminPromotionsPage;
+

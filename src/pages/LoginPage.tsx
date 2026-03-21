@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,7 +29,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useSubscribeLead } from '@/hooks/useLeads';
 import { toast } from 'sonner';
-import logoGoat from '@/assets/logo-goat.png';
+import logoPincel from '@/assets/logo-pincel-de-luz.png';
 import { getErrorMessage, isAuthError } from '@/lib/auth-error';
 import { FirstPurchaseBanner } from '@/components/conversion/FirstPurchaseBanner';
 
@@ -242,8 +242,8 @@ const LoginPage = () => {
           {/* Logo */}
           <Link to="/" className="mb-12">
             <motion.img 
-              src={logoGoat} 
-              alt="GOAT Comunicação Visual" 
+              src={logoPincel} 
+              alt="Pincel de Luz Personalizados" 
               className="h-16 w-auto brightness-0 invert"
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 300 }}
@@ -307,7 +307,7 @@ const LoginPage = () => {
         {/* Mobile Header */}
         <div className="lg:hidden p-4 border-b border-border">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logoGoat} alt="GOAT" className="h-10 w-auto" />
+            <img src={logoPincel} alt="Pincel de Luz" className="h-10 w-auto" />
           </Link>
         </div>
 
@@ -754,3 +754,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+

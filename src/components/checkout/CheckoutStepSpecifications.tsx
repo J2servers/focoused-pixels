@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { QuoteFormData } from '@/pages/CheckoutPage';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,7 @@ interface CheckoutStepSpecificationsProps {
 
 export function CheckoutStepSpecifications({ formData, updateFormData }: CheckoutStepSpecificationsProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const isImageLogo = !!formData.logoUrl && !formData.logoUrl.toLowerCase().endsWith('.pdf');
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -136,6 +137,36 @@ export function CheckoutStepSpecifications({ formData, updateFormData }: Checkou
               onChange={(e) => updateFormData({ preferredColors: e.target.value })}
               placeholder="Ex: Preto com dourado, cores da marca, etc."
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Preview do Produto</Label>
+            <div className="rounded-xl border border-border bg-gradient-to-br from-background to-muted/30 p-4">
+              <div className="text-xs text-muted-foreground mb-3">
+                Prévia ilustrativa para você validar texto, logo e conceito antes do fechamento.
+              </div>
+              <div className="rounded-xl bg-white/70 border border-border min-h-[180px] flex flex-col items-center justify-center p-4 text-center gap-3">
+                {isImageLogo ? (
+                  <img
+                    src={formData.logoUrl}
+                    alt="Logo da arte"
+                    className="max-h-14 object-contain"
+                  />
+                ) : (
+                  <div className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                    Espaço da sua logo
+                  </div>
+                )}
+
+                <div className="font-bold text-lg leading-tight">
+                  {formData.customText || 'Seu texto personalizado aparece aqui'}
+                </div>
+
+                <div className="text-xs text-muted-foreground">
+                  {formData.preferredColors || 'Defina as cores desejadas para a produção final'}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -288,3 +319,4 @@ export function CheckoutStepSpecifications({ formData, updateFormData }: Checkou
     </div>
   );
 }
+

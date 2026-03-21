@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CheckoutPage - Página de checkout/orçamento
  * 
  * CONFIGURAÇÕES USADAS (Admin > Configurações > Checkout):
@@ -10,7 +10,7 @@
  * - quantity_discount_10/20/50/100: Desconto por quantidade
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
@@ -30,6 +30,9 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useSubscribeLead } from '@/hooks/useLeads';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { useCheckoutProfile } from '@/hooks/useCheckoutProfile';
+import { saveAbandonedCartContact } from '@/lib/abandoned-cart';
 
 export interface QuoteFormData {
   // Customer info
@@ -135,9 +138,54 @@ const CheckoutPage = () => {
   const { items, total, clearCart } = useCart();
   const navigate = useNavigate();
   const subscribeLead = useSubscribeLead();
+  const { user } = useAuthContext();
+  const { savedProfile, hasProfile, saveProfile, clearProfile } = useCheckoutProfile(user?.id);
+
+  useEffect(() => {
+    saveAbandonedCartContact({
+      userId: user?.id,
+      name: formData.customerName,
+      email: formData.customerEmail,
+      phone: formData.customerPhone,
+    });
+  }, [formData.customerEmail, formData.customerName, formData.customerPhone, user?.id]);
 
   const updateFormData = (updates: Partial<QuoteFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
+  };
+
+  const applySavedProfile = () => {
+    if (!savedProfile) return;
+    updateFormData({
+      customerName: savedProfile.fullName || '',
+      customerEmail: savedProfile.email || '',
+      customerPhone: savedProfile.phone || '',
+      customerCompany: savedProfile.company || '',
+      customerCnpj: savedProfile.cnpj || '',
+      deliveryAddress: savedProfile.address || '',
+      deliveryCep: savedProfile.cep || '',
+      shippingMethod: savedProfile.shippingMethod || 'sedex',
+    });
+    toast.success('Dados preenchidos em 1 clique!');
+  };
+
+  const saveCurrentProfile = async () => {
+    if (!formData.customerName || !formData.customerEmail) {
+      toast.error('Preencha nome e e-mail para salvar seu perfil.');
+      return;
+    }
+
+    await saveProfile({
+      fullName: formData.customerName,
+      email: formData.customerEmail,
+      phone: formData.customerPhone,
+      address: formData.deliveryAddress,
+      cep: formData.deliveryCep,
+      company: formData.customerCompany,
+      cnpj: formData.customerCnpj,
+      shippingMethod: formData.shippingMethod,
+    });
+    toast.success('Perfil salvo para checkout em 1 clique.');
   };
 
   const nextStep = () => {
@@ -272,6 +320,17 @@ const CheckoutPage = () => {
       }
 
       toast.success('Orçamento enviado com sucesso! Entraremos em contato em breve.');
+      await saveProfile({
+        fullName: formData.customerName,
+        email: formData.customerEmail,
+        phone: formData.customerPhone,
+        address: formData.deliveryAddress,
+        cep: formData.deliveryCep,
+        company: formData.customerCompany,
+        cnpj: formData.customerCnpj,
+        shippingMethod: formData.shippingMethod,
+      });
+
       clearCart();
       navigate('/orcamento-enviado');
     } catch (error: unknown) {
@@ -338,6 +397,36 @@ const CheckoutPage = () => {
                   <CardTitle>{steps[currentStep - 1].title}</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {currentStep === 1 && hasProfile && (
+                    <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                      <p className="text-sm font-medium mb-2">
+                        Cliente recorrente detectado. Preencha em 1 clique:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <Button type="button" onClick={applySavedProfile}>
+                          Usar dados salvos
+                        </Button>
+                        <Button type="button" variant="outline" onClick={saveCurrentProfile}>
+                          Atualizar dados salvos
+                        </Button>
+                        <Button type="button" variant="ghost" onClick={clearProfile}>
+                          Limpar perfil salvo
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {currentStep === 1 && !hasProfile && (
+                    <div className="mb-6 rounded-xl border border-border p-4">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Salve seus dados para checkout em 1 clique nas próximas compras.
+                      </p>
+                      <Button type="button" variant="outline" onClick={saveCurrentProfile}>
+                        Salvar dados para próximos pedidos
+                      </Button>
+                    </div>
+                  )}
+
                   {currentStep === 1 && (
                     <CheckoutStepCustomer
                       formData={formData}
@@ -420,3 +509,5 @@ const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
+
+

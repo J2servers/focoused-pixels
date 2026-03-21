@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DynamicSocialProof - Shows "Maria de SP acabou de comprar..." toast notifications
  */
 import { useEffect, useRef } from 'react';
@@ -68,3 +68,4 @@ export function DynamicSocialProof() {
 
   return null;
 }
+

@@ -1,4 +1,4 @@
-import { AdminLayout } from '@/components/admin';
+﻿import { AdminLayout } from '@/components/admin';
 import { MediaLibrary } from '@/components/admin/MediaLibrary';
 
 const AdminMediaPage = () => {
@@ -10,3 +10,4 @@ const AdminMediaPage = () => {
 };
 
 export default AdminMediaPage;
+

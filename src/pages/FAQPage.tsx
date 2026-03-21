@@ -1,4 +1,4 @@
-import { TopBar } from '@/components/layout/TopBar';
+﻿import { TopBar } from '@/components/layout/TopBar';
 import { MainHeader } from '@/components/layout/MainHeader';
 import { NavigationBar } from '@/components/layout/NavigationBar';
 import { Footer } from '@/components/layout/Footer';
@@ -238,3 +238,4 @@ const FAQPage = () => {
 };
 
 export default FAQPage;
+

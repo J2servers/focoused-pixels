@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Search, Bell, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -140,3 +140,4 @@ export const AdminHeader = ({ title }: AdminHeaderProps) => {
     </>
   );
 };
+

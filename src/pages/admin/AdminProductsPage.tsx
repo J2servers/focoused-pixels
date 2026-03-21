@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { AdminLayout, DataTable, Column, ImageUpload, MultiImageUpload } from '@/components/admin';
 import { FormFieldInfo } from '@/components/admin/FormFieldInfo';
 import { Button } from '@/components/ui/button';
@@ -361,7 +361,7 @@ const AdminProductsPage = () => {
               <p className="text-xs text-[hsl(var(--admin-text-muted))]">Dados principais que identificam o produto</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <FormFieldInfo 
                   label="Nome do Produto" 
@@ -416,7 +416,7 @@ const AdminProductsPage = () => {
               <p className="text-xs text-muted-foreground">Valores de venda e controle de disponibilidade</p>
             </div>
 
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
               <div className="space-y-2">
                 <FormFieldInfo 
                   label="Preço de Venda" 
@@ -496,7 +496,7 @@ const AdminProductsPage = () => {
               <p className="text-xs text-muted-foreground">Informações internas para cálculo de margem de lucro (não visíveis ao cliente)</p>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <FormFieldInfo 
                   label="Custo de Material" 
@@ -566,7 +566,7 @@ const AdminProductsPage = () => {
               <p className="text-xs text-muted-foreground">Classificação e controle de exibição do produto</p>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <FormFieldInfo 
                   label="Código SKU" 
@@ -712,3 +712,4 @@ const AdminProductsPage = () => {
 };
 
 export default AdminProductsPage;
+

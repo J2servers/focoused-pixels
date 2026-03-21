@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FreeShippingProgress - Barra de progresso para frete grátis
  * Aumenta ticket médio em +30% incentivando adição de itens
  */
@@ -105,3 +105,4 @@ export function FreeShippingProgress({ variant = 'inline' }: FreeShippingProgres
     </div>
   );
 }
+

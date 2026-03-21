@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Conversion Components Index
  * Componentes otimizados para aumentar taxa de conversão do e-commerce
  */
@@ -9,7 +9,8 @@ export { ProductCardOptimized } from './ProductCardOptimized';
 export { SocialProofSection } from './SocialProofSection';
 export { BestSellersSection } from './BestSellersSection';
 export { GuaranteesSection } from './GuaranteesSection';
-export { FreeShippingProgress } from './FreeShippingProgress';
-export { ViewingNowBadge } from './ViewingNowBadge';
 export { HowItWorksSection } from './HowItWorksSection';
 export { WeeklyUrgencySection } from './WeeklyUrgencySection';
+export { FreeShippingProgress } from './FreeShippingProgress';
+export { ViewingNowBadge } from './ViewingNowBadge';
+
