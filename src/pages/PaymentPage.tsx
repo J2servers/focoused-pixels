@@ -41,6 +41,7 @@ import { useCheckoutProfile } from '@/hooks/useCheckoutProfile';
 interface PaymentState {
   orderId: string;
   amount: number;
+  shippingCost: number;
   customerName: string;
   customerEmail: string;
   customerCpf: string;
@@ -191,12 +192,23 @@ const PaymentPage = () => {
         if (storedPayment) {
           try {
             const data = JSON.parse(storedPayment);
-            if (!data.amount || data.amount <= 0) {
+            const shippingCost = data.shipping?.cost || 0;
+            const itemsAmount = data.amount || 0;
+            if (!itemsAmount || itemsAmount <= 0) {
               toast.error('Valor do pedido inválido');
               navigate('/');
               return;
             }
-            setPaymentState(data);
+            setPaymentState({
+              orderId: data.orderId,
+              amount: itemsAmount + shippingCost,
+              shippingCost,
+              customerName: data.customerName || '',
+              customerEmail: data.customerEmail || '',
+              customerCpf: data.customerCpf || '',
+              customerPhone: data.customerPhone || '',
+              description: data.description || '',
+            });
           } catch {
             toast.error('Dados do pedido corrompidos');
             sessionStorage.removeItem('pending_payment');
@@ -223,6 +235,7 @@ const PaymentPage = () => {
         setPaymentState({
           orderId: order.id,
           amount: order.total,
+          shippingCost: order.shipping_cost || 0,
           customerName: order.customer_name,
           customerEmail: order.customer_email,
           customerCpf: '',
@@ -334,9 +347,9 @@ const PaymentPage = () => {
       customer_email: state.customerEmail.trim().toLowerCase(),
       customer_phone: sanitizedPhone || state.customerPhone || '',
       items: cartItems as unknown as import('@/integrations/supabase/types').Json,
-      subtotal: state.amount - (shippingInfo.cost || 0),
+      subtotal: state.amount - state.shippingCost,
       total: state.amount,
-      shipping_cost: shippingInfo.cost || 0,
+      shipping_cost: state.shippingCost,
       shipping_method: shippingInfo.method || null,
       shipping_cep: shippingInfo.cep || customerForm.cep?.trim() || null,
       shipping_city: shippingInfo.city || customerForm.city?.trim() || null,
@@ -658,6 +671,14 @@ const PaymentPage = () => {
                     uploadedFiles={uploadedFiles}
                     setUploadedFiles={setUploadedFiles}
                     amount={paymentState.amount}
+                    shippingCost={paymentState.shippingCost}
+                    onShippingChange={(cost) => {
+                      setPaymentState(prev => prev ? {
+                        ...prev,
+                        amount: (prev.amount - prev.shippingCost) + cost,
+                        shippingCost: cost,
+                      } : null);
+                    }}
                     onSubmit={handleDetailsSubmit}
                     isProcessing={isProcessing}
                   />
@@ -971,9 +992,15 @@ const PaymentPage = () => {
                       <Separator />
                       <div className="space-y-1.5 text-sm">
                         <div className="flex justify-between">
-                          <span>Subtotal</span>
-                          <span>{formatCurrency(paymentState.amount)}</span>
+                          <span>Subtotal (itens)</span>
+                          <span>{formatCurrency(paymentState.amount - paymentState.shippingCost)}</span>
                         </div>
+                        {paymentState.shippingCost > 0 && (
+                          <div className="flex justify-between">
+                            <span>Frete</span>
+                            <span>{formatCurrency(paymentState.shippingCost)}</span>
+                          </div>
+                        )}
                         {paymentMethod === 'pix' && (
                           <div className="flex justify-between text-emerald-600">
                             <span>Desconto PIX ({pixDiscount}%)</span>
