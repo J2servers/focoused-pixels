@@ -115,7 +115,8 @@ serve(async (req) => {
     const requestData = await req.json() as PaymentRequest;
     const { 
       action, orderId, amount, description, payerEmail, payerName, payerCpf, payerPhone,
-      paymentId, items, token, installments, issuerId, paymentMethodId, expirationDays, bin
+      paymentId, items, token, installments, issuerId, paymentMethodId, expirationDays, bin,
+      payerZipCode, payerStreetName, payerStreetNumber, payerNeighborhood, payerCity, payerState
     } = requestData;
 
     console.log(`[MercadoPago] Action: ${action}, OrderId: ${orderId}`);
