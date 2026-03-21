@@ -42,24 +42,25 @@ export function useCheckoutProfile(userId?: string) {
   const loadRemoteProfile = useCallback(async () => {
     if (!userId) return null;
     try {
-      const { data, error } = await supabase
-        .from('customer_checkout_profiles' as any)
+      const { data, error } = await (supabase as any)
+        .from('customer_checkout_profiles')
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
 
       if (error || !data) return null;
 
+      const row = data as Record<string, any>;
       const mapped: CheckoutProfileData = {
-        fullName: data.full_name || '',
-        email: data.email || '',
-        phone: data.phone || '',
-        address: data.address || '',
-        cep: data.cep || '',
-        company: data.company || '',
-        cnpj: data.cnpj || '',
-        shippingMethod: data.shipping_method || 'sedex',
-        updatedAt: data.updated_at || new Date().toISOString(),
+        fullName: row.full_name || '',
+        email: row.email || '',
+        phone: row.phone || '',
+        address: row.address || '',
+        cep: row.cep || '',
+        company: row.company || '',
+        cnpj: row.cnpj || '',
+        shippingMethod: row.shipping_method || 'sedex',
+        updatedAt: row.updated_at || new Date().toISOString(),
       };
 
       localStorage.setItem(storageKey, JSON.stringify(mapped));

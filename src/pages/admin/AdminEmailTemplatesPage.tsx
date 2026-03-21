@@ -104,7 +104,7 @@ const SAMPLE_VALUES: Record<string, string> = {
   '{{company_name}}': 'Pincel de Luz',
 };
 
-const replaceVariables = (text: string) => TEMPLATE_VARIABLES.reduce((acc, key) => acc.replaceAll(key, SAMPLE_VALUES[key] || key), text);
+const replaceVariables = (text: string) => TEMPLATE_VARIABLES.reduce((acc, key) => acc.split(key).join(SAMPLE_VALUES[key] || key), text);
 
 const sanitizePreviewHtml = (html: string) => {
   if (typeof window === 'undefined') return html;
@@ -165,7 +165,7 @@ const AdminEmailTemplatesPage = () => {
     }
 
     setEmailTemplates((emails || []) as EmailTemplate[]);
-    setWhatsTemplates((whats || []) as WhatsAppTemplate[]);
+    setWhatsTemplates((whats || []).map((w: any) => ({ ...w, content: w.message_text || w.content || '' })) as WhatsAppTemplate[]);
     setLoading(false);
   };
 
@@ -200,13 +200,13 @@ const AdminEmailTemplatesPage = () => {
     const payload = {
       name: editWhats.name,
       category: editWhats.category || 'promocao',
-      content: editWhats.content,
+      message_text: editWhats.content,
       variables: editWhats.variables || [],
       is_active: editWhats.is_active ?? true,
     };
     const action = editWhats.id
       ? supabase.from('whatsapp_templates').update(payload).eq('id', editWhats.id)
-      : supabase.from('whatsapp_templates').insert(payload);
+      : supabase.from('whatsapp_templates').insert(payload as any);
     const { error } = await action;
     if (error) {
       if (error.code === 'PGRST205') return toast.error('A tabela de templates de WhatsApp ainda não foi publicada no Supabase.');
@@ -218,7 +218,14 @@ const AdminEmailTemplatesPage = () => {
   };
 
   const installSuggestedWhatsTemplates = async () => {
-    const { error } = await supabase.from('whatsapp_templates').upsert(SUGGESTED_WHATSAPP_TEMPLATES, {
+    const mapped = SUGGESTED_WHATSAPP_TEMPLATES.map(t => ({
+      name: t.name,
+      category: t.category,
+      message_text: t.content,
+      variables: t.variables,
+      is_active: true,
+    }));
+    const { error } = await supabase.from('whatsapp_templates').upsert(mapped as any, {
       onConflict: 'name',
       ignoreDuplicates: false,
     });

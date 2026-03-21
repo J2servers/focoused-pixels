@@ -92,7 +92,7 @@ export interface CompanyInfo {
   google_tag_manager_id: string | null;
   // Integrations
   whatsapp_message_template: string | null;
-  why_choose_us_config: Record<string, unknown> | null;
+  why_choose_us_config: Record<string, any> | null;
   enable_reviews_auto_approve: boolean | null;
   reviews_min_rating_to_show: number | null;
   // Payment gateway flags kept for backward compatibility (credentials in payment_credentials table)
@@ -280,7 +280,7 @@ export function useUpdateCompanyInfo() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string | null; data: Partial<CompanyInfo> }) => {
-      const sanitizedData = sanitizeCompanyPayload(data);
+      const sanitizedData = sanitizeCompanyPayload(data) as Record<string, any>;
 
       // Ensure company_name is present for insert operations
       const insertData = { company_name: sanitizedData.company_name || 'Pincel de Luz Personalizados', ...sanitizedData };
@@ -288,15 +288,15 @@ export function useUpdateCompanyInfo() {
       if (id) {
         const { error } = await supabase
           .from('company_info')
-          .update(sanitizedData)
+          .update(sanitizedData as any)
           .eq('id', id);
         if (!error) return;
 
-        const retryPayload = stripOptionalCompanyColumns(sanitizedData);
+        const retryPayload = stripOptionalCompanyColumns(sanitizedData as Partial<CompanyInfo>);
         const shouldRetry = error.code === '42703' || error.message?.toLowerCase().includes('column');
 
         if (shouldRetry && Object.keys(retryPayload).length > 0) {
-          const retry = await supabase.from('company_info').update(retryPayload).eq('id', id);
+          const retry = await supabase.from('company_info').update(retryPayload as any).eq('id', id);
           if (!retry.error) return;
         }
 
@@ -304,14 +304,14 @@ export function useUpdateCompanyInfo() {
       } else {
         const { error } = await supabase
           .from('company_info')
-          .insert([insertData]);
+          .insert([insertData as any]);
         if (!error) return;
 
-        const retryPayload = stripOptionalCompanyColumns(insertData);
+        const retryPayload = stripOptionalCompanyColumns(insertData as Partial<CompanyInfo>);
         const shouldRetry = error.code === '42703' || error.message?.toLowerCase().includes('column');
 
         if (shouldRetry) {
-          const retry = await supabase.from('company_info').insert([retryPayload]);
+          const retry = await supabase.from('company_info').insert([retryPayload as any]);
           if (!retry.error) return;
         }
 
