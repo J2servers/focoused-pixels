@@ -392,11 +392,12 @@ const PaymentPage = () => {
       const dbOrderId = await createOrderInDB(updatedState);
       if (!dbOrderId) return;
 
+      const fullAddress = [street, customerForm.number, customerForm.complement, customerForm.neighborhood, customerForm.city, customerForm.state].filter(Boolean).join(', ');
       await saveProfile({
         fullName: name,
         email,
         phone,
-        address,
+        address: fullAddress,
         cep,
       });
 
