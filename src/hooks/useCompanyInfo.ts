@@ -108,6 +108,11 @@ export interface CompanyInfo {
   boleto_extra_days: number | null;
   max_installments: number | null;
   min_installment_value: number | null;
+  // Why Choose Us & Branding
+  why_choose_us_config: Record<string, any> | null;
+  logo_sidebar_size: number | null;
+  logo_header_size: number | null;
+  logo_mobile_size: number | null;
 }
 
 // Default fallback values when no data is in the database
