@@ -1,4 +1,4 @@
-import { TopBar } from '@/components/layout/TopBar';
+﻿import { TopBar } from '@/components/layout/TopBar';
 import { MainHeader } from '@/components/layout/MainHeader';
 import { NavigationBar } from '@/components/layout/NavigationBar';
 import { Footer } from '@/components/layout/Footer';
@@ -7,7 +7,7 @@ import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Card, CardContent } from '@/components/ui/card';
 import { storeInfo } from '@/data/store';
 import { Target, Eye, Heart, Award, Users, Lightbulb } from 'lucide-react';
-import logo from '@/assets/logo-goat.png';
+import logo from '@/assets/logo-pincel-de-luz.png';
 
 const AboutPage = () => {
   return (
@@ -106,7 +106,7 @@ const AboutPage = () => {
         {/* Diferenciais */}
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold mb-12 text-center">Por que escolher a GOAT?</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-12 text-center">Por que escolher a Pincel de Luz?</h2>
             
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="text-center p-6">
@@ -212,3 +212,4 @@ const AboutPage = () => {
 };
 
 export default AboutPage;
+

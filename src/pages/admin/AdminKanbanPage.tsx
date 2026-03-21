@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -258,7 +258,7 @@ const AdminKanbanPage = () => {
           </DialogHeader>
           {selectedOrder && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground">Cliente</p>
                   <p className="font-medium">{selectedOrder.customer_name}</p>
@@ -321,3 +321,4 @@ const AdminKanbanPage = () => {
 };
 
 export default AdminKanbanPage;
+

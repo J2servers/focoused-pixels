@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState, type ElementType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DynamicTopBar } from '@/components/layout/DynamicTopBar';
 import { DynamicMainHeader } from '@/components/layout/DynamicMainHeader';
@@ -14,6 +14,8 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { useCustomerOrders } from '@/hooks/useCustomerOrders';
 import { useActivePromotions } from '@/hooks/usePromotions';
 import { PRODUCTION_STATUS_LABELS, type ProductionStatus } from '@/hooks/useOrders';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { PromotionCountdown } from '@/components/conversion/PromotionCountdown';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
@@ -31,7 +33,9 @@ import {
   Percent,
   Gift,
   Wrench,
-  Eye
+  Eye,
+  Camera,
+  ArrowRight
 } from 'lucide-react';
 
 // Production status progress mapping
@@ -44,7 +48,7 @@ const PRODUCTION_PROGRESS: Record<ProductionStatus, number> = {
   shipped: 100,
 };
 
-const PRODUCTION_STATUS_ICONS: Record<ProductionStatus, React.ElementType> = {
+const PRODUCTION_STATUS_ICONS: Record<ProductionStatus, ElementType> = {
   pending: Clock,
   awaiting_material: AlertCircle,
   in_production: Wrench,
@@ -52,6 +56,15 @@ const PRODUCTION_STATUS_ICONS: Record<ProductionStatus, React.ElementType> = {
   ready: Package,
   shipped: Truck,
 };
+
+const PRODUCTION_FLOW: ProductionStatus[] = [
+  'pending',
+  'awaiting_material',
+  'in_production',
+  'quality_check',
+  'ready',
+  'shipped',
+];
 
 const ORDER_STATUS_LABELS: Record<string, string> = {
   pending: 'Pendente',
@@ -72,6 +85,7 @@ const PAYMENT_STATUS_LABELS: Record<string, string> = {
 const CustomerAreaPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthContext();
+  const siteSettings = useSiteSettings();
   const [searchOrder, setSearchOrder] = useState('');
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
@@ -82,6 +96,42 @@ const CustomerAreaPage = () => {
     order.order_number.toLowerCase().includes(searchOrder.toLowerCase()) ||
     order.customer_name.toLowerCase().includes(searchOrder.toLowerCase())
   );
+  const deliveredOrders = orders.filter(
+    (order) => order.order_status === 'delivered' || order.production_status === 'shipped'
+  );
+
+  const getStatusIndex = (status: string) => {
+    const idx = PRODUCTION_FLOW.indexOf(status as ProductionStatus);
+    return idx === -1 ? 0 : idx;
+  };
+
+  const getStepDate = (order: typeof orders[number], status: ProductionStatus) => {
+    if (status === 'pending') return order.created_at;
+    if (status === 'in_production') return order.production_started_at;
+    if (status === 'ready') return order.production_completed_at;
+    if (status === 'shipped' && getStatusIndex(order.production_status) >= getStatusIndex('shipped')) {
+      return order.updated_at;
+    }
+    if (
+      (status === 'awaiting_material' || status === 'quality_check') &&
+      getStatusIndex(order.production_status) >= getStatusIndex(status)
+    ) {
+      return order.updated_at;
+    }
+    return null;
+  };
+
+  const handlePostPurchaseFollowUp = (order: typeof orders[number]) => {
+    const whatsappNumber = (siteSettings.whatsapp || '').replace(/\D/g, '');
+    const message = [
+      `Olá! Recebi o pedido ${order.order_number} e quero participar da recompensa de cliente.`,
+      'Quero enviar foto + avaliação para ganhar meu cupom especial.',
+      `Nome: ${order.customer_name}`,
+      `E-mail: ${order.customer_email}`,
+    ].join('\n');
+    if (!whatsappNumber) return;
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -235,6 +285,35 @@ const CustomerAreaPage = () => {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Pós-compra e encantamento */}
+              {deliveredOrders.length > 0 && (
+                <Card className="border-primary/20 bg-primary/5">
+                  <CardContent className="pt-6">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div>
+                        <h3 className="font-semibold text-lg mb-1">Seu pedido chegou? Ganhe recompensa</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Envie foto + avaliação do seu produto e receba cupom especial para a próxima compra.
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handlePostPurchaseFollowUp(deliveredOrders[0])}
+                          className="gap-2"
+                        >
+                          <Camera className="h-4 w-4" />
+                          Enviar foto e avaliar
+                        </Button>
+                        <Button variant="outline" onClick={() => navigate('/por-que-escolher')} className="gap-2">
+                          Ver experiência da marca
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Orders List */}
               {ordersLoading ? (
@@ -412,6 +491,40 @@ const CustomerAreaPage = () => {
                                     <Wrench className="h-4 w-4" />
                                     Status da Produção
                                   </h4>
+
+                                  <div className="mb-4 rounded-lg border border-border bg-muted/30 p-3">
+                                    <p className="text-sm font-medium mb-3">Timeline do pedido</p>
+                                    <div className="grid md:grid-cols-6 gap-2">
+                                      {PRODUCTION_FLOW.map((status) => {
+                                        const Icon = PRODUCTION_STATUS_ICONS[status];
+                                        const isReached = getStatusIndex(order.production_status) >= getStatusIndex(status);
+                                        const isCurrent = order.production_status === status;
+                                        const stepDate = getStepDate(order, status);
+
+                                        return (
+                                          <div
+                                            key={`timeline-${status}`}
+                                            className={`rounded-lg p-2 text-center border ${
+                                              isCurrent
+                                                ? 'bg-primary text-primary-foreground border-primary'
+                                                : isReached
+                                                ? 'bg-primary/10 border-primary/30 text-primary'
+                                                : 'bg-background border-border text-muted-foreground'
+                                            }`}
+                                          >
+                                            <Icon className="h-4 w-4 mx-auto mb-1" />
+                                            <p className="text-[10px] leading-tight font-medium">
+                                              {PRODUCTION_STATUS_LABELS[status]}
+                                            </p>
+                                            <p className="text-[10px] mt-1 opacity-80">
+                                              {stepDate ? format(new Date(stepDate), 'dd/MM', { locale: ptBR }) : '--'}
+                                            </p>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+
                                   <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
                                     {(['pending', 'awaiting_material', 'in_production', 'quality_check', 'ready', 'shipped'] as ProductionStatus[]).map((status) => {
                                       const Icon = PRODUCTION_STATUS_ICONS[status];
@@ -462,6 +575,24 @@ const CustomerAreaPage = () => {
                                   <div className="p-3 bg-muted rounded-lg">
                                     <p className="text-sm font-medium mb-1">Observações:</p>
                                     <p className="text-sm text-muted-foreground">{order.notes}</p>
+                                  </div>
+                                )}
+
+                                {(order.order_status === 'delivered' || order.production_status === 'shipped') && (
+                                  <div className="p-3 rounded-lg border border-primary/20 bg-primary/5">
+                                    <p className="text-sm font-medium mb-2">
+                                      Pedido entregue: envie foto + avaliação e ganhe cupom.
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                      <Button size="sm" onClick={() => handlePostPurchaseFollowUp(order)} className="gap-2">
+                                        <Camera className="h-4 w-4" />
+                                        Quero meu cupom
+                                      </Button>
+                                      <Button size="sm" variant="outline" onClick={() => navigate('/por-que-escolher')} className="gap-2">
+                                        Ver programa de benefícios
+                                        <ArrowRight className="h-4 w-4" />
+                                      </Button>
+                                    </div>
                                   </div>
                                 )}
                               </CardContent>
@@ -547,6 +678,9 @@ const CustomerAreaPage = () => {
                               {format(new Date(promo.end_date), "dd/MM/yyyy", { locale: ptBR })}
                             </span>
                           </div>
+                          <div className="mb-4">
+                            <PromotionCountdown endDate={promo.end_date} />
+                          </div>
                           <Button className="w-full" onClick={() => navigate('/categorias')}>
                             <Eye className="h-4 w-4 mr-2" />
                             Ver Produtos
@@ -568,3 +702,4 @@ const CustomerAreaPage = () => {
 };
 
 export default CustomerAreaPage;
+

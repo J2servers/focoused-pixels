@@ -1,4 +1,4 @@
-import { QuoteFormData } from '@/pages/CheckoutPage';
+﻿import { QuoteFormData } from '@/pages/CheckoutPage';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
@@ -359,3 +359,4 @@ export function CheckoutStepReview({ formData, cartItems, cartTotal }: CheckoutS
     </div>
   );
 }
+

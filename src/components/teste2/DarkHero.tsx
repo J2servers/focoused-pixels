@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Truck, Zap, Clock, Shield, ArrowRight } from 'lucide-react';
@@ -160,3 +160,4 @@ export function DarkHero() {
     </section>
   );
 }
+

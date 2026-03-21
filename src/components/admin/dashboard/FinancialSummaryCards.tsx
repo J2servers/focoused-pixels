@@ -1,4 +1,4 @@
-import { 
+﻿import { 
   DollarSign, 
   TrendingUp, 
   Receipt, 
@@ -110,3 +110,4 @@ export function FinancialSummaryCards() {
     </div>
   );
 }
+

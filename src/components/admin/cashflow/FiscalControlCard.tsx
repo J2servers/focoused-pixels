@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+﻿import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Receipt, Building2, FileText, Calculator, Settings } from 'lucide-react';
@@ -134,3 +134,4 @@ export function FiscalControlCard() {
     </Card>
   );
 }
+

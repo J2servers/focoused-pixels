@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ProductFAQ - FAQ section on product page
  */
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -63,3 +63,4 @@ export function ProductFAQ({ productName }: ProductFAQProps) {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-import { QuoteFormData } from '@/pages/CheckoutPage';
+﻿import { QuoteFormData } from '@/pages/CheckoutPage';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -200,3 +200,4 @@ export function CheckoutStepCustomer({ formData, updateFormData }: CheckoutStepC
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Hook centralizado para acessar configurações do site
  * 
  * DOCUMENTAÇÃO DE ONDE CADA CONFIGURAÇÃO É USADA:
@@ -89,7 +89,7 @@ export function useSiteSettings() {
     seoDescription: settings?.seo_description || 'Produtos personalizados em acrílico, MDF e LED.',
     seoKeywords: settings?.seo_keywords || '',
     ogImage: settings?.og_image || null,
-    faviconUrl: settings?.favicon_url || null,
+    faviconUrl: settings?.favicon_url || '/favicon-pincel.png',
 
     // Appearance
     primaryColor: settings?.primary_color || '#7c3aed',
@@ -196,3 +196,4 @@ export function useSiteSettings() {
 
 // Export type for use in components
 export type SiteSettings = ReturnType<typeof useSiteSettings>;
+

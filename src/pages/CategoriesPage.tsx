@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCategories } from '@/hooks/useProducts';
@@ -101,3 +101,4 @@ export default function CategoriesPage() {
     </div>
   );
 }
+

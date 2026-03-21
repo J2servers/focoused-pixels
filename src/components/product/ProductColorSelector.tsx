@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+﻿import { cn } from '@/lib/utils';
 
 interface ProductColorSelectorProps {
   colors: string[];
@@ -82,3 +82,4 @@ export const ProductColorSelector = ({
     </div>
   );
 };
+

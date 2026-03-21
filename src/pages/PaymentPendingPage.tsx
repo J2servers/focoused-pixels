@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from 'react-router-dom';
+﻿import { Link, useSearchParams } from 'react-router-dom';
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,15 +50,15 @@ const PaymentPendingPage = () => {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <span className="font-semibold text-foreground">1.</span>
-                  <span>Se você pagou via Boleto, aguarde até 3 dias úteis para a confirmação</span>
+                  <span>Se você pagou via boleto, aguarde a compensação bancária. O produto não é enviado antes da confirmação do pagamento.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="font-semibold text-foreground">2.</span>
-                  <span>Você receberá um email assim que o pagamento for confirmado</span>
+                  <span>Assim que o sistema reconhecer o pagamento, enviamos automaticamente a confirmação por mensagem e seu comprovante de pagamento.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="font-semibold text-foreground">3.</span>
-                  <span>Seu pedido será processado automaticamente após a confirmação</span>
+                  <span>Depois da confirmação, o pedido segue para produção e envio sem precisar de nova ação sua.</span>
                 </li>
               </ul>
             </div>
@@ -103,3 +103,4 @@ const PaymentPendingPage = () => {
 };
 
 export default PaymentPendingPage;
+

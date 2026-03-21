@@ -66,6 +66,7 @@ export function mapDbProduct(p: DbProduct) {
     image: p.cover_image || '/placeholder.svg',
     images: p.gallery_images || [],
     category: p.category?.slug || '',
+    categoryId: p.category?.id || undefined,
     subcategory: undefined,
     rating: 4.5,
     reviews: 0,

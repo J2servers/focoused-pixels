@@ -1,13 +1,12 @@
-import { 
+﻿import { 
   LayoutDashboard, 
   Package, 
   FolderTree, 
   Percent, 
   Image, 
   Building2, 
-  Users, 
-  Settings, 
   FileText,
+  Settings, 
   Star,
   LogOut,
   ChevronLeft,
@@ -19,10 +18,7 @@ import {
   Kanban,
   Menu,
   X,
-  Webhook,
-  MessageSquare,
-  Mail,
-  ImageIcon
+  Mail
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -55,13 +51,8 @@ const menuItems = [
   { title: 'Avaliações', url: '/admin/avaliacoes', icon: Star },
   { title: 'Leads', url: '/admin/leads', icon: UserPlus },
   { title: 'Empresa', url: '/admin/empresa', icon: Building2 },
-  { title: 'WhatsApp', url: '/admin/whatsapp', icon: MessageSquare },
-  { title: 'E-mail Templates', url: '/admin/email-templates', icon: Mail },
-  { title: 'Mídia', url: '/admin/midia', icon: ImageIcon },
-  { title: 'Usuários', url: '/admin/usuarios', icon: Users, adminOnly: true },
-  { title: 'API & CRM', url: '/admin/api', icon: Webhook },
-  { title: 'Logs', url: '/admin/logs', icon: FileText },
-  { title: 'Pág. Conversão', url: '/admin/pagina-por-que-escolher', icon: Sparkles },
+  { title: 'Página Comercial', url: '/admin/pagina-por-que-escolher', icon: Sparkles },
+  { title: 'Templates', url: '/admin/templates', icon: Mail },
   { title: 'Configurações', url: '/admin/configuracoes', icon: Settings },
 ];
 
@@ -272,3 +263,4 @@ export const AdminSidebar = () => {
     </aside>
   );
 };
+

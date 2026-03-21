@@ -1,4 +1,4 @@
-/**
+﻿/**
  * PaymentPage - Multi-step payment flow
  * Step 1: Auth (create account / login)
  * Step 2: Customer details + shipping + customization
@@ -34,6 +34,7 @@ import {
 
 import { PaymentStepAuth } from '@/components/payment/PaymentStepAuth';
 import { PaymentStepDetails } from '@/components/payment/PaymentStepDetails';
+import { useCheckoutProfile } from '@/hooks/useCheckoutProfile';
 
 // ===== Types & Helpers =====
 
@@ -75,6 +76,11 @@ const formatCurrency = (value: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
 const PIX_POLL_TIMEOUT_MS = 15 * 60 * 1000;
+const BOLETO_FLOW_TEMPLATE = [
+  'Seu pedido fica reservado, mas o produto so entra em producao e envio depois da confirmacao do pagamento do boleto.',
+  'Assim que o sistema reconhecer a compensacao do boleto, enviaremos automaticamente a confirmacao por mensagem e o pedido segue para a proxima etapa.',
+  'Se o boleto vencer sem pagamento, o pedido continua fora da receita e aguarda nova acao do cliente.',
+];
 
 // ===== Step Configuration =====
 const steps = [
@@ -90,6 +96,7 @@ const PaymentPage = () => {
   const navigate = useNavigate();
   const { data: companyInfo } = useCompanyInfo();
   const { user, session } = useAuthContext();
+  const { savedProfile, hasProfile, saveProfile } = useCheckoutProfile(user?.id);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'boleto'>('pix');
@@ -157,6 +164,18 @@ const PaymentPage = () => {
       }));
     }
   }, [user, session, currentStep]);
+
+  useEffect(() => {
+    if (!savedProfile) return;
+    setCustomerForm(prev => ({
+      ...prev,
+      name: prev.name || savedProfile.fullName || '',
+      email: prev.email || savedProfile.email || '',
+      phone: prev.phone || savedProfile.phone || '',
+      address: prev.address || savedProfile.address || '',
+      cep: prev.cep || savedProfile.cep || '',
+    }));
+  }, [savedProfile]);
 
   // Load order data
   useEffect(() => {
@@ -369,6 +388,14 @@ const PaymentPage = () => {
       const dbOrderId = await createOrderInDB(updatedState);
       if (!dbOrderId) return;
 
+      await saveProfile({
+        fullName: name,
+        email,
+        phone,
+        address,
+        cep,
+      });
+
       setPaymentState({ ...updatedState, orderId: dbOrderId });
       setCurrentStep(3);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -511,6 +538,19 @@ const PaymentPage = () => {
 
   if (!paymentState) return null;
 
+  const applySavedCheckoutProfile = () => {
+    if (!savedProfile) return;
+    setCustomerForm(prev => ({
+      ...prev,
+      name: savedProfile.fullName || prev.name,
+      email: (user?.email || savedProfile.email || prev.email),
+      phone: savedProfile.phone || prev.phone,
+      address: savedProfile.address || prev.address,
+      cep: savedProfile.cep || prev.cep,
+    }));
+    toast.success('Dados de entrega preenchidos em 1 clique.');
+  };
+
   const pixAmount = paymentState.amount * (1 - pixDiscount / 100);
   const installments = calculateInstallments(paymentState.amount);
   const progress = (currentStep / steps.length) * 100;
@@ -585,6 +625,20 @@ const PaymentPage = () => {
               {/* Step 2: Details */}
               {currentStep === 2 && (
                 <>
+                  {hasProfile && (
+                    <Card className="border-primary/20 bg-primary/5">
+                      <CardContent className="pt-5 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-medium">Cliente recorrente detectado.</p>
+                          <p className="text-xs text-muted-foreground">Use seus dados salvos para finalizar mais rápido.</p>
+                        </div>
+                        <Button type="button" onClick={applySavedCheckoutProfile}>
+                          Usar dados salvos
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+
                   <PaymentStepDetails
                     customerForm={customerForm}
                     setCustomerForm={setCustomerForm}
@@ -819,6 +873,7 @@ const PaymentPage = () => {
                           <Building2 className="h-5 w-5 text-orange-500" />
                           Boleto Bancário
                         </CardTitle>
+                        <CardDescription>O produto so e liberado apos a confirmacao real do boleto.</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         {!boletoData ? (
@@ -828,6 +883,14 @@ const PaymentPage = () => {
                               <p className="text-sm text-muted-foreground">
                                 Vencimento em {3 + boletoExtraDays} dias
                               </p>
+                            </div>
+                            <div className="rounded-lg border border-orange-500/30 bg-orange-500/10 p-4 text-sm text-left">
+                              <p className="font-medium text-foreground mb-2">Mensagem automatica para pagamento em boleto</p>
+                              <div className="space-y-2 text-muted-foreground">
+                                {BOLETO_FLOW_TEMPLATE.map((item) => (
+                                  <p key={item}>• {item}</p>
+                                ))}
+                              </div>
                             </div>
                             {!paymentState.customerCpf && (
                               <div className="space-y-2">
@@ -865,6 +928,14 @@ const PaymentPage = () => {
                                 <Button variant="outline" onClick={() => copyToClipboard(boletoData.barcode)}>
                                   <Copy className="h-4 w-4" />
                                 </Button>
+                              </div>
+                            </div>
+                            <div className="rounded-lg border border-orange-500/30 bg-orange-500/10 p-4 text-sm text-left">
+                              <p className="font-medium text-foreground mb-2">Como funciona a confirmacao</p>
+                              <div className="space-y-2 text-muted-foreground">
+                                {BOLETO_FLOW_TEMPLATE.map((item) => (
+                                  <p key={item}>• {item}</p>
+                                ))}
                               </div>
                             </div>
                             <Button asChild className="w-full" variant="outline">
@@ -934,3 +1005,5 @@ const PaymentPage = () => {
 };
 
 export default PaymentPage;
+
+

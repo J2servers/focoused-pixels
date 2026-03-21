@@ -1,4 +1,4 @@
-/**
+﻿/**
  * BestSellersSection - Mais vendidos com design limpo
  */
 
@@ -45,9 +45,11 @@ export function BestSellersSection({ onAddToCart }: BestSellersSectionProps) {
         <div className="flex items-end justify-between mb-8">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-              Mais Vendidos
+              Mais Vendidos da Semana
             </h2>
-            <p className="text-sm text-muted-foreground mt-1">Os favoritos dos nossos clientes</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Seleção campeã de pedidos reais e recompra dos clientes
+            </p>
           </div>
           <Link to="/categorias">
             <Button variant="ghost" size="sm" className="text-primary font-semibold group">
@@ -65,6 +67,9 @@ export function BestSellersSection({ onAddToCart }: BestSellersSectionProps) {
               product={product}
               index={index}
               onAddToCart={onAddToCart}
+              highlightBadge={
+                index === 0 ? 'Top #1' : index === 1 ? 'Top #2' : index === 2 ? 'Top #3' : undefined
+              }
             />
           ))}
         </div>
@@ -72,3 +77,4 @@ export function BestSellersSection({ onAddToCart }: BestSellersSectionProps) {
     </section>
   );
 }
+

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { MessageSquarePlus, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -162,3 +162,4 @@ export const ProductReviews = ({ productSlug, productName }: ProductReviewsProps
     </section>
   );
 };
+

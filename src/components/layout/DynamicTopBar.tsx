@@ -1,4 +1,4 @@
-import { Instagram, Facebook, Youtube, Mail, Phone } from 'lucide-react';
+﻿import { Instagram, Facebook, Youtube, Mail, Phone } from 'lucide-react';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 
 // Pinterest icon component since lucide doesn't have it
@@ -98,3 +98,4 @@ export function DynamicTopBar() {
     </div>
   );
 }
+

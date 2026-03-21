@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ProductShareButtons - Share product on social media
  */
 import { Share2, MessageCircle, Facebook, Link2, Check } from 'lucide-react';
@@ -60,3 +60,4 @@ export function ProductShareButtons({ productName, productSlug }: ProductShareBu
     </div>
   );
 }
+

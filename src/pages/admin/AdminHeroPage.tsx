@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { AdminLayout, DataTable, Column, ImageUpload } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -255,7 +255,7 @@ const AdminHeroPage = () => {
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Título</Label>
                 <Input
@@ -274,7 +274,7 @@ const AdminHeroPage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="cta_text">Texto do Botão (CTA)</Label>
                 <Input
@@ -316,7 +316,7 @@ const AdminHeroPage = () => {
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="display_order">Ordem</Label>
                 <Input
@@ -420,3 +420,4 @@ const AdminHeroPage = () => {
 };
 
 export default AdminHeroPage;
+

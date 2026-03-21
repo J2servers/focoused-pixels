@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+﻿import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateSimplesTax } from '@/hooks/useFinancialData';
 
@@ -84,13 +84,24 @@ export function useDashboardMetrics() {
 
       // ===== VENDAS =====
       const activeOrders = allOrders.filter(o => o.order_status !== 'cancelled');
+      const paidOrders = activeOrders.filter(o => o.payment_status === 'paid');
+      const pendingPaymentOrders = activeOrders.filter(o => o.payment_status === 'pending');
+      const failedPaymentOrders = activeOrders.filter(o => ['failed', 'rejected'].includes(o.payment_status || ''));
       const cancelledOrders = allOrders.filter(o => o.order_status === 'cancelled');
 
       const ordersToday = activeOrders.filter(o => new Date(o.created_at) >= todayStart);
       const ordersWeek = activeOrders.filter(o => new Date(o.created_at) >= weekStart);
       const ordersMonth = activeOrders.filter(o => new Date(o.created_at) >= monthStart);
       const ordersYear = activeOrders.filter(o => new Date(o.created_at) >= yearStart);
+      const paidOrdersToday = paidOrders.filter(o => new Date(o.created_at) >= todayStart);
+      const paidOrdersWeek = paidOrders.filter(o => new Date(o.created_at) >= weekStart);
+      const paidOrdersMonth = paidOrders.filter(o => new Date(o.created_at) >= monthStart);
+      const paidOrdersYear = paidOrders.filter(o => new Date(o.created_at) >= yearStart);
       const ordersLastMonth = activeOrders.filter(o => {
+        const d = new Date(o.created_at);
+        return d >= lastMonthStart && d <= lastMonthEnd;
+      });
+      const paidOrdersLastMonth = paidOrders.filter(o => {
         const d = new Date(o.created_at);
         return d >= lastMonthStart && d <= lastMonthEnd;
       });
@@ -104,17 +115,19 @@ export function useDashboardMetrics() {
       const vendasMesAnterior = ordersLastMonth.length;
       const vendasTotal = activeOrders.length;
 
-      const receitaHoje = sum(ordersToday);
-      const receitaSemana = sum(ordersWeek);
-      const receitaMes = sum(ordersMonth);
-      const receitaAno = sum(ordersYear);
-      const receitaMesAnterior = sum(ordersLastMonth);
-      const receitaTotal = sum(activeOrders);
+      const receitaHoje = sum(paidOrdersToday);
+      const receitaSemana = sum(paidOrdersWeek);
+      const receitaMes = sum(paidOrdersMonth);
+      const receitaAno = sum(paidOrdersYear);
+      const receitaMesAnterior = sum(paidOrdersLastMonth);
+      const receitaTotal = sum(paidOrders);
+      const receitaPendente = sum(pendingPaymentOrders);
+      const receitaFalhada = sum(failedPaymentOrders);
 
-      const ticketMedio = vendasTotal > 0 ? receitaTotal / vendasTotal : 0;
-      const ticketMedioHoje = vendasHoje > 0 ? receitaHoje / vendasHoje : 0;
-      const maiorVenda = activeOrders.length > 0 ? Math.max(...activeOrders.map(o => o.total || 0)) : 0;
-      const menorVenda = activeOrders.length > 0 ? Math.min(...activeOrders.filter(o => o.total > 0).map(o => o.total)) : 0;
+      const ticketMedio = paidOrders.length > 0 ? receitaTotal / paidOrders.length : 0;
+      const ticketMedioHoje = paidOrdersToday.length > 0 ? receitaHoje / paidOrdersToday.length : 0;
+      const maiorVenda = paidOrders.length > 0 ? Math.max(...paidOrders.map(o => o.total || 0)) : 0;
+      const menorVenda = paidOrders.filter(o => o.total > 0).length > 0 ? Math.min(...paidOrders.filter(o => o.total > 0).map(o => o.total)) : 0;
 
       const vendasPendentes = allOrders.filter(o => o.order_status === 'pending').length;
       const vendasConfirmadas = allOrders.filter(o => o.order_status === 'confirmed').length;
@@ -128,7 +141,7 @@ export function useDashboardMetrics() {
       const crescimentoReceita = receitaMesAnterior > 0 ? ((receitaMes - receitaMesAnterior) / receitaMesAnterior * 100) : receitaMes > 0 ? 100 : 0;
 
       // ===== PAGAMENTOS =====
-      const byPayment = (method: string) => activeOrders.filter(o => o.payment_method === method);
+      const byPayment = (method: string) => paidOrders.filter(o => o.payment_method === method);
       const pixOrders = byPayment('pix');
       const cardOrders = byPayment('credit_card');
       const boletoOrders = byPayment('boleto');
@@ -172,8 +185,12 @@ export function useDashboardMetrics() {
       const produtosDestaque = allProducts.filter(p => p.is_featured).length;
 
       // Produto mais vendido
+      const paidOrderIds = new Set(paidOrders.map(o => o.id));
+      const paidOrdersById = new Map(paidOrders.map(o => [o.id, o]));
+      const paidOrderItems = allOrderItems.filter(item => item.order_id && paidOrderIds.has(item.order_id));
+
       const productSales = new Map<string, { name: string; qty: number; revenue: number }>();
-      allOrderItems.forEach(item => {
+      paidOrderItems.forEach(item => {
         const key = item.product_name || item.product_id || 'unknown';
         const existing = productSales.get(key);
         if (existing) {
@@ -225,11 +242,15 @@ export function useDashboardMetrics() {
       const topPages = Array.from(pageCounts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([path, views]) => ({ path, views }));
 
       // ===== FINANCEIRO =====
-      const orders12m = activeOrders.filter(o => new Date(o.created_at) >= twelveMonthsAgo);
+      const orders12m = paidOrders.filter(o => new Date(o.created_at) >= twelveMonthsAgo);
       const receitaBruta12m = sum(orders12m);
-      const custoMaterial = allOrderItems.reduce((s, i) => s + (i.cost_material || 0), 0);
-      const custoMaoDeObra = allOrderItems.reduce((s, i) => s + (i.cost_labor || 0), 0);
-      const custoFrete = allOrderItems.reduce((s, i) => s + (i.cost_shipping || 0), 0);
+      const orderItems12m = paidOrderItems.filter(item => {
+        const order = item.order_id ? paidOrdersById.get(item.order_id) : null;
+        return order ? new Date(order.created_at) >= twelveMonthsAgo : false;
+      });
+      const custoMaterial = orderItems12m.reduce((s, i) => s + (i.cost_material || 0), 0);
+      const custoMaoDeObra = orderItems12m.reduce((s, i) => s + (i.cost_labor || 0), 0);
+      const custoFrete = orderItems12m.reduce((s, i) => s + (i.cost_shipping || 0), 0);
       const custoTotal = custoMaterial + custoMaoDeObra + custoFrete;
 
       const anexo = (taxSettings?.simples_anexo || 'III') as 'II' | 'III';
@@ -272,7 +293,7 @@ export function useDashboardMetrics() {
       const bannersAtivos = allHeroSlides.filter(h => h.status === 'active').length;
 
       // ===== VENDAS POR DIA (últimos 7 dias para gráfico) =====
-      const vendasPorDia: { date: string; vendas: number; receita: number }[] = [];
+      const vendasPorDia: { date: string; vendas: number; receita: number; aguardando: number }[] = [];
       for (let i = 6; i >= 0; i--) {
         const day = startOfDay(daysAgo(i));
         const nextDay = new Date(day.getTime() + 86400000);
@@ -280,10 +301,19 @@ export function useDashboardMetrics() {
           const d = new Date(o.created_at);
           return d >= day && d < nextDay;
         });
+        const dayPaidOrders = paidOrders.filter(o => {
+          const d = new Date(o.created_at);
+          return d >= day && d < nextDay;
+        });
+        const dayPendingOrders = pendingPaymentOrders.filter(o => {
+          const d = new Date(o.created_at);
+          return d >= day && d < nextDay;
+        });
         vendasPorDia.push({
           date: day.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' }),
           vendas: dayOrders.length,
-          receita: sum(dayOrders),
+          receita: sum(dayPaidOrders),
+          aguardando: sum(dayPendingOrders),
         });
       }
 
@@ -292,9 +322,9 @@ export function useDashboardMetrics() {
       for (let i = 5; i >= 0; i--) {
         const mStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const mEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
-        const mOrders = activeOrders.filter(o => { const d = new Date(o.created_at); return d >= mStart && d <= mEnd; });
-        const mItems = allOrderItems.filter(item => {
-          const order = allOrders.find(o => o.id === item.order_id);
+        const mOrders = paidOrders.filter(o => { const d = new Date(o.created_at); return d >= mStart && d <= mEnd; });
+        const mItems = paidOrderItems.filter(item => {
+          const order = item.order_id ? paidOrdersById.get(item.order_id) : null;
           if (!order) return false;
           const d = new Date(order.created_at);
           return d >= mStart && d <= mEnd;
@@ -389,6 +419,12 @@ export function useDashboardMetrics() {
         { name: 'Boleto', value: boletoOrders.length, total: sum(boletoOrders), fill: 'hsl(220, 15%, 50%)' },
       ].filter(p => p.value > 0);
 
+      const receitaStatusResumoMes = [
+        { name: 'Recebido', value: sum(paidOrdersMonth), fill: 'hsl(145, 63%, 42%)' },
+        { name: 'Aguardando', value: sum(pendingPaymentOrders.filter(o => new Date(o.created_at) >= monthStart)), fill: 'hsl(45, 93%, 47%)' },
+        { name: 'Falhou', value: sum(failedPaymentOrders.filter(o => new Date(o.created_at) >= monthStart)), fill: 'hsl(0, 72%, 51%)' },
+      ].filter(item => item.value > 0);
+
       const statusDistribution = [
         { name: 'Pendentes', value: vendasPendentes, fill: 'hsl(45, 93%, 47%)' },
         { name: 'Confirmadas', value: vendasConfirmadas, fill: 'hsl(210, 80%, 55%)' },
@@ -434,10 +470,31 @@ export function useDashboardMetrics() {
       for (let i = 5; i >= 0; i--) {
         const mStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const mEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
-        const mOrders = activeOrders.filter(o => { const d = new Date(o.created_at); return d >= mStart && d <= mEnd; });
+        const mOrders = paidOrders.filter(o => { const d = new Date(o.created_at); return d >= mStart && d <= mEnd; });
         ticketPorMes.push({
           mes: mStart.toLocaleDateString('pt-BR', { month: 'short' }),
           ticket: mOrders.length > 0 ? sum(mOrders) / mOrders.length : 0,
+        });
+      }
+
+      const receitaComparativa7d: { date: string; recebido: number; aguardando: number; pedidosPagos: number; pedidosPendentes: number }[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const day = startOfDay(daysAgo(i));
+        const nextDay = new Date(day.getTime() + 86400000);
+        const dayPaidOrders = paidOrders.filter(o => {
+          const d = new Date(o.created_at);
+          return d >= day && d < nextDay;
+        });
+        const dayPendingOrders = pendingPaymentOrders.filter(o => {
+          const d = new Date(o.created_at);
+          return d >= day && d < nextDay;
+        });
+        receitaComparativa7d.push({
+          date: day.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' }),
+          recebido: sum(dayPaidOrders),
+          aguardando: sum(dayPendingOrders),
+          pedidosPagos: dayPaidOrders.length,
+          pedidosPendentes: dayPendingOrders.length,
         });
       }
 
@@ -471,7 +528,7 @@ export function useDashboardMetrics() {
         vendasMesAnterior, vendasPendentes, vendasConfirmadas, vendasProcessando,
         vendasEnviadas, vendasEntregues, vendasCanceladas,
         receitaHoje, receitaSemana, receitaMes, receitaAno, receitaTotal,
-        receitaMesAnterior,
+        receitaMesAnterior, receitaPendente, receitaFalhada,
         ticketMedio, ticketMedioHoje, maiorVenda, menorVenda,
         crescimentoVendas, crescimentoReceita,
         vendasPorDia,
@@ -545,7 +602,7 @@ export function useDashboardMetrics() {
         ticketPorMes, conversaoPorDia,
 
         // GRÁFICOS
-        receitaPorMes, paymentDistribution, statusDistribution,
+        receitaPorMes, paymentDistribution, statusDistribution, receitaStatusResumoMes, receitaComparativa7d,
         leadsPorDia, visitasPorDia, productionDistribution,
         reviewsDistribution, quotesDistribution, productsDistribution,
         caixaPorDia, whatsappDistribution,
@@ -555,3 +612,4 @@ export function useDashboardMetrics() {
     staleTime: 30000,
   });
 }
+

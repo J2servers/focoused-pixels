@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HeroConversion - Hero banner moderno, full-width
  * 100% editável via admin (hero_slides)
  */
@@ -154,3 +154,4 @@ export function HeroConversion() {
     </section>
   );
 }
+

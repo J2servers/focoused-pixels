@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+﻿import { motion } from 'framer-motion';
 import { Sparkles, Shield, Truck, Clock, Award, Zap } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 
@@ -52,3 +52,4 @@ export function DifferentialsSection() {
     </section>
   );
 }
+

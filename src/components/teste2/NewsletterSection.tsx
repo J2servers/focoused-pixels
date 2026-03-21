@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Sparkles, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -117,3 +117,4 @@ export function NewsletterSection() {
     </section>
   );
 }
+

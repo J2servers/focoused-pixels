@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -245,7 +245,7 @@ const AdminCouponsPage = () => {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Código</Label>
                 <Input
@@ -282,7 +282,7 @@ const AdminCouponsPage = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Valor do Desconto</Label>
                 <Input
@@ -303,7 +303,7 @@ const AdminCouponsPage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Desconto Máximo (R$)</Label>
                 <Input
@@ -324,7 +324,7 @@ const AdminCouponsPage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Data Início</Label>
                 <Input
@@ -385,3 +385,4 @@ const AdminCouponsPage = () => {
 };
 
 export default AdminCouponsPage;
+

@@ -1,7 +1,9 @@
-import { AdminLayout } from '@/components/admin';
+﻿import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
+import { useAbandonedCartInsights, useTriggerAbandonedCartRecovery } from '@/hooks/useAbandonedCartInsights';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
@@ -114,7 +116,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 // ===== MOBILE DASHBOARD =====
-function MobileDashboard({ m }: { m: any }) {
+function MobileDashboard({ m, abandoned }: { m: any; abandoned: any }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
@@ -136,24 +138,47 @@ function MobileDashboard({ m }: { m: any }) {
           </ResponsiveContainer>
         </CardContent>
       </Card>
+      <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))]">
+        <CardHeader className="pb-1 pt-3 px-3">
+          <CardTitle className="text-xs text-[hsl(var(--admin-text-muted))]">Recebido x aguardando</CardTitle>
+        </CardHeader>
+        <CardContent className="p-2 h-36">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={m.receitaComparativa7d || []}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
+              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Bar dataKey="recebido" fill="hsl(145,63%,42%)" radius={[3, 3, 0, 0]} name="Recebido" />
+              <Bar dataKey="aguardando" fill="hsl(45,93%,47%)" radius={[3, 3, 0, 0]} name="Aguardando" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
       <div className="grid grid-cols-2 gap-2">
+        <M label="Receita Real" value={m.receitaTotal} icon={DollarSign} color="bg-emerald-700" format="currency" />
+        <M label="A Receber" value={m.receitaPendente} icon={Clock} color="bg-amber-600" format="currency" />
         <M label="Saldo do Dia" value={m.saldoDia} icon={Wallet} color={m.saldoDia >= 0 ? "bg-emerald-600" : "bg-red-600"} format="currency" />
         <M label="Visitas Hoje" value={m.visitasHoje} icon={Eye} color="bg-cyan-600" />
         <M label="Leads Hoje" value={m.leadsHoje} icon={UserPlus} color="bg-pink-600" />
         <M label="Produtos Ativos" value={m.produtosAtivos} icon={Package} color="bg-orange-600" href="/admin/produtos" />
         <M label="Estoque Baixo" value={m.produtosEstoqueBaixo} icon={AlertTriangle} color="bg-yellow-600" />
         <M label="Orçamentos Pend." value={m.orcamentosPendentes} icon={FileText} color="bg-violet-600" href="/admin/orcamentos" />
+        <M label="Sessoes Aband." value={abandoned.sessionsAbandoned} icon={ShoppingBag} color="bg-rose-600" />
+        <M label="Top Abandono" value={abandoned.topProductName} icon={ShoppingBag} color="bg-rose-700" format="text" />
       </div>
     </div>
   );
 }
 
 // ===== DESKTOP DASHBOARD - fully fluid =====
-function DesktopDashboard({ m }: { m: any }) {
+function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
   const funnelData = m.funnelData || [];
   const conversaoPorDia = m.conversaoPorDia || [];
   const ticketPorMes = m.ticketPorMes || [];
   const paymentDistribution = m.paymentDistribution || [];
+  const receitaStatusResumoMes = m.receitaStatusResumoMes || [];
+  const receitaComparativa7d = m.receitaComparativa7d || [];
   const statusDistribution = m.statusDistribution || [];
   const vendasPorDia = m.vendasPorDia || [];
   const receitaPorMes = m.receitaPorMes || [];
@@ -165,7 +190,6 @@ function DesktopDashboard({ m }: { m: any }) {
   const reviewsDistribution = m.reviewsDistribution || [];
   const whatsappDistribution = m.whatsappDistribution || [];
   const caixaPorDia = m.caixaPorDia || [];
-  const topProducts = m.topProducts || [];
   return (
     <div className="grid grid-cols-12 gap-[0.4vw] auto-rows-min">
       {/* ROW 1: Hero KPIs */}
@@ -173,6 +197,63 @@ function DesktopDashboard({ m }: { m: any }) {
       <div className="col-span-3"><HeroKPI label="Receita do Mês" value={m.receitaMes} icon={TrendingUp} color="bg-gradient-to-br from-blue-500 to-blue-600" trend={m.crescimentoReceita} subtitle={`${m.vendasMes} vendas`} /></div>
       <div className="col-span-3"><HeroKPI label="Ticket Médio" value={m.ticketMedio} icon={Target} color="bg-gradient-to-br from-purple-500 to-purple-600" subtitle={`Hoje: R$ ${m.ticketMedioHoje.toFixed(2)}`} /></div>
       <div className="col-span-3"><HeroKPI label="Receita Líquida 12m" value={m.receitaLiquida} icon={TrendingUp} color="bg-gradient-to-br from-teal-500 to-teal-600" subtitle={`Margem: ${m.margemLiquida.toFixed(1)}%`} /></div>
+
+      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+        <CardHeader className="pb-1 pt-[0.5vh] px-[0.6vw]">
+          <CardTitle className="text-[clamp(10px,0.7vw,13px)] text-white">Leitura financeira rápida</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 p-[0.6vw]">
+          <p className="text-[clamp(8px,0.58vw,11px)] text-[hsl(var(--admin-text-muted))]">
+            Receita considera apenas pedidos com pagamento confirmado. Pedidos aguardando boleto, PIX pendente ou pagamentos falhados ficam fora do faturamento.
+          </p>
+          <div className="grid grid-cols-2 gap-[0.3vw]">
+            <M label="Receita Real" value={m.receitaTotal} icon={DollarSign} color="bg-emerald-600" format="currency" />
+            <M label="A Receber" value={m.receitaPendente} icon={Clock} color="bg-amber-600" format="currency" />
+            <M label="Falhou" value={m.receitaFalhada} icon={AlertTriangle} color="bg-red-600" format="currency" />
+            <M label="Pagos" value={m.pagamentosPagos} icon={CheckCircle} color="bg-blue-600" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]">
+          <CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Status financeiro do mês</CardTitle>
+        </CardHeader>
+        <CardContent className="p-[0.3vw] h-[20vh] min-h-[130px]">
+          {receitaStatusResumoMes.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={receitaStatusResumoMes} cx="50%" cy="50%" innerRadius="42%" outerRadius="76%" paddingAngle={4} dataKey="value">
+                  {receitaStatusResumoMes.map((entry: any, index: number) => <Cell key={index} fill={entry.fill} />)}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ fontSize: 10 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-8">Sem movimentação financeira no período</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]">
+          <CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Recebido x aguardando (7 dias)</CardTitle>
+        </CardHeader>
+        <CardContent className="p-[0.3vw] h-[20vh] min-h-[130px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={receitaComparativa7d}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Bar dataKey="recebido" fill="hsl(145,63%,42%)" radius={[3, 3, 0, 0]} name="Recebido" />
+              <Bar dataKey="aguardando" fill="hsl(45,93%,47%)" radius={[3, 3, 0, 0]} name="Aguardando" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
 
       {/* ROW 1.5: Conversion Analytics & Sales Funnel */}
       <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
@@ -245,6 +326,10 @@ function DesktopDashboard({ m }: { m: any }) {
         <M label="R$ Abandonado" value={m.abandonedValue} icon={DollarSign} color="bg-red-700" format="currency" />
         <M label="Recorrentes" value={m.repeatCustomers} icon={Repeat} color="bg-purple-600" />
         <M label="Taxa Recorr." value={m.repeatRate} icon={Repeat} color="bg-purple-700" format="percent" />
+        <M label="Sessoes Aband." value={abandoned.sessionsAbandoned} icon={ShoppingBag} color="bg-rose-600" />
+        <M label="Recuperadas" value={abandoned.sessionsRecovered} icon={CheckCircle} color="bg-emerald-600" />
+        <M label="Tx Recuperacao" value={abandoned.recoveryRate} icon={TrendingUp} color="bg-emerald-700" format="percent" />
+        <M label="Top Abandono" value={abandoned.topProductName} icon={ShoppingBag} color="bg-rose-700" format="text" />
       </div>
 
       <Card className="col-span-5 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
@@ -274,7 +359,9 @@ function DesktopDashboard({ m }: { m: any }) {
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
               <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} />
               <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="receita" stroke="hsl(270,70%,55%)" fill="url(#recGrad)" strokeWidth={2.5} name="Receita (R$)" />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Area type="monotone" dataKey="receita" stroke="hsl(270,70%,55%)" fill="url(#recGrad)" strokeWidth={2.5} name="Receita recebida" />
+              <Area type="monotone" dataKey="aguardando" stroke="hsl(45,93%,47%)" fillOpacity={0} strokeWidth={2} name="Aguardando pagamento" />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>
@@ -543,7 +630,18 @@ function DesktopDashboard({ m }: { m: any }) {
 // ===== MAIN PAGE =====
 const AdminDashboardPage = () => {
   const { data: m, isLoading } = useDashboardMetrics();
+  const { data: abandonedInsights } = useAbandonedCartInsights();
+  const triggerRecovery = useTriggerAbandonedCartRecovery();
   const isMobile = useIsMobile();
+  const abandoned = abandonedInsights || {
+    sessionsAbandoned: 0,
+    sessionsRecovered: 0,
+    remindersSent: 0,
+    recoveryRate: 0,
+    totalAbandonedValue: 0,
+    topProductName: 'N/A',
+    topProducts: [],
+  };
 
   if (isLoading || !m) {
     return (
@@ -559,9 +657,22 @@ const AdminDashboardPage = () => {
 
   return (
     <AdminLayout title="Dashboard">
-      {isMobile ? <MobileDashboard m={m} /> : <DesktopDashboard m={m} />}
+      <div className="mb-3 flex justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => triggerRecovery.mutate()}
+          disabled={triggerRecovery.isPending}
+          className="gap-2 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))]"
+        >
+          <RefreshCw className={cn("h-4 w-4", triggerRecovery.isPending && "animate-spin")} />
+          {triggerRecovery.isPending ? 'Executando recuperacao...' : 'Executar recuperacao de carrinhos'}
+        </Button>
+      </div>
+      {isMobile ? <MobileDashboard m={m} abandoned={abandoned} /> : <DesktopDashboard m={m} abandoned={abandoned} />}
     </AdminLayout>
   );
 };
 
 export default AdminDashboardPage;
+

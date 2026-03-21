@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+﻿import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface CompanyInfo {
@@ -22,6 +22,9 @@ export interface CompanyInfo {
   returns_policy: string | null;
   footer_logo: string | null;
   header_logo: string | null;
+  footer_logo_height: number | null;
+  header_logo_height: number | null;
+  header_logo_mobile_height: number | null;
   free_shipping_minimum: number | null;
   free_shipping_message: string | null;
   installments: number | null;
@@ -89,6 +92,7 @@ export interface CompanyInfo {
   google_tag_manager_id: string | null;
   // Integrations
   whatsapp_message_template: string | null;
+  why_choose_us_config: Record<string, unknown> | null;
   enable_reviews_auto_approve: boolean | null;
   reviews_min_rating_to_show: number | null;
   // Payment gateway flags kept for backward compatibility (credentials in payment_credentials table)
@@ -108,11 +112,6 @@ export interface CompanyInfo {
   boleto_extra_days: number | null;
   max_installments: number | null;
   min_installment_value: number | null;
-  // Why Choose Us & Branding
-  why_choose_us_config: Record<string, any> | null;
-  logo_sidebar_size: number | null;
-  logo_header_size: number | null;
-  logo_mobile_size: number | null;
 }
 
 // Default fallback values when no data is in the database
@@ -134,8 +133,11 @@ const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
   privacy_policy: null,
   terms_of_service: null,
   returns_policy: null,
-  footer_logo: null,
-  header_logo: null,
+  footer_logo: '/favicon-pincel.png',
+  header_logo: '/favicon-pincel.png',
+  footer_logo_height: 48,
+  header_logo_height: 64,
+  header_logo_mobile_height: 36,
   free_shipping_minimum: 159,
   free_shipping_message: 'Frete grátis em compras acima de R$ 159',
   installments: 12,
@@ -146,7 +148,7 @@ const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
   seo_description: 'Produtos personalizados em acrílico, MDF e LED. Letreiros, displays, crachás e muito mais.',
   seo_keywords: 'acrílico personalizado, letreiro neon, display qr code, crachás personalizados',
   og_image: null,
-  favicon_url: null,
+  favicon_url: '/favicon-pincel.png',
   // Appearance
   primary_color: '#7c3aed',
   secondary_color: '#10b981',
@@ -203,6 +205,7 @@ const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
   google_tag_manager_id: null,
   // Integrations
   whatsapp_message_template: 'Olá! Gostaria de saber mais sobre os produtos da Pincel de Luz.',
+  why_choose_us_config: null,
   enable_reviews_auto_approve: false,
   reviews_min_rating_to_show: 1,
   // Payment flags (credentials are in payment_credentials table)
@@ -222,11 +225,25 @@ const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
   boleto_extra_days: 3,
   max_installments: 12,
   min_installment_value: 50,
-  // Why Choose Us & Branding
-  why_choose_us_config: null,
-  logo_sidebar_size: 120,
-  logo_header_size: 160,
-  logo_mobile_size: 100,
+};
+
+const sanitizeCompanyPayload = (data: Partial<CompanyInfo>) =>
+  Object.fromEntries(
+    Object.entries(data).filter(([key, value]) => {
+      if (key === 'id') return false;
+      if (value === undefined) return false;
+      if (typeof value === 'number' && !Number.isFinite(value)) return false;
+      return true;
+    }),
+  ) as Partial<CompanyInfo>;
+
+const stripOptionalCompanyColumns = (data: Partial<CompanyInfo>) => {
+  const retryPayload = { ...data };
+  delete retryPayload.header_logo_height;
+  delete retryPayload.header_logo_mobile_height;
+  delete retryPayload.footer_logo_height;
+  delete retryPayload.why_choose_us_config;
+  return retryPayload;
 };
 
 export function useCompanyInfo() {
@@ -262,23 +279,43 @@ export function useUpdateCompanyInfo() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data, ...directData }: { id?: string | null; data?: Partial<CompanyInfo> } & Partial<CompanyInfo>) => {
-      // Support both { id, data } pattern and direct properties
-      const updateData = data || directData;
+    mutationFn: async ({ id, data }: { id: string | null; data: Partial<CompanyInfo> }) => {
+      const sanitizedData = sanitizeCompanyPayload(data);
+
       // Ensure company_name is present for insert operations
-      const insertData = { company_name: data.company_name || 'Pincel de Luz Personalizados', ...data };
+      const insertData = { company_name: sanitizedData.company_name || 'Pincel de Luz Personalizados', ...sanitizedData };
       
       if (id) {
         const { error } = await supabase
           .from('company_info')
-          .update(data)
+          .update(sanitizedData)
           .eq('id', id);
-        if (error) throw error;
+        if (!error) return;
+
+        const retryPayload = stripOptionalCompanyColumns(sanitizedData);
+        const shouldRetry = error.code === '42703' || error.message?.toLowerCase().includes('column');
+
+        if (shouldRetry && Object.keys(retryPayload).length > 0) {
+          const retry = await supabase.from('company_info').update(retryPayload).eq('id', id);
+          if (!retry.error) return;
+        }
+
+        throw error;
       } else {
         const { error } = await supabase
           .from('company_info')
           .insert([insertData]);
-        if (error) throw error;
+        if (!error) return;
+
+        const retryPayload = stripOptionalCompanyColumns(insertData);
+        const shouldRetry = error.code === '42703' || error.message?.toLowerCase().includes('column');
+
+        if (shouldRetry) {
+          const retry = await supabase.from('company_info').insert([retryPayload]);
+          if (!retry.error) return;
+        }
+
+        throw error;
       }
     },
     onSuccess: () => {
@@ -286,3 +323,4 @@ export function useUpdateCompanyInfo() {
     },
   });
 }
+

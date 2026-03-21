@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Index - Homepage com tema Neumorphism
  */
 
@@ -30,6 +30,8 @@ import {
   SocialProofSection,
   BestSellersSection,
   GuaranteesSection,
+  HowItWorksSection,
+  WeeklyUrgencySection,
 } from '@/components/conversion';
 
 /* ── Category visual cards ── */
@@ -42,7 +44,7 @@ function CategoriesShowcase({ categories }: { categories: any[] }) {
         <div className="flex items-end justify-between mb-8">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Categorias</h2>
-            <p className="text-sm text-muted-foreground mt-1">Encontre o produto perfeito</p>
+            <p className="text-sm text-muted-foreground mt-1">Escolha sua base e personalize em poucos passos</p>
           </div>
           <Link to="/categorias">
             <Button variant="ghost" size="sm" className="text-primary font-semibold group">
@@ -168,8 +170,8 @@ const Index = () => {
           {!productsLoading && products.length === 0 && (
             <div className="py-12 px-4 text-center">
               <div className="rounded-2xl neu-concave p-8">
-                <h2 className="text-lg font-bold mb-2">Catálogo em construção</h2>
-                <p className="text-sm text-muted-foreground mb-4">Em breve teremos produtos disponíveis.</p>
+                <h2 className="text-lg font-bold mb-2">Catálogo em atualização</h2>
+                <p className="text-sm text-muted-foreground mb-4">Estamos preparando uma vitrine ainda mais completa para você.</p>
                 <Link to="/sobre"><Button size="sm">Saiba mais</Button></Link>
               </div>
             </div>
@@ -201,8 +203,14 @@ const Index = () => {
           <CategoriesShowcase categories={parentCategories} />
         )}
 
+        {/* Como funciona */}
+        <HowItWorksSection />
+
         {/* Best Sellers */}
         <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
+
+        {/* Urgência honesta */}
+        <WeeklyUrgencySection />
 
         {/* Category Sections */}
         {productsLoading || categoriesLoading ? (
@@ -241,8 +249,8 @@ const Index = () => {
           <section className="py-16">
             <div className="container mx-auto px-4 text-center">
               <div className="rounded-2xl neu-concave p-12 max-w-lg mx-auto">
-                <h2 className="text-2xl font-bold mb-4">Catálogo em construção</h2>
-                <p className="text-muted-foreground mb-6">Em breve teremos produtos disponíveis.</p>
+                <h2 className="text-2xl font-bold mb-4">Catálogo em atualização</h2>
+                <p className="text-muted-foreground mb-6">Estamos organizando uma seleção especial com produtos prontos para personalização.</p>
                 <Link to="/sobre"><Button size="lg">Saiba mais</Button></Link>
               </div>
             </div>
@@ -262,3 +270,4 @@ const Index = () => {
 };
 
 export default Index;
+

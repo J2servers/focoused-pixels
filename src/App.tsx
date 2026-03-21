@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+﻿import { lazy, Suspense } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +9,7 @@ import { SiteSettingsProvider } from "@/components/providers/SiteSettingsProvide
 import { PageViewTracker } from "@/components/PageViewTracker";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAbandonedCartTracker } from "@/hooks/useAbandonedCartTracker";
 
 // Eager-load homepage for fast FCP
 import Index from "./pages/Index";
@@ -23,6 +24,7 @@ const SearchPage = lazy(() => import("./pages/SearchPage"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
 const QuoteSuccessPage = lazy(() => import("./pages/QuoteSuccessPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
+const WhyChooseUsPage = lazy(() => import("./pages/WhyChooseUsPage"));
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
 const TermsPage = lazy(() => import("./pages/TermsPage"));
 const FAQPage = lazy(() => import("./pages/FAQPage"));
@@ -58,8 +60,9 @@ const AdminKanbanPage = lazy(() => import("./pages/admin/AdminKanbanPage"));
 const AdminQuotesPage = lazy(() => import("./pages/admin/AdminQuotesPage"));
 const AdminApiDocsPage = lazy(() => import("./pages/admin/AdminApiDocsPage"));
 const AdminWhatsAppPage = lazy(() => import("./pages/admin/AdminWhatsAppPage"));
-const AdminEmailTemplatesPage = lazy(() => import("./pages/admin/AdminEmailTemplatesPage"));
+const AdminTemplatesPage = lazy(() => import("./pages/admin/AdminEmailTemplatesPage"));
 const AdminMediaPage = lazy(() => import("./pages/admin/AdminMediaPage"));
+const AdminWhyChooseUsPage = lazy(() => import("./pages/admin/AdminWhyChooseUsPage"));
 
 const queryClient = new QueryClient();
 
@@ -72,16 +75,22 @@ const PageLoader = () => (
   </div>
 );
 
+const RuntimeTrackers = () => {
+  useAbandonedCartTracker();
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <SiteSettingsProvider>
             <ScrollToTop />
             <PageViewTracker />
+            <RuntimeTrackers />
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<Index />} />
@@ -100,6 +109,7 @@ const App = () => (
                 <Route path="/pagamento/pendente" element={<PaymentPendingPage />} />
                 
                 <Route path="/sobre" element={<AboutPage />} />
+                <Route path="/por-que-escolher" element={<WhyChooseUsPage />} />
                 <Route path="/privacidade" element={<PrivacyPage />} />
                 <Route path="/termos" element={<TermsPage />} />
                 <Route path="/faq" element={<FAQPage />} />
@@ -128,8 +138,10 @@ const App = () => (
                 <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
                 <Route path="/admin/api" element={<AdminApiDocsPage />} />
                 <Route path="/admin/whatsapp" element={<AdminWhatsAppPage />} />
-                <Route path="/admin/email-templates" element={<AdminEmailTemplatesPage />} />
+                <Route path="/admin/templates" element={<AdminTemplatesPage />} />
+                <Route path="/admin/email-templates" element={<AdminTemplatesPage />} />
                 <Route path="/admin/midia" element={<AdminMediaPage />} />
+                <Route path="/admin/pagina-por-que-escolher" element={<AdminWhyChooseUsPage />} />
                 
                 <Route path="/teste" element={<TestePage />} />
                 <Route path="/teste2" element={<Teste2Page />} />
@@ -144,3 +156,4 @@ const App = () => (
 );
 
 export default App;
+

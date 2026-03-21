@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@/components/ui/card';
+﻿import { Card, CardContent } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCashSummary } from '@/hooks/useCashFlow';
@@ -83,3 +83,4 @@ export function CashFlowSummaryCards({ startDate, endDate }: CashFlowSummaryCard
     </div>
   );
 }
+

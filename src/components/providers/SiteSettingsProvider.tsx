@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SiteSettingsProvider
  * 
  * Provedor global que aplica configurações dinâmicas do admin ao site:
@@ -14,6 +14,7 @@ import { useEffect, ReactNode } from 'react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { MaintenancePage } from '@/pages/MaintenancePage';
 import { useLocation } from 'react-router-dom';
+import logoPincelDeLuz from '@/assets/logo-pincel-de-luz.png';
 
 interface SiteSettingsProviderProps {
   children: ReactNode;
@@ -159,16 +160,15 @@ export function SiteSettingsProvider({ children }: SiteSettingsProviderProps) {
       ogImageMeta.setAttribute('content', settings.ogImage);
     }
 
-    // Update favicon
-    if (settings.faviconUrl) {
-      let faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-      if (!faviconLink) {
-        faviconLink = document.createElement('link');
-        faviconLink.rel = 'icon';
-        document.head.appendChild(faviconLink);
-      }
-      faviconLink.href = settings.faviconUrl;
+    // Update favicon (always keep a valid fallback)
+    const faviconHref = settings.faviconUrl || logoPincelDeLuz;
+    let faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
+    if (!faviconLink) {
+      faviconLink = document.createElement('link');
+      faviconLink.rel = 'icon';
+      document.head.appendChild(faviconLink);
     }
+    faviconLink.href = faviconHref;
   }, [settings.seoTitle, settings.seoDescription, settings.seoKeywords, settings.ogImage, settings.faviconUrl, settings.isLoading]);
 
   // Load Google Analytics
@@ -265,3 +265,4 @@ declare global {
     dataLayer?: unknown[];
   }
 }
+

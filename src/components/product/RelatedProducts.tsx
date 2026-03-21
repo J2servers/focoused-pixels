@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { Product, getRelatedProducts } from '@/data/products';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -121,3 +121,4 @@ export function RelatedProducts({ product, limit = 4 }: RelatedProductsProps) {
     </FadeInView>
   );
 }
+

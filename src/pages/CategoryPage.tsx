@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { TopBar } from '@/components/layout/TopBar';
 import { MainHeader } from '@/components/layout/MainHeader';
@@ -467,3 +467,4 @@ const CategoryPage = () => {
 };
 
 export default CategoryPage;
+

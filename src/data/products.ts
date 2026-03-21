@@ -1,4 +1,4 @@
-// Dados de produtos - Goat Comunicação Visual
+﻿// Dados de produtos - Goat Comunicação Visual
 // Importar imagens de produtos
 import displayQrCode from '@/assets/products/display-qr-code.jpg';
 import crachasAcrilico from '@/assets/products/crachas-acrilico.jpg';
@@ -654,3 +654,4 @@ export const getBestSellers = (): Product[] => {
 export const getNewArrivals = (): Product[] => {
   return products.filter((p) => p.badge === 'lancamento');
 };
+

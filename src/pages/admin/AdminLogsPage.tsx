@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { AdminLayout, DataTable, Column } from '@/components/admin';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -190,3 +190,4 @@ const AdminLogsPage = () => {
 };
 
 export default AdminLogsPage;
+

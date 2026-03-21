@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -104,3 +104,4 @@ const PaymentSuccessPage = () => {
 };
 
 export default PaymentSuccessPage;
+

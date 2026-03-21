@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SiteVisitsCard - Card de visitas do site para o dashboard admin
  */
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -90,3 +90,4 @@ export function SiteVisitsCard() {
     </Card>
   );
 }
+

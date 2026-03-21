@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FirstPurchaseBanner - Shows first-purchase discount on login/register pages
  */
 import { Gift, Percent, Truck } from 'lucide-react';
@@ -26,3 +26,4 @@ export function FirstPurchaseBanner() {
     </div>
   );
 }
+

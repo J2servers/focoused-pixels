@@ -1,4 +1,4 @@
-/**
+﻿/**
  * QuoteSuccessPage - Página de sucesso após envio de orçamento
  * 
  * CONFIGURAÇÕES USADAS (Admin > Configurações > Checkout):
@@ -86,3 +86,4 @@ const QuoteSuccessPage = () => {
 };
 
 export default QuoteSuccessPage;
+

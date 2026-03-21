@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SocialProofSection - Prova social com design neumorphism
  */
 
@@ -124,3 +124,4 @@ export function SocialProofSection() {
     </section>
   );
 }
+

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CookieBanner - Banner de consentimento de cookies
  * 
  * CONFIGURAÇÕES USADAS (Admin > Configurações > LGPD):
@@ -63,3 +63,4 @@ export function CookieBanner() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ViewingNowBadge - Badge de "X pessoas vendo agora"
  * Cria FOMO e urgência, aumentando conversão em +25%
  */
@@ -99,3 +99,4 @@ export function ViewingNowBadge({
     </motion.div>
   );
 }
+

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { AdminLayout, DataTable, Column, ImageUpload } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -526,7 +526,7 @@ const AdminCategoriesPage = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="display_order" className="text-white">Ordem</Label>
                 <Input
@@ -607,3 +607,4 @@ const AdminCategoriesPage = () => {
 };
 
 export default AdminCategoriesPage;
+
