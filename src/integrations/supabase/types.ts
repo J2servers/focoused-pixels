@@ -14,6 +14,107 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_cart_reminders: {
+        Row: {
+          channel: string
+          converted_at: string | null
+          coupon_code: string | null
+          coupon_discount: number | null
+          created_at: string
+          id: string
+          message_text: string | null
+          opened_at: string | null
+          sent_at: string | null
+          session_id: string
+          status: string
+        }
+        Insert: {
+          channel?: string
+          converted_at?: string | null
+          coupon_code?: string | null
+          coupon_discount?: number | null
+          created_at?: string
+          id?: string
+          message_text?: string | null
+          opened_at?: string | null
+          sent_at?: string | null
+          session_id: string
+          status?: string
+        }
+        Update: {
+          channel?: string
+          converted_at?: string | null
+          coupon_code?: string | null
+          coupon_discount?: number | null
+          created_at?: string
+          id?: string
+          message_text?: string | null
+          opened_at?: string | null
+          sent_at?: string | null
+          session_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abandoned_cart_reminders_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "abandoned_cart_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      abandoned_cart_sessions: {
+        Row: {
+          cart_items: Json
+          cart_total: number
+          coupon_code: string | null
+          created_at: string
+          id: string
+          last_activity_at: string
+          recovered: boolean
+          recovered_at: string | null
+          reminder_sent: boolean
+          reminder_sent_at: string | null
+          session_id: string
+          user_email: string | null
+          user_name: string | null
+          user_phone: string | null
+        }
+        Insert: {
+          cart_items?: Json
+          cart_total?: number
+          coupon_code?: string | null
+          created_at?: string
+          id?: string
+          last_activity_at?: string
+          recovered?: boolean
+          recovered_at?: string | null
+          reminder_sent?: boolean
+          reminder_sent_at?: string | null
+          session_id: string
+          user_email?: string | null
+          user_name?: string | null
+          user_phone?: string | null
+        }
+        Update: {
+          cart_items?: Json
+          cart_total?: number
+          coupon_code?: string | null
+          created_at?: string
+          id?: string
+          last_activity_at?: string
+          recovered?: boolean
+          recovered_at?: string | null
+          reminder_sent?: boolean
+          reminder_sent_at?: string | null
+          session_id?: string
+          user_email?: string | null
+          user_name?: string | null
+          user_phone?: string | null
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           created_at: string
@@ -225,6 +326,9 @@ export type Database = {
           id: string
           installments: number | null
           lgpd_contact_email: string | null
+          logo_header_size: number | null
+          logo_mobile_size: number | null
+          logo_sidebar_size: number | null
           low_stock_threshold: number | null
           maintenance_message: string | null
           maintenance_mode: boolean | null
@@ -277,6 +381,7 @@ export type Database = {
           warranty: string | null
           whatsapp: string | null
           whatsapp_message_template: string | null
+          why_choose_us_config: Json | null
         }
         Insert: {
           abandoned_cart_reminder_hours?: number | null
@@ -321,6 +426,9 @@ export type Database = {
           id?: string
           installments?: number | null
           lgpd_contact_email?: string | null
+          logo_header_size?: number | null
+          logo_mobile_size?: number | null
+          logo_sidebar_size?: number | null
           low_stock_threshold?: number | null
           maintenance_message?: string | null
           maintenance_mode?: boolean | null
@@ -373,6 +481,7 @@ export type Database = {
           warranty?: string | null
           whatsapp?: string | null
           whatsapp_message_template?: string | null
+          why_choose_us_config?: Json | null
         }
         Update: {
           abandoned_cart_reminder_hours?: number | null
@@ -417,6 +526,9 @@ export type Database = {
           id?: string
           installments?: number | null
           lgpd_contact_email?: string | null
+          logo_header_size?: number | null
+          logo_mobile_size?: number | null
+          logo_sidebar_size?: number | null
           low_stock_threshold?: number | null
           maintenance_message?: string | null
           maintenance_mode?: boolean | null
@@ -469,6 +581,7 @@ export type Database = {
           warranty?: string | null
           whatsapp?: string | null
           whatsapp_message_template?: string | null
+          why_choose_us_config?: Json | null
         }
         Relationships: []
       }
@@ -642,6 +755,45 @@ export type Database = {
           subtitle?: string | null
           theme?: string | null
           title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hostinger_email_credentials: {
+        Row: {
+          id: string
+          is_active: boolean
+          reply_to: string | null
+          smtp_host: string
+          smtp_password: string | null
+          smtp_port: number
+          smtp_user: string | null
+          test_email: string | null
+          test_mode: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          is_active?: boolean
+          reply_to?: string | null
+          smtp_host?: string
+          smtp_password?: string | null
+          smtp_port?: number
+          smtp_user?: string | null
+          test_email?: string | null
+          test_mode?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          is_active?: boolean
+          reply_to?: string | null
+          smtp_host?: string
+          smtp_password?: string | null
+          smtp_port?: number
+          smtp_user?: string | null
+          test_email?: string | null
+          test_mode?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -1648,6 +1800,42 @@ export type Database = {
           recipient_phone?: string
           sent_at?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      whatsapp_templates: {
+        Row: {
+          category: string
+          channel: string
+          created_at: string
+          id: string
+          is_active: boolean
+          message_text: string
+          name: string
+          updated_at: string
+          variables: string[] | null
+        }
+        Insert: {
+          category?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          message_text: string
+          name: string
+          updated_at?: string
+          variables?: string[] | null
+        }
+        Update: {
+          category?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          message_text?: string
+          name?: string
+          updated_at?: string
+          variables?: string[] | null
         }
         Relationships: []
       }

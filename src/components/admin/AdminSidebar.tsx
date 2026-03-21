@@ -61,6 +61,7 @@ const menuItems = [
   { title: 'Usuários', url: '/admin/usuarios', icon: Users, adminOnly: true },
   { title: 'API & CRM', url: '/admin/api', icon: Webhook },
   { title: 'Logs', url: '/admin/logs', icon: FileText },
+  { title: 'Pág. Conversão', url: '/admin/pagina-por-que-escolher', icon: Sparkles },
   { title: 'Configurações', url: '/admin/configuracoes', icon: Settings },
 ];
 

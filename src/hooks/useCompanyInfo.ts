@@ -108,6 +108,11 @@ export interface CompanyInfo {
   boleto_extra_days: number | null;
   max_installments: number | null;
   min_installment_value: number | null;
+  // Why Choose Us & Branding
+  why_choose_us_config: Record<string, any> | null;
+  logo_sidebar_size: number | null;
+  logo_header_size: number | null;
+  logo_mobile_size: number | null;
 }
 
 // Default fallback values when no data is in the database
@@ -217,6 +222,11 @@ const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
   boleto_extra_days: 3,
   max_installments: 12,
   min_installment_value: 50,
+  // Why Choose Us & Branding
+  why_choose_us_config: null,
+  logo_sidebar_size: 120,
+  logo_header_size: 160,
+  logo_mobile_size: 100,
 };
 
 export function useCompanyInfo() {
@@ -252,7 +262,9 @@ export function useUpdateCompanyInfo() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string | null; data: Partial<CompanyInfo> }) => {
+    mutationFn: async ({ id, data, ...directData }: { id?: string | null; data?: Partial<CompanyInfo> } & Partial<CompanyInfo>) => {
+      // Support both { id, data } pattern and direct properties
+      const updateData = data || directData;
       // Ensure company_name is present for insert operations
       const insertData = { company_name: data.company_name || 'Pincel de Luz Personalizados', ...data };
       

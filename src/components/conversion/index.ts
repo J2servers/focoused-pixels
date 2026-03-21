@@ -11,3 +11,5 @@ export { BestSellersSection } from './BestSellersSection';
 export { GuaranteesSection } from './GuaranteesSection';
 export { FreeShippingProgress } from './FreeShippingProgress';
 export { ViewingNowBadge } from './ViewingNowBadge';
+export { HowItWorksSection } from './HowItWorksSection';
+export { WeeklyUrgencySection } from './WeeklyUrgencySection';
