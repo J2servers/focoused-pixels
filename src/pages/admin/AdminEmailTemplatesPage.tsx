@@ -104,7 +104,7 @@ const SAMPLE_VALUES: Record<string, string> = {
   '{{company_name}}': 'Pincel de Luz',
 };
 
-const replaceVariables = (text: string) => TEMPLATE_VARIABLES.reduce((acc, key) => acc.replaceAll(key, SAMPLE_VALUES[key] || key), text);
+const replaceVariables = (text: string) => TEMPLATE_VARIABLES.reduce((acc, key) => acc.split(key).join(SAMPLE_VALUES[key] || key), text);
 
 const sanitizePreviewHtml = (html: string) => {
   if (typeof window === 'undefined') return html;
