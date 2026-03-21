@@ -318,11 +318,14 @@ export type Database = {
           favicon_url: string | null
           fixed_shipping_value: number | null
           footer_logo: string | null
+          footer_logo_height: number | null
           free_shipping_message: string | null
           free_shipping_minimum: number | null
           google_analytics_id: string | null
           google_tag_manager_id: string | null
           header_logo: string | null
+          header_logo_height: number | null
+          header_logo_mobile_height: number | null
           id: string
           installments: number | null
           lgpd_contact_email: string | null
@@ -418,11 +421,14 @@ export type Database = {
           favicon_url?: string | null
           fixed_shipping_value?: number | null
           footer_logo?: string | null
+          footer_logo_height?: number | null
           free_shipping_message?: string | null
           free_shipping_minimum?: number | null
           google_analytics_id?: string | null
           google_tag_manager_id?: string | null
           header_logo?: string | null
+          header_logo_height?: number | null
+          header_logo_mobile_height?: number | null
           id?: string
           installments?: number | null
           lgpd_contact_email?: string | null
@@ -518,11 +524,14 @@ export type Database = {
           favicon_url?: string | null
           fixed_shipping_value?: number | null
           footer_logo?: string | null
+          footer_logo_height?: number | null
           free_shipping_message?: string | null
           free_shipping_minimum?: number | null
           google_analytics_id?: string | null
           google_tag_manager_id?: string | null
           header_logo?: string | null
+          header_logo_height?: number | null
+          header_logo_mobile_height?: number | null
           id?: string
           installments?: number | null
           lgpd_contact_email?: string | null
@@ -672,6 +681,54 @@ export type Database = {
           usage_count?: number | null
           usage_limit?: number | null
           value?: number
+        }
+        Relationships: []
+      }
+      email_credentials: {
+        Row: {
+          business_email: string | null
+          email_enabled: boolean | null
+          id: string
+          reply_to_email: string | null
+          sender_name: string | null
+          smtp_host: string | null
+          smtp_password: string | null
+          smtp_port: number | null
+          smtp_secure: boolean | null
+          smtp_username: string | null
+          test_mode: boolean | null
+          test_recipient: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_email?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          reply_to_email?: string | null
+          sender_name?: string | null
+          smtp_host?: string | null
+          smtp_password?: string | null
+          smtp_port?: number | null
+          smtp_secure?: boolean | null
+          smtp_username?: string | null
+          test_mode?: boolean | null
+          test_recipient?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_email?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          reply_to_email?: string | null
+          sender_name?: string | null
+          smtp_host?: string | null
+          smtp_password?: string | null
+          smtp_port?: number | null
+          smtp_secure?: boolean | null
+          smtp_username?: string | null
+          test_mode?: boolean | null
+          test_recipient?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
