@@ -80,15 +80,27 @@ serve(async (req) => {
     const destCoord = stateCoords[destUF] || stateCoords['SP'];
     const distance = haversineDistance(origCoord[0], origCoord[1], destCoord[0], destCoord[1]);
 
-    const productWeight = weight || 0.5; // kg
+    const productWeight = weight || 0.5; // kg (total cart weight)
     const price = productPrice || 0;
 
-    // Base freight calculation based on distance and weight
-    const distanceFactor = Math.max(1, distance / 500); // normalize
-    const weightFactor = Math.max(1, productWeight / 0.3);
+    // ===== Weight-based pricing tiers (Correios-inspired) =====
+    // Base cost increases with weight tiers
+    let weightMultiplier = 1;
+    if (productWeight <= 0.3) weightMultiplier = 0.8;
+    else if (productWeight <= 1) weightMultiplier = 1;
+    else if (productWeight <= 3) weightMultiplier = 1.4;
+    else if (productWeight <= 5) weightMultiplier = 1.8;
+    else if (productWeight <= 10) weightMultiplier = 2.5;
+    else if (productWeight <= 20) weightMultiplier = 3.5;
+    else if (productWeight <= 30) weightMultiplier = 4.5;
+    else weightMultiplier = 5.5; // 30kg+
 
-    const pacBase = 8 + (distanceFactor * 4.5) + (weightFactor * 2);
-    const sedexBase = pacBase * 1.9;
+    // Distance factor (normalized)
+    const distanceFactor = Math.max(1, distance / 500);
+
+    // Base prices with weight and distance
+    const pacBase = (10 + (distanceFactor * 5)) * weightMultiplier;
+    const sedexBase = pacBase * 1.85;
     const expressBase = sedexBase * 1.5;
 
     // Same state discount
@@ -99,8 +111,9 @@ serve(async (req) => {
     const sedexPrice = Math.round(sedexBase * stateDiscount * 100) / 100;
     const expressPrice = Math.round(expressBase * stateDiscount * 100) / 100;
 
-    // Days estimation based on distance
-    const pacDaysMin = sameState ? 5 : Math.ceil(6 + distance / 800);
+    // Days estimation - heavier items may take slightly longer
+    const heavyPenalty = productWeight > 10 ? 1 : 0;
+    const pacDaysMin = sameState ? 5 : Math.ceil(6 + distance / 800) + heavyPenalty;
     const pacDaysMax = pacDaysMin + 4;
     const sedexDaysMin = sameState ? 2 : Math.ceil(3 + distance / 1500);
     const sedexDaysMax = sedexDaysMin + 2;
@@ -147,6 +160,7 @@ serve(async (req) => {
       },
       hasFreeShipping,
       distance: Math.round(distance),
+      totalWeight: productWeight,
     }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

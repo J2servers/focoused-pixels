@@ -44,6 +44,7 @@ interface PaymentStepDetailsProps {
   setUploadedFiles: React.Dispatch<React.SetStateAction<{ name: string; url: string }[]>>;
   amount: number;
   shippingCost: number;
+  cartWeight?: number;
   onShippingChange: (cost: number, method: string, city: string, state: string) => void;
   onSubmit: () => void;
   isProcessing: boolean;
@@ -72,6 +73,7 @@ export function PaymentStepDetails({
   setUploadedFiles,
   amount,
   shippingCost,
+  cartWeight = 0.5,
   onShippingChange,
   onSubmit,
   isProcessing,
@@ -99,9 +101,9 @@ export function PaymentStepDetails({
       const { data, error } = await supabase.functions.invoke('calculate-freight', {
         body: {
           destinationCep: cleanCep,
-          productPrice: amount - shippingCost, // subtotal only
-          weight: 0.5,
-          freeShippingMinimum: 0, // let backend decide
+          productPrice: amount - shippingCost,
+          weight: cartWeight,
+          freeShippingMinimum: 0,
         },
       });
 
