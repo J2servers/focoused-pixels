@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,8 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  User, Upload, FileImage, X, Type, Loader2, CheckCircle2
+  User, Upload, FileImage, X, Type, Loader2, CheckCircle2, Truck
 } from 'lucide-react';
+import { FreightCalculator } from '@/components/product/FreightCalculator';
 
 interface CustomerFormData {
   name: string;
@@ -34,6 +35,8 @@ interface PaymentStepDetailsProps {
   uploadedFiles: { name: string; url: string }[];
   setUploadedFiles: React.Dispatch<React.SetStateAction<{ name: string; url: string }[]>>;
   amount: number;
+  shippingCost: number;
+  onShippingChange: (cost: number) => void;
   onSubmit: () => void;
   isProcessing: boolean;
 }
