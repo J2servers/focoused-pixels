@@ -40,6 +40,10 @@ interface Product {
   cost_labor?: number | null;
   cost_shipping?: number | null;
   min_stock?: number | null;
+  weight_kg?: number | null;
+  length_cm?: number | null;
+  width_cm?: number | null;
+  height_cm?: number | null;
 }
 
 interface Category {
