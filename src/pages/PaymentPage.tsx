@@ -42,6 +42,7 @@ interface PaymentState {
   orderId: string;
   amount: number;
   shippingCost: number;
+  shippingMethod: string;
   customerName: string;
   customerEmail: string;
   customerCpf: string;
@@ -203,6 +204,7 @@ const PaymentPage = () => {
               orderId: data.orderId,
               amount: itemsAmount + shippingCost,
               shippingCost,
+              shippingMethod: data.shipping?.method || '',
               customerName: data.customerName || '',
               customerEmail: data.customerEmail || '',
               customerCpf: data.customerCpf || '',
@@ -236,6 +238,7 @@ const PaymentPage = () => {
           orderId: order.id,
           amount: order.total,
           shippingCost: order.shipping_cost || 0,
+          shippingMethod: order.shipping_method || '',
           customerName: order.customer_name,
           customerEmail: order.customer_email,
           customerCpf: '',
@@ -350,7 +353,7 @@ const PaymentPage = () => {
       subtotal: state.amount - state.shippingCost,
       total: state.amount,
       shipping_cost: state.shippingCost,
-      shipping_method: shippingInfo.method || null,
+      shipping_method: state.shippingMethod || shippingInfo.method || null,
       shipping_cep: shippingInfo.cep || customerForm.cep?.trim() || null,
       shipping_city: shippingInfo.city || customerForm.city?.trim() || null,
       shipping_state: shippingInfo.state || customerForm.state?.trim() || null,
@@ -673,12 +676,18 @@ const PaymentPage = () => {
                     setUploadedFiles={setUploadedFiles}
                     amount={paymentState.amount}
                     shippingCost={paymentState.shippingCost}
-                    onShippingChange={(cost) => {
+                    onShippingChange={(cost, method, city, state) => {
                       setPaymentState(prev => prev ? {
                         ...prev,
                         amount: (prev.amount - prev.shippingCost) + cost,
                         shippingCost: cost,
+                        shippingMethod: method,
                       } : null);
+                      setCustomerForm(prev => ({
+                        ...prev,
+                        city: city || prev.city,
+                        state: state || prev.state,
+                      }));
                     }}
                     onSubmit={handleDetailsSubmit}
                     isProcessing={isProcessing}
