@@ -109,7 +109,12 @@ const PaymentPage = () => {
     email: '',
     cpf: '',
     phone: '',
-    address: '',
+    street: '',
+    number: '',
+    complement: '',
+    neighborhood: '',
+    city: '',
+    state: '',
     cep: '',
   });
 
