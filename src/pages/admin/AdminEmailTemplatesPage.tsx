@@ -1,4 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { WorkflowBuilder } from '@/components/admin/workflows';
 import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -328,6 +329,7 @@ const AdminEmailTemplatesPage = () => {
             )}
           </CardContent>
         </Card>
+        <WorkflowBuilder />
       </div>
 
       <Dialog open={!!editEmail} onOpenChange={() => setEditEmail(null)}>
