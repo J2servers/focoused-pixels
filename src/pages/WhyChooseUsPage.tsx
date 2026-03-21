@@ -1,8 +1,9 @@
 /**
  * WhyChooseUsPage — Tema Neumorphism (machined)
- * Consistente com as demais páginas da loja pública.
+ * Aplica config.theme do admin como CSS custom properties.
  */
 
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { DynamicMainHeader } from '@/components/layout/DynamicMainHeader';
 import { NavigationBar } from '@/components/layout/NavigationBar';
@@ -16,7 +17,7 @@ import {
   Ruler, ShieldCheck, Sparkles, Star, Truck, Zap, ArrowRight,
 } from 'lucide-react';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
-import { defaultWhyChooseUsConfig, mergeWhyChooseUsConfig } from '@/lib/whyChooseUsConfig';
+import { defaultWhyChooseUsConfig, mergeWhyChooseUsConfig, type WhyChooseUsTheme } from '@/lib/whyChooseUsConfig';
 
 /* ── fallback images ── */
 import heroNeon from '@/assets/hero/hero-neon.jpg';
@@ -57,6 +58,28 @@ const STORY_ICONS = [Sparkles, Ruler, Truck];
 const TECH_ICONS = [Zap, Cpu, Ruler];
 const CTA_ICONS = [BadgeCheck, HeartHandshake, Gem];
 
+/* ── Build inline CSS from admin theme ── */
+function buildThemeStyles(theme: WhyChooseUsTheme): React.CSSProperties {
+  return {
+    '--wcup-bg': theme.pageBackground,
+    '--wcup-section-bg': theme.sectionBackground,
+    '--wcup-dark-bg': theme.darkSectionBackground,
+    '--wcup-card-bg': theme.cardBackground,
+    '--wcup-card-border': theme.cardBorder,
+    '--wcup-text': theme.textPrimary,
+    '--wcup-text-secondary': theme.textSecondary,
+    '--wcup-text-on-dark': theme.textOnDark,
+    '--wcup-text-muted-dark': theme.textMutedOnDark,
+    '--wcup-accent': theme.accent,
+    '--wcup-accent-soft': theme.accentSoft,
+    '--wcup-btn-primary-bg': theme.buttonPrimaryBackground,
+    '--wcup-btn-primary-text': theme.buttonPrimaryText,
+    '--wcup-btn-secondary-bg': theme.buttonSecondaryBackground,
+    '--wcup-btn-secondary-text': theme.buttonSecondaryText,
+    fontFamily: theme.bodyFont,
+  } as React.CSSProperties;
+}
+
 /* ── Section Header reusable ── */
 function SectionHeader({ eyebrow, title, highlight, description, center }: {
   eyebrow?: string; title: string; highlight?: string; description?: string; center?: boolean;
@@ -64,14 +87,14 @@ function SectionHeader({ eyebrow, title, highlight, description, center }: {
   return (
     <div className={center ? 'text-center max-w-3xl mx-auto' : 'max-w-3xl'}>
       {eyebrow && (
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary mb-3">{eyebrow}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--wcup-accent)' }}>{eyebrow}</p>
       )}
-      <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight">
+      <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: 'var(--wcup-text)' }}>
         {title}
-        {highlight && <span className="block mt-1 text-primary">{highlight}</span>}
+        {highlight && <span className="block mt-1" style={{ color: 'var(--wcup-accent)' }}>{highlight}</span>}
       </h2>
       {description && (
-        <p className="mt-4 text-sm md:text-base text-muted-foreground leading-relaxed">{description}</p>
+        <p className="mt-4 text-sm md:text-base leading-relaxed" style={{ color: 'var(--wcup-text-secondary)' }}>{description}</p>
       )}
     </div>
   );
@@ -80,6 +103,7 @@ function SectionHeader({ eyebrow, title, highlight, description, center }: {
 const WhyChooseUsPage = () => {
   const { data: companyInfo } = useCompanyInfo();
   const config = mergeWhyChooseUsConfig(defaultWhyChooseUsConfig, companyInfo?.why_choose_us_config);
+  const themeStyles = useMemo(() => buildThemeStyles(config.theme), [config.theme]);
 
   const hasCustomGallery = config.gallery.items.some(i => i.title.trim() || i.image.trim());
   const gallery = hasCustomGallery
@@ -103,34 +127,55 @@ const WhyChooseUsPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background page-enter">
+    <div className="min-h-screen flex flex-col page-enter" style={themeStyles}>
       <TrustBar />
       <DynamicMainHeader />
       <NavigationBar />
 
-      <main className="flex-1">
+      <main className="flex-1" style={{ backgroundColor: 'var(--wcup-bg)', color: 'var(--wcup-text)' }}>
         {/* ═══ HERO ═══ */}
         <section className="py-12 lg:py-20">
           <div className="container mx-auto px-4">
             <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full neu-flat px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-primary mb-6">
+                <div
+                  className="inline-flex items-center gap-2 rounded-full neu-flat px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] mb-6"
+                  style={{ color: 'var(--wcup-accent)' }}
+                >
                   <ShieldCheck className="h-4 w-4" />
                   {config.hero.badge}
                 </div>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-[1.05]">
+                <h1
+                  className="font-black tracking-tight leading-[1.05]"
+                  style={{ fontSize: config.theme.heroTitleSize, fontFamily: config.theme.headingFont, color: 'var(--wcup-text)' }}
+                >
                   {config.hero.title}
-                  <span className="block mt-2 text-primary">{config.hero.highlightedTitle}</span>
+                  <span className="block mt-2" style={{ color: 'var(--wcup-accent)' }}>{config.hero.highlightedTitle}</span>
                 </h1>
-                <p className="mt-6 text-base text-muted-foreground leading-relaxed max-w-2xl">{config.hero.description}</p>
-                <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-2xl">{config.hero.secondaryDescription}</p>
+                <p className="mt-6 text-base leading-relaxed max-w-2xl" style={{ color: 'var(--wcup-text-secondary)' }}>{config.hero.description}</p>
+                <p className="mt-3 text-sm leading-relaxed max-w-2xl" style={{ color: 'var(--wcup-text-secondary)' }}>{config.hero.secondaryDescription}</p>
 
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                   <Link to={safeHref(config.hero.primaryCtaHref, '/checkout')}>
-                    <Button size="lg" className="min-w-[200px]">{config.hero.primaryCtaLabel}</Button>
+                    <Button
+                      size="lg"
+                      className="min-w-[220px] border-0 shadow-lg hover:brightness-110 hover:-translate-y-0.5 transition-all"
+                      style={{ backgroundColor: 'var(--wcup-btn-primary-bg)', color: 'var(--wcup-btn-primary-text)' }}
+                    >
+                      {config.hero.primaryCtaLabel}
+                    </Button>
                   </Link>
                   <Link to={safeHref(config.hero.secondaryCtaHref, '/categorias')}>
-                    <Button size="lg" variant="outline" className="min-w-[200px] group">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="min-w-[220px] group border-2 hover:brightness-110 hover:-translate-y-0.5 transition-all"
+                      style={{
+                        backgroundColor: 'var(--wcup-btn-secondary-bg)',
+                        color: 'var(--wcup-btn-secondary-text)',
+                        borderColor: 'var(--wcup-card-border)',
+                      }}
+                    >
                       {config.hero.secondaryCtaLabel}
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                     </Button>
@@ -141,8 +186,8 @@ const WhyChooseUsPage = () => {
                 <div className="mt-10 grid grid-cols-2 xl:grid-cols-4 gap-3">
                   {config.metrics.map(m => (
                     <div key={m.value} className="rounded-2xl neu-concave p-4 text-center">
-                      <div className="text-xl font-black text-primary">{m.value}</div>
-                      <div className="text-[11px] text-muted-foreground mt-1 leading-snug">{m.label}</div>
+                      <div className="text-xl font-black" style={{ color: 'var(--wcup-accent)' }}>{m.value}</div>
+                      <div className="text-[11px] mt-1 leading-snug" style={{ color: 'var(--wcup-text-secondary)' }}>{m.label}</div>
                     </div>
                   ))}
                 </div>
@@ -165,7 +210,7 @@ const WhyChooseUsPage = () => {
         </section>
 
         {/* ═══ STORYTELLING ═══ */}
-        <section className="py-12 lg:py-16">
+        <section className="py-12 lg:py-16" style={{ backgroundColor: 'var(--wcup-section-bg)' }}>
           <div className="container mx-auto px-4">
             <SectionHeader
               eyebrow={config.story.eyebrow}
@@ -176,12 +221,16 @@ const WhyChooseUsPage = () => {
               {config.story.items.map((item, i) => {
                 const Icon = STORY_ICONS[i] || Sparkles;
                 return (
-                  <article key={item.title} className="rounded-2xl neu-flat p-6">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                  <article
+                    key={item.title || i}
+                    className="rounded-2xl neu-flat p-6"
+                    style={{ backgroundColor: 'var(--wcup-card-bg)', borderColor: 'var(--wcup-card-border)' }}
+                  >
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: 'var(--wcup-accent-soft)', color: 'var(--wcup-accent)' }}>
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-bold text-lg mb-2">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                    <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--wcup-text)' }}>{item.title}</h3>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--wcup-text-secondary)' }}>{item.description}</p>
                   </article>
                 );
               })}
@@ -190,17 +239,22 @@ const WhyChooseUsPage = () => {
         </section>
 
         {/* ═══ TECNOLOGIA ═══ */}
-        <section className="py-12 lg:py-16 bg-foreground text-background">
+        <section className="py-12 lg:py-16" style={{ backgroundColor: 'var(--wcup-dark-bg)', color: 'var(--wcup-text-on-dark)' }}>
           <div className="container mx-auto px-4">
             <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary mb-3">{config.technology.eyebrow}</p>
-                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">{config.technology.title}</h2>
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--wcup-accent)' }}>{config.technology.eyebrow}</p>
+                <h2
+                  className="font-bold tracking-tight"
+                  style={{ fontSize: config.theme.sectionTitleSize, fontFamily: config.theme.headingFont, color: 'var(--wcup-text-on-dark)' }}
+                >
+                  {config.technology.title}
+                </h2>
                 <p className="mt-5 text-sm leading-relaxed opacity-70">{config.technology.description}</p>
                 <div className="mt-8 space-y-3">
                   {config.technology.bullets.map(b => (
                     <div key={b.text} className="flex items-start gap-3">
-                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" style={{ color: 'var(--wcup-accent)' }} />
                       <p className="text-sm leading-relaxed opacity-80">{b.text}</p>
                     </div>
                   ))}
@@ -211,15 +265,15 @@ const WhyChooseUsPage = () => {
                 {config.technology.items.map((item, i) => {
                   const Icon = TECH_ICONS[i] || Cpu;
                   return (
-                    <div key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+                    <div key={item.title || i} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
                       <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-white/10 text-primary flex items-center justify-center shrink-0">
+                        <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0" style={{ color: 'var(--wcup-accent)' }}>
                           <Icon className="h-5 w-5" />
                         </div>
                         <div>
                           <h3 className="font-bold text-lg">{item.title}</h3>
                           <p className="mt-2 text-sm leading-relaxed opacity-70">{item.description}</p>
-                          <p className="mt-3 text-xs font-semibold text-primary">{item.highlight}</p>
+                          <p className="mt-3 text-xs font-semibold" style={{ color: 'var(--wcup-accent)' }}>{item.highlight}</p>
                         </div>
                       </div>
                     </div>
@@ -231,7 +285,7 @@ const WhyChooseUsPage = () => {
         </section>
 
         {/* ═══ GALERIA ═══ */}
-        <section className="py-12 lg:py-16">
+        <section className="py-12 lg:py-16" style={{ backgroundColor: 'var(--wcup-bg)' }}>
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
               <SectionHeader
@@ -239,23 +293,26 @@ const WhyChooseUsPage = () => {
                 title={config.gallery.title}
                 highlight={config.gallery.highlightedTitle}
               />
-              <p className="max-w-md text-sm text-muted-foreground leading-relaxed">{config.gallery.description}</p>
+              <p className="max-w-md text-sm leading-relaxed" style={{ color: 'var(--wcup-text-secondary)' }}>{config.gallery.description}</p>
             </div>
 
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-5 stagger-children">
-              {gallery.map(item => (
-                <article key={item.title} className="rounded-2xl neu-raised overflow-hidden group">
+              {gallery.map((item, idx) => (
+                <article key={item.title || idx} className="rounded-2xl neu-raised overflow-hidden group">
                   <div className="relative overflow-hidden">
                     <img src={item.image} alt={item.title} className="h-[240px] w-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
                     {item.tag && (
-                      <span className="absolute left-3 top-3 rounded-full bg-primary/90 text-primary-foreground px-3 py-1 text-[10px] font-semibold uppercase tracking-wider">
+                      <span
+                        className="absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wider"
+                        style={{ backgroundColor: 'var(--wcup-accent)', color: 'var(--wcup-btn-primary-text)' }}
+                      >
                         {item.tag}
                       </span>
                     )}
                   </div>
-                  <div className="p-5">
-                    <h3 className="font-bold mb-1">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                  <div className="p-5" style={{ backgroundColor: 'var(--wcup-card-bg)' }}>
+                    <h3 className="font-bold mb-1" style={{ color: 'var(--wcup-text)' }}>{item.title}</h3>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--wcup-text-secondary)' }}>{item.description}</p>
                   </div>
                 </article>
               ))}
@@ -264,7 +321,7 @@ const WhyChooseUsPage = () => {
         </section>
 
         {/* ═══ DEPOIMENTOS ═══ */}
-        <section className="py-12 lg:py-16">
+        <section className="py-12 lg:py-16" style={{ backgroundColor: 'var(--wcup-section-bg)' }}>
           <div className="container mx-auto px-4">
             <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
@@ -283,26 +340,26 @@ const WhyChooseUsPage = () => {
               </div>
 
               <div className="grid gap-4">
-                {testimonials.map(item => (
-                  <div key={item.author} className="rounded-2xl neu-flat overflow-hidden">
+                {testimonials.map((item, idx) => (
+                  <div key={item.author || idx} className="rounded-2xl neu-flat overflow-hidden" style={{ backgroundColor: 'var(--wcup-card-bg)' }}>
                     <div className="grid md:grid-cols-[180px_1fr]">
                       <img src={item.image} alt={item.author} className="h-full min-h-[180px] w-full object-cover" loading="lazy" />
                       <div className="p-5 flex flex-col justify-between">
                         <div>
-                          <div className="flex items-center gap-0.5 text-primary mb-3">
+                          <div className="flex items-center gap-0.5 mb-3" style={{ color: 'var(--wcup-accent)' }}>
                             {Array.from({ length: 5 }).map((_, j) => (
                               <Star key={j} className="h-4 w-4 fill-current" />
                             ))}
                           </div>
-                          <p className="font-semibold leading-relaxed">"{item.quote}"</p>
+                          <p className="font-semibold leading-relaxed" style={{ color: 'var(--wcup-text)' }}>"{item.quote}"</p>
                         </div>
                         <div className="mt-4 flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full neu-convex flex items-center justify-center text-sm font-bold text-primary">
+                          <div className="w-10 h-10 rounded-full neu-convex flex items-center justify-center text-sm font-bold" style={{ color: 'var(--wcup-accent)' }}>
                             {item.author.slice(0, 1)}
                           </div>
                           <div>
-                            <div className="font-semibold text-sm">{item.author}</div>
-                            <div className="text-xs text-muted-foreground">{item.subtitle}</div>
+                            <div className="font-semibold text-sm" style={{ color: 'var(--wcup-text)' }}>{item.author}</div>
+                            <div className="text-xs" style={{ color: 'var(--wcup-text-secondary)' }}>{item.subtitle}</div>
                           </div>
                         </div>
                       </div>
@@ -315,15 +372,18 @@ const WhyChooseUsPage = () => {
         </section>
 
         {/* ═══ CTA FINAL ═══ */}
-        <section className="py-12 lg:py-16 bg-foreground text-background">
+        <section className="py-12 lg:py-16" style={{ backgroundColor: 'var(--wcup-dark-bg)', color: 'var(--wcup-text-on-dark)' }}>
           <div className="container mx-auto px-4">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-10 backdrop-blur-sm">
               <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary mb-3">{config.finalCta.eyebrow}</p>
-                  <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+                  <p className="text-xs font-semibold uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--wcup-accent)' }}>{config.finalCta.eyebrow}</p>
+                  <h2
+                    className="font-bold tracking-tight"
+                    style={{ fontSize: config.theme.sectionTitleSize, fontFamily: config.theme.headingFont }}
+                  >
                     {config.finalCta.title}
-                    <span className="block mt-1 text-primary">{config.finalCta.highlightedTitle}</span>
+                    <span className="block mt-1" style={{ color: 'var(--wcup-accent)' }}>{config.finalCta.highlightedTitle}</span>
                   </h2>
                   <p className="mt-5 text-sm leading-relaxed opacity-70">{config.finalCta.description}</p>
                 </div>
@@ -333,7 +393,7 @@ const WhyChooseUsPage = () => {
                     const Icon = CTA_ICONS[i % 3];
                     return (
                       <div key={i} className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
-                        <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                        <Icon className="mt-0.5 h-5 w-5 shrink-0" style={{ color: 'var(--wcup-accent)' }} />
                         <p className="text-sm leading-relaxed opacity-80">{b.text}</p>
                       </div>
                     );
@@ -343,10 +403,25 @@ const WhyChooseUsPage = () => {
 
               <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row">
                 <Link to={safeHref(config.finalCta.primaryCtaHref, '/checkout')}>
-                  <Button size="lg" className="min-w-[220px]">{config.finalCta.primaryCtaLabel}</Button>
+                  <Button
+                    size="lg"
+                    className="min-w-[220px] border-0 shadow-lg hover:brightness-110 hover:-translate-y-0.5 transition-all"
+                    style={{ backgroundColor: 'var(--wcup-btn-primary-bg)', color: 'var(--wcup-btn-primary-text)' }}
+                  >
+                    {config.finalCta.primaryCtaLabel}
+                  </Button>
                 </Link>
                 <Link to={safeHref(config.finalCta.secondaryCtaHref, '/minha-area')}>
-                  <Button size="lg" variant="outline" className="min-w-[220px] border-white/30 text-white bg-white/10 hover:bg-white/20 hover:border-white/50 group">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="min-w-[220px] group border-2 hover:brightness-110 hover:-translate-y-0.5 transition-all"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--wcup-text-on-dark)',
+                      borderColor: 'rgba(255,255,255,0.3)',
+                    }}
+                  >
                     {config.finalCta.secondaryCtaLabel}
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                   </Button>

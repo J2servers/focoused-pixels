@@ -413,6 +413,24 @@ const AdminWhyChooseUsPage = () => {
               </div>
             </div>
 
+            <div className="space-y-4">
+              <Label className="text-sm font-semibold">Bullets de tecnologia</Label>
+              {config.technology.bullets.map((bullet, index) => (
+                <div key={index} className="flex gap-2 items-start">
+                  <Textarea
+                    value={bullet.text}
+                    onChange={(e) => {
+                      const next = cloneConfig(config);
+                      next.technology.bullets[index].text = e.target.value;
+                      setConfig(next);
+                    }}
+                    placeholder={`Bullet ${index + 1}`}
+                    className="min-h-[60px]"
+                  />
+                </div>
+              ))}
+            </div>
+
             <div className="grid gap-4 lg:grid-cols-3">
               {config.technology.items.map((item, index) => (
                 <div key={index} className="space-y-2 rounded-lg border p-4">
