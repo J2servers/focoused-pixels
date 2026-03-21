@@ -443,6 +443,7 @@ const PaymentPage = () => {
         description: paymentState.description,
         payerEmail: paymentState.customerEmail,
         payerName: paymentState.customerName,
+        payerPhone: paymentState.customerPhone,
       });
       setPixData({
         qrCode: result.qrCode,
