@@ -222,6 +222,11 @@ const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
   boleto_extra_days: 3,
   max_installments: 12,
   min_installment_value: 50,
+  // Why Choose Us & Branding
+  why_choose_us_config: null,
+  logo_sidebar_size: 120,
+  logo_header_size: 160,
+  logo_mobile_size: 100,
 };
 
 export function useCompanyInfo() {
