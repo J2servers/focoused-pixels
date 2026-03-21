@@ -49,6 +49,8 @@ export function PaymentStepDetails({
   uploadedFiles,
   setUploadedFiles,
   amount,
+  shippingCost,
+  onShippingChange,
   onSubmit,
   isProcessing,
 }: PaymentStepDetailsProps) {
