@@ -124,6 +124,22 @@ serve(async (req) => {
     const config = await getPaymentConfig(supabase);
     const baseUrl = "https://api.mercadopago.com";
 
+    // Helper: fire-and-forget notification
+    const notifyCustomer = async (payload: Record<string, unknown>) => {
+      try {
+        await fetch(`${supabaseUrl}/functions/v1/notify-customer`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${supabaseServiceKey}`,
+          },
+          body: JSON.stringify(payload),
+        });
+      } catch (e) {
+        console.error("[MercadoPago] Notification error (non-blocking):", e);
+      }
+    };
+
     // Test connection
     if (action === "test_connection") {
       const testResponse = await fetch(`${baseUrl}/users/me`, {
