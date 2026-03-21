@@ -1,59 +1,63 @@
 
 
-# Fix: Boleto Generation - Missing Address Fields
+# Plan: Send WhatsApp notification after boleto generation
 
-## Problem
-Mercado Pago API requires payer address fields (`zip_code`, `street_name`, `street_number`, `neighborhood`, `city`, `federal_unit`) to generate a registered boleto. The current code doesn't send any address data to the edge function.
+## What will be done
+After a boleto is successfully generated, the system will automatically send a WhatsApp message to the customer with the boleto barcode and payment link, using the existing WhatsApp Evolution API integration with failover logic.
 
-The customer already fills in address and CEP in Step 2, but this data is never forwarded to the boleto creation request.
+## Changes
 
-## Root Cause
-- `PaymentPage.tsx` calls `create_boleto` without address fields
-- `usePaymentGateway.ts` interface doesn't include address fields
-- Edge function `payment-mercadopago/index.ts` doesn't accept or send `payer.address` to Mercado Pago API
+### 1. Update Edge Function `payment-mercadopago/index.ts`
+After successfully creating the boleto (line ~394), add a call to the `whatsapp-evolution` function to send the boleto details to the customer. This keeps the notification server-side and reliable.
 
-## Plan
+- After `console.log("[MercadoPago] Boleto created:", data.id)`, invoke the WhatsApp function with:
+  - Customer phone (new parameter `payerPhone`)
+  - Customer name
+  - Barcode content
+  - Boleto URL
+  - Expiration date
+  - Amount
+- The WhatsApp send is fire-and-forget (non-blocking) so it doesn't delay the boleto response
+- If WhatsApp fails, it logs the error but doesn't fail the payment
 
-### 1. Update Edge Function (`payment-mercadopago/index.ts`)
-- Add address fields to `PaymentRequest` interface: `payerZipCode`, `payerStreetName`, `payerStreetNumber`, `payerNeighborhood`, `payerCity`, `payerState`
-- Add `payer.address` object to the boleto payload sent to Mercado Pago API
+### 2. Update `PaymentPage.tsx`
+Pass `payerPhone` to the `create_boleto` call (line ~460). The phone is already available in `paymentState.customerPhone`.
 
-### 2. Update Payment Gateway Hook (`usePaymentGateway.ts`)
-- Add address fields to `MercadoPagoPaymentRequest` interface
+Add `payerPhone: paymentState.customerPhone` to the `mutateAsync` call.
 
-### 3. Update Payment Page (`PaymentPage.tsx`)
-- Pass `customerForm.address` and `customerForm.cep` to the `create_boleto` call
-- Parse the address string to extract street, number, neighborhood, city, state (best-effort)
+### 3. Update Edge Function interface
+Add `payerPhone` to the `PaymentRequest` interface (already exists but need to ensure it's destructured and used in the boleto handler).
 
-### 4. Improve Address Collection (`PaymentStepDetails.tsx`)
-- Split the single "Endereço Completo" textarea into structured fields: Street, Number, Neighborhood, City, State
-- This ensures clean data for Mercado Pago instead of guessing from free text
+## Message template
+```
+🧾 *Boleto Gerado - Pincel de Luz*
 
-## Technical Details
+Olá, {nome}! Seu boleto foi gerado com sucesso.
 
-**Edge function boleto payload change:**
-```typescript
-payer: {
-  // ...existing fields
-  address: {
-    zip_code: payerZipCode?.replace(/\D/g, ""),
-    street_name: payerStreetName,
-    street_number: payerStreetNumber,
-    neighborhood: payerNeighborhood,
-    city: payerCity,
-    federal_unit: payerState,
-  }
-}
+💰 *Valor:* R$ {valor}
+📅 *Vencimento:* {data}
+
+📋 *Código de barras:*
+{barcode}
+
+🔗 *Link do boleto:*
+{url}
+
+Qualquer dúvida, estamos à disposição! ✨
 ```
 
-**Customer form expansion** (structured fields instead of free text):
+## Technical flow
+```text
+PaymentPage (frontend)
+  └─ create_boleto (edge fn)
+       ├─ Mercado Pago API → boleto created
+       ├─ WhatsApp Evolution API → message sent (async, non-blocking)
+       └─ Response to frontend (barcode, url, etc.)
 ```
-address → street (rua)
-number → number (número)  
-complement → complement (complemento)
-neighborhood → neighborhood (bairro)
-city → city (cidade)
-state → state (UF)
-cep → cep (already exists)
-```
+
+## Files to modify
+| File | Change |
+|------|--------|
+| `supabase/functions/payment-mercadopago/index.ts` | Add WhatsApp notification after boleto creation |
+| `src/pages/PaymentPage.tsx` | Pass `payerPhone` to boleto request |
 
