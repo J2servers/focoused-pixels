@@ -698,6 +698,7 @@ const PaymentPage = () => {
                     setUploadedFiles={setUploadedFiles}
                     amount={paymentState.amount}
                     shippingCost={paymentState.shippingCost}
+                    cartWeight={cartWeight}
                     onShippingChange={(cost, method, city, state) => {
                       setPaymentState(prev => prev ? {
                         ...prev,
