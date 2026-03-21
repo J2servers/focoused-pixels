@@ -37,7 +37,7 @@ export const useAbandonedCartTracker = () => {
           .upsert({
             session_id: sessionIdRef.current,
             cart_items: cartItems,
-            cart_total: getTotal(),
+            cart_total: total,
             last_activity_at: new Date().toISOString(),
           }, { onConflict: 'session_id' });
       } catch (error) {

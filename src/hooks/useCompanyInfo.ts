@@ -262,7 +262,9 @@ export function useUpdateCompanyInfo() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string | null; data: Partial<CompanyInfo> }) => {
+    mutationFn: async ({ id, data, ...directData }: { id?: string | null; data?: Partial<CompanyInfo> } & Partial<CompanyInfo>) => {
+      // Support both { id, data } pattern and direct properties
+      const updateData = data || directData;
       // Ensure company_name is present for insert operations
       const insertData = { company_name: data.company_name || 'Pincel de Luz Personalizados', ...data };
       
