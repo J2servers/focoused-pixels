@@ -204,6 +204,7 @@ const PaymentPage = () => {
               orderId: data.orderId,
               amount: itemsAmount + shippingCost,
               shippingCost,
+              shippingMethod: data.shipping?.method || '',
               customerName: data.customerName || '',
               customerEmail: data.customerEmail || '',
               customerCpf: data.customerCpf || '',
