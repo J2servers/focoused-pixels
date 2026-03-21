@@ -338,6 +338,20 @@ serve(async (req) => {
 
       console.log("[MercadoPago] PIX created:", data.id);
 
+      // Notify customer (fire-and-forget)
+      notifyCustomer({
+        event: "pix_generated",
+        customer: { name: payerName || "Cliente", email: payerEmail, phone: payerPhone || "" },
+        order: { orderId, amount, description },
+        pix: {
+          qrCode: data.point_of_interaction?.transaction_data?.qr_code,
+          ticketUrl: data.point_of_interaction?.transaction_data?.ticket_url,
+          expirationDate: data.date_of_expiration,
+          finalAmount: discountedAmount,
+          discountPercent: config.pixDiscountPercent,
+        },
+      });
+
       return new Response(
         JSON.stringify({
           success: true,
