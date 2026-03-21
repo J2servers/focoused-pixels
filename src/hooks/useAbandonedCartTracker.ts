@@ -32,7 +32,7 @@ export const useAbandonedCartTracker = () => {
           image: item.image,
         }));
 
-        await supabase
+        await (supabase as any)
           .from('abandoned_cart_sessions')
           .upsert({
             session_id: sessionIdRef.current,
