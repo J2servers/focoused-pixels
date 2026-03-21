@@ -92,7 +92,7 @@ export interface CompanyInfo {
   google_tag_manager_id: string | null;
   // Integrations
   whatsapp_message_template: string | null;
-  why_choose_us_config: Record<string, unknown> | null;
+  why_choose_us_config: Record<string, any> | null;
   enable_reviews_auto_approve: boolean | null;
   reviews_min_rating_to_show: number | null;
   // Payment gateway flags kept for backward compatibility (credentials in payment_credentials table)

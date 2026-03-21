@@ -74,7 +74,7 @@ const SidebarContent = ({
   };
 
   const filteredItems = menuItems.filter(item => 
-    !item.adminOnly || isAdmin()
+    !(item as any).adminOnly || isAdmin()
   );
 
   const NavItem = ({ item, isActive }: { item: typeof menuItems[0], isActive: boolean }) => {

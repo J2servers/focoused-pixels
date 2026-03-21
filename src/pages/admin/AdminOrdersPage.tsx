@@ -56,7 +56,6 @@ const EXPORT_COLUMNS = [
 
 const isCompletedSale = (order: Order) =>
   order.payment_status === 'paid' &&
-  order.payment_status !== 'refunded' &&
   order.order_status !== 'cancelled';
 
 const isAwaitingPayment = (order: Order) =>

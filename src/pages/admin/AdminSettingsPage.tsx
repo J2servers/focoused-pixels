@@ -954,7 +954,7 @@ const AdminSettingsPage = () => {
               <div className="rounded-[24px] bg-[#e8f0fe] p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#174ea6]">Usuario</p>
                 <p className="mt-2 text-xl font-semibold text-slate-900">{profile?.full_name || 'Sem nome'}</p>
-                <p className="mt-2 text-sm text-slate-700">{profile?.email || 'sem-email'}</p>
+                <p className="mt-2 text-sm text-slate-700">{(profile as any)?.email || 'sem-email'}</p>
               </div>
               <div className="rounded-[24px] bg-[#fce8e6] p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c5221f]">Proteção</p>
