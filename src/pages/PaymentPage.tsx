@@ -212,6 +212,27 @@ const PaymentPage = () => {
               customerPhone: data.customerPhone || '',
               description: data.description || '',
             });
+
+            // Calculate total cart weight from product data
+            if (data.cartItems?.length > 0) {
+              const productIds = data.cartItems
+                .map((item: { id?: string; product_id?: string }) => item.id || item.product_id)
+                .filter(Boolean);
+              if (productIds.length > 0) {
+                const { data: products } = await supabase
+                  .from('products')
+                  .select('id, weight_kg')
+                  .in('id', productIds);
+                if (products) {
+                  const weightMap = new Map(products.map((p: { id: string; weight_kg: number | null }) => [p.id, p.weight_kg || 0.5]));
+                  const totalWeight = data.cartItems.reduce((sum: number, item: { id?: string; product_id?: string; quantity?: number }) => {
+                    const pid = item.id || item.product_id || '';
+                    return sum + (weightMap.get(pid) || 0.5) * (item.quantity || 1);
+                  }, 0);
+                  setCartWeight(Math.max(0.3, totalWeight));
+                }
+              }
+            }
           } catch {
             toast.error('Dados do pedido corrompidos');
             sessionStorage.removeItem('pending_payment');
