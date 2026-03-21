@@ -393,6 +393,35 @@ serve(async (req) => {
 
       console.log("[MercadoPago] Boleto created:", data.id);
 
+      // Send WhatsApp notification (fire-and-forget)
+      if (payerPhone) {
+        const cleanPhone = payerPhone.replace(/\D/g, "");
+        const formattedPhone = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
+        const expirationFormatted = data.date_of_expiration 
+          ? new Date(data.date_of_expiration).toLocaleDateString("pt-BR") 
+          : "—";
+        const boletoMessage = `🧾 *Boleto Gerado - Pincel de Luz*\n\nOlá, ${payerName || "Cliente"}! Seu boleto foi gerado com sucesso.\n\n💰 *Valor:* R$ ${amount?.toFixed(2).replace(".", ",")}\n📅 *Vencimento:* ${expirationFormatted}\n\n📋 *Código de barras:*\n${data.barcode?.content || "Não disponível"}\n\n🔗 *Link do boleto:*\n${data.transaction_details?.external_resource_url || "Não disponível"}\n\nQualquer dúvida, estamos à disposição! ✨`;
+
+        try {
+          const whatsappResponse = await fetch(`${supabaseUrl}/functions/v1/whatsapp-evolution`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${supabaseServiceKey}`,
+            },
+            body: JSON.stringify({
+              action: "send_message",
+              phone: formattedPhone,
+              message: boletoMessage,
+            }),
+          });
+          const whatsappResult = await whatsappResponse.json();
+          console.log("[MercadoPago] WhatsApp boleto notification:", whatsappResult.success ? "sent" : "failed");
+        } catch (whatsappError) {
+          console.error("[MercadoPago] WhatsApp notification error (non-blocking):", whatsappError);
+        }
+      }
+
       return new Response(
         JSON.stringify({
           success: true,
