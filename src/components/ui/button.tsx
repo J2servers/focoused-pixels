@@ -21,6 +21,17 @@ const buttonVariants = cva(
           "hover:bg-muted/60 hover:text-foreground border border-transparent hover:border-[hsl(var(--neon-primary)/0.3)]",
         link: "text-primary underline-offset-4 hover:underline",
       },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-xl px-3",
+        lg: "h-11 rounded-2xl px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
   },
 );
 
