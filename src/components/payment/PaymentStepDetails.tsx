@@ -96,7 +96,7 @@ export function PaymentStepDetails({
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const isValid = customerForm.name.trim() && customerForm.phone.trim() && customerForm.address.trim() && customerForm.cep.trim();
+  const isValid = customerForm.name.trim() && customerForm.phone.trim() && customerForm.street.trim() && customerForm.cep.trim() && customerForm.city.trim() && customerForm.state.trim();
 
   return (
     <div className="space-y-4">
