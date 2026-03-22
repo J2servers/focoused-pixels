@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import VisualWorkflowBuilder from '@/components/admin/workflows/VisualWorkflowBuilder';
+import { VisualWorkflowBuilder } from '@/components/admin/workflows';
 import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
