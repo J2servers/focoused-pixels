@@ -134,9 +134,6 @@ const AdminEmailTemplatesPage = () => {
   const [editWhats, setEditWhats] = useState<Partial<WhatsAppTemplate> | null>(null);
   const [preview, setPreview] = useState<{ channel: Channel; title: string; content: string; subject?: string } | null>(null);
 
-  // Workflow preset import
-  const [presetToImport, setPresetToImport] = useState<WorkflowPreset | null>(null);
-
   const loadData = async () => {
     setLoading(true);
     const [{ data: emails, error: emailError }, { data: whats, error: whatsError }] = await Promise.all([
