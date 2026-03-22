@@ -126,7 +126,6 @@ const sanitizePreviewHtml = (html: string) => {
 
 const AdminEmailTemplatesPage = () => {
   const [activeTab, setActiveTab] = useState<PageTab>('templates');
-  const [presetCategory, setPresetCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([]);
   const [whatsTemplates, setWhatsTemplates] = useState<WhatsAppTemplate[]>([]);
