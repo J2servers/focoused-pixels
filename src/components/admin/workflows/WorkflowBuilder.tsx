@@ -15,7 +15,7 @@ import {
   Plus, Trash2, Play, Pause, Clock, Mail, MessageSquare,
   ArrowDown, Zap, ShoppingCart, CreditCard, Package, Star,
   ChevronDown, ChevronUp, Save, Copy, GripVertical, LayoutGrid,
-  RefreshCw, Heart, UserPlus, Truck, Gift, ChevronRight, AlertTriangle,
+  RefreshCw, Heart, UserPlus, Truck, Gift, ChevronRight, AlertTriangle, Eye,
 } from 'lucide-react';
 
 /* ─── types ─── */
