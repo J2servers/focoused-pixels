@@ -519,6 +519,33 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
                               ))}
                             </SelectContent>
                           </Select>
+
+                          {/* Template content preview */}
+                          {step.template_id && (() => {
+                            const list = step.type === 'send_email' ? emailTemplates : whatsTemplates;
+                            const tpl = list.find(t => t.id === step.template_id);
+                            if (!tpl) return null;
+                            const content = step.type === 'send_email'
+                              ? (tpl.body || '').replace(/<[^>]*>/g, '').slice(0, 300)
+                              : (tpl.message_text || '').slice(0, 300);
+                            return content ? (
+                              <div className="mt-3 rounded-lg border border-dashed border-current/20 bg-background/50 p-3">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Eye className="h-3 w-3 opacity-50" />
+                                  <span className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Preview do conteúdo</span>
+                                  {step.type === 'send_email' && tpl.subject && (
+                                    <Badge variant="outline" className="text-[9px] ml-auto">Assunto: {tpl.subject}</Badge>
+                                  )}
+                                </div>
+                                <p className="text-xs opacity-70 whitespace-pre-wrap leading-relaxed">{content}{content.length >= 300 ? '...' : ''}</p>
+                                <div className="mt-2 flex flex-wrap gap-1">
+                                  {(content.match(/\{\{[^}]+\}\}/g) || []).filter((v, i, a) => a.indexOf(v) === i).map(v => (
+                                    <Badge key={v} variant="secondary" className="text-[8px] font-mono">{v}</Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : null;
+                          })()}
                         </div>
                       )}
                     </div>
