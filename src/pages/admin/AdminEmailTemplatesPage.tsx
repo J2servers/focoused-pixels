@@ -304,24 +304,7 @@ const AdminEmailTemplatesPage = () => {
       )}
 
       {activeTab === 'workflows' && (
-        <WorkflowBuilder presetToImport={presetToImport} onPresetImported={() => setPresetToImport(null)} />
-      )}
-
-      {activeTab === 'presets' && (
-        <div className="rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] overflow-hidden" style={{ minHeight: 480 }}>
-          <div className="border-b border-[hsl(var(--admin-card-border)/0.5)] px-4 py-3 flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-white flex items-center gap-2"><LayoutGrid className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />Modelos Prontos</h3>
-              <p className="text-[11px] text-[hsl(var(--admin-text-muted))]">Clique em um modelo para usá-lo como base de um novo workflow</p>
-            </div>
-            <Badge variant="secondary" className="text-xs">{WORKFLOW_PRESETS.length} modelos</Badge>
-          </div>
-          <WorkflowPresets
-            selectedCategory={presetCategory}
-            onSelectCategory={setPresetCategory}
-            onUsePreset={handleUsePreset}
-          />
-        </div>
+        <WorkflowBuilder />
       )}
 
       {/* ─── Dialogs ─── */}
