@@ -97,6 +97,21 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
 
   useEffect(() => { loadData(); }, []);
 
+  // Handle preset import
+  useEffect(() => {
+    if (presetToImport) {
+      setEditing({
+        name: presetToImport.name,
+        description: presetToImport.description || '',
+        trigger_event: presetToImport.trigger_event,
+        trigger_delay_minutes: 0,
+        steps: presetToImport.steps.map((s: any) => ({ ...s, id: uid() })),
+        is_active: false,
+      });
+      onPresetImported?.();
+    }
+  }, [presetToImport]);
+
   /* ─── CRUD ─── */
   const saveWorkflow = async () => {
     if (!editing?.name) return toast.error('Informe o nome do workflow');
