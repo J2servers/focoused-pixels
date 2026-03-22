@@ -8,13 +8,14 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Plus, Trash2, Play, Pause, Clock, Mail, MessageSquare,
   ArrowDown, Zap, ShoppingCart, CreditCard, Package, Star,
   ChevronDown, ChevronUp, Save, Copy, GripVertical, LayoutGrid,
-  RefreshCw, Heart, UserPlus, Truck, Gift, ChevronRight, AlertTriangle,
+  RefreshCw, Heart, UserPlus, Truck, Gift, ChevronRight, AlertTriangle, Eye,
 } from 'lucide-react';
 
 /* ─── types ─── */
@@ -41,7 +42,7 @@ export interface Workflow {
   last_run_at?: string;
 }
 
-interface TemplateLite { id: string; name: string; }
+interface TemplateLite { id: string; name: string; body?: string; message_text?: string; subject?: string; }
 
 const TRIGGER_EVENTS = [
   { value: 'abandoned_cart', label: 'Carrinho abandonado', icon: ShoppingCart, color: 'text-orange-500' },
@@ -122,12 +123,12 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
     setLoading(true);
     const [{ data: wf }, { data: et }, { data: wt }] = await Promise.all([
       supabase.from('automation_workflows').select('*').order('created_at', { ascending: false }),
-      supabase.from('email_templates').select('id, name').eq('is_active', true),
-      supabase.from('whatsapp_templates').select('id, name').eq('is_active', true),
+      supabase.from('email_templates').select('id, name, subject, body').eq('is_active', true),
+      supabase.from('whatsapp_templates').select('id, name, message_text').eq('is_active', true),
     ]);
     setWorkflows((wf || []).map((w: any) => ({ ...w, steps: (w.steps || []) as WorkflowStep[] })));
     setEmailTemplates((et || []) as TemplateLite[]);
-    setWhatsTemplates((wt || []) as TemplateLite[]);
+    setWhatsTemplates((wt || []).map((t: any) => ({ ...t, message_text: t.message_text })) as TemplateLite[]);
     setLoading(false);
   };
 
@@ -518,6 +519,33 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
                               ))}
                             </SelectContent>
                           </Select>
+
+                          {/* Template content preview */}
+                          {step.template_id && (() => {
+                            const list = step.type === 'send_email' ? emailTemplates : whatsTemplates;
+                            const tpl = list.find(t => t.id === step.template_id);
+                            if (!tpl) return null;
+                            const content = step.type === 'send_email'
+                              ? (tpl.body || '').replace(/<[^>]*>/g, '').slice(0, 300)
+                              : (tpl.message_text || '').slice(0, 300);
+                            return content ? (
+                              <div className="mt-3 rounded-lg border border-dashed border-current/20 bg-background/50 p-3">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Eye className="h-3 w-3 opacity-50" />
+                                  <span className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Preview do conteúdo</span>
+                                  {step.type === 'send_email' && tpl.subject && (
+                                    <Badge variant="outline" className="text-[9px] ml-auto">Assunto: {tpl.subject}</Badge>
+                                  )}
+                                </div>
+                                <p className="text-xs opacity-70 whitespace-pre-wrap leading-relaxed">{content}{content.length >= 300 ? '...' : ''}</p>
+                                <div className="mt-2 flex flex-wrap gap-1">
+                                  {(content.match(/\{\{[^}]+\}\}/g) || []).filter((v, i, a) => a.indexOf(v) === i).map(v => (
+                                    <Badge key={v} variant="secondary" className="text-[8px] font-mono">{v}</Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : null;
+                          })()}
                         </div>
                       )}
                     </div>

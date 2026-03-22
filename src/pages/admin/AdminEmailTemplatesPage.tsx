@@ -52,6 +52,16 @@ const TEMPLATE_VARIABLES = [
   '{{expires_at}}',
   '{{cart_items}}',
   '{{company_name}}',
+  '{{barcode}}',
+  '{{boleto_url}}',
+  '{{expiration_date}}',
+  '{{shipping_address}}',
+  '{{shipping_city}}',
+  '{{shipping_state}}',
+  '{{shipping_cep}}',
+  '{{delivery_estimate}}',
+  '{{customer_email}}',
+  '{{customer_phone}}',
 ];
 
 const SUGGESTED_WHATSAPP_TEMPLATES: SuggestedWhatsAppTemplate[] = [
@@ -104,6 +114,16 @@ const SAMPLE_VALUES: Record<string, string> = {
   '{{expires_at}}': 'hoje 23:59',
   '{{cart_items}}': '2 itens personalizados',
   '{{company_name}}': 'Pincel de Luz',
+  '{{barcode}}': '23793.38128 60000.000003 00000.000400 1 84340000028990',
+  '{{boleto_url}}': 'https://www.mercadopago.com.br/payments/123/ticket',
+  '{{expiration_date}}': '25/03/2026',
+  '{{shipping_address}}': 'Rua das Flores, 123 - Centro',
+  '{{shipping_city}}': 'São Paulo',
+  '{{shipping_state}}': 'SP',
+  '{{shipping_cep}}': '01001-000',
+  '{{delivery_estimate}}': '5 a 8 dias úteis',
+  '{{customer_email}}': 'ana@email.com',
+  '{{customer_phone}}': '(11) 99999-0000',
 };
 
 const replaceVariables = (text: string) => TEMPLATE_VARIABLES.reduce((acc, key) => acc.split(key).join(SAMPLE_VALUES[key] || key), text);
