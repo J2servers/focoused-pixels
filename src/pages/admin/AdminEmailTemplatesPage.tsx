@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { WorkflowBuilder } from '@/components/admin/workflows';
-import WorkflowPresets, { WORKFLOW_PRESETS, type WorkflowPreset } from '@/components/admin/workflows/WorkflowPresets';
 import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
