@@ -52,6 +52,16 @@ const TEMPLATE_VARIABLES = [
   '{{expires_at}}',
   '{{cart_items}}',
   '{{company_name}}',
+  '{{barcode}}',
+  '{{boleto_url}}',
+  '{{expiration_date}}',
+  '{{shipping_address}}',
+  '{{shipping_city}}',
+  '{{shipping_state}}',
+  '{{shipping_cep}}',
+  '{{delivery_estimate}}',
+  '{{customer_email}}',
+  '{{customer_phone}}',
 ];
 
 const SUGGESTED_WHATSAPP_TEMPLATES: SuggestedWhatsAppTemplate[] = [
