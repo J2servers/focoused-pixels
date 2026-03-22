@@ -229,6 +229,30 @@ serve(async (req) => {
       processed: true,
     });
 
+    // Trigger automation workflows for this event (fire-and-forget)
+    try {
+      await fetch(`${supabaseUrl}/functions/v1/execute-workflow`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${supabaseServiceKey}` },
+        body: JSON.stringify({
+          action: "trigger",
+          trigger_event: event,
+          trigger_data: {
+            customer_name: customer.name,
+            customer_email: customer.email,
+            customer_phone: customer.phone,
+            order_id: order.orderId,
+            order_number: order.orderNumber || order.orderId,
+            amount: formatCurrency(order.amount),
+            company_name: companyName,
+          },
+        }),
+      });
+      console.log(`[Notify] Workflow trigger sent for event: ${event}`);
+    } catch (e) {
+      console.error("[Notify] Workflow trigger error (non-blocking):", e);
+    }
+
     return new Response(
       JSON.stringify({ success: true, whatsappSent, emailSent }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
