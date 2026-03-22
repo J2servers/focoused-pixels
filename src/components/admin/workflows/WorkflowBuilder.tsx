@@ -69,8 +69,13 @@ const unitLabel = (u: string, v: number) => {
   return v === 1 ? map[u][0] : map[u][1];
 };
 
+interface WorkflowBuilderProps {
+  presetToImport?: { name: string; description?: string; trigger_event: string; steps: any[] } | null;
+  onPresetImported?: () => void;
+}
+
 /* ─── component ─── */
-export default function WorkflowBuilder() {
+export default function WorkflowBuilder({ presetToImport, onPresetImported }: WorkflowBuilderProps = {}) {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [emailTemplates, setEmailTemplates] = useState<TemplateLite[]>([]);
   const [whatsTemplates, setWhatsTemplates] = useState<TemplateLite[]>([]);
@@ -91,6 +96,21 @@ export default function WorkflowBuilder() {
   };
 
   useEffect(() => { loadData(); }, []);
+
+  // Handle preset import
+  useEffect(() => {
+    if (presetToImport) {
+      setEditing({
+        name: presetToImport.name,
+        description: presetToImport.description || '',
+        trigger_event: presetToImport.trigger_event,
+        trigger_delay_minutes: 0,
+        steps: presetToImport.steps.map((s: any) => ({ ...s, id: uid() })),
+        is_active: false,
+      });
+      onPresetImported?.();
+    }
+  }, [presetToImport]);
 
   /* ─── CRUD ─── */
   const saveWorkflow = async () => {
