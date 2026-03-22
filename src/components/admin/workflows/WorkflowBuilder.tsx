@@ -123,12 +123,12 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
     setLoading(true);
     const [{ data: wf }, { data: et }, { data: wt }] = await Promise.all([
       supabase.from('automation_workflows').select('*').order('created_at', { ascending: false }),
-      supabase.from('email_templates').select('id, name').eq('is_active', true),
-      supabase.from('whatsapp_templates').select('id, name').eq('is_active', true),
+      supabase.from('email_templates').select('id, name, subject, body').eq('is_active', true),
+      supabase.from('whatsapp_templates').select('id, name, message_text').eq('is_active', true),
     ]);
     setWorkflows((wf || []).map((w: any) => ({ ...w, steps: (w.steps || []) as WorkflowStep[] })));
     setEmailTemplates((et || []) as TemplateLite[]);
-    setWhatsTemplates((wt || []) as TemplateLite[]);
+    setWhatsTemplates((wt || []).map((t: any) => ({ ...t, message_text: t.message_text })) as TemplateLite[]);
     setLoading(false);
   };
 
