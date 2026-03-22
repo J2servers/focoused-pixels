@@ -69,8 +69,13 @@ const unitLabel = (u: string, v: number) => {
   return v === 1 ? map[u][0] : map[u][1];
 };
 
+interface WorkflowBuilderProps {
+  presetToImport?: { name: string; description?: string; trigger_event: string; steps: any[] } | null;
+  onPresetImported?: () => void;
+}
+
 /* ─── component ─── */
-export default function WorkflowBuilder() {
+export default function WorkflowBuilder({ presetToImport, onPresetImported }: WorkflowBuilderProps = {}) {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [emailTemplates, setEmailTemplates] = useState<TemplateLite[]>([]);
   const [whatsTemplates, setWhatsTemplates] = useState<TemplateLite[]>([]);
