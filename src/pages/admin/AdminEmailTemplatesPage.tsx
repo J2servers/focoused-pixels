@@ -203,15 +203,9 @@ const AdminEmailTemplatesPage = () => {
     loadData();
   };
 
-  const handleUsePreset = (preset: WorkflowPreset) => {
-    setPresetToImport(preset);
-    setActiveTab('workflows');
-  };
-
   const tabs: { key: PageTab; label: string; icon: React.ElementType; desc: string }[] = [
     { key: 'templates', label: 'Templates', icon: Mail, desc: 'E-mail e WhatsApp' },
-    { key: 'workflows', label: 'Workflows', icon: Workflow, desc: 'Automações' },
-    { key: 'presets', label: 'Modelos Prontos', icon: LayoutGrid, desc: 'Workflows pré-configurados' },
+    { key: 'workflows', label: 'Workflows', icon: Workflow, desc: 'Automações & Modelos' },
   ];
 
   return (
