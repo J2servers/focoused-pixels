@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { WorkflowBuilder } from '@/components/admin/workflows';
+import VisualWorkflowBuilder from '@/components/admin/workflows/VisualWorkflowBuilder';
 import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -324,7 +324,7 @@ const AdminEmailTemplatesPage = () => {
       )}
 
       {activeTab === 'workflows' && (
-        <WorkflowBuilder />
+        <VisualWorkflowBuilder />
       )}
 
       {/* ─── Dialogs ─── */}
