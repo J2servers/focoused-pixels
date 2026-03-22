@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 import { Mail, MessageSquare, Plus, Edit2, Trash2, Eye, Copy, Save, Zap, Workflow } from 'lucide-react';
 
 type Channel = 'email' | 'whatsapp';
-type PageTab = 'templates' | 'workflows' | 'presets';
+type PageTab = 'templates' | 'workflows';
 
 interface EmailTemplate {
   id: string;
