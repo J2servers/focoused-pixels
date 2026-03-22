@@ -7,12 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Plus, Trash2, Play, Pause, Clock, Mail, MessageSquare,
   ArrowDown, Zap, ShoppingCart, CreditCard, Package, Star,
-  ChevronDown, ChevronUp, Save, Copy, GripVertical,
+  ChevronDown, ChevronUp, Save, Copy, GripVertical, LayoutGrid,
+  RefreshCw, Heart, UserPlus, Truck, Gift, ChevronRight, AlertTriangle,
 } from 'lucide-react';
 
 /* ─── types ─── */
@@ -69,18 +71,52 @@ const unitLabel = (u: string, v: number) => {
   return v === 1 ? map[u][0] : map[u][1];
 };
 
+/* ─── Preset categories ─── */
+const PRESET_CATEGORIES = [
+  { key: 'vendas', label: 'Vendas', icon: CreditCard },
+  { key: 'recuperacao', label: 'Recuperação', icon: RefreshCw },
+  { key: 'pos_venda', label: 'Pós-venda', icon: Heart },
+  { key: 'leads', label: 'Leads', icon: UserPlus },
+  { key: 'logistica', label: 'Logística', icon: Truck },
+];
+
+interface WorkflowPreset {
+  name: string;
+  description: string;
+  trigger_event: string;
+  icon: React.ElementType;
+  color: string;
+  category: string;
+  steps: Omit<WorkflowStep, 'id'>[];
+}
+
+const WORKFLOW_PRESETS: WorkflowPreset[] = [
+  { name: 'Confirmação PIX', description: 'WhatsApp + e-mail após PIX', trigger_event: 'pix_generated', icon: Zap, color: 'text-purple-500', category: 'vendas', steps: [{ type: 'send_whatsapp', channel: 'whatsapp', template_name: 'PIX confirmado' }, { type: 'delay', delay_value: 5, delay_unit: 'minutes', delay_minutes: 5 }, { type: 'send_email', channel: 'email', template_name: 'PIX confirmado' }] },
+  { name: 'Boleto completo', description: 'WhatsApp + e-mail + lembrete', trigger_event: 'boleto_generated', icon: CreditCard, color: 'text-yellow-500', category: 'vendas', steps: [{ type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Boleto gerado' }, { type: 'send_email', channel: 'email', template_name: 'Boleto gerado' }, { type: 'delay', delay_value: 2, delay_unit: 'days', delay_minutes: 2880 }, { type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Lembrete de boleto' }] },
+  { name: 'Pedido confirmado', description: 'Multicanal ao criar pedido', trigger_event: 'order_created', icon: Package, color: 'text-blue-500', category: 'vendas', steps: [{ type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Pedido criado' }, { type: 'delay', delay_value: 2, delay_unit: 'minutes', delay_minutes: 2 }, { type: 'send_email', channel: 'email', template_name: 'Pedido criado' }] },
+  { name: 'Pagamento + produção', description: 'Confirmação e aviso de produção', trigger_event: 'payment_confirmed', icon: CreditCard, color: 'text-green-500', category: 'vendas', steps: [{ type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Pagamento confirmado' }, { type: 'send_email', channel: 'email', template_name: 'Pagamento confirmado' }, { type: 'delay', delay_value: 1, delay_unit: 'hours', delay_minutes: 60 }, { type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Produção iniciada' }] },
+  { name: 'Recuperação agressiva', description: '3 tentativas em 24h', trigger_event: 'abandoned_cart', icon: ShoppingCart, color: 'text-orange-500', category: 'recuperacao', steps: [{ type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Carrinho abandonado' }, { type: 'delay', delay_value: 2, delay_unit: 'hours', delay_minutes: 120 }, { type: 'send_email', channel: 'email', template_name: 'Carrinho abandonado' }, { type: 'delay', delay_value: 22, delay_unit: 'hours', delay_minutes: 1320 }, { type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Lembrete de carrinho com urgência' }] },
+  { name: 'Recuperação suave', description: 'Só e-mails gentis', trigger_event: 'abandoned_cart', icon: ShoppingCart, color: 'text-orange-400', category: 'recuperacao', steps: [{ type: 'delay', delay_value: 1, delay_unit: 'hours', delay_minutes: 60 }, { type: 'send_email', channel: 'email', template_name: 'Carrinho abandonado' }, { type: 'delay', delay_value: 23, delay_unit: 'hours', delay_minutes: 1380 }, { type: 'send_email', channel: 'email', template_name: 'Lembrete de carrinho com urgência' }] },
+  { name: 'Pós-entrega + avaliação', description: 'Avaliação e cupom recompra', trigger_event: 'post_delivery', icon: Star, color: 'text-pink-500', category: 'pos_venda', steps: [{ type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Pós-venda com avaliação' }, { type: 'delay', delay_value: 3, delay_unit: 'days', delay_minutes: 4320 }, { type: 'send_email', channel: 'email', template_name: 'Solicitar avaliação' }, { type: 'delay', delay_value: 7, delay_unit: 'days', delay_minutes: 10080 }, { type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Recompra VIP' }] },
+  { name: 'Recompra VIP 30d', description: 'Cupom 30 dias após entrega', trigger_event: 'post_delivery', icon: Gift, color: 'text-amber-500', category: 'pos_venda', steps: [{ type: 'delay', delay_value: 30, delay_unit: 'days', delay_minutes: 43200 }, { type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Recompra VIP' }, { type: 'delay', delay_value: 3, delay_unit: 'days', delay_minutes: 4320 }, { type: 'send_email', channel: 'email', template_name: 'Recompra VIP' }] },
+  { name: 'Boas-vindas lead', description: 'Cupom de primeira compra', trigger_event: 'order_created', icon: UserPlus, color: 'text-indigo-500', category: 'leads', steps: [{ type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Boas-vindas com cupom' }, { type: 'delay', delay_value: 1, delay_unit: 'days', delay_minutes: 1440 }, { type: 'send_email', channel: 'email', template_name: 'Boas-vindas' }, { type: 'delay', delay_value: 3, delay_unit: 'days', delay_minutes: 4320 }, { type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Lembrete de cupom' }] },
+  { name: 'Notificação de envio', description: 'Aviso com rastreio', trigger_event: 'payment_confirmed', icon: Truck, color: 'text-cyan-500', category: 'logistica', steps: [{ type: 'delay', delay_value: 3, delay_unit: 'days', delay_minutes: 4320 }, { type: 'send_whatsapp', channel: 'whatsapp', template_name: 'Pedido enviado com rastreio' }, { type: 'send_email', channel: 'email', template_name: 'Pedido enviado' }] },
+];
+
+/* ─── component ─── */
 interface WorkflowBuilderProps {
-  presetToImport?: { name: string; description?: string; trigger_event: string; steps: any[] } | null;
+  presetToImport?: WorkflowPreset | null;
   onPresetImported?: () => void;
 }
 
-/* ─── component ─── */
 export default function WorkflowBuilder({ presetToImport, onPresetImported }: WorkflowBuilderProps = {}) {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [emailTemplates, setEmailTemplates] = useState<TemplateLite[]>([]);
   const [whatsTemplates, setWhatsTemplates] = useState<TemplateLite[]>([]);
   const [editing, setEditing] = useState<Workflow | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showPresets, setShowPresets] = useState(true);
 
   const loadData = async () => {
     setLoading(true);
@@ -97,7 +133,6 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
 
   useEffect(() => { loadData(); }, []);
 
-  // Handle preset import
   useEffect(() => {
     if (presetToImport) {
       setEditing({
@@ -160,6 +195,17 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
     });
   };
 
+  const usePreset = (preset: WorkflowPreset) => {
+    setEditing({
+      name: preset.name,
+      description: preset.description,
+      trigger_event: preset.trigger_event,
+      trigger_delay_minutes: 0,
+      steps: preset.steps.map(s => ({ ...s, id: uid() })),
+      is_active: false,
+    });
+  };
+
   /* ─── step helpers ─── */
   const addStep = (type: WorkflowStep['type']) => {
     if (!editing) return;
@@ -173,7 +219,7 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
     if (!editing) return;
     const steps = [...editing.steps];
     const s = { ...steps[idx], ...patch };
-    if (s.type === 'delay' && patch.delay_value !== undefined || patch.delay_unit !== undefined) {
+    if (s.type === 'delay' && (patch.delay_value !== undefined || patch.delay_unit !== undefined)) {
       s.delay_minutes = delayToMinutes(s.delay_value || 0, s.delay_unit || 'minutes');
     }
     steps[idx] = s;
@@ -195,91 +241,183 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
   };
 
   const newWorkflow = (): Workflow => ({
-    name: '',
-    description: '',
-    trigger_event: 'abandoned_cart',
-    trigger_delay_minutes: 0,
-    steps: [],
-    is_active: false,
+    name: '', description: '', trigger_event: 'abandoned_cart', trigger_delay_minutes: 0, steps: [], is_active: false,
   });
 
   const triggerInfo = (ev: string) => TRIGGER_EVENTS.find(t => t.value === ev) || TRIGGER_EVENTS[0];
 
+  const filteredPresets = selectedCategory === 'all'
+    ? WORKFLOW_PRESETS
+    : WORKFLOW_PRESETS.filter(p => p.category === selectedCategory);
+
   /* ─── render ─── */
   return (
-    <div className="space-y-6">
-      {/* header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold flex items-center gap-2"><Zap className="h-5 w-5 text-primary" />Workflows de Automação</h3>
-          <p className="text-sm text-muted-foreground">Crie sequências automáticas de envios com temporizadores</p>
-        </div>
-        <Button onClick={() => setEditing(newWorkflow())}><Plus className="h-4 w-4 mr-2" />Novo Workflow</Button>
-      </div>
+    <div className="flex gap-0 rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] overflow-hidden" style={{ minHeight: 600 }}>
+      {/* ─── Left Sidebar: Presets ─── */}
+      {showPresets && (
+        <div className="w-64 shrink-0 border-r border-[hsl(var(--admin-card-border)/0.5)] flex flex-col bg-[hsl(var(--admin-bg)/0.5)]">
+          {/* Sidebar header */}
+          <div className="p-3 border-b border-[hsl(var(--admin-card-border)/0.5)]">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-[hsl(var(--admin-text-muted))] mb-2">
+              Modelos Prontos
+            </h4>
+            {/* Categories */}
+            <div className="space-y-0.5">
+              <button
+                onClick={() => setSelectedCategory('all')}
+                className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
+                  selectedCategory === 'all'
+                    ? 'bg-[hsl(var(--admin-accent-purple)/0.2)] text-white'
+                    : 'text-[hsl(var(--admin-text-muted))] hover:bg-[hsl(var(--admin-sidebar-hover))] hover:text-white'
+                }`}
+              >
+                <Zap className="h-3.5 w-3.5" />
+                <span>Todos</span>
+                <Badge variant="secondary" className="ml-auto text-[9px] h-4 px-1.5">{WORKFLOW_PRESETS.length}</Badge>
+              </button>
+              {PRESET_CATEGORIES.map(cat => {
+                const count = WORKFLOW_PRESETS.filter(p => p.category === cat.key).length;
+                return (
+                  <button
+                    key={cat.key}
+                    onClick={() => setSelectedCategory(cat.key)}
+                    className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
+                      selectedCategory === cat.key
+                        ? 'bg-[hsl(var(--admin-accent-purple)/0.2)] text-white'
+                        : 'text-[hsl(var(--admin-text-muted))] hover:bg-[hsl(var(--admin-sidebar-hover))] hover:text-white'
+                    }`}
+                  >
+                    <cat.icon className="h-3.5 w-3.5" />
+                    <span>{cat.label}</span>
+                    <Badge variant="secondary" className="ml-auto text-[9px] h-4 px-1.5">{count}</Badge>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-      {/* list */}
-      {loading ? (
-        <p className="text-sm text-muted-foreground">Carregando...</p>
-      ) : workflows.length === 0 ? (
-        <Card><CardContent className="py-12 text-center text-muted-foreground">
-          <Zap className="h-12 w-12 mx-auto mb-4 opacity-30" />
-          <p className="font-medium">Nenhum workflow criado</p>
-          <p className="text-sm mt-1">Crie seu primeiro workflow de automação</p>
-        </CardContent></Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {workflows.map(w => {
-            const t = triggerInfo(w.trigger_event);
-            const TIcon = t.icon;
-            return (
-              <Card key={w.id} className="border relative group">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="min-w-0">
-                      <CardTitle className="text-sm truncate">{w.name}</CardTitle>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <TIcon className={`h-3.5 w-3.5 ${t.color}`} />
-                        <span className="text-xs text-muted-foreground">{t.label}</span>
-                      </div>
+          {/* Preset list */}
+          <ScrollArea className="flex-1">
+            <div className="p-2 space-y-2">
+              {filteredPresets.map((preset, i) => {
+                const Icon = preset.icon;
+                const emailCount = preset.steps.filter(s => s.type === 'send_email').length;
+                const whatsCount = preset.steps.filter(s => s.type === 'send_whatsapp').length;
+                return (
+                  <div
+                    key={i}
+                    onClick={() => usePreset(preset)}
+                    className="group rounded-lg border border-[hsl(var(--admin-card-border)/0.5)] bg-[hsl(var(--admin-card))] p-3 hover:border-[hsl(var(--admin-accent-purple)/0.5)] transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Icon className={`h-3.5 w-3.5 ${preset.color}`} />
+                      <span className="text-xs font-medium text-white truncate">{preset.name}</span>
+                      <ChevronRight className="h-3 w-3 text-[hsl(var(--admin-text-muted))] ml-auto shrink-0 group-hover:text-[hsl(var(--admin-accent-purple))] transition-colors" />
                     </div>
-                    <Switch checked={w.is_active} onCheckedChange={v => toggleActive(w.id!, v)} />
+                    <p className="text-[10px] text-[hsl(var(--admin-text-muted))] mb-2 line-clamp-2">{preset.description}</p>
+                    <div className="flex gap-1">
+                      {whatsCount > 0 && <Badge className="text-[8px] h-4 gap-0.5 bg-green-500/10 text-green-400 border-green-700"><MessageSquare className="h-2 w-2" />{whatsCount}</Badge>}
+                      {emailCount > 0 && <Badge className="text-[8px] h-4 gap-0.5 bg-blue-500/10 text-blue-400 border-blue-700"><Mail className="h-2 w-2" />{emailCount}</Badge>}
+                      <span className="text-[9px] text-[hsl(var(--admin-text-muted))] ml-auto">{preset.steps.length}p</span>
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {/* mini pipeline */}
-                  <div className="flex items-center gap-1 flex-wrap">
-                    {w.steps.map((s, i) => (
-                      <div key={s.id} className="flex items-center gap-1">
-                        {i > 0 && <ArrowDown className="h-3 w-3 text-muted-foreground/50 rotate-[-90deg]" />}
-                        {s.type === 'delay' ? (
-                          <Badge variant="outline" className="text-[10px] gap-1"><Clock className="h-2.5 w-2.5" />{s.delay_value}{s.delay_unit?.[0]}</Badge>
-                        ) : s.type === 'send_email' ? (
-                          <Badge className="text-[10px] gap-1 bg-blue-500/10 text-blue-600 border-blue-200"><Mail className="h-2.5 w-2.5" />Email</Badge>
-                        ) : (
-                          <Badge className="text-[10px] gap-1 bg-green-500/10 text-green-600 border-green-200"><MessageSquare className="h-2.5 w-2.5" />WhatsApp</Badge>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{w.steps.length} passo{w.steps.length !== 1 ? 's' : ''}</span>
-                    <span>{w.run_count || 0} execuções</span>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setEditing({ ...w, steps: w.steps.map(s => ({ ...s })) })}>Editar</Button>
-                    <Button size="sm" variant="outline" onClick={() => duplicateWorkflow(w)}><Copy className="h-3 w-3" /></Button>
-                    <Button size="sm" variant="outline" className="text-destructive" onClick={() => deleteWorkflow(w.id!)}><Trash2 className="h-3 w-3" /></Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                );
+              })}
+            </div>
+          </ScrollArea>
         </div>
       )}
 
-      {/* editor dialog */}
+      {/* ─── Main content ─── */}
+      <div className="flex-1 flex flex-col">
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[hsl(var(--admin-card-border)/0.5)]">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => setShowPresets(!showPresets)} className="text-[hsl(var(--admin-text-muted))] hover:text-white">
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+            <div>
+              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                <Zap className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />
+                Workflows de Automação
+              </h3>
+              <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">
+                {workflows.length} workflow{workflows.length !== 1 ? 's' : ''} • {workflows.filter(w => w.is_active).length} ativo{workflows.filter(w => w.is_active).length !== 1 ? 's' : ''}
+              </p>
+            </div>
+          </div>
+          <Button size="sm" onClick={() => setEditing(newWorkflow())} className="gap-1.5">
+            <Plus className="h-4 w-4" />Novo Workflow
+          </Button>
+        </div>
+
+        {/* Workflow list */}
+        <ScrollArea className="flex-1">
+          <div className="p-4">
+            {loading ? (
+              <p className="text-sm text-[hsl(var(--admin-text-muted))]">Carregando...</p>
+            ) : workflows.length === 0 ? (
+              <div className="py-16 text-center text-[hsl(var(--admin-text-muted))]">
+                <Zap className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <p className="font-medium text-white">Nenhum workflow criado</p>
+                <p className="text-sm mt-1">Selecione um modelo pronto na barra lateral ou crie do zero</p>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {workflows.map(w => {
+                  const t = triggerInfo(w.trigger_event);
+                  const TIcon = t.icon;
+                  return (
+                    <Card key={w.id} className="border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] relative group">
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="min-w-0">
+                            <CardTitle className="text-sm truncate text-white">{w.name}</CardTitle>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <TIcon className={`h-3.5 w-3.5 ${t.color}`} />
+                              <span className="text-xs text-[hsl(var(--admin-text-muted))]">{t.label}</span>
+                            </div>
+                          </div>
+                          <Switch checked={w.is_active} onCheckedChange={v => toggleActive(w.id!, v)} />
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {w.steps.map((s, i) => (
+                            <div key={s.id} className="flex items-center gap-1">
+                              {i > 0 && <ArrowDown className="h-3 w-3 text-[hsl(var(--admin-text-muted)/0.3)] rotate-[-90deg]" />}
+                              {s.type === 'delay' ? (
+                                <Badge variant="outline" className="text-[10px] gap-1"><Clock className="h-2.5 w-2.5" />{s.delay_value}{s.delay_unit?.[0]}</Badge>
+                              ) : s.type === 'send_email' ? (
+                                <Badge className="text-[10px] gap-1 bg-blue-500/10 text-blue-400 border-blue-700"><Mail className="h-2.5 w-2.5" />Email</Badge>
+                              ) : (
+                                <Badge className="text-[10px] gap-1 bg-green-500/10 text-green-400 border-green-700"><MessageSquare className="h-2.5 w-2.5" />WhatsApp</Badge>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs text-[hsl(var(--admin-text-muted))]">
+                          <span>{w.steps.length} passo{w.steps.length !== 1 ? 's' : ''}</span>
+                          <span>{w.run_count || 0} execuções</span>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={() => setEditing({ ...w, steps: w.steps.map(s => ({ ...s })) })}>Editar</Button>
+                          <Button size="sm" variant="outline" onClick={() => duplicateWorkflow(w)}><Copy className="h-3 w-3" /></Button>
+                          <Button size="sm" variant="outline" className="text-destructive" onClick={() => deleteWorkflow(w.id!)}><Trash2 className="h-3 w-3" /></Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+
+      {/* ─── Editor dialog ─── */}
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -288,7 +426,6 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
 
           {editing && (
             <div className="space-y-6">
-              {/* basic info */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Nome</label>
@@ -311,14 +448,13 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
 
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Descrição (opcional)</label>
-                <Textarea rows={2} value={editing.description || ''} onChange={e => setEditing({ ...editing, description: e.target.value })} placeholder="Descreva o objetivo deste workflow" />
+                <Textarea rows={2} value={editing.description || ''} onChange={e => setEditing({ ...editing, description: e.target.value })} placeholder="Descreva o objetivo" />
               </div>
 
-              {/* ─── visual pipeline ─── */}
+              {/* Visual pipeline */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Passos do workflow</label>
 
-                {/* trigger node */}
                 <div className="flex flex-col items-center">
                   <div className="rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 px-6 py-3 text-center">
                     <div className="flex items-center justify-center gap-2">
@@ -326,23 +462,16 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
                       <span className="text-sm font-medium">Gatilho: {triggerInfo(editing.trigger_event).label}</span>
                     </div>
                   </div>
-                  {editing.steps.length > 0 && (
-                    <div className="w-px h-6 bg-border" />
-                  )}
+                  {editing.steps.length > 0 && <div className="w-px h-6 bg-border" />}
                 </div>
 
-                {/* steps */}
                 {editing.steps.map((step, idx) => (
                   <div key={step.id} className="flex flex-col items-center">
                     <div className="w-full max-w-lg">
                       {step.type === 'delay' ? (
-                        /* delay node */
                         <div className="rounded-xl border-2 border-orange-200 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-800 p-4">
                           <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-orange-500" />
-                              <span className="text-sm font-medium">Aguardar</span>
-                            </div>
+                            <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-orange-500" /><span className="text-sm font-medium">Aguardar</span></div>
                             <div className="flex gap-1">
                               <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => moveStep(idx, -1)} disabled={idx === 0}><ChevronUp className="h-3 w-3" /></Button>
                               <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => moveStep(idx, 1)} disabled={idx === editing.steps.length - 1}><ChevronDown className="h-3 w-3" /></Button>
@@ -362,7 +491,6 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
                           </div>
                         </div>
                       ) : (
-                        /* send node */
                         <div className={`rounded-xl border-2 p-4 ${step.type === 'send_email' ? 'border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-800' : 'border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800'}`}>
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
@@ -397,24 +525,16 @@ export default function WorkflowBuilder({ presetToImport, onPresetImported }: Wo
                   </div>
                 ))}
 
-                {/* add step buttons */}
                 <div className="flex flex-col items-center pt-2">
                   {editing.steps.length > 0 && <div className="w-px h-4 bg-border" />}
                   <div className="flex gap-2 flex-wrap justify-center">
-                    <Button variant="outline" size="sm" onClick={() => addStep('send_email')} className="gap-1.5">
-                      <Mail className="h-3.5 w-3.5 text-blue-500" />E-mail
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => addStep('send_whatsapp')} className="gap-1.5">
-                      <MessageSquare className="h-3.5 w-3.5 text-green-500" />WhatsApp
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => addStep('delay')} className="gap-1.5">
-                      <Clock className="h-3.5 w-3.5 text-orange-500" />Temporizador
-                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => addStep('send_email')} className="gap-1.5"><Mail className="h-3.5 w-3.5 text-blue-500" />E-mail</Button>
+                    <Button variant="outline" size="sm" onClick={() => addStep('send_whatsapp')} className="gap-1.5"><MessageSquare className="h-3.5 w-3.5 text-green-500" />WhatsApp</Button>
+                    <Button variant="outline" size="sm" onClick={() => addStep('delay')} className="gap-1.5"><Clock className="h-3.5 w-3.5 text-orange-500" />Temporizador</Button>
                   </div>
                 </div>
               </div>
 
-              {/* active switch */}
               <div className="flex items-center gap-3 pt-2 border-t">
                 <Switch checked={editing.is_active} onCheckedChange={v => setEditing({ ...editing, is_active: v })} />
                 <div>
