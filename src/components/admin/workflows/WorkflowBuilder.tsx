@@ -42,7 +42,7 @@ export interface Workflow {
   last_run_at?: string;
 }
 
-interface TemplateLite { id: string; name: string; }
+interface TemplateLite { id: string; name: string; body?: string; message_text?: string; subject?: string; }
 
 const TRIGGER_EVENTS = [
   { value: 'abandoned_cart', label: 'Carrinho abandonado', icon: ShoppingCart, color: 'text-orange-500' },
