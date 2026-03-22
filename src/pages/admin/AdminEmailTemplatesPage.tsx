@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { WorkflowBuilder } from '@/components/admin/workflows';
-import WorkflowPresets, { WORKFLOW_PRESETS, type WorkflowPreset } from '@/components/admin/workflows/WorkflowPresets';
 import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,10 +11,10 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Mail, MessageSquare, Plus, Edit2, Trash2, Eye, Copy, Save, Zap, LayoutGrid, Workflow } from 'lucide-react';
+import { Mail, MessageSquare, Plus, Edit2, Trash2, Eye, Copy, Save, Zap, Workflow } from 'lucide-react';
 
 type Channel = 'email' | 'whatsapp';
-type PageTab = 'templates' | 'workflows' | 'presets';
+type PageTab = 'templates' | 'workflows';
 
 interface EmailTemplate {
   id: string;
@@ -127,7 +126,6 @@ const sanitizePreviewHtml = (html: string) => {
 
 const AdminEmailTemplatesPage = () => {
   const [activeTab, setActiveTab] = useState<PageTab>('templates');
-  const [presetCategory, setPresetCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([]);
   const [whatsTemplates, setWhatsTemplates] = useState<WhatsAppTemplate[]>([]);
@@ -135,9 +133,6 @@ const AdminEmailTemplatesPage = () => {
   const [editEmail, setEditEmail] = useState<Partial<EmailTemplate> | null>(null);
   const [editWhats, setEditWhats] = useState<Partial<WhatsAppTemplate> | null>(null);
   const [preview, setPreview] = useState<{ channel: Channel; title: string; content: string; subject?: string } | null>(null);
-
-  // Workflow preset import
-  const [presetToImport, setPresetToImport] = useState<WorkflowPreset | null>(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -208,15 +203,9 @@ const AdminEmailTemplatesPage = () => {
     loadData();
   };
 
-  const handleUsePreset = (preset: WorkflowPreset) => {
-    setPresetToImport(preset);
-    setActiveTab('workflows');
-  };
-
   const tabs: { key: PageTab; label: string; icon: React.ElementType; desc: string }[] = [
     { key: 'templates', label: 'Templates', icon: Mail, desc: 'E-mail e WhatsApp' },
-    { key: 'workflows', label: 'Workflows', icon: Workflow, desc: 'Automações' },
-    { key: 'presets', label: 'Modelos Prontos', icon: LayoutGrid, desc: 'Workflows pré-configurados' },
+    { key: 'workflows', label: 'Workflows', icon: Workflow, desc: 'Automações & Modelos' },
   ];
 
   return (
@@ -315,24 +304,7 @@ const AdminEmailTemplatesPage = () => {
       )}
 
       {activeTab === 'workflows' && (
-        <WorkflowBuilder presetToImport={presetToImport} onPresetImported={() => setPresetToImport(null)} />
-      )}
-
-      {activeTab === 'presets' && (
-        <div className="rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] overflow-hidden" style={{ minHeight: 480 }}>
-          <div className="border-b border-[hsl(var(--admin-card-border)/0.5)] px-4 py-3 flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-white flex items-center gap-2"><LayoutGrid className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />Modelos Prontos</h3>
-              <p className="text-[11px] text-[hsl(var(--admin-text-muted))]">Clique em um modelo para usá-lo como base de um novo workflow</p>
-            </div>
-            <Badge variant="secondary" className="text-xs">{WORKFLOW_PRESETS.length} modelos</Badge>
-          </div>
-          <WorkflowPresets
-            selectedCategory={presetCategory}
-            onSelectCategory={setPresetCategory}
-            onUsePreset={handleUsePreset}
-          />
-        </div>
+        <WorkflowBuilder />
       )}
 
       {/* ─── Dialogs ─── */}

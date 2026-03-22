@@ -1950,6 +1950,59 @@ export type Database = {
         }
         Relationships: []
       }
+      workflow_executions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          current_step_index: number
+          error_message: string | null
+          id: string
+          next_run_at: string
+          started_at: string
+          status: string
+          step_results: Json
+          trigger_data: Json
+          updated_at: string
+          workflow_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          current_step_index?: number
+          error_message?: string | null
+          id?: string
+          next_run_at?: string
+          started_at?: string
+          status?: string
+          step_results?: Json
+          trigger_data?: Json
+          updated_at?: string
+          workflow_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          current_step_index?: number
+          error_message?: string | null
+          id?: string
+          next_run_at?: string
+          started_at?: string
+          status?: string
+          step_results?: Json
+          trigger_data?: Json
+          updated_at?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_executions_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "automation_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
