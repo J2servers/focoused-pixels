@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Mail, MessageSquare, Plus, Edit2, Trash2, Eye, Copy, Save, Zap, LayoutGrid, Workflow } from 'lucide-react';
+import { Mail, MessageSquare, Plus, Edit2, Trash2, Eye, Copy, Save, Zap, Workflow } from 'lucide-react';
 
 type Channel = 'email' | 'whatsapp';
 type PageTab = 'templates' | 'workflows' | 'presets';
