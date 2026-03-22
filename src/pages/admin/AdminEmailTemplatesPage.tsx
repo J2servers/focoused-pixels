@@ -324,7 +324,7 @@ const AdminEmailTemplatesPage = () => {
       )}
 
       {activeTab === 'workflows' && (
-        <WorkflowBuilder />
+        <VisualWorkflowBuilder />
       )}
 
       {/* ─── Dialogs ─── */}
