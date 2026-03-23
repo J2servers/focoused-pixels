@@ -116,12 +116,19 @@ serve(async (req) => {
           continue;
         }
 
+        const formattedTotal = `R$ ${Number(order.total).toFixed(2).replace('.', ',')}`;
         const vars: Record<string, string> = {
           customer_name: order.customer_name,
           order_number: order.order_number,
-          total: `R$ ${Number(order.total).toFixed(2).replace('.', ',')}`,
+          total: formattedTotal,
+          amount: formattedTotal,
           expiration_date: expiryDate.toLocaleDateString('pt-BR'),
           company_name: 'Pincel de Luz',
+          shipping_address: order.shipping_address || "",
+          shipping_city: order.shipping_city || "",
+          shipping_state: order.shipping_state || "",
+          shipping_cep: order.shipping_cep || "",
+          delivery_estimate: order.shipping_method === "express" ? "3-5 dias úteis" : "7-12 dias úteis",
         };
 
         if (isExpired) {
