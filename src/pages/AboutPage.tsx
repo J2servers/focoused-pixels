@@ -12,8 +12,8 @@ import logo from '@/assets/logo-pincel-de-luz.png';
 const AboutPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <TopBar />
-      <MainHeader />
+      <DynamicTopBar />
+      <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1">
