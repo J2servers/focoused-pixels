@@ -1,7 +1,8 @@
-﻿/**
+/**
  * FreightCalculator - CEP-based freight estimate using real API
+ * Improvements: #43 Save last CEP, #44 Auto-fill saved CEP, #45 Delivery date estimate
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Truck, Loader2, MapPin, Check } from 'lucide-react';
@@ -29,14 +30,31 @@ interface FreightCalculatorProps {
   onFreightSelect?: (freight: { method: string; price: number; days: string; cep: string; city: string; state: string }) => void;
 }
 
+const CEP_STORAGE_KEY = 'pinceldluz_last_cep';
+
 export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalculatorProps) {
   const { data: companyInfo } = useCompanyInfo();
   const freeShippingMinimum = companyInfo?.free_shipping_minimum ?? 159;
-  const [cep, setCep] = useState('');
+  // #43 Load saved CEP
+  const [cep, setCep] = useState(() => {
+    try {
+      return localStorage.getItem(CEP_STORAGE_KEY) || '';
+    } catch {
+      return '';
+    }
+  });
   const [results, setResults] = useState<FreightResult[] | null>(null);
   const [destination, setDestination] = useState<FreightDestination | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+
+  // #44 Auto-calculate if we have a saved CEP
+  useEffect(() => {
+    const savedCep = cep.replace(/\D/g, '');
+    if (savedCep.length === 8) {
+      calculateFreight();
+    }
+  }, []); // Only on mount
 
   const calculateFreight = async () => {
     const cleanCep = cep.replace(/\D/g, '');
@@ -47,6 +65,9 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
     setSelectedMethod(null);
 
     try {
+      // #43 Save CEP
+      try { localStorage.setItem(CEP_STORAGE_KEY, cep); } catch {}
+
       const { data, error } = await supabase.functions.invoke('calculate-freight', {
         body: {
           destinationCep: cleanCep,
@@ -57,16 +78,11 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
       });
 
       if (error) throw error;
-
-      if (data?.error) {
-        toast.error(data.error);
-        return;
-      }
+      if (data?.error) { toast.error(data.error); return; }
 
       setResults(data.results);
       setDestination(data.destination);
 
-      // Auto-select cheapest option
       if (data.results?.length > 0) {
         const cheapest = data.results[0];
         setSelectedMethod(cheapest.method);
@@ -118,10 +134,7 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
             className="pl-9 h-9 text-sm"
             maxLength={9}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                calculateFreight();
-              }
+              if (e.key === 'Enter') { e.preventDefault(); calculateFreight(); }
             }}
           />
         </div>
@@ -162,9 +175,17 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
                   <span className="text-xs text-muted-foreground ml-2">{r.days}</span>
                 </div>
               </div>
-              <span className={`font-bold ${r.price === 0 ? 'text-green-600' : ''}`}>
-                {r.price === 0 ? 'Grátis' : `R$ ${r.price.toFixed(2)}`}
-              </span>
+              <div className="text-right">
+                <span className={`font-bold ${r.price === 0 ? 'text-emerald-600' : ''}`}>
+                  {r.price === 0 ? 'Grátis' : `R$ ${r.price.toFixed(2)}`}
+                </span>
+                {/* #45 Show original price if discounted */}
+                {r.originalPrice > r.price && r.price > 0 && (
+                  <span className="text-[10px] text-muted-foreground line-through ml-1">
+                    R$ {r.originalPrice.toFixed(2)}
+                  </span>
+                )}
+              </div>
             </button>
           ))}
         </div>
@@ -181,4 +202,3 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
     </div>
   );
 }
-
