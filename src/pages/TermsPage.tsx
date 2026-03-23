@@ -8,8 +8,8 @@ import { storeInfo } from '@/data/store';
 const TermsPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <TopBar />
-      <MainHeader />
+      <DynamicTopBar />
+      <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1 py-12">
