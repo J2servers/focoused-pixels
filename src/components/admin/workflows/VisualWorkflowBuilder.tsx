@@ -104,12 +104,28 @@ interface PresetDef {
 }
 
 const PRESETS: PresetDef[] = [
+  { name: 'Cobrança boleto diária', description: 'Cobra 8h AM, verifica pagamento, repete até vencer', trigger_event: 'boleto_generated', category: 'vendas', icon: CreditCard, steps: [
+    { type: 'send_whatsapp', template_name: 'Boleto gerado' },
+    { type: 'send_email', template_name: 'Boleto gerado' },
+    { type: 'schedule' as any, schedule_hour: 8, schedule_minute: 0 },
+    { type: 'check_status' as any, check_type: 'payment_confirmed', condition_label: 'Pagamento confirmado?' },
+    { type: 'send_whatsapp', template_name: 'Lembrete de boleto' },
+    { type: 'send_email', template_name: 'Lembrete de boleto' },
+    { type: 'loop' as any, max_loops: 5, loop_label: 'Repetir cobrança 5x' },
+  ] },
   { name: 'Boleto completo', description: 'WhatsApp + e-mail + lembrete', trigger_event: 'boleto_generated', category: 'vendas', icon: CreditCard, steps: [{ type: 'send_whatsapp', template_name: 'Boleto gerado' }, { type: 'send_email', template_name: 'Boleto gerado' }, { type: 'delay', delay_value: 2, delay_unit: 'days' }, { type: 'send_whatsapp', template_name: 'Lembrete de boleto' }] },
   { name: 'Confirmação PIX', description: 'WhatsApp + e-mail após PIX', trigger_event: 'pix_generated', category: 'vendas', icon: Zap, steps: [{ type: 'send_whatsapp', template_name: 'PIX confirmado' }, { type: 'delay', delay_value: 5, delay_unit: 'minutes' }, { type: 'send_email', template_name: 'PIX confirmado' }] },
   { name: 'Pedido confirmado', description: 'Multicanal ao criar pedido', trigger_event: 'order_created', category: 'vendas', icon: Package, steps: [{ type: 'send_whatsapp', template_name: 'Pedido criado' }, { type: 'delay', delay_value: 2, delay_unit: 'minutes' }, { type: 'send_email', template_name: 'Pedido criado' }] },
   { name: 'Pagamento + produção', description: 'Confirmação e produção', trigger_event: 'payment_confirmed', category: 'vendas', icon: CreditCard, steps: [{ type: 'send_whatsapp', template_name: 'Pagamento confirmado' }, { type: 'send_email', template_name: 'Pagamento confirmado' }, { type: 'delay', delay_value: 1, delay_unit: 'hours' }, { type: 'send_whatsapp', template_name: 'Produção iniciada' }] },
   { name: 'Recuperação agressiva', description: '3 tentativas em 24h', trigger_event: 'abandoned_cart', category: 'recuperacao', icon: ShoppingCart, steps: [{ type: 'send_whatsapp', template_name: 'Carrinho abandonado' }, { type: 'delay', delay_value: 2, delay_unit: 'hours' }, { type: 'send_email', template_name: 'Carrinho abandonado' }, { type: 'delay', delay_value: 22, delay_unit: 'hours' }, { type: 'send_whatsapp', template_name: 'Lembrete de carrinho com urgência' }] },
-  { name: 'Recuperação suave', description: 'Só e-mails gentis', trigger_event: 'abandoned_cart', category: 'recuperacao', icon: ShoppingCart, steps: [{ type: 'delay', delay_value: 1, delay_unit: 'hours' }, { type: 'send_email', template_name: 'Carrinho abandonado' }, { type: 'delay', delay_value: 23, delay_unit: 'hours' }, { type: 'send_email', template_name: 'Lembrete de carrinho com urgência' }] },
+  { name: 'Recuperação com verificação', description: 'Verifica carrinho antes de cobrar', trigger_event: 'abandoned_cart', category: 'recuperacao', icon: ShoppingCart, steps: [
+    { type: 'delay', delay_value: 1, delay_unit: 'hours' },
+    { type: 'check_status' as any, check_type: 'cart_recovered', condition_label: 'Carrinho recuperado?' },
+    { type: 'send_whatsapp', template_name: 'Carrinho abandonado' },
+    { type: 'delay', delay_value: 23, delay_unit: 'hours' },
+    { type: 'check_status' as any, check_type: 'cart_recovered', condition_label: 'Carrinho recuperado?' },
+    { type: 'send_email', template_name: 'Lembrete de carrinho com urgência' },
+  ] },
   { name: 'Pós-entrega + avaliação', description: 'Avaliação e cupom recompra', trigger_event: 'post_delivery', category: 'pos_venda', icon: Star, steps: [{ type: 'send_whatsapp', template_name: 'Pós-venda com avaliação' }, { type: 'delay', delay_value: 3, delay_unit: 'days' }, { type: 'send_email', template_name: 'Solicitar avaliação' }, { type: 'delay', delay_value: 7, delay_unit: 'days' }, { type: 'send_whatsapp', template_name: 'Recompra VIP' }] },
   { name: 'Recompra VIP 30d', description: 'Cupom 30 dias após entrega', trigger_event: 'post_delivery', category: 'pos_venda', icon: Gift, steps: [{ type: 'delay', delay_value: 30, delay_unit: 'days' }, { type: 'send_whatsapp', template_name: 'Recompra VIP' }, { type: 'delay', delay_value: 3, delay_unit: 'days' }, { type: 'send_email', template_name: 'Recompra VIP' }] },
   { name: 'Boas-vindas lead', description: 'Cupom primeira compra', trigger_event: 'order_created', category: 'leads', icon: UserPlus, steps: [{ type: 'send_whatsapp', template_name: 'Boas-vindas com cupom' }, { type: 'delay', delay_value: 1, delay_unit: 'days' }, { type: 'send_email', template_name: 'Boas-vindas' }] },
