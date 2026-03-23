@@ -100,7 +100,7 @@ interface PresetDef {
   trigger_event: string;
   category: string;
   icon: React.ElementType;
-  steps: { type: string; template_name?: string; delay_value?: number; delay_unit?: string; condition_label?: string }[];
+  steps: { type: string; template_name?: string; delay_value?: number; delay_unit?: string; condition_label?: string; check_type?: string; schedule_hour?: number; schedule_minute?: number; max_loops?: number; loop_label?: string }[];
 }
 
 const PRESETS: PresetDef[] = [
