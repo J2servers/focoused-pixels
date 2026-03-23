@@ -43,51 +43,67 @@ function formatDate(dateStr: string | undefined): string {
 function replaceVars(template: string, vars: Record<string, string>): string {
   let result = template;
   for (const [key, value] of Object.entries(vars)) {
+    result = result.replaceAll(`{{${key}}}`, value || "");
     result = result.replaceAll(`{${key}}`, value || "");
   }
   return result;
 }
 
-// WhatsApp message builders (hardcoded since WhatsApp templates are plain text)
-function buildPixWhatsApp(data: NotifyRequest): string {
+// Event name → WhatsApp template name mapping
+const EVENT_TO_WA_TEMPLATE: Record<string, string[]> = {
+  pix_generated: ["pix_generated", "PIX Gerado"],
+  boleto_generated: ["boleto_generated", "Boleto Emitido", "Boleto gerado"],
+  card_approved: ["card_approved", "Pagamento Confirmado"],
+  card_pending: ["card_pending"],
+  payment_confirmed: ["payment_confirmed", "Pagamento Confirmado"],
+};
+
+// Fallback WhatsApp messages (only used if no DB template found)
+function buildFallbackWhatsApp(data: NotifyRequest): string {
   const firstName = data.customer.name.split(" ")[0] || "Cliente";
   const finalAmount = data.pix?.finalAmount ?? data.order.amount;
   const discount = data.pix?.discountPercent ?? 0;
-  return [
-    `💳 *PIX Gerado - Pincel de Luz*`, ``,
-    `Olá, ${firstName}! Seu pagamento via PIX foi gerado.`, ``,
-    `💰 *Valor:* ${formatCurrency(finalAmount)}`,
-    discount > 0 ? `🏷️ *Desconto PIX:* ${discount}%` : null,
-    `⏰ *Expira em:* ${formatDate(data.pix?.expirationDate)}`, ``,
-    data.pix?.ticketUrl ? `🔗 *Link para pagamento:*\n${data.pix.ticketUrl}` : null, ``,
-    `Após o pagamento, você receberá a confirmação automaticamente. ✨`,
-  ].filter(Boolean).join("\n");
-}
 
-function buildBoletoWhatsApp(data: NotifyRequest): string {
-  const firstName = data.customer.name.split(" ")[0] || "Cliente";
-  return [
-    `🧾 *Boleto Gerado - Pincel de Luz*`, ``,
-    `Olá, ${firstName}! Seu boleto foi gerado com sucesso.`, ``,
-    `💰 *Valor:* ${formatCurrency(data.order.amount)}`,
-    `📅 *Vencimento:* ${formatDate(data.boleto?.expirationDate)}`, ``,
-    data.boleto?.barcode ? `📋 *Código de barras:*\n${data.boleto.barcode}` : null, ``,
-    data.boleto?.boletoUrl ? `🔗 *Link do boleto:*\n${data.boleto.boletoUrl}` : null, ``,
-    `Após a compensação, você receberá a confirmação. ✨`,
-  ].filter(Boolean).join("\n");
-}
+  switch (data.event) {
+    case "pix_generated":
+      return [
+        `💳 *PIX Gerado - Pincel de Luz*`, ``,
+        `Olá, ${firstName}! Seu pagamento via PIX foi gerado.`, ``,
+        `💰 *Valor:* ${formatCurrency(finalAmount)}`,
+        discount > 0 ? `🏷️ *Desconto PIX:* ${discount}%` : null,
+        `⏰ *Expira em:* ${formatDate(data.pix?.expirationDate)}`, ``,
+        data.pix?.ticketUrl ? `🔗 *Link para pagamento:*\n${data.pix.ticketUrl}` : null, ``,
+        `Após o pagamento, você receberá a confirmação automaticamente. ✨`,
+      ].filter(Boolean).join("\n");
 
-function buildCardWhatsApp(data: NotifyRequest): string {
-  const firstName = data.customer.name.split(" ")[0] || "Cliente";
-  const inst = data.card?.installments || 1;
-  const instText = inst > 1 ? `${inst}x de ${formatCurrency(data.card?.installmentAmount || data.order.amount / inst)}` : `à vista`;
-  return [
-    `✅ *Pagamento Aprovado - Pincel de Luz*`, ``,
-    `Olá, ${firstName}! Seu pagamento foi aprovado.`, ``,
-    `💰 *Valor:* ${formatCurrency(data.order.amount)} (${instText})`,
-    data.card?.brand ? `💳 *Cartão:* ${data.card.brand} final ${data.card.lastFourDigits || "****"}` : null, ``,
-    `Seu pedido já está em processamento! ✨`,
-  ].filter(Boolean).join("\n");
+    case "boleto_generated":
+      return [
+        `🧾 *Boleto Gerado - Pincel de Luz*`, ``,
+        `Olá, ${firstName}! Seu boleto foi gerado com sucesso.`, ``,
+        `💰 *Valor:* ${formatCurrency(data.order.amount)}`,
+        `📅 *Vencimento:* ${formatDate(data.boleto?.expirationDate)}`, ``,
+        data.boleto?.barcode ? `📋 *Código de barras:*\n${data.boleto.barcode}` : null, ``,
+        data.boleto?.boletoUrl ? `🔗 *Link do boleto:*\n${data.boleto.boletoUrl}` : null, ``,
+        `Após a compensação, você receberá a confirmação. ✨`,
+      ].filter(Boolean).join("\n");
+
+    case "card_approved":
+      const inst = data.card?.installments || 1;
+      const instText = inst > 1 ? `${inst}x de ${formatCurrency(data.card?.installmentAmount || data.order.amount / inst)}` : `à vista`;
+      return [
+        `✅ *Pagamento Aprovado - Pincel de Luz*`, ``,
+        `Olá, ${firstName}! Seu pagamento foi aprovado.`, ``,
+        `💰 *Valor:* ${formatCurrency(data.order.amount)} (${instText})`,
+        data.card?.brand ? `💳 *Cartão:* ${data.card.brand} final ${data.card.lastFourDigits || "****"}` : null, ``,
+        `Seu pedido já está em processamento! ✨`,
+      ].filter(Boolean).join("\n");
+
+    case "card_pending":
+      return `⏳ *Pagamento em Análise*\n\nOlá, ${firstName}! Seu pagamento está sendo analisado. Você receberá uma confirmação em breve.`;
+
+    default:
+      return `Olá ${firstName}, recebemos seu pagamento. Obrigado!`;
+  }
 }
 
 serve(async (req) => {
@@ -118,15 +134,6 @@ serve(async (req) => {
 
     const companyName = company?.company_name || "Pincel de Luz";
 
-    // Load email template from DB
-    const { data: template } = await supabase
-      .from("email_templates")
-      .select("subject, body")
-      .eq("name", event)
-      .eq("is_active", true)
-      .limit(1)
-      .maybeSingle();
-
     // Build template variables
     const firstName = customer.name.split(" ")[0] || "Cliente";
     const inst = data.card?.installments || 1;
@@ -134,8 +141,12 @@ serve(async (req) => {
 
     const templateVars: Record<string, string> = {
       customer_name: firstName,
+      customer_email: customer.email || "",
+      customer_phone: customer.phone || "",
       amount: formatCurrency(data.pix?.finalAmount ?? order.amount),
       company_name: companyName,
+      order_id: order.orderId || "",
+      order_number: order.orderNumber || order.orderId || "",
       discount_percent: String(data.pix?.discountPercent ?? 0),
       expiration_date: formatDate(data.pix?.expirationDate || data.boleto?.expirationDate),
       payment_link: data.pix?.ticketUrl || "",
@@ -146,32 +157,53 @@ serve(async (req) => {
       card_last_four: data.card?.lastFourDigits || "****",
     };
 
+    // ─── Load email template from DB ───
+    const { data: emailTemplate } = await supabase
+      .from("email_templates")
+      .select("subject, body")
+      .eq("name", event)
+      .eq("is_active", true)
+      .limit(1)
+      .maybeSingle();
+
     let emailSubject = "";
     let emailHtml = "";
 
-    if (template) {
-      emailSubject = replaceVars(template.subject, templateVars);
-      emailHtml = replaceVars(template.body, templateVars);
+    if (emailTemplate) {
+      emailSubject = replaceVars(emailTemplate.subject, templateVars);
+      emailHtml = replaceVars(emailTemplate.body, templateVars);
     } else {
-      // Fallback
       emailSubject = `${event.replace(/_/g, " ")} - ${companyName}`;
       emailHtml = `<p>Olá ${firstName}, seu evento "${event}" foi processado. Valor: ${formatCurrency(order.amount)}</p>`;
     }
 
-    // Build WhatsApp message
+    // ─── Load WhatsApp template from DB ───
     let whatsappMessage = "";
-    switch (event) {
-      case "pix_generated": whatsappMessage = buildPixWhatsApp(data); break;
-      case "boleto_generated": whatsappMessage = buildBoletoWhatsApp(data); break;
-      case "card_approved": whatsappMessage = buildCardWhatsApp(data); break;
-      case "card_pending":
-        whatsappMessage = `⏳ *Pagamento em Análise*\n\nOlá, ${firstName}! Seu pagamento está sendo analisado. Você receberá uma confirmação em breve.`;
+    const candidateNames = EVENT_TO_WA_TEMPLATE[event] || [event];
+
+    for (const tplName of candidateNames) {
+      const { data: waTpl } = await supabase
+        .from("whatsapp_templates")
+        .select("message_text")
+        .eq("name", tplName)
+        .eq("is_active", true)
+        .limit(1)
+        .maybeSingle();
+
+      if (waTpl?.message_text) {
+        whatsappMessage = replaceVars(waTpl.message_text, templateVars);
+        console.log(`[Notify] WhatsApp template loaded: ${tplName}`);
         break;
-      default:
-        whatsappMessage = `Olá ${firstName}, recebemos seu pagamento. Obrigado!`;
+      }
     }
 
-    // Send WhatsApp
+    // Fallback to hardcoded if no DB template
+    if (!whatsappMessage) {
+      whatsappMessage = buildFallbackWhatsApp(data);
+      console.log(`[Notify] Using fallback WhatsApp message for ${event}`);
+    }
+
+    // ─── Send WhatsApp ───
     const cleanPhone = sanitizePhone(customer.phone);
     let whatsappSent = false;
     if (cleanPhone && whatsappMessage) {
@@ -195,7 +227,7 @@ serve(async (req) => {
       }
     }
 
-    // Send Email
+    // ─── Send Email ───
     let emailSent = false;
     if (customer.email && customer.email.includes("@") && emailHtml) {
       try {
@@ -217,7 +249,7 @@ serve(async (req) => {
       }
     }
 
-    // Log
+    // ─── Log ───
     await supabase.from("webhook_logs").insert({
       direction: "outbound",
       endpoint: "notify-customer",
@@ -229,7 +261,7 @@ serve(async (req) => {
       processed: true,
     });
 
-    // Trigger automation workflows for this event (fire-and-forget)
+    // ─── Trigger automation workflows (fire-and-forget) ───
     try {
       await fetch(`${supabaseUrl}/functions/v1/execute-workflow`, {
         method: "POST",
@@ -238,13 +270,10 @@ serve(async (req) => {
           action: "trigger",
           trigger_event: event,
           trigger_data: {
+            ...templateVars,
             customer_name: customer.name,
             customer_email: customer.email,
             customer_phone: customer.phone,
-            order_id: order.orderId,
-            order_number: order.orderNumber || order.orderId,
-            amount: formatCurrency(order.amount),
-            company_name: companyName,
           },
         }),
       });
