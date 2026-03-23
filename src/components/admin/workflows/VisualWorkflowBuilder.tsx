@@ -37,6 +37,9 @@ import EmailNode from './nodes/EmailNode';
 import WhatsAppNode from './nodes/WhatsAppNode';
 import DelayNode from './nodes/DelayNode';
 import ConditionNode from './nodes/ConditionNode';
+import CheckStatusNode from './nodes/CheckStatusNode';
+import LoopNode from './nodes/LoopNode';
+import ScheduleNode from './nodes/ScheduleNode';
 
 /* ─── types ─── */
 interface TemplateLite { id: string; name: string; body?: string; message_text?: string; subject?: string; }
@@ -58,6 +61,9 @@ const NODE_TYPES = {
   send_whatsapp: WhatsAppNode,
   delay: DelayNode,
   condition: ConditionNode,
+  check_status: CheckStatusNode,
+  loop: LoopNode,
+  schedule: ScheduleNode,
 };
 
 const TRIGGER_EVENTS = [
@@ -75,6 +81,9 @@ const DRAGGABLE_NODES = [
   { type: 'send_whatsapp', label: 'WhatsApp', icon: MessageSquare, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/30' },
   { type: 'delay', label: 'Aguardar', icon: Clock, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/30' },
   { type: 'condition', label: 'Condição', icon: GitBranch, color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/30' },
+  { type: 'check_status', label: 'Verificar Status', icon: SearchCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+  { type: 'schedule', label: 'Agendar Horário', icon: CalendarClock, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30' },
+  { type: 'loop', label: 'Loop / Repetir', icon: Repeat, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
 ];
 
 const PRESET_CATEGORIES = [
