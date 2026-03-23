@@ -52,6 +52,11 @@ import ConditionNode from './nodes/ConditionNode';
 import CheckStatusNode from './nodes/CheckStatusNode';
 import LoopNode from './nodes/LoopNode';
 import ScheduleNode from './nodes/ScheduleNode';
+import UpdateOrderStatusNode from './nodes/UpdateOrderStatusNode';
+import CreateCouponNode from './nodes/CreateCouponNode';
+import HttpWebhookNode from './nodes/HttpWebhookNode';
+import AddTagNode from './nodes/AddTagNode';
+import WaitForEventNode from './nodes/WaitForEventNode';
 
 /* ─── types ─── */
 interface TemplateLite { id: string; name: string; body?: string; message_text?: string; subject?: string; }
@@ -91,6 +96,11 @@ const NODE_TYPES = {
   check_status: CheckStatusNode,
   loop: LoopNode,
   schedule: ScheduleNode,
+  update_order_status: UpdateOrderStatusNode,
+  create_coupon: CreateCouponNode,
+  http_webhook: HttpWebhookNode,
+  add_tag: AddTagNode,
+  wait_for_event: WaitForEventNode,
 };
 
 const TRIGGER_EVENTS = [
@@ -108,9 +118,14 @@ const DRAGGABLE_NODES = [
   { type: 'send_whatsapp', label: 'WhatsApp', icon: MessageSquare, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/30', description: 'Enviar WhatsApp' },
   { type: 'delay', label: 'Aguardar', icon: Clock, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/30', description: 'Esperar um tempo' },
   { type: 'condition', label: 'Condição', icon: GitBranch, color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/30', description: 'Ramificação condicional' },
-  { type: 'check_status', label: 'Verificar', icon: SearchCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', description: 'Verificar status real' },
-  { type: 'schedule', label: 'Agendar', icon: CalendarClock, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30', description: 'Agendar para horário' },
+  { type: 'check_status', label: 'Verificar', icon: SearchCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', description: 'Verificar status real no banco' },
+  { type: 'schedule', label: 'Agendar', icon: CalendarClock, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30', description: 'Agendar para horário específico' },
   { type: 'loop', label: 'Loop', icon: Repeat, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30', description: 'Repetir bloco N vezes' },
+  { type: 'update_order_status', label: 'Atualizar Pedido', icon: Settings2, color: 'text-indigo-400', bg: 'bg-indigo-500/10 border-indigo-500/30', description: 'Alterar status do pedido automaticamente' },
+  { type: 'create_coupon', label: 'Criar Cupom', icon: Gift, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30', description: 'Gerar cupom de desconto automático' },
+  { type: 'http_webhook', label: 'Webhook', icon: Activity, color: 'text-rose-400', bg: 'bg-rose-500/10 border-rose-500/30', description: 'Chamar API externa via HTTP' },
+  { type: 'add_tag', label: 'Tag Lead', icon: UserPlus, color: 'text-teal-400', bg: 'bg-teal-500/10 border-teal-500/30', description: 'Adicionar/remover tag do lead' },
+  { type: 'wait_for_event', label: 'Aguardar Evento', icon: Zap, color: 'text-sky-400', bg: 'bg-sky-500/10 border-sky-500/30', description: 'Esperar evento acontecer (com timeout)' },
 ];
 
 const PRESET_CATEGORIES = [
@@ -1418,6 +1433,105 @@ function WorkflowBuilderInner() {
                       onChange={e => updateSelectedNode({ loop_label: e.target.value })}
                       placeholder="Ex: Repetir cobrança 5x"
                     />
+                  </div>
+                )}
+
+                {/* Update Order Status config */}
+                {selectedNode.type === 'update_order_status' && (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Novo status do pedido</label>
+                    <Select value={(selectedNode.data.new_order_status as string) || 'processing'} onValueChange={v => updateSelectedNode({ new_order_status: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="processing">Em produção</SelectItem>
+                        <SelectItem value="shipped">Enviado</SelectItem>
+                        <SelectItem value="delivered">Entregue</SelectItem>
+                        <SelectItem value="cancelled">Cancelado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Status de pagamento (opcional)</label>
+                    <Select value={(selectedNode.data.new_payment_status as string) || ''} onValueChange={v => updateSelectedNode({ new_payment_status: v })}>
+                      <SelectTrigger><SelectValue placeholder="Não alterar" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="paid">Pago</SelectItem>
+                        <SelectItem value="refunded">Reembolsado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Create Coupon config */}
+                {selectedNode.type === 'create_coupon' && (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Tipo de desconto</label>
+                    <Select value={(selectedNode.data.coupon_type as string) || 'percentage'} onValueChange={v => updateSelectedNode({ coupon_type: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="percentage">Percentual (%)</SelectItem>
+                        <SelectItem value="fixed">Valor fixo (R$)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Valor</label>
+                    <Input type="number" min={1} value={(selectedNode.data.coupon_value as number) || 10} onChange={e => updateSelectedNode({ coupon_value: parseInt(e.target.value) || 1 })} />
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Validade (dias)</label>
+                    <Input type="number" min={1} value={(selectedNode.data.coupon_duration_days as number) || 7} onChange={e => updateSelectedNode({ coupon_duration_days: parseInt(e.target.value) || 1 })} />
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Prefixo do código</label>
+                    <Input value={(selectedNode.data.coupon_prefix as string) || 'AUTO'} onChange={e => updateSelectedNode({ coupon_prefix: e.target.value.toUpperCase() })} placeholder="AUTO" />
+                    <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">O cupom gerado será injetado como {'{{coupon_code}}'} nos passos seguintes.</p>
+                  </div>
+                )}
+
+                {/* HTTP Webhook config */}
+                {selectedNode.type === 'http_webhook' && (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">URL</label>
+                    <Input value={(selectedNode.data.webhook_url as string) || ''} onChange={e => updateSelectedNode({ webhook_url: e.target.value })} placeholder="https://api.exemplo.com/hook" />
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Método</label>
+                    <Select value={(selectedNode.data.webhook_method as string) || 'POST'} onValueChange={v => updateSelectedNode({ webhook_method: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="POST">POST</SelectItem>
+                        <SelectItem value="GET">GET</SelectItem>
+                        <SelectItem value="PUT">PUT</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">Os dados do trigger serão enviados como JSON no body. Use {'{{variavel}}'} no body personalizado.</p>
+                  </div>
+                )}
+
+                {/* Add Tag config */}
+                {selectedNode.type === 'add_tag' && (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Nome da tag</label>
+                    <Input value={(selectedNode.data.tag_name as string) || ''} onChange={e => updateSelectedNode({ tag_name: e.target.value })} placeholder="vip, comprador, inativo..." />
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Ação</label>
+                    <Select value={(selectedNode.data.tag_action as string) || 'add'} onValueChange={v => updateSelectedNode({ tag_action: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="add">Adicionar</SelectItem>
+                        <SelectItem value="remove">Remover</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">A tag será aplicada ao lead correspondente ao e-mail do cliente.</p>
+                  </div>
+                )}
+
+                {/* Wait For Event config */}
+                {selectedNode.type === 'wait_for_event' && (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Evento a aguardar</label>
+                    <Select value={(selectedNode.data.wait_event as string) || 'payment_confirmed'} onValueChange={v => updateSelectedNode({ wait_event: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="payment_confirmed">Pagamento confirmado</SelectItem>
+                        <SelectItem value="order_shipped">Pedido enviado</SelectItem>
+                        <SelectItem value="cart_recovered">Carrinho recuperado</SelectItem>
+                        <SelectItem value="boleto_expired">Boleto vencido</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Timeout (minutos)</label>
+                    <Input type="number" min={5} value={(selectedNode.data.wait_timeout_minutes as number) || 1440} onChange={e => updateSelectedNode({ wait_timeout_minutes: parseInt(e.target.value) || 60 })} />
+                    <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">O workflow pausa e verifica a cada 5min se o evento ocorreu. Após o timeout, avança automaticamente.</p>
                   </div>
                 )}
 
