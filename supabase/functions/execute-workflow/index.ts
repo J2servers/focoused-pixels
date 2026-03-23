@@ -16,14 +16,21 @@ interface WorkflowStep {
   delay_value?: number;
   delay_unit?: string;
   condition_label?: string;
-  check_type?: string; // payment_confirmed, boleto_expired, order_shipped, cart_recovered
+  check_type?: string;
   schedule_hour?: number;
   schedule_minute?: number;
   max_loops?: number;
   loop_label?: string;
-  // For branching: which handle was followed
   source_handle?: string;
+  yes_next_index?: number;
+  no_next_index?: number;
+  exit_next_index?: number;
+  loop_next_index?: number;
+  retry_count?: number;
 }
+
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 5 * 60 * 1000; // 5 min
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -65,11 +72,9 @@ serve(async (req) => {
         const firstStep = steps[0];
         let initialDelayMs = (wf.trigger_delay_minutes || 0) * 60 * 1000;
 
-        // If first step is delay, use it
         if (firstStep.type === "delay") {
           initialDelayMs = (firstStep.delay_minutes || 0) * 60 * 1000;
         }
-        // If first step is schedule, calculate time until scheduled hour
         if (firstStep.type === "schedule") {
           initialDelayMs = calcScheduleDelay(firstStep.schedule_hour ?? 8, firstStep.schedule_minute ?? 0);
         }
@@ -131,7 +136,8 @@ serve(async (req) => {
         try {
           const workflow = exec.automation_workflows;
           if (!workflow) {
-            await supabase.from("workflow_executions").update({ status: "failed", error_message: "Workflow not found" }).eq("id", exec.id);
+            await failExec(supabase, exec.id, "Workflow not found");
+            await notifyAdminError(supabase, supabaseUrl, serviceKey, exec, "Workflow vinculado não encontrado");
             continue;
           }
 
@@ -141,10 +147,10 @@ serve(async (req) => {
           const stepResults = (exec.step_results || []) as any[];
 
           if (currentIdx >= steps.length) {
-            await supabase.from("workflow_executions").update({
+            await updateExec(supabase, exec.id, {
               status: "completed",
               completed_at: new Date().toISOString(),
-            }).eq("id", exec.id);
+            });
             processed++;
             continue;
           }
@@ -188,7 +194,7 @@ serve(async (req) => {
             continue;
           }
 
-          // ─── CHECK_STATUS (condition based on real data) ───
+          // ─── CHECK_STATUS / CONDITION ───
           if (step.type === "check_status" || step.type === "condition") {
             const checkType = step.check_type || step.condition_label || "payment_confirmed";
             const passed = await evaluateCondition(supabase, checkType, triggerData);
@@ -197,13 +203,8 @@ serve(async (req) => {
             stepResult.check_type = checkType;
             stepResult.result = passed;
 
-            // Find which branch to follow based on edges stored in steps
-            // For now: if passed (YES) → skip next step and go to step+1
-            // If not passed (NO) → continue to step+1
-            // The visual builder stores branch info, but in flat steps:
-            // - "yes_next_index" and "no_next_index" in step data
-            const yesIdx = (step as any).yes_next_index ?? currentIdx + 1;
-            const noIdx = (step as any).no_next_index ?? currentIdx + 1;
+            const yesIdx = step.yes_next_index ?? currentIdx + 1;
+            const noIdx = step.no_next_index ?? currentIdx + 1;
             const nextIdx = passed ? yesIdx : noIdx;
 
             if (nextIdx >= steps.length) {
@@ -227,7 +228,6 @@ serve(async (req) => {
           // ─── LOOP ───
           if (step.type === "loop") {
             const maxLoops = step.max_loops || 5;
-            // Count how many times we've been at this loop step
             const loopCount = stepResults.filter(r => r.step_index === currentIdx && r.type === "loop").length;
 
             stepResult.status = "completed";
@@ -235,9 +235,8 @@ serve(async (req) => {
             stepResult.max_loops = maxLoops;
 
             if (loopCount >= maxLoops) {
-              // Exit loop - go to next step after loop
               console.log(`[WorkflowEngine] Loop limit reached (${maxLoops}x) for exec ${exec.id}`);
-              const exitIdx = (step as any).exit_next_index ?? currentIdx + 1;
+              const exitIdx = step.exit_next_index ?? currentIdx + 1;
               if (exitIdx >= steps.length) {
                 await updateExec(supabase, exec.id, {
                   status: "completed",
@@ -253,9 +252,7 @@ serve(async (req) => {
                 });
               }
             } else {
-              // Continue loop - go to loop_next_index (the beginning of the loop body)
-              const loopIdx = (step as any).loop_next_index ?? 0;
-              // Default: jump back to step after last check_status before this loop
+              const loopIdx = step.loop_next_index ?? 0;
               const targetIdx = loopIdx > 0 ? loopIdx : Math.max(0, currentIdx - (steps.slice(0, currentIdx).reverse().findIndex(s => s.type === "check_status" || s.type === "schedule") + 1));
 
               await updateExec(supabase, exec.id, {
@@ -269,28 +266,68 @@ serve(async (req) => {
             continue;
           }
 
-          // ─── SEND EMAIL ───
+          // ─── SEND EMAIL (with retry) ───
           if (step.type === "send_email") {
             const result = await sendEmail(supabase, supabaseUrl, serviceKey, step, triggerData);
             stepResult = { ...stepResult, ...result };
+
+            if (result.status === "failed" || result.status === "error") {
+              const retryCount = (step.retry_count || 0);
+              const prevRetries = stepResults.filter(r => r.step_index === currentIdx && (r.status === "failed" || r.status === "error")).length;
+
+              if (prevRetries < MAX_RETRIES) {
+                console.log(`[WorkflowEngine] Email failed, scheduling retry ${prevRetries + 1}/${MAX_RETRIES}`);
+                stepResult.retry_attempt = prevRetries + 1;
+                await updateExec(supabase, exec.id, {
+                  status: "running",
+                  next_run_at: new Date(Date.now() + RETRY_DELAY_MS).toISOString(),
+                  step_results: [...stepResults, stepResult],
+                });
+                processed++;
+                continue;
+              } else {
+                // Max retries exhausted — notify admin and continue
+                await notifyAdminError(supabase, supabaseUrl, serviceKey, exec,
+                  `Email falhou após ${MAX_RETRIES} tentativas: ${result.error || result.reason || "erro desconhecido"}`);
+                await logFailure(supabase, exec, step, result);
+              }
+            }
           }
-          // ─── SEND WHATSAPP ───
+          // ─── SEND WHATSAPP (with retry) ───
           else if (step.type === "send_whatsapp") {
             const result = await sendWhatsApp(supabase, supabaseUrl, serviceKey, step, triggerData);
             stepResult = { ...stepResult, ...result };
+
+            if (result.status === "failed" || result.status === "error") {
+              const prevRetries = stepResults.filter(r => r.step_index === currentIdx && (r.status === "failed" || r.status === "error")).length;
+
+              if (prevRetries < MAX_RETRIES) {
+                console.log(`[WorkflowEngine] WhatsApp failed, scheduling retry ${prevRetries + 1}/${MAX_RETRIES}`);
+                stepResult.retry_attempt = prevRetries + 1;
+                await updateExec(supabase, exec.id, {
+                  status: "running",
+                  next_run_at: new Date(Date.now() + RETRY_DELAY_MS).toISOString(),
+                  step_results: [...stepResults, stepResult],
+                });
+                processed++;
+                continue;
+              } else {
+                await notifyAdminError(supabase, supabaseUrl, serviceKey, exec,
+                  `WhatsApp falhou após ${MAX_RETRIES} tentativas: ${result.error || result.reason || "erro desconhecido"}`);
+                await logFailure(supabase, exec, step, result);
+              }
+            }
           }
 
           // Advance to next step
           const nextIdx = currentIdx + 1;
           let nextRunAt = new Date().toISOString();
 
-          // Peek at next step for scheduling
           if (nextIdx < steps.length) {
             const nextStep = steps[nextIdx];
             if (nextStep.type === "delay") {
               const delayMs = (nextStep.delay_minutes || 0) * 60 * 1000;
               nextRunAt = new Date(Date.now() + delayMs).toISOString();
-              // Skip the delay step
               await updateExec(supabase, exec.id, {
                 status: nextIdx + 1 >= steps.length ? "completed" : "running",
                 current_step_index: nextIdx + 1,
@@ -330,7 +367,8 @@ serve(async (req) => {
         } catch (e) {
           console.error(`[WorkflowEngine] Error processing exec ${exec.id}:`, e);
           const msg = e instanceof Error ? e.message : "Unknown error";
-          await supabase.from("workflow_executions").update({ status: "failed", error_message: msg }).eq("id", exec.id);
+          await failExec(supabase, exec.id, msg);
+          await notifyAdminError(supabase, supabaseUrl, serviceKey, exec, `Erro fatal no workflow: ${msg}`);
           errors++;
         }
       }
@@ -370,19 +408,127 @@ async function updateExec(supabase: any, id: string, updates: Record<string, any
   await supabase.from("workflow_executions").update(updates).eq("id", id);
 }
 
+async function failExec(supabase: any, id: string, errorMessage: string) {
+  await supabase.from("workflow_executions").update({
+    status: "failed",
+    error_message: errorMessage,
+    completed_at: new Date().toISOString(),
+  }).eq("id", id);
+}
+
+/**
+ * Notify admin via webhook_logs + email when workflow step fails
+ */
+async function notifyAdminError(
+  supabase: any, supabaseUrl: string, serviceKey: string,
+  exec: any, errorDetail: string
+) {
+  try {
+    const workflowName = exec.automation_workflows?.name || "Desconhecido";
+    const triggerData = exec.trigger_data || {};
+    const orderNumber = triggerData.order_number || triggerData.order_id || "N/A";
+
+    // Log the failure prominently
+    await supabase.from("webhook_logs").insert({
+      direction: "internal",
+      endpoint: "workflow-error-alert",
+      event_type: "workflow_step_failed",
+      source: "execute-workflow",
+      request_body: {
+        workflow_name: workflowName,
+        execution_id: exec.id,
+        order_number: orderNumber,
+        customer_name: triggerData.customer_name || "N/A",
+        error: errorDetail,
+      },
+      status_code: 500,
+      processed: false,
+      error_message: errorDetail,
+    });
+
+    // Try to send admin email notification
+    const { data: company } = await supabase
+      .from("company_info")
+      .select("email, notification_email, company_name")
+      .limit(1)
+      .maybeSingle();
+
+    const adminEmail = company?.notification_email || company?.email;
+    if (!adminEmail) {
+      console.log("[WorkflowEngine] No admin email configured for error alerts");
+      return;
+    }
+
+    const alertHtml = `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+        <div style="background:#fef2f2;border:2px solid #ef4444;border-radius:12px;padding:24px;">
+          <h2 style="color:#dc2626;margin:0 0 16px;">⚠️ Falha no Workflow Automático</h2>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:6px 0;font-weight:bold;color:#374151;">Workflow:</td><td style="padding:6px 0;">${workflowName}</td></tr>
+            <tr><td style="padding:6px 0;font-weight:bold;color:#374151;">Pedido:</td><td style="padding:6px 0;">${orderNumber}</td></tr>
+            <tr><td style="padding:6px 0;font-weight:bold;color:#374151;">Cliente:</td><td style="padding:6px 0;">${triggerData.customer_name || "N/A"}</td></tr>
+            <tr><td style="padding:6px 0;font-weight:bold;color:#374151;">Erro:</td><td style="padding:6px 0;color:#dc2626;">${errorDetail}</td></tr>
+            <tr><td style="padding:6px 0;font-weight:bold;color:#374151;">Horário:</td><td style="padding:6px 0;">${new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}</td></tr>
+          </table>
+          <p style="margin-top:16px;font-size:13px;color:#6b7280;">O sistema tentou ${MAX_RETRIES} vezes antes de desistir. Verifique as configurações no painel administrativo.</p>
+        </div>
+      </div>`;
+
+    await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
+      body: JSON.stringify({
+        to: adminEmail,
+        subject: `⚠️ Falha no workflow "${workflowName}" - Pedido ${orderNumber}`,
+        html: alertHtml,
+        from_name: company?.company_name || "Sistema",
+      }),
+    });
+
+    console.log(`[WorkflowEngine] Admin error notification sent to ${adminEmail}`);
+  } catch (e) {
+    console.error("[WorkflowEngine] Failed to notify admin:", e);
+  }
+}
+
+/**
+ * Log failure details to webhook_logs for traceability
+ */
+async function logFailure(supabase: any, exec: any, step: WorkflowStep, result: Record<string, any>) {
+  try {
+    await supabase.from("webhook_logs").insert({
+      direction: "outbound",
+      endpoint: `workflow-${step.type}`,
+      event_type: "send_failed_max_retries",
+      source: "execute-workflow",
+      request_body: {
+        execution_id: exec.id,
+        step_type: step.type,
+        template_name: step.template_name || step.template_id || "N/A",
+        trigger_data: exec.trigger_data,
+      },
+      response_body: result,
+      status_code: 500,
+      processed: false,
+      error_message: result.error || result.reason || "Max retries exhausted",
+    });
+  } catch (e) {
+    console.error("[WorkflowEngine] Log failure error:", e);
+  }
+}
+
 /**
  * Calculate delay in ms until next occurrence of HH:MM in BRT (UTC-3)
  */
 function calcScheduleDelay(hour: number, minute: number): number {
   const now = new Date();
-  // BRT = UTC-3
   const brtOffset = -3 * 60;
   const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
   const brtMinutes = utcMinutes + brtOffset;
   const targetMinutes = hour * 60 + minute;
 
   let diffMinutes = targetMinutes - (brtMinutes >= 0 ? brtMinutes : brtMinutes + 1440);
-  if (diffMinutes <= 0) diffMinutes += 1440; // next day
+  if (diffMinutes <= 0) diffMinutes += 1440;
 
   return diffMinutes * 60 * 1000;
 }
@@ -466,7 +612,7 @@ async function sendEmail(supabase: any, supabaseUrl: string, serviceKey: string,
     });
 
     const result = await resp.json();
-    return { status: result?.success ? "sent" : "failed", channel: "email", response: result };
+    return { status: result?.success ? "sent" : "failed", channel: "email", response: result, error: result?.error };
   } catch (e) {
     return { status: "error", channel: "email", error: e instanceof Error ? e.message : "Unknown" };
   }
@@ -502,7 +648,7 @@ async function sendWhatsApp(supabase: any, supabaseUrl: string, serviceKey: stri
     });
 
     const result = await resp.json();
-    return { status: result?.success ? "sent" : "failed", channel: "whatsapp", response: result };
+    return { status: result?.success ? "sent" : "failed", channel: "whatsapp", response: result, error: result?.error };
   } catch (e) {
     return { status: "error", channel: "whatsapp", error: e instanceof Error ? e.message : "Unknown" };
   }
