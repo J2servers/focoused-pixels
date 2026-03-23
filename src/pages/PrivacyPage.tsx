@@ -1,15 +1,12 @@
-﻿import { TopBar } from '@/components/layout/TopBar';
-import { MainHeader } from '@/components/layout/MainHeader';
-import { NavigationBar } from '@/components/layout/NavigationBar';
-import { Footer } from '@/components/layout/Footer';
+import { DynamicTopBar, DynamicMainHeader, NavigationBar, DynamicFooter } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { storeInfo } from '@/data/store';
 
 const PrivacyPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <TopBar />
-      <MainHeader />
+      <DynamicTopBar />
+      <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1 py-12">
@@ -139,7 +136,7 @@ const PrivacyPage = () => {
         </div>
       </main>
 
-      <Footer />
+      <DynamicFooter />
       <WhatsAppButton />
     </div>
   );

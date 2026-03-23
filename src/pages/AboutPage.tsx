@@ -1,7 +1,4 @@
-﻿import { TopBar } from '@/components/layout/TopBar';
-import { MainHeader } from '@/components/layout/MainHeader';
-import { NavigationBar } from '@/components/layout/NavigationBar';
-import { Footer } from '@/components/layout/Footer';
+import { DynamicTopBar, DynamicMainHeader, NavigationBar, DynamicFooter } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,8 +9,8 @@ import logo from '@/assets/logo-pincel-de-luz.png';
 const AboutPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <TopBar />
-      <MainHeader />
+      <DynamicTopBar />
+      <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1">
@@ -204,7 +201,7 @@ const AboutPage = () => {
         </section>
       </main>
 
-      <Footer />
+      <DynamicFooter />
       <WhatsAppButton />
       <AIChatWidget />
     </div>
