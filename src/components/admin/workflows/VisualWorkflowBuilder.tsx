@@ -29,7 +29,7 @@ import {
   Plus, Trash2, Save, Mail, MessageSquare, Clock, Zap, ShoppingCart,
   CreditCard, Package, Star, Truck, GitBranch, Play, Pause, Copy,
   ChevronRight, RefreshCw, Heart, UserPlus, Gift, X, Eye,
-  GripVertical, Settings2,
+  GripVertical, Settings2, SearchCheck, CalendarClock, Repeat,
 } from 'lucide-react';
 
 import TriggerNode from './nodes/TriggerNode';
@@ -37,6 +37,9 @@ import EmailNode from './nodes/EmailNode';
 import WhatsAppNode from './nodes/WhatsAppNode';
 import DelayNode from './nodes/DelayNode';
 import ConditionNode from './nodes/ConditionNode';
+import CheckStatusNode from './nodes/CheckStatusNode';
+import LoopNode from './nodes/LoopNode';
+import ScheduleNode from './nodes/ScheduleNode';
 
 /* ─── types ─── */
 interface TemplateLite { id: string; name: string; body?: string; message_text?: string; subject?: string; }
@@ -58,6 +61,9 @@ const NODE_TYPES = {
   send_whatsapp: WhatsAppNode,
   delay: DelayNode,
   condition: ConditionNode,
+  check_status: CheckStatusNode,
+  loop: LoopNode,
+  schedule: ScheduleNode,
 };
 
 const TRIGGER_EVENTS = [
@@ -75,6 +81,9 @@ const DRAGGABLE_NODES = [
   { type: 'send_whatsapp', label: 'WhatsApp', icon: MessageSquare, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/30' },
   { type: 'delay', label: 'Aguardar', icon: Clock, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/30' },
   { type: 'condition', label: 'Condição', icon: GitBranch, color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/30' },
+  { type: 'check_status', label: 'Verificar Status', icon: SearchCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+  { type: 'schedule', label: 'Agendar Horário', icon: CalendarClock, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30' },
+  { type: 'loop', label: 'Loop / Repetir', icon: Repeat, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
 ];
 
 const PRESET_CATEGORIES = [
@@ -91,16 +100,32 @@ interface PresetDef {
   trigger_event: string;
   category: string;
   icon: React.ElementType;
-  steps: { type: string; template_name?: string; delay_value?: number; delay_unit?: string; condition_label?: string }[];
+  steps: { type: string; template_name?: string; delay_value?: number; delay_unit?: string; condition_label?: string; check_type?: string; schedule_hour?: number; schedule_minute?: number; max_loops?: number; loop_label?: string }[];
 }
 
 const PRESETS: PresetDef[] = [
+  { name: 'Cobrança boleto diária', description: 'Cobra 8h AM, verifica pagamento, repete até vencer', trigger_event: 'boleto_generated', category: 'vendas', icon: CreditCard, steps: [
+    { type: 'send_whatsapp', template_name: 'Boleto gerado' },
+    { type: 'send_email', template_name: 'Boleto gerado' },
+    { type: 'schedule' as any, schedule_hour: 8, schedule_minute: 0 },
+    { type: 'check_status' as any, check_type: 'payment_confirmed', condition_label: 'Pagamento confirmado?' },
+    { type: 'send_whatsapp', template_name: 'Lembrete de boleto' },
+    { type: 'send_email', template_name: 'Lembrete de boleto' },
+    { type: 'loop' as any, max_loops: 5, loop_label: 'Repetir cobrança 5x' },
+  ] },
   { name: 'Boleto completo', description: 'WhatsApp + e-mail + lembrete', trigger_event: 'boleto_generated', category: 'vendas', icon: CreditCard, steps: [{ type: 'send_whatsapp', template_name: 'Boleto gerado' }, { type: 'send_email', template_name: 'Boleto gerado' }, { type: 'delay', delay_value: 2, delay_unit: 'days' }, { type: 'send_whatsapp', template_name: 'Lembrete de boleto' }] },
   { name: 'Confirmação PIX', description: 'WhatsApp + e-mail após PIX', trigger_event: 'pix_generated', category: 'vendas', icon: Zap, steps: [{ type: 'send_whatsapp', template_name: 'PIX confirmado' }, { type: 'delay', delay_value: 5, delay_unit: 'minutes' }, { type: 'send_email', template_name: 'PIX confirmado' }] },
   { name: 'Pedido confirmado', description: 'Multicanal ao criar pedido', trigger_event: 'order_created', category: 'vendas', icon: Package, steps: [{ type: 'send_whatsapp', template_name: 'Pedido criado' }, { type: 'delay', delay_value: 2, delay_unit: 'minutes' }, { type: 'send_email', template_name: 'Pedido criado' }] },
   { name: 'Pagamento + produção', description: 'Confirmação e produção', trigger_event: 'payment_confirmed', category: 'vendas', icon: CreditCard, steps: [{ type: 'send_whatsapp', template_name: 'Pagamento confirmado' }, { type: 'send_email', template_name: 'Pagamento confirmado' }, { type: 'delay', delay_value: 1, delay_unit: 'hours' }, { type: 'send_whatsapp', template_name: 'Produção iniciada' }] },
   { name: 'Recuperação agressiva', description: '3 tentativas em 24h', trigger_event: 'abandoned_cart', category: 'recuperacao', icon: ShoppingCart, steps: [{ type: 'send_whatsapp', template_name: 'Carrinho abandonado' }, { type: 'delay', delay_value: 2, delay_unit: 'hours' }, { type: 'send_email', template_name: 'Carrinho abandonado' }, { type: 'delay', delay_value: 22, delay_unit: 'hours' }, { type: 'send_whatsapp', template_name: 'Lembrete de carrinho com urgência' }] },
-  { name: 'Recuperação suave', description: 'Só e-mails gentis', trigger_event: 'abandoned_cart', category: 'recuperacao', icon: ShoppingCart, steps: [{ type: 'delay', delay_value: 1, delay_unit: 'hours' }, { type: 'send_email', template_name: 'Carrinho abandonado' }, { type: 'delay', delay_value: 23, delay_unit: 'hours' }, { type: 'send_email', template_name: 'Lembrete de carrinho com urgência' }] },
+  { name: 'Recuperação com verificação', description: 'Verifica carrinho antes de cobrar', trigger_event: 'abandoned_cart', category: 'recuperacao', icon: ShoppingCart, steps: [
+    { type: 'delay', delay_value: 1, delay_unit: 'hours' },
+    { type: 'check_status' as any, check_type: 'cart_recovered', condition_label: 'Carrinho recuperado?' },
+    { type: 'send_whatsapp', template_name: 'Carrinho abandonado' },
+    { type: 'delay', delay_value: 23, delay_unit: 'hours' },
+    { type: 'check_status' as any, check_type: 'cart_recovered', condition_label: 'Carrinho recuperado?' },
+    { type: 'send_email', template_name: 'Lembrete de carrinho com urgência' },
+  ] },
   { name: 'Pós-entrega + avaliação', description: 'Avaliação e cupom recompra', trigger_event: 'post_delivery', category: 'pos_venda', icon: Star, steps: [{ type: 'send_whatsapp', template_name: 'Pós-venda com avaliação' }, { type: 'delay', delay_value: 3, delay_unit: 'days' }, { type: 'send_email', template_name: 'Solicitar avaliação' }, { type: 'delay', delay_value: 7, delay_unit: 'days' }, { type: 'send_whatsapp', template_name: 'Recompra VIP' }] },
   { name: 'Recompra VIP 30d', description: 'Cupom 30 dias após entrega', trigger_event: 'post_delivery', category: 'pos_venda', icon: Gift, steps: [{ type: 'delay', delay_value: 30, delay_unit: 'days' }, { type: 'send_whatsapp', template_name: 'Recompra VIP' }, { type: 'delay', delay_value: 3, delay_unit: 'days' }, { type: 'send_email', template_name: 'Recompra VIP' }] },
   { name: 'Boas-vindas lead', description: 'Cupom primeira compra', trigger_event: 'order_created', category: 'leads', icon: UserPlus, steps: [{ type: 'send_whatsapp', template_name: 'Boas-vindas com cupom' }, { type: 'delay', delay_value: 1, delay_unit: 'days' }, { type: 'send_email', template_name: 'Boas-vindas' }] },
@@ -733,6 +758,82 @@ export default function VisualWorkflowBuilder() {
                   />
                   <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">
                     Saída SIM (verde) e NÃO (vermelho) permitem ramificações condicionais no fluxo.
+                  </p>
+                </div>
+              )}
+
+              {/* Check Status config */}
+              {selectedNode.type === 'check_status' && (
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Verificação automática</label>
+                  <Select
+                    value={(selectedNode.data.check_type as string) || 'payment_confirmed'}
+                    onValueChange={v => updateSelectedNode({ check_type: v, condition_label: { payment_confirmed: 'Pagamento confirmado?', boleto_expired: 'Boleto vencido?', order_shipped: 'Pedido enviado?', cart_recovered: 'Carrinho recuperado?' }[v] || v })}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="payment_confirmed">Pagamento confirmado?</SelectItem>
+                      <SelectItem value="boleto_expired">Boleto vencido?</SelectItem>
+                      <SelectItem value="order_shipped">Pedido enviado?</SelectItem>
+                      <SelectItem value="cart_recovered">Carrinho recuperado?</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">
+                    O motor verifica o status real no banco. SIM = condição verdadeira, NÃO = continua o fluxo.
+                  </p>
+                </div>
+              )}
+
+              {/* Schedule config */}
+              {selectedNode.type === 'schedule' && (
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Horário agendado (BRT)</label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={23}
+                      className="w-20"
+                      value={(selectedNode.data.schedule_hour as number) ?? 8}
+                      onChange={e => updateSelectedNode({ schedule_hour: parseInt(e.target.value) || 0 })}
+                      placeholder="Hora"
+                    />
+                    <span className="text-lg text-[hsl(var(--admin-text-muted))] self-center">:</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={59}
+                      className="w-20"
+                      value={(selectedNode.data.schedule_minute as number) ?? 0}
+                      onChange={e => updateSelectedNode({ schedule_minute: parseInt(e.target.value) || 0 })}
+                      placeholder="Min"
+                    />
+                  </div>
+                  <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">
+                    O fluxo pausa e continua no próximo dia no horário definido (fuso BRT).
+                  </p>
+                </div>
+              )}
+
+              {/* Loop config */}
+              {selectedNode.type === 'loop' && (
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Máximo de repetições</label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={30}
+                    value={(selectedNode.data.max_loops as number) || 5}
+                    onChange={e => updateSelectedNode({ max_loops: parseInt(e.target.value) || 1, loop_label: `Repetir até ${e.target.value}x` })}
+                  />
+                  <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Descrição</label>
+                  <Input
+                    value={(selectedNode.data.loop_label as string) || ''}
+                    onChange={e => updateSelectedNode({ loop_label: e.target.value })}
+                    placeholder="Ex: Repetir cobrança 5x"
+                  />
+                  <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">
+                    O loop volta ao início do bloco (antes da verificação) até atingir o limite. Saída REPETE continua o ciclo, saída FIM encerra.
                   </p>
                 </div>
               )}

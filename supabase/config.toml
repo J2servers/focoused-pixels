@@ -19,4 +19,9 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.crm-webhook]
+
+[functions.boleto-reminder-cron]
+verify_jwt = false
+
+[functions.execute-workflow]
 verify_jwt = false
