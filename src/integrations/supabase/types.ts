@@ -726,6 +726,51 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_checkout_profiles: {
+        Row: {
+          address: string | null
+          cep: string | null
+          cnpj: string | null
+          company: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          shipping_method: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          cep?: string | null
+          cnpj?: string | null
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          shipping_method?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          cep?: string | null
+          cnpj?: string | null
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          shipping_method?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_credentials: {
         Row: {
           business_email: string | null
