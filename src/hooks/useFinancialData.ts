@@ -138,7 +138,7 @@ export function useProductsWithMargins() {
   });
 }
 
-export function useOrders() {
+function useFinancialOrders() {
   return useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
