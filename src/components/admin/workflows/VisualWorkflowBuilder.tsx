@@ -1436,6 +1436,105 @@ function WorkflowBuilderInner() {
                   </div>
                 )}
 
+                {/* Update Order Status config */}
+                {selectedNode.type === 'update_order_status' && (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Novo status do pedido</label>
+                    <Select value={(selectedNode.data.new_order_status as string) || 'processing'} onValueChange={v => updateSelectedNode({ new_order_status: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="processing">Em produção</SelectItem>
+                        <SelectItem value="shipped">Enviado</SelectItem>
+                        <SelectItem value="delivered">Entregue</SelectItem>
+                        <SelectItem value="cancelled">Cancelado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Status de pagamento (opcional)</label>
+                    <Select value={(selectedNode.data.new_payment_status as string) || ''} onValueChange={v => updateSelectedNode({ new_payment_status: v })}>
+                      <SelectTrigger><SelectValue placeholder="Não alterar" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="paid">Pago</SelectItem>
+                        <SelectItem value="refunded">Reembolsado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Create Coupon config */}
+                {selectedNode.type === 'create_coupon' && (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Tipo de desconto</label>
+                    <Select value={(selectedNode.data.coupon_type as string) || 'percentage'} onValueChange={v => updateSelectedNode({ coupon_type: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="percentage">Percentual (%)</SelectItem>
+                        <SelectItem value="fixed">Valor fixo (R$)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Valor</label>
+                    <Input type="number" min={1} value={(selectedNode.data.coupon_value as number) || 10} onChange={e => updateSelectedNode({ coupon_value: parseInt(e.target.value) || 1 })} />
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Validade (dias)</label>
+                    <Input type="number" min={1} value={(selectedNode.data.coupon_duration_days as number) || 7} onChange={e => updateSelectedNode({ coupon_duration_days: parseInt(e.target.value) || 1 })} />
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Prefixo do código</label>
+                    <Input value={(selectedNode.data.coupon_prefix as string) || 'AUTO'} onChange={e => updateSelectedNode({ coupon_prefix: e.target.value.toUpperCase() })} placeholder="AUTO" />
+                    <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">O cupom gerado será injetado como {'{{coupon_code}}'} nos passos seguintes.</p>
+                  </div>
+                )}
+
+                {/* HTTP Webhook config */}
+                {selectedNode.type === 'http_webhook' && (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">URL</label>
+                    <Input value={(selectedNode.data.webhook_url as string) || ''} onChange={e => updateSelectedNode({ webhook_url: e.target.value })} placeholder="https://api.exemplo.com/hook" />
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Método</label>
+                    <Select value={(selectedNode.data.webhook_method as string) || 'POST'} onValueChange={v => updateSelectedNode({ webhook_method: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="POST">POST</SelectItem>
+                        <SelectItem value="GET">GET</SelectItem>
+                        <SelectItem value="PUT">PUT</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">Os dados do trigger serão enviados como JSON no body. Use {'{{variavel}}'} no body personalizado.</p>
+                  </div>
+                )}
+
+                {/* Add Tag config */}
+                {selectedNode.type === 'add_tag' && (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Nome da tag</label>
+                    <Input value={(selectedNode.data.tag_name as string) || ''} onChange={e => updateSelectedNode({ tag_name: e.target.value })} placeholder="vip, comprador, inativo..." />
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Ação</label>
+                    <Select value={(selectedNode.data.tag_action as string) || 'add'} onValueChange={v => updateSelectedNode({ tag_action: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="add">Adicionar</SelectItem>
+                        <SelectItem value="remove">Remover</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">A tag será aplicada ao lead correspondente ao e-mail do cliente.</p>
+                  </div>
+                )}
+
+                {/* Wait For Event config */}
+                {selectedNode.type === 'wait_for_event' && (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Evento a aguardar</label>
+                    <Select value={(selectedNode.data.wait_event as string) || 'payment_confirmed'} onValueChange={v => updateSelectedNode({ wait_event: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="payment_confirmed">Pagamento confirmado</SelectItem>
+                        <SelectItem value="order_shipped">Pedido enviado</SelectItem>
+                        <SelectItem value="cart_recovered">Carrinho recuperado</SelectItem>
+                        <SelectItem value="boleto_expired">Boleto vencido</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Timeout (minutos)</label>
+                    <Input type="number" min={5} value={(selectedNode.data.wait_timeout_minutes as number) || 1440} onChange={e => updateSelectedNode({ wait_timeout_minutes: parseInt(e.target.value) || 60 })} />
+                    <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">O workflow pausa e verifica a cada 5min se o evento ocorreu. Após o timeout, avança automaticamente.</p>
+                  </div>
+                )}
+
                 {/* Delete button */}
                 {selectedNode.type !== 'trigger' && (
                   <div className="pt-3 border-t border-[hsl(var(--admin-card-border)/0.3)]">
