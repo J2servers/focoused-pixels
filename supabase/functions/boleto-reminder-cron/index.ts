@@ -56,7 +56,7 @@ serve(async (req) => {
     // Find unpaid boleto orders
     const { data: pendingOrders, error: ordersError } = await supabase
       .from("orders")
-      .select("id, order_number, customer_name, customer_email, customer_phone, total, created_at, payment_status, payment_method, notes")
+      .select("id, order_number, customer_name, customer_email, customer_phone, total, created_at, payment_status, payment_method, notes, shipping_address, shipping_city, shipping_state, shipping_cep, shipping_method")
       .eq("payment_method", "boleto")
       .eq("payment_status", "pending")
       .not("order_status", "eq", "cancelled");
