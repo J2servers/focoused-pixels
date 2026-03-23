@@ -1,7 +1,8 @@
-﻿import { useState, useEffect } from 'react';
-import { MessageSquarePlus, Star } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { MessageSquarePlus, Star, ArrowUpDown, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ReviewCard } from './ReviewCard';
 import { ReviewForm } from './ReviewForm';
 import { ReviewStars } from './ReviewStars';
@@ -24,10 +25,18 @@ interface ProductReviewsProps {
   productName: string;
 }
 
+type SortOption = 'newest' | 'oldest' | 'highest' | 'lowest' | 'with_images';
+
 export const ProductReviews = ({ productSlug, productName }: ProductReviewsProps) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  // #35 Sort reviews
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  // #36 Filter by rating
+  const [filterRating, setFilterRating] = useState<number | null>(null);
+  // #37 Pagination
+  const [visibleCount, setVisibleCount] = useState(5);
 
   const fetchReviews = async () => {
     setIsLoading(true);
@@ -61,13 +70,46 @@ export const ProductReviews = ({ productSlug, productName }: ProductReviewsProps
       : 0,
   }));
 
+  // #38 Review with images count
+  const reviewsWithImages = reviews.filter(r => r.images && r.images.length > 0).length;
+
+  // Apply sort and filter
+  const processedReviews = useMemo(() => {
+    let filtered = [...reviews];
+
+    // Filter by rating
+    if (filterRating !== null) {
+      filtered = filtered.filter(r => r.rating === filterRating);
+    }
+
+    // Sort
+    switch (sortBy) {
+      case 'oldest':
+        filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        break;
+      case 'highest':
+        filtered.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'lowest':
+        filtered.sort((a, b) => a.rating - b.rating);
+        break;
+      case 'with_images':
+        filtered.sort((a, b) => (b.images?.length || 0) - (a.images?.length || 0));
+        break;
+      default: // newest
+        filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+
+    return filtered;
+  }, [reviews, sortBy, filterRating]);
+
   const handleFormSuccess = () => {
     setShowForm(false);
     fetchReviews();
   };
 
   return (
-    <section className="mt-16 border-t border-border pt-12">
+    <section id="product-reviews" className="mt-16 border-t border-border pt-12">
       <FadeInView>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <h2 className="text-2xl font-bold text-foreground">
@@ -134,10 +176,16 @@ export const ProductReviews = ({ productSlug, productName }: ProductReviewsProps
                 </p>
               </div>
 
-              {/* Distribution */}
+              {/* Distribution - #39 Clickable filter */}
               <div className="space-y-3">
                 {ratingDistribution.map(({ star, count, percentage }) => (
-                  <div key={star} className="flex items-center gap-3">
+                  <button
+                    key={star}
+                    onClick={() => setFilterRating(filterRating === star ? null : star)}
+                    className={`w-full flex items-center gap-3 rounded-lg px-1 py-0.5 transition-colors ${
+                      filterRating === star ? 'bg-primary/10' : 'hover:bg-muted/50'
+                    }`}
+                  >
                     <span className="text-sm text-muted-foreground w-12">
                       {star} {star === 1 ? 'estrela' : 'estrelas'}
                     </span>
@@ -145,21 +193,70 @@ export const ProductReviews = ({ productSlug, productName }: ProductReviewsProps
                     <span className="text-sm text-muted-foreground w-8 text-right">
                       {count}
                     </span>
-                  </div>
+                  </button>
                 ))}
               </div>
+
+              {/* #40 Quick stats */}
+              {reviewsWithImages > 0 && (
+                <p className="text-xs text-muted-foreground mt-4 text-center">
+                  📸 {reviewsWithImages} avaliação(ões) com fotos
+                </p>
+              )}
+
+              {filterRating !== null && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFilterRating(null)}
+                  className="w-full mt-3 text-xs"
+                >
+                  Limpar filtro
+                </Button>
+              )}
             </div>
           </FadeInView>
 
           {/* Reviews List */}
           <div className="space-y-4">
-            {reviews.map(review => (
+            {/* #41 Sort and filter controls */}
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-muted-foreground">
+                {processedReviews.length} {processedReviews.length === 1 ? 'avaliação' : 'avaliações'}
+                {filterRating !== null && ` com ${filterRating} estrela${filterRating > 1 ? 's' : ''}`}
+              </p>
+              <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+                <SelectTrigger className="w-44 h-8 text-xs">
+                  <ArrowUpDown className="h-3 w-3 mr-1" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Mais recentes</SelectItem>
+                  <SelectItem value="oldest">Mais antigas</SelectItem>
+                  <SelectItem value="highest">Melhor avaliadas</SelectItem>
+                  <SelectItem value="lowest">Pior avaliadas</SelectItem>
+                  <SelectItem value="with_images">Com fotos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {processedReviews.slice(0, visibleCount).map(review => (
               <ReviewCard key={review.id} review={review} />
             ))}
+
+            {/* #42 Load more */}
+            {visibleCount < processedReviews.length && (
+              <Button
+                variant="outline"
+                onClick={() => setVisibleCount(prev => prev + 5)}
+                className="w-full"
+              >
+                Ver mais avaliações ({processedReviews.length - visibleCount} restantes)
+              </Button>
+            )}
           </div>
         </div>
       )}
     </section>
   );
 };
-
