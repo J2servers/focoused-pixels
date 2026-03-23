@@ -29,16 +29,20 @@ serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Auth check: only service role or admin
-    const authHeader = req.headers.get("Authorization") || "";
-    const token = authHeader.replace("Bearer ", "");
-    if (token !== serviceKey) {
-      // Check if it's an admin user
-      const { data: { user } } = await supabase.auth.getUser(token);
-      if (!user) {
-        return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
-          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
+    // Auth check: accept cron calls or admin users
+    const body = await req.json().catch(() => ({}));
+    const isCronCall = body?.source === "cron" || body?.cron_secret === "internal_cron_call";
+    
+    if (!isCronCall) {
+      const authHeader = req.headers.get("Authorization") || "";
+      const token = authHeader.replace("Bearer ", "");
+      if (token !== serviceKey) {
+        const { data: { user } } = await supabase.auth.getUser(token);
+        if (!user) {
+          return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+            status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
       }
     }
 
