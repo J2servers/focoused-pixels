@@ -220,7 +220,7 @@ async function sendEmailNotification(
     return { sent: false };
   }
 }
-/** Process paid order: update lead, send notifications */
+/** Process paid order: update lead, send notifications, trigger workflows */
 async function processConfirmedOrder(
   supabase: ReturnType<typeof createClient>,
   order: {
@@ -262,6 +262,33 @@ async function processConfirmedOrder(
   }, Email=${
     emailResult.status === "fulfilled" ? emailResult.value.sent : "error"
   }`);
+
+  // Trigger automation workflows for payment_confirmed event
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const formattedTotal = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(order.total);
+
+    await fetch(`${supabaseUrl}/functions/v1/execute-workflow`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${supabaseServiceKey}` },
+      body: JSON.stringify({
+        action: "trigger",
+        trigger_event: "payment_confirmed",
+        trigger_data: {
+          customer_name: order.customer_name,
+          customer_email: order.customer_email,
+          customer_phone: order.customer_phone,
+          order_number: order.order_number,
+          amount: formattedTotal,
+          payment_method: order.payment_method || "unknown",
+        },
+      }),
+    });
+    console.log(`[Webhook] Workflow trigger sent for payment_confirmed: ${order.order_number}`);
+  } catch (e) {
+    console.error("[Webhook] Workflow trigger error (non-blocking):", e);
+  }
 }
 
 // ===== MAIN HANDLER =====
