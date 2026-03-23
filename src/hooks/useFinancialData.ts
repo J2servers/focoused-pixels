@@ -138,7 +138,7 @@ export function useProductsWithMargins() {
   });
 }
 
-export function useOrders() {
+function useFinancialOrders() {
   return useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
@@ -199,7 +199,7 @@ export function useQuotesApproved() {
 }
 
 export function useFinancialSummary() {
-  const { data: orders } = useOrders();
+  const { data: orders } = useFinancialOrders();
   const { data: orderItems } = useOrderItems();
   const { data: quotesApproved } = useQuotesApproved();
   const { data: taxSettings } = useTaxSettings();
