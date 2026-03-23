@@ -96,6 +96,11 @@ const NODE_TYPES = {
   check_status: CheckStatusNode,
   loop: LoopNode,
   schedule: ScheduleNode,
+  update_order_status: UpdateOrderStatusNode,
+  create_coupon: CreateCouponNode,
+  http_webhook: HttpWebhookNode,
+  add_tag: AddTagNode,
+  wait_for_event: WaitForEventNode,
 };
 
 const TRIGGER_EVENTS = [
