@@ -118,9 +118,14 @@ const DRAGGABLE_NODES = [
   { type: 'send_whatsapp', label: 'WhatsApp', icon: MessageSquare, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/30', description: 'Enviar WhatsApp' },
   { type: 'delay', label: 'Aguardar', icon: Clock, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/30', description: 'Esperar um tempo' },
   { type: 'condition', label: 'Condição', icon: GitBranch, color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/30', description: 'Ramificação condicional' },
-  { type: 'check_status', label: 'Verificar', icon: SearchCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', description: 'Verificar status real' },
-  { type: 'schedule', label: 'Agendar', icon: CalendarClock, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30', description: 'Agendar para horário' },
+  { type: 'check_status', label: 'Verificar', icon: SearchCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', description: 'Verificar status real no banco' },
+  { type: 'schedule', label: 'Agendar', icon: CalendarClock, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30', description: 'Agendar para horário específico' },
   { type: 'loop', label: 'Loop', icon: Repeat, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30', description: 'Repetir bloco N vezes' },
+  { type: 'update_order_status', label: 'Atualizar Pedido', icon: Settings2, color: 'text-indigo-400', bg: 'bg-indigo-500/10 border-indigo-500/30', description: 'Alterar status do pedido automaticamente' },
+  { type: 'create_coupon', label: 'Criar Cupom', icon: Gift, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30', description: 'Gerar cupom de desconto automático' },
+  { type: 'http_webhook', label: 'Webhook', icon: Activity, color: 'text-rose-400', bg: 'bg-rose-500/10 border-rose-500/30', description: 'Chamar API externa via HTTP' },
+  { type: 'add_tag', label: 'Tag Lead', icon: UserPlus, color: 'text-teal-400', bg: 'bg-teal-500/10 border-teal-500/30', description: 'Adicionar/remover tag do lead' },
+  { type: 'wait_for_event', label: 'Aguardar Evento', icon: Zap, color: 'text-sky-400', bg: 'bg-sky-500/10 border-sky-500/30', description: 'Esperar evento acontecer (com timeout)' },
 ];
 
 const PRESET_CATEGORIES = [
