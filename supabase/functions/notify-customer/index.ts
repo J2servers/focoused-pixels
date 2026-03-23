@@ -139,23 +139,52 @@ serve(async (req) => {
     const inst = data.card?.installments || 1;
     const instText = inst > 1 ? `${inst}x de ${formatCurrency(data.card?.installmentAmount || order.amount / inst)}` : `à vista`;
 
+    const formattedAmount = formatCurrency(data.pix?.finalAmount ?? order.amount);
+    const expirationDateStr = formatDate(data.pix?.expirationDate || data.boleto?.expirationDate);
+
     const templateVars: Record<string, string> = {
       customer_name: firstName,
       customer_email: customer.email || "",
       customer_phone: customer.phone || "",
-      amount: formatCurrency(data.pix?.finalAmount ?? order.amount),
+      amount: formattedAmount,
+      total: formattedAmount, // alias for templates using {{total}}
       company_name: companyName,
       order_id: order.orderId || "",
       order_number: order.orderNumber || order.orderId || "",
       discount_percent: String(data.pix?.discountPercent ?? 0),
-      expiration_date: formatDate(data.pix?.expirationDate || data.boleto?.expirationDate),
+      expiration_date: expirationDateStr,
       payment_link: data.pix?.ticketUrl || "",
       barcode: data.boleto?.barcode || "",
       boleto_url: data.boleto?.boletoUrl || "",
       installment_text: instText,
       card_brand: data.card?.brand || "",
       card_last_four: data.card?.lastFourDigits || "****",
+      shipping_address: "",
+      shipping_city: "",
+      shipping_state: "",
+      shipping_cep: "",
+      delivery_estimate: "",
     };
+
+    // Try to enrich with order shipping data from DB
+    if (order.orderId) {
+      try {
+        const { data: orderData } = await supabase
+          .from("orders")
+          .select("shipping_address, shipping_city, shipping_state, shipping_cep, shipping_method")
+          .eq("id", order.orderId)
+          .maybeSingle();
+        if (orderData) {
+          templateVars.shipping_address = orderData.shipping_address || "";
+          templateVars.shipping_city = orderData.shipping_city || "";
+          templateVars.shipping_state = orderData.shipping_state || "";
+          templateVars.shipping_cep = orderData.shipping_cep || "";
+          templateVars.delivery_estimate = orderData.shipping_method === "express" ? "3-5 dias úteis" : "7-12 dias úteis";
+        }
+      } catch (e) {
+        console.warn("[Notify] Could not fetch order shipping data:", e);
+      }
+    }
 
     // ─── Load email template from DB ───
     const { data: emailTemplate } = await supabase

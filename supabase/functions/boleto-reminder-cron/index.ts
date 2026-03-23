@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 /**
@@ -56,7 +56,7 @@ serve(async (req) => {
     // Find unpaid boleto orders
     const { data: pendingOrders, error: ordersError } = await supabase
       .from("orders")
-      .select("id, order_number, customer_name, customer_email, customer_phone, total, created_at, payment_status, payment_method, notes")
+      .select("id, order_number, customer_name, customer_email, customer_phone, total, created_at, payment_status, payment_method, notes, shipping_address, shipping_city, shipping_state, shipping_cep, shipping_method")
       .eq("payment_method", "boleto")
       .eq("payment_status", "pending")
       .not("order_status", "eq", "cancelled");
@@ -116,12 +116,19 @@ serve(async (req) => {
           continue;
         }
 
+        const formattedTotal = `R$ ${Number(order.total).toFixed(2).replace('.', ',')}`;
         const vars: Record<string, string> = {
           customer_name: order.customer_name,
           order_number: order.order_number,
-          total: `R$ ${Number(order.total).toFixed(2).replace('.', ',')}`,
+          total: formattedTotal,
+          amount: formattedTotal,
           expiration_date: expiryDate.toLocaleDateString('pt-BR'),
           company_name: 'Pincel de Luz',
+          shipping_address: order.shipping_address || "",
+          shipping_city: order.shipping_city || "",
+          shipping_state: order.shipping_state || "",
+          shipping_cep: order.shipping_cep || "",
+          delivery_estimate: order.shipping_method === "express" ? "3-5 dias úteis" : "7-12 dias úteis",
         };
 
         if (isExpired) {
