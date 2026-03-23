@@ -422,19 +422,27 @@ serve(async (req) => {
         
         console.log(`[Webhook EFI] PIX received: ${pix.txid}, value: ${pix.valor}`);
         
-        const result = await supabase
-          .from("orders")
-          .update({ 
-            payment_status: "paid",
-            order_status: "confirmed",
-            payment_method: "pix",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("order_number", pix.txid)
-          .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
-          .single();
+        const updateData = { 
+          payment_status: "paid",
+          order_status: "confirmed",
+          payment_method: "pix",
+          updated_at: new Date().toISOString(),
+        };
+        const selectCols = "order_number, customer_name, customer_email, customer_phone, total, items, payment_method";
 
-        if (result.data) {
+        // Try matching by order_number first, then by id (UUID)
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        let result;
+
+        if (uuidRegex.test(pix.txid)) {
+          result = await supabase.from("orders").update(updateData).eq("id", pix.txid).select(selectCols).maybeSingle();
+        }
+
+        if (!result?.data) {
+          result = await supabase.from("orders").update(updateData).eq("order_number", pix.txid).select(selectCols).maybeSingle();
+        }
+
+        if (result?.data) {
           await processConfirmedOrder(supabase, result.data);
         } else {
           console.error(`[Webhook EFI] Order not found for txid: ${pix.txid}`);
