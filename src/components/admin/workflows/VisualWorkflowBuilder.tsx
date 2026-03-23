@@ -29,7 +29,7 @@ import {
   Plus, Trash2, Save, Mail, MessageSquare, Clock, Zap, ShoppingCart,
   CreditCard, Package, Star, Truck, GitBranch, Play, Pause, Copy,
   ChevronRight, RefreshCw, Heart, UserPlus, Gift, X, Eye,
-  GripVertical, Settings2,
+  GripVertical, Settings2, SearchCheck, CalendarClock, Repeat,
 } from 'lucide-react';
 
 import TriggerNode from './nodes/TriggerNode';
