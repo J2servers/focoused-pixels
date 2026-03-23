@@ -762,6 +762,82 @@ export default function VisualWorkflowBuilder() {
                 </div>
               )}
 
+              {/* Check Status config */}
+              {selectedNode.type === 'check_status' && (
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Verificação automática</label>
+                  <Select
+                    value={(selectedNode.data.check_type as string) || 'payment_confirmed'}
+                    onValueChange={v => updateSelectedNode({ check_type: v, condition_label: { payment_confirmed: 'Pagamento confirmado?', boleto_expired: 'Boleto vencido?', order_shipped: 'Pedido enviado?', cart_recovered: 'Carrinho recuperado?' }[v] || v })}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="payment_confirmed">Pagamento confirmado?</SelectItem>
+                      <SelectItem value="boleto_expired">Boleto vencido?</SelectItem>
+                      <SelectItem value="order_shipped">Pedido enviado?</SelectItem>
+                      <SelectItem value="cart_recovered">Carrinho recuperado?</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">
+                    O motor verifica o status real no banco. SIM = condição verdadeira, NÃO = continua o fluxo.
+                  </p>
+                </div>
+              )}
+
+              {/* Schedule config */}
+              {selectedNode.type === 'schedule' && (
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Horário agendado (BRT)</label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={23}
+                      className="w-20"
+                      value={(selectedNode.data.schedule_hour as number) ?? 8}
+                      onChange={e => updateSelectedNode({ schedule_hour: parseInt(e.target.value) || 0 })}
+                      placeholder="Hora"
+                    />
+                    <span className="text-lg text-[hsl(var(--admin-text-muted))] self-center">:</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={59}
+                      className="w-20"
+                      value={(selectedNode.data.schedule_minute as number) ?? 0}
+                      onChange={e => updateSelectedNode({ schedule_minute: parseInt(e.target.value) || 0 })}
+                      placeholder="Min"
+                    />
+                  </div>
+                  <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">
+                    O fluxo pausa e continua no próximo dia no horário definido (fuso BRT).
+                  </p>
+                </div>
+              )}
+
+              {/* Loop config */}
+              {selectedNode.type === 'loop' && (
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Máximo de repetições</label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={30}
+                    value={(selectedNode.data.max_loops as number) || 5}
+                    onChange={e => updateSelectedNode({ max_loops: parseInt(e.target.value) || 1, loop_label: `Repetir até ${e.target.value}x` })}
+                  />
+                  <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Descrição</label>
+                  <Input
+                    value={(selectedNode.data.loop_label as string) || ''}
+                    onChange={e => updateSelectedNode({ loop_label: e.target.value })}
+                    placeholder="Ex: Repetir cobrança 5x"
+                  />
+                  <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">
+                    O loop volta ao início do bloco (antes da verificação) até atingir o limite. Saída REPETE continua o ciclo, saída FIM encerra.
+                  </p>
+                </div>
+              )}
+
               {/* Delete button */}
               {selectedNode.type !== 'trigger' && (
                 <div className="pt-3 border-t border-[hsl(var(--admin-card-border)/0.3)]">
