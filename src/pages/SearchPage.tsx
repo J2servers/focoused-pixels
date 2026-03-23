@@ -70,8 +70,8 @@ const SearchPage = () => {
   // Desktop Version
   return (
     <div className="min-h-screen flex flex-col">
-      <TopBar />
-      <MainHeader />
+      <DynamicTopBar />
+      <DynamicMainHeader />
       <NavigationBar />
 
       <main className="flex-1">
