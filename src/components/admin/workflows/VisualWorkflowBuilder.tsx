@@ -52,6 +52,11 @@ import ConditionNode from './nodes/ConditionNode';
 import CheckStatusNode from './nodes/CheckStatusNode';
 import LoopNode from './nodes/LoopNode';
 import ScheduleNode from './nodes/ScheduleNode';
+import UpdateOrderStatusNode from './nodes/UpdateOrderStatusNode';
+import CreateCouponNode from './nodes/CreateCouponNode';
+import HttpWebhookNode from './nodes/HttpWebhookNode';
+import AddTagNode from './nodes/AddTagNode';
+import WaitForEventNode from './nodes/WaitForEventNode';
 
 /* ─── types ─── */
 interface TemplateLite { id: string; name: string; body?: string; message_text?: string; subject?: string; }
