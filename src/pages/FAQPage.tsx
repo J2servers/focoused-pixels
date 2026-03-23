@@ -230,7 +230,7 @@ const FAQPage = () => {
         </section>
       </main>
 
-      <Footer />
+      <DynamicFooter />
       <WhatsAppButton />
       <AIChatWidget />
     </div>

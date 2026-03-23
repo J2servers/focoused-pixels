@@ -183,7 +183,7 @@ const TermsPage = () => {
         </div>
       </main>
 
-      <Footer />
+      <DynamicFooter />
       <WhatsAppButton />
     </div>
   );

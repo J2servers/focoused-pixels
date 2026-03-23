@@ -114,7 +114,7 @@ const SearchPage = () => {
         </div>
       </main>
 
-      <Footer />
+      <DynamicFooter />
       <WhatsAppButton />
       <AIChatWidget />
     </div>

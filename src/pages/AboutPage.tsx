@@ -204,7 +204,7 @@ const AboutPage = () => {
         </section>
       </main>
 
-      <Footer />
+      <DynamicFooter />
       <WhatsAppButton />
       <AIChatWidget />
     </div>

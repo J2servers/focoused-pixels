@@ -139,7 +139,7 @@ const PrivacyPage = () => {
         </div>
       </main>
 
-      <Footer />
+      <DynamicFooter />
       <WhatsAppButton />
     </div>
   );
