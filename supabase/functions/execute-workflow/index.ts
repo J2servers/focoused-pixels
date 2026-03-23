@@ -655,8 +655,23 @@ async function sendWhatsApp(supabase: any, supabaseUrl: string, serviceKey: stri
 }
 
 function replaceVars(template: string, vars: Record<string, any>): string {
+  // Add legacy aliases for backward compatibility
+  const aliases: Record<string, string> = {
+    nome: vars.customer_name || "",
+    valor: vars.amount || vars.total || "",
+    prazo: vars.expiration_date || "",
+    pedido: vars.order_number || "",
+    telefone: vars.customer_phone || "",
+    email: vars.customer_email || "",
+    endereco: vars.shipping_address || "",
+    cidade: vars.shipping_city || "",
+    estado: vars.shipping_state || "",
+    cep: vars.shipping_cep || "",
+  };
+  const merged = { ...aliases, ...vars };
+
   let result = template;
-  for (const [key, value] of Object.entries(vars)) {
+  for (const [key, value] of Object.entries(merged)) {
     if (typeof value === "string" || typeof value === "number") {
       result = result.replaceAll(`{{${key}}}`, String(value));
       result = result.replaceAll(`{${key}}`, String(value));
