@@ -62,17 +62,25 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Auth: accept service role key via Authorization header OR legacy x-cron-secret
+    const authHeader = req.headers.get("Authorization");
+    const bearerToken = authHeader?.replace("Bearer ", "").trim();
     const cronSecret = Deno.env.get("ABANDONED_CART_CRON_SECRET");
-    const incomingSecret = req.headers.get("x-cron-secret");
-    if (!cronSecret || incomingSecret !== cronSecret) {
+    const incomingCronSecret = req.headers.get("x-cron-secret");
+
+    const isServiceRole = bearerToken === serviceRoleKey;
+    const isCronAuth = cronSecret && incomingCronSecret === cronSecret;
+
+    if (!isServiceRole && !isCronAuth) {
       return new Response(
         JSON.stringify({ success: false, error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const storefrontUrl = (Deno.env.get("STORE_URL") || "https://pinceldeluz.com.br").replace(/\/$/, "");
 
     const supabase = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
@@ -87,7 +95,6 @@ serve(async (req) => {
     const companyName = companyInfo?.company_name || "Pincel de Luz";
     const cutoffIso = new Date(Date.now() - reminderHours * 60 * 60 * 1000).toISOString();
 
-    // Use actual columns: session_id, user_name, user_email, user_phone, reminder_sent, coupon_code
     const { data: sessions, error: sessionsError } = await supabase
       .from("abandoned_cart_sessions")
       .select("id, session_id, user_name, user_email, user_phone, cart_total, cart_items, reminder_sent, coupon_code")
@@ -115,7 +122,6 @@ serve(async (req) => {
 
     for (const session of targets) {
       try {
-        // Create coupon if needed
         let couponCode = session.coupon_code;
         const discountValue = 10;
         if (!couponCode) {
@@ -159,7 +165,6 @@ serve(async (req) => {
 
         let sentAny = false;
 
-        // Send email
         if (session.user_email) {
           try {
             const resp = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
@@ -180,7 +185,6 @@ serve(async (req) => {
           } catch (e) { console.error("[recover] email error:", e); }
         }
 
-        // Send WhatsApp
         const phone = normalizePhone(session.user_phone);
         if (phone) {
           try {
@@ -202,7 +206,6 @@ serve(async (req) => {
           } catch (e) { console.error("[recover] whatsapp error:", e); }
         }
 
-        // Log reminder
         await supabase.from("abandoned_cart_reminders").insert({
           session_id: session.id,
           channel: phone ? "whatsapp" : "email",
@@ -213,7 +216,6 @@ serve(async (req) => {
           sent_at: sentAny ? new Date().toISOString() : null,
         });
 
-        // Update session
         await supabase.from("abandoned_cart_sessions").update({
           reminder_sent: true,
           reminder_sent_at: new Date().toISOString(),

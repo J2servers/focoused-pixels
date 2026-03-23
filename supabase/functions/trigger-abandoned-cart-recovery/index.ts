@@ -21,18 +21,10 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const cronSecret = Deno.env.get("ABANDONED_CART_CRON_SECRET");
 
     if (!supabaseUrl || !serviceRoleKey) {
       return new Response(
         JSON.stringify({ success: false, error: "Supabase credentials are not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
-    if (!cronSecret) {
-      return new Response(
-        JSON.stringify({ success: false, error: "ABANDONED_CART_CRON_SECRET is not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -70,11 +62,12 @@ serve(async (req) => {
       );
     }
 
+    // Use service role key as internal auth for function-to-function call
     const recoverResponse = await fetch(`${supabaseUrl}/functions/v1/recover-abandoned-carts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-cron-secret": cronSecret,
+        "Authorization": `Bearer ${serviceRoleKey}`,
       },
       body: JSON.stringify({ source: "admin-manual" }),
     });
