@@ -427,7 +427,28 @@ const ProductPage = () => {
                   </div>
                 </div>
 
-                {/* Color Selector */}
+                {/* Volume Discount Table */}
+                <VolumeDiscountTable tiers={discountTiers} currentQuantity={quantity} />
+
+                {/* Color Dropdowns (FocoLaser style) */}
+                <div className="space-y-3">
+                  <ProductColorDropdown
+                    label="Cor de fundo da Placa:"
+                    colors={storeInfo.customizationOptions.backgroundColors}
+                    selectedColor={selectedBgColor}
+                    onSelectColor={setSelectedBgColor}
+                    required
+                  />
+                  <ProductColorDropdown
+                    label="Cor da placa onde vai a Logo:"
+                    colors={storeInfo.customizationOptions.mirrorColors}
+                    selectedColor={selectedLogoColor}
+                    onSelectColor={setSelectedLogoColor}
+                    required
+                  />
+                </div>
+
+                {/* Legacy circle color selector for simple products */}
                 {product.colors && product.colors.length > 0 && (
                   <ProductColorSelector
                     colors={product.colors}
@@ -446,10 +467,18 @@ const ProductPage = () => {
                         onSelectSize={setSelectedSize}
                       />
                     </div>
-                    {/* #13 Size Guide */}
                     <SizeGuideModal sizes={product.sizes} productName={product.name} />
                   </div>
                 )}
+
+                {/* Customization Form: text, upload, whatsapp */}
+                <ProductCustomizationForm
+                  data={customizationData}
+                  onDataChange={setCustomizationData}
+                />
+
+                {/* How It Works */}
+                <HowItWorksSteps />
 
                 {/* Quantity Calculator */}
                 <ProductQuantityCalculator
@@ -464,17 +493,17 @@ const ProductPage = () => {
                   product={product}
                   quantity={quantity}
                   selectedSize={selectedSize}
-                  selectedColor={selectedColor}
+                  selectedColor={selectedColor || selectedBgColor}
                   onAddToCart={handleAddToCart}
                 />
 
-                {/* Freight Calculator - with saved CEP */}
+                {/* Freight Calculator */}
                 <FreightCalculator 
                   productPrice={product.price * quantity} 
                   onFreightSelect={setSelectedFreight}
                 />
 
-                {/* #19 Delivery Estimate */}
+                {/* Delivery Estimate */}
                 {selectedFreight && (
                   <DeliveryEstimate
                     freightDays={selectedFreight.days}
