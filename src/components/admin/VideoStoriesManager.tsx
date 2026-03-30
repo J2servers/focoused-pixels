@@ -146,9 +146,13 @@ export function VideoStoriesManager() {
                 <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Descrição breve do vídeo" rows={2} />
               </div>
               <div>
-                <Label>URL do Vídeo *</Label>
-                <Input value={form.video_url} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="https://..." />
-                <p className="text-xs text-muted-foreground mt-1">Cole o link do vídeo (MP4, WebM) ou faça upload no storage</p>
+                <Label>Vídeo *</Label>
+                <VideoUpload
+                  value={form.video_url}
+                  onChange={(url) => setForm(f => ({ ...f, video_url: url }))}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Ou cole a URL diretamente:</p>
+                <Input value={form.video_url} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="https://..." className="mt-1" />
               </div>
               <div>
                 <Label>Thumbnail (capa)</Label>
