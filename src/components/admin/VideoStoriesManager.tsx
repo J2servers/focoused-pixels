@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ImageUpload } from '@/components/admin/ImageUpload';
+import { VideoUpload } from '@/components/admin/VideoUpload';
 import { Plus, Trash2, Edit, Video, GripVertical, Eye, ArrowUp, ArrowDown } from 'lucide-react';
 import { useAllVideoStories, useCreateVideoStory, useUpdateVideoStory, useDeleteVideoStory } from '@/hooks/useVideoStories';
 import { toast } from 'sonner';
