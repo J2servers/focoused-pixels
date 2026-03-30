@@ -243,6 +243,9 @@ const Index = () => {
         {/* Social Proof */}
         <SocialProofSection />
 
+        {/* Video Stories */}
+        <VideoStoriesCarousel />
+
         {/* Guarantees */}
         <GuaranteesSection />
 

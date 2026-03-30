@@ -1552,6 +1552,9 @@ const AdminCompanyPage = () => {
 
 
 
+        {/* Video Stories Manager */}
+        <VideoStoriesManager />
+
         <div className="flex justify-end">
 
           <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} size="lg">

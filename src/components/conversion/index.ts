@@ -13,4 +13,5 @@ export { HowItWorksSection } from './HowItWorksSection';
 export { WeeklyUrgencySection } from './WeeklyUrgencySection';
 export { FreeShippingProgress } from './FreeShippingProgress';
 export { ViewingNowBadge } from './ViewingNowBadge';
+export { VideoStoriesCarousel } from './VideoStoriesCarousel';
 
