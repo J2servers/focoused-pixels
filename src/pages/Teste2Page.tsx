@@ -39,6 +39,7 @@ const Teste2Page = () => {
       <CategoriesGrid />
       <FeaturedSection />
       <SocialProofSection />
+      <VideoStoriesCarousel />
       <DifferentialsSection />
       <NewsletterSection />
       <CTASection />
