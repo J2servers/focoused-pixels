@@ -89,8 +89,11 @@ const ProductPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setSelectedSize(null);
     setSelectedColor(null);
+    setSelectedBgColor(null);
+    setSelectedLogoColor(null);
     setQuantity(1);
     setSelectedFreight(null);
+    setCustomizationData({ customText: '', logoFiles: [], whatsappNumber: '' });
   }, [productSlug]);
 
   if (isLoading) {
