@@ -32,6 +32,7 @@ import {
   GuaranteesSection,
   HowItWorksSection,
   WeeklyUrgencySection,
+  VideoStoriesCarousel,
 } from '@/components/conversion';
 
 /* ── Category visual cards ── */
@@ -241,6 +242,9 @@ const Index = () => {
 
         {/* Social Proof */}
         <SocialProofSection />
+
+        {/* Video Stories */}
+        <VideoStoriesCarousel />
 
         {/* Guarantees */}
         <GuaranteesSection />

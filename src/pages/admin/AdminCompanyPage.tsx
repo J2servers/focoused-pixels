@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { VideoStoriesManager } from '@/components/admin/VideoStoriesManager';
 
 import { Link } from 'react-router-dom';
 
@@ -1551,6 +1552,9 @@ const AdminCompanyPage = () => {
         </Card>
 
 
+
+        {/* Video Stories Manager */}
+        <VideoStoriesManager />
 
         <div className="flex justify-end">
 

@@ -1836,6 +1836,60 @@ export type Database = {
         }
         Relationships: []
       }
+      video_stories: {
+        Row: {
+          created_at: string
+          cta_link: string | null
+          cta_text: string | null
+          description: string | null
+          display_order: number | null
+          duration_seconds: number | null
+          id: string
+          likes_count: number | null
+          status: string | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string | null
+          updated_at: string
+          video_url: string
+          views_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          cta_link?: string | null
+          cta_text?: string | null
+          description?: string | null
+          display_order?: number | null
+          duration_seconds?: number | null
+          id?: string
+          likes_count?: number | null
+          status?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string | null
+          updated_at?: string
+          video_url: string
+          views_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          cta_link?: string | null
+          cta_text?: string | null
+          description?: string | null
+          display_order?: number | null
+          duration_seconds?: number | null
+          id?: string
+          likes_count?: number | null
+          status?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string | null
+          updated_at?: string
+          video_url?: string
+          views_count?: number | null
+        }
+        Relationships: []
+      }
       webhook_logs: {
         Row: {
           created_at: string
