@@ -180,6 +180,16 @@ const ProductPage = () => {
       image: product.image,
       quantity,
       size: selectedSize || undefined,
+      color: selectedColor || selectedBgColor || undefined,
+      customization: {
+        customText: customizationData.customText || undefined,
+        whatsappNumber: customizationData.whatsappNumber || undefined,
+        logoFileNames: customizationData.logoFiles.length > 0
+          ? customizationData.logoFiles.map(f => f.name)
+          : undefined,
+        backgroundColorChoice: selectedBgColor || undefined,
+        logoColorChoice: selectedLogoColor || undefined,
+      },
     });
     toast.success('Produto adicionado ao carrinho!', {
       action: {
