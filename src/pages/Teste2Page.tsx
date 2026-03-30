@@ -17,8 +17,8 @@ import {
   NewsletterSection,
   CTASection,
   DarkFooter,
+  DarkVideoStories,
 } from '@/components/teste2';
-import { VideoStoriesCarousel } from '@/components/conversion/VideoStoriesCarousel';
 
 const Teste2Page = () => {
   const settings = useSiteSettings();
@@ -39,7 +39,7 @@ const Teste2Page = () => {
       <CategoriesGrid />
       <FeaturedSection />
       <SocialProofSection />
-      <VideoStoriesCarousel />
+      <DarkVideoStories />
       <DifferentialsSection />
       <NewsletterSection />
       <CTASection />

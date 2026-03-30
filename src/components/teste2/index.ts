@@ -9,3 +9,4 @@ export { DifferentialsSection } from './DifferentialsSection';
 export { CTASection } from './CTASection';
 export { DarkFooter } from './DarkFooter';
 export { TrustMarquee } from './TrustMarquee';
+export { DarkVideoStories } from './DarkVideoStories';

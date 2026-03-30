@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ImageUpload } from '@/components/admin/ImageUpload';
+import { VideoUpload } from '@/components/admin/VideoUpload';
 import { Plus, Trash2, Edit, Video, GripVertical, Eye, ArrowUp, ArrowDown } from 'lucide-react';
 import { useAllVideoStories, useCreateVideoStory, useUpdateVideoStory, useDeleteVideoStory } from '@/hooks/useVideoStories';
 import { toast } from 'sonner';
@@ -145,9 +146,13 @@ export function VideoStoriesManager() {
                 <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Descrição breve do vídeo" rows={2} />
               </div>
               <div>
-                <Label>URL do Vídeo *</Label>
-                <Input value={form.video_url} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="https://..." />
-                <p className="text-xs text-muted-foreground mt-1">Cole o link do vídeo (MP4, WebM) ou faça upload no storage</p>
+                <Label>Vídeo *</Label>
+                <VideoUpload
+                  value={form.video_url}
+                  onChange={(url) => setForm(f => ({ ...f, video_url: url }))}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Ou cole a URL diretamente:</p>
+                <Input value={form.video_url} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="https://..." className="mt-1" />
               </div>
               <div>
                 <Label>Thumbnail (capa)</Label>
