@@ -13,3 +13,8 @@ export { SizeGuideModal } from './SizeGuideModal';
 export { ProductSectionTabs } from './ProductSectionTabs';
 export { DeliveryEstimate } from './DeliveryEstimate';
 export { NotifyWhenAvailable } from './NotifyWhenAvailable';
+export { ProductColorDropdown } from './ProductColorDropdown';
+export { VolumeDiscountTable } from './VolumeDiscountTable';
+export { ProductCustomizationForm } from './ProductCustomizationForm';
+export { BuyTogetherSection } from './BuyTogetherSection';
+export { HowItWorksSteps } from './HowItWorksSteps';

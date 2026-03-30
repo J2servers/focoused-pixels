@@ -1,6 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export interface CartCustomization {
+  customText?: string;
+  whatsappNumber?: string;
+  logoFileNames?: string[];
+  backgroundColorChoice?: string;
+  logoColorChoice?: string;
+}
+
 export interface CartItem {
   id: string;
   name: string;
@@ -8,6 +16,8 @@ export interface CartItem {
   image: string;
   quantity: number;
   size?: string;
+  color?: string;
+  customization?: CartCustomization;
 }
 
 interface CartState {
