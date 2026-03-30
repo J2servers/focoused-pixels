@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { VideoStoriesManager } from '@/components/admin/VideoStoriesManager';
 
 import { Link } from 'react-router-dom';
 
