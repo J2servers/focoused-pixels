@@ -60,7 +60,14 @@ const ProductPage = () => {
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedBgColor, setSelectedBgColor] = useState<string | null>(null);
+  const [selectedLogoColor, setSelectedLogoColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [customizationData, setCustomizationData] = useState<CustomizationData>({
+    customText: '',
+    logoFiles: [],
+    whatsappNumber: '',
+  });
   const [selectedFreight, setSelectedFreight] = useState<{
     method: string; price: number; days: string; cep: string; city: string; state: string;
   } | null>(null);
