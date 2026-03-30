@@ -17,12 +17,18 @@ import { toast } from 'sonner';
 import {
   ProductImageGallery,
   ProductColorSelector,
+  ProductColorDropdown,
   ProductSizeSelector,
   ProductQuantityCalculator,
   ProductWhatsAppQuote,
   ProductSpecifications,
   RelatedProducts,
+  VolumeDiscountTable,
+  ProductCustomizationForm,
+  BuyTogetherSection,
+  HowItWorksSteps,
 } from '@/components/product';
+import type { CustomizationData } from '@/components/product/ProductCustomizationForm';
 import { ProductReviews } from '@/components/reviews';
 import { TrustBar, ViewingNowBadge } from '@/components/conversion';
 import { UrgencyBadge } from '@/components/conversion/UrgencyBadge';
@@ -54,7 +60,14 @@ const ProductPage = () => {
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedBgColor, setSelectedBgColor] = useState<string | null>(null);
+  const [selectedLogoColor, setSelectedLogoColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [customizationData, setCustomizationData] = useState<CustomizationData>({
+    customText: '',
+    logoFiles: [],
+    whatsappNumber: '',
+  });
   const [selectedFreight, setSelectedFreight] = useState<{
     method: string; price: number; days: string; cep: string; city: string; state: string;
   } | null>(null);
@@ -76,8 +89,11 @@ const ProductPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setSelectedSize(null);
     setSelectedColor(null);
+    setSelectedBgColor(null);
+    setSelectedLogoColor(null);
     setQuantity(1);
     setSelectedFreight(null);
+    setCustomizationData({ customText: '', logoFiles: [], whatsappNumber: '' });
   }, [productSlug]);
 
   if (isLoading) {
@@ -164,6 +180,16 @@ const ProductPage = () => {
       image: product.image,
       quantity,
       size: selectedSize || undefined,
+      color: selectedColor || selectedBgColor || undefined,
+      customization: {
+        customText: customizationData.customText || undefined,
+        whatsappNumber: customizationData.whatsappNumber || undefined,
+        logoFileNames: customizationData.logoFiles.length > 0
+          ? customizationData.logoFiles.map(f => f.name)
+          : undefined,
+        backgroundColorChoice: selectedBgColor || undefined,
+        logoColorChoice: selectedLogoColor || undefined,
+      },
     });
     toast.success('Produto adicionado ao carrinho!', {
       action: {
@@ -401,7 +427,28 @@ const ProductPage = () => {
                   </div>
                 </div>
 
-                {/* Color Selector */}
+                {/* Volume Discount Table */}
+                <VolumeDiscountTable tiers={discountTiers} currentQuantity={quantity} />
+
+                {/* Color Dropdowns (FocoLaser style) */}
+                <div className="space-y-3">
+                  <ProductColorDropdown
+                    label="Cor de fundo da Placa:"
+                    colors={storeInfo.customizationOptions.backgroundColors}
+                    selectedColor={selectedBgColor}
+                    onSelectColor={setSelectedBgColor}
+                    required
+                  />
+                  <ProductColorDropdown
+                    label="Cor da placa onde vai a Logo:"
+                    colors={storeInfo.customizationOptions.mirrorColors}
+                    selectedColor={selectedLogoColor}
+                    onSelectColor={setSelectedLogoColor}
+                    required
+                  />
+                </div>
+
+                {/* Legacy circle color selector for simple products */}
                 {product.colors && product.colors.length > 0 && (
                   <ProductColorSelector
                     colors={product.colors}
@@ -420,10 +467,18 @@ const ProductPage = () => {
                         onSelectSize={setSelectedSize}
                       />
                     </div>
-                    {/* #13 Size Guide */}
                     <SizeGuideModal sizes={product.sizes} productName={product.name} />
                   </div>
                 )}
+
+                {/* Customization Form: text, upload, whatsapp */}
+                <ProductCustomizationForm
+                  data={customizationData}
+                  onDataChange={setCustomizationData}
+                />
+
+                {/* How It Works */}
+                <HowItWorksSteps />
 
                 {/* Quantity Calculator */}
                 <ProductQuantityCalculator
@@ -438,17 +493,17 @@ const ProductPage = () => {
                   product={product}
                   quantity={quantity}
                   selectedSize={selectedSize}
-                  selectedColor={selectedColor}
+                  selectedColor={selectedColor || selectedBgColor}
                   onAddToCart={handleAddToCart}
                 />
 
-                {/* Freight Calculator - with saved CEP */}
+                {/* Freight Calculator */}
                 <FreightCalculator 
                   productPrice={product.price * quantity} 
                   onFreightSelect={setSelectedFreight}
                 />
 
-                {/* #19 Delivery Estimate */}
+                {/* Delivery Estimate */}
                 {selectedFreight && (
                   <DeliveryEstimate
                     freightDays={selectedFreight.days}

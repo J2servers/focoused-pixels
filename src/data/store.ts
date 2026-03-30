@@ -44,8 +44,8 @@ export const storeInfo = {
     payment: ['PIX', 'Boleto', 'Cartão de Crédito em até 12x', 'Cartão de Débito'],
   },
   customizationOptions: {
-    backgroundColors: ['Branco', 'Preto', 'Transparente', 'Azul Royal', 'Rosa', 'Lilás', 'Verde', 'Vermelho'],
-    mirrorColors: ['Dourado', 'Prata', 'Rose Gold', 'Azul', 'Bronze', 'Vermelho', 'Verde', 'Lilás', 'Laranja', 'Preto'],
+    backgroundColors: ['Branco', 'Preto', 'Transparente', 'Azul Royal', 'Azul Claro', 'Rosa', 'Lilás', 'Verde', 'Vermelho', 'Dourado', 'Prata', 'Bronze', 'Laranja'],
+    mirrorColors: ['Dourado', 'Prata', 'Rose Gold', 'Bronze', 'Azul', 'Azul Royal', 'Azul Claro', 'Vermelho', 'Verde', 'Lilás', 'Laranja', 'Preto', 'Branco', 'Rosé'],
     materials: ['Acrílico Cristal', 'Acrílico Espelhado', 'MDF', 'Acrílico com LED'],
     finishes: ['Polido', 'Fosco', 'Brilhante'],
     fixation: ['Fita Dupla Face (inclusa)', 'Prolongadores de Inox', 'Suporte de Mesa'],
