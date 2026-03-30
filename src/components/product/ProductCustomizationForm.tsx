@@ -198,10 +198,10 @@ export const ProductCustomizationForm = ({
       </div>
 
       {/* Personalization Notice */}
-      <div className="flex gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
-        <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+      <div className="flex gap-3 p-4 rounded-xl bg-accent/10 border border-accent/30">
+        <AlertTriangle className="h-5 w-5 text-accent shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <p className="text-sm font-bold text-amber-600 dark:text-amber-400">
+          <p className="text-sm font-bold text-accent">
             [ATENÇÃO] ❗
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed">

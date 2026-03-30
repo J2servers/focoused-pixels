@@ -107,7 +107,7 @@ export const BuyTogetherSection = ({
           <p className="text-lg font-bold text-primary">
             R$ {discountedTotal.toFixed(2).replace('.', ',')}
           </p>
-          <p className="text-xs font-medium text-green-600 dark:text-green-400">
+          <p className="text-xs font-medium text-primary">
             {bundleDiscount}% de desconto
           </p>
         </div>
