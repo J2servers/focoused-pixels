@@ -32,6 +32,7 @@ import {
   GuaranteesSection,
   HowItWorksSection,
   WeeklyUrgencySection,
+  VideoStoriesCarousel,
 } from '@/components/conversion';
 
 /* ── Category visual cards ── */
