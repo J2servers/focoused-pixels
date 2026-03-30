@@ -18,6 +18,7 @@ import {
   CTASection,
   DarkFooter,
 } from '@/components/teste2';
+import { VideoStoriesCarousel } from '@/components/conversion/VideoStoriesCarousel';
 
 const Teste2Page = () => {
   const settings = useSiteSettings();
