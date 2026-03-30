@@ -17,12 +17,18 @@ import { toast } from 'sonner';
 import {
   ProductImageGallery,
   ProductColorSelector,
+  ProductColorDropdown,
   ProductSizeSelector,
   ProductQuantityCalculator,
   ProductWhatsAppQuote,
   ProductSpecifications,
   RelatedProducts,
+  VolumeDiscountTable,
+  ProductCustomizationForm,
+  BuyTogetherSection,
+  HowItWorksSteps,
 } from '@/components/product';
+import type { CustomizationData } from '@/components/product/ProductCustomizationForm';
 import { ProductReviews } from '@/components/reviews';
 import { TrustBar, ViewingNowBadge } from '@/components/conversion';
 import { UrgencyBadge } from '@/components/conversion/UrgencyBadge';
