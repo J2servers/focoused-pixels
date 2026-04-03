@@ -143,6 +143,7 @@ const App = () => (
                 <Route path="/admin/email-templates" element={<AdminTemplatesPage />} />
                 <Route path="/admin/midia" element={<AdminMediaPage />} />
                 <Route path="/admin/pagina-por-que-escolher" element={<AdminWhyChooseUsPage />} />
+                <Route path="/admin/workflows" element={<AdminWorkflowsPage />} />
                 
                 <Route path="/teste" element={<TestePage />} />
                 <Route path="/teste2" element={<Teste2Page />} />

@@ -1,5 +1,5 @@
 import { AdminLayout } from '@/components/admin';
-import { WorkflowBuilder } from '@/components/admin/workflows/WorkflowBuilder';
+import WorkflowBuilder from '@/components/admin/workflows/WorkflowBuilder';
 
 const AdminWorkflowsPage = () => {
   return (
