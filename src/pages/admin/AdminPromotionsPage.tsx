@@ -107,7 +107,7 @@ const AdminPromotionsPage = () => {
     },
     {
       key: 'status', header: 'Status',
-      render: (p) => <AdminStatusBadge label={p.status === 'active' ? 'Ativa' : 'Inativa'} variant={p.status === 'active' ? 'success' : 'default'} />,
+      render: (p) => <AdminStatusBadge label={p.status === 'active' ? 'Ativa' : 'Inativa'} variant={p.status === 'active' ? 'success' : 'neutral'} />,
     },
     { key: 'priority', header: 'Prioridade', sortable: true },
     {
