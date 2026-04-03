@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useAdminQuotes, useUpdateQuoteStatus, type Quote } from '@/hooks/useAdminQuotes';
 import { useCreateOrderFromQuote } from '@/hooks/useOrders';
-import { Eye, FileText, ArrowRightCircle, Clock, CheckCircle, XCircle, Inbox } from 'lucide-react';
+import { Eye, FileText, ArrowRightCircle, Clock, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -50,9 +50,9 @@ const AdminQuotesPage = () => {
       sortable: true,
       render: (q) => (
         <div>
-          <p className="font-medium">{q.customer_name}</p>
-          <p className="text-xs text-muted-foreground">{q.customer_email}</p>
-          {q.customer_company && <p className="text-xs text-muted-foreground">{q.customer_company}</p>}
+          <p className="font-medium text-white">{q.customer_name}</p>
+          <p className="text-xs text-[hsl(var(--admin-text-muted))]">{q.customer_email}</p>
+          {q.customer_company && <p className="text-xs text-[hsl(var(--admin-text-muted))]">{q.customer_company}</p>}
         </div>
       ),
     },
@@ -62,10 +62,10 @@ const AdminQuotesPage = () => {
       render: (q) => (
         <div className="flex flex-wrap gap-1">
           {q.product_types.slice(0, 2).map((type) => (
-            <Badge key={type} variant="outline" className="text-xs">{type}</Badge>
+            <Badge key={type} variant="outline" className="text-xs border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))]">{type}</Badge>
           ))}
           {q.product_types.length > 2 && (
-            <Badge variant="outline" className="text-xs">+{q.product_types.length - 2}</Badge>
+            <Badge variant="outline" className="text-xs border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))]">+{q.product_types.length - 2}</Badge>
           )}
         </div>
       ),
@@ -79,7 +79,11 @@ const AdminQuotesPage = () => {
       key: 'cart_total',
       header: 'Valor',
       sortable: true,
-      render: (q) => q.cart_total ? `R$ ${q.cart_total.toFixed(2).replace('.', ',')}` : 'A calcular',
+      render: (q) => (
+        <span className="font-semibold text-white">
+          {q.cart_total ? `R$ ${q.cart_total.toFixed(2).replace('.', ',')}` : 'A calcular'}
+        </span>
+      ),
     },
     {
       key: 'status',
@@ -93,18 +97,23 @@ const AdminQuotesPage = () => {
       key: 'created_at',
       header: 'Data',
       sortable: true,
-      render: (q) => format(new Date(q.created_at), "dd/MM/yy HH:mm", { locale: ptBR }),
+      render: (q) => (
+        <span className="text-sm text-[hsl(var(--admin-text-muted))]">
+          {format(new Date(q.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
+        </span>
+      ),
     },
     {
       key: 'id',
       header: '',
       render: (q) => (
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setSelectedQuote(q)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white" onClick={() => setSelectedQuote(q)}>
             <Eye className="h-4 w-4" />
           </Button>
           {q.status === 'approved' && (
-            <Button size="sm" onClick={() => handleConvertToOrder(q.id)} disabled={createOrderFromQuote.isPending}>
+            <Button size="sm" onClick={() => handleConvertToOrder(q.id)} disabled={createOrderFromQuote.isPending}
+              className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
               <ArrowRightCircle className="h-4 w-4 mr-1" />
               Converter
             </Button>
@@ -119,7 +128,7 @@ const AdminQuotesPage = () => {
       <div className="space-y-6">
         <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar por nome ou email...">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full md:w-[200px]">
+            <SelectTrigger className="w-full md:w-[200px] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -146,48 +155,47 @@ const AdminQuotesPage = () => {
         />
       </div>
 
-      {/* Quote Details Modal */}
       <Dialog open={!!selectedQuote} onOpenChange={() => setSelectedQuote(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh]">
+        <DialogContent className="max-w-2xl max-h-[90vh] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
           <DialogHeader>
-            <DialogTitle>Detalhes do Orçamento</DialogTitle>
+            <DialogTitle className="text-white">Detalhes do Orçamento</DialogTitle>
           </DialogHeader>
 
           {selectedQuote && (
             <ScrollArea className="max-h-[60vh]">
               <div className="space-y-6 p-1">
                 <div>
-                  <h4 className="font-semibold mb-2">Cliente</h4>
-                  <div className="bg-muted/50 rounded-lg p-4 space-y-1 text-sm">
-                    <p><strong>Nome:</strong> {selectedQuote.customer_name}</p>
-                    <p><strong>Email:</strong> {selectedQuote.customer_email}</p>
-                    <p><strong>Telefone:</strong> {selectedQuote.customer_phone}</p>
+                  <h4 className="font-semibold mb-2 text-white">Cliente</h4>
+                  <div className="bg-[hsl(var(--admin-bg))] rounded-lg p-4 space-y-1 text-sm text-[hsl(var(--admin-text-muted))]">
+                    <p><strong className="text-white">Nome:</strong> {selectedQuote.customer_name}</p>
+                    <p><strong className="text-white">Email:</strong> {selectedQuote.customer_email}</p>
+                    <p><strong className="text-white">Telefone:</strong> {selectedQuote.customer_phone}</p>
                     {selectedQuote.customer_company && (
-                      <p><strong>Empresa:</strong> {selectedQuote.customer_company}</p>
+                      <p><strong className="text-white">Empresa:</strong> {selectedQuote.customer_company}</p>
                     )}
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-[hsl(var(--admin-card-border))]" />
 
                 <div>
-                  <h4 className="font-semibold mb-2">Produtos Solicitados</h4>
+                  <h4 className="font-semibold mb-2 text-white">Produtos Solicitados</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedQuote.product_types.map((type) => (
-                      <Badge key={type}>{type}</Badge>
+                      <Badge key={type} className="bg-[hsl(var(--admin-accent-purple)/0.2)] text-[hsl(var(--admin-accent-purple))] border border-[hsl(var(--admin-accent-purple)/0.3)]">{type}</Badge>
                     ))}
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-[hsl(var(--admin-card-border))]" />
 
                 <div>
-                  <h4 className="font-semibold mb-2">Status</h4>
+                  <h4 className="font-semibold mb-2 text-white">Status</h4>
                   <Select
                     value={selectedQuote.status}
                     onValueChange={(value) => updateStatus.mutate({ id: selectedQuote.id, status: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -206,6 +214,7 @@ const AdminQuotesPage = () => {
               <Button
                 onClick={() => handleConvertToOrder(selectedQuote.id)}
                 disabled={createOrderFromQuote.isPending}
+                className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white"
               >
                 <ArrowRightCircle className="h-4 w-4 mr-2" />
                 Converter em Pedido
