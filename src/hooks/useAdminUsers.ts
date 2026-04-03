@@ -61,10 +61,10 @@ export function useCreateAdminUser() {
         full_name,
       });
 
-      const { error: roleError } = await supabase.from('user_roles').insert({
+      const { error: roleError } = await supabase.from('user_roles').insert([{
         user_id: authData.user.id,
-        role,
-      });
+        role: role as 'admin' | 'editor' | 'support',
+      }]);
       if (roleError) throw roleError;
     },
     onSuccess: () => {
