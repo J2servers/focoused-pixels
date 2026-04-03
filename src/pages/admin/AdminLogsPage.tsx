@@ -71,7 +71,11 @@ const AdminLogsPage = () => {
       key: 'created_at',
       header: 'Data/Hora',
       sortable: true,
-      render: (log) => format(new Date(log.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR }),
+      render: (log) => (
+        <span className="text-sm text-[hsl(var(--admin-text-muted))]">
+          {format(new Date(log.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+        </span>
+      ),
     },
     {
       key: 'action',
@@ -81,20 +85,22 @@ const AdminLogsPage = () => {
     {
       key: 'table_name',
       header: 'Módulo',
-      render: (log) => TABLE_NAMES[log.table_name] || log.table_name,
+      render: (log) => (
+        <span className="text-white">{TABLE_NAMES[log.table_name] || log.table_name}</span>
+      ),
     },
     {
       key: 'record_id',
       header: 'ID do Registro',
       render: (log) => (
-        <span className="font-mono text-xs">{log.record_id?.slice(0, 8)}...</span>
+        <span className="font-mono text-xs text-[hsl(var(--admin-text-muted))]">{log.record_id?.slice(0, 8)}...</span>
       ),
     },
     {
       key: 'user_id',
       header: 'Usuário',
       render: (log) => (
-        <span className="font-mono text-xs">{log.user_id?.slice(0, 8) || 'Sistema'}...</span>
+        <span className="font-mono text-xs text-[hsl(var(--admin-text-muted))]">{log.user_id?.slice(0, 8) || 'Sistema'}...</span>
       ),
     },
   ];
@@ -106,7 +112,7 @@ const AdminLogsPage = () => {
       <div className="space-y-4">
         <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar nos logs...">
           <Select value={actionFilter} onValueChange={setActionFilter}>
-            <SelectTrigger className="w-[150px]">
+            <SelectTrigger className="w-[150px] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
               <SelectValue placeholder="Ação" />
             </SelectTrigger>
             <SelectContent>
@@ -117,7 +123,7 @@ const AdminLogsPage = () => {
             </SelectContent>
           </Select>
           <Select value={moduleFilter} onValueChange={setModuleFilter}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-[160px] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
               <SelectValue placeholder="Módulo" />
             </SelectTrigger>
             <SelectContent>
@@ -127,8 +133,8 @@ const AdminLogsPage = () => {
               ))}
             </SelectContent>
           </Select>
-          <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-[150px]" placeholder="De" />
-          <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-[150px]" placeholder="Até" />
+          <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-[150px] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white" placeholder="De" />
+          <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-[150px] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white" placeholder="Até" />
           <ExportButtons data={exportData} columns={exportColumns} filename="logs-auditoria" title="Logs de Auditoria" />
         </AdminFilterBar>
 
