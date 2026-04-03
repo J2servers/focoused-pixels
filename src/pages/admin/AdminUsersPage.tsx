@@ -11,10 +11,10 @@ import { Plus, Trash2, Loader2, Shield, Users, UserCheck } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useAdminUsers, useCreateAdminUser, useDeleteAdminUser, type AdminUser } from '@/hooks/useAdminUsers';
 
-const ROLE_VARIANTS: Record<string, { label: string; variant: 'danger' | 'info' | 'default' }> = {
+const ROLE_VARIANTS: Record<string, { label: string; variant: 'danger' | 'info' | 'neutral' }> = {
   admin: { label: 'Admin', variant: 'danger' },
   editor: { label: 'Editor', variant: 'info' },
-  support: { label: 'Suporte', variant: 'default' },
+  support: { label: 'Suporte', variant: 'neutral' },
 };
 
 const AdminUsersPage = () => {

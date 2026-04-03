@@ -84,7 +84,7 @@ const AdminHeroPage = () => {
     { key: 'display_order', header: 'Ordem', sortable: true },
     {
       key: 'status', header: 'Status',
-      render: (s) => <AdminStatusBadge label={s.status === 'active' ? 'Ativo' : 'Inativo'} variant={s.status === 'active' ? 'success' : 'default'} />,
+      render: (s) => <AdminStatusBadge label={s.status === 'active' ? 'Ativo' : 'Inativo'} variant={s.status === 'active' ? 'success' : 'neutral'} />,
     },
     {
       key: 'theme', header: 'Tema',
