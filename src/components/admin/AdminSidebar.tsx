@@ -1,4 +1,4 @@
-﻿import { 
+import { 
   LayoutDashboard, 
   Package, 
   FolderTree, 
@@ -18,7 +18,13 @@
   Kanban,
   Menu,
   X,
-  Mail
+  Mail,
+  MessageSquare,
+  Users,
+  ScrollText,
+  ImageIcon,
+  Workflow,
+  Code2,
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -53,6 +59,12 @@ const menuItems = [
   { title: 'Empresa', url: '/admin/empresa', icon: Building2 },
   { title: 'Página Comercial', url: '/admin/pagina-por-que-escolher', icon: Sparkles },
   { title: 'Templates', url: '/admin/templates', icon: Mail },
+  { title: 'WhatsApp', url: '/admin/whatsapp', icon: MessageSquare },
+  { title: 'Mídia', url: '/admin/midia', icon: ImageIcon },
+  { title: 'Workflows', url: '/admin/workflows', icon: Workflow },
+  { title: 'Usuários', url: '/admin/usuarios', icon: Users, adminOnly: true },
+  { title: 'Logs', url: '/admin/logs', icon: ScrollText, adminOnly: true },
+  { title: 'API', url: '/admin/api', icon: Code2, adminOnly: true },
   { title: 'Configurações', url: '/admin/configuracoes', icon: Settings },
 ];
 
