@@ -1,4 +1,4 @@
-﻿import { AdminLayout } from '@/components/admin';
+import { AdminLayout } from '@/components/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -21,8 +21,7 @@ import {
   PieChart as PieChartIcon, Award, RefreshCw, ShoppingBag, Repeat, XCircle
 } from 'lucide-react';
 
-
-// ===== METRIC CARD - fluid sizing =====
+// ===== METRIC CARD =====
 function M({ label, value, icon: Icon, color, href, format = 'number', trend }: {
   label: string; value: number | string; icon: React.ElementType; color: string;
   href?: string; format?: 'number' | 'currency' | 'percent' | 'text' | 'days'; trend?: number | null;
@@ -35,18 +34,18 @@ function M({ label, value, icon: Icon, color, href, format = 'number', trend }: 
 
   const inner = (
     <div className={cn(
-      "flex items-center gap-[0.4vw] px-[0.5vw] py-[0.4vh] rounded-lg border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] transition-all h-full min-h-[3.5vh]",
+      "flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] transition-all h-full",
       href && "hover:border-[hsl(var(--admin-accent-purple)/0.4)] cursor-pointer"
     )}>
-      <div className={cn("p-[0.3vw] rounded-md shrink-0", color)}>
-        <Icon className="h-[1.2vw] w-[1.2vw] min-h-3 min-w-3 text-white" />
+      <div className={cn("p-1.5 rounded-lg shrink-0", color)}>
+        <Icon className="h-3.5 w-3.5 text-white" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-[clamp(10px,0.85vw,14px)] font-bold text-white truncate leading-tight">{fmt}</p>
-        <p className="text-[clamp(8px,0.6vw,11px)] text-[hsl(var(--admin-text-muted))] truncate leading-tight">{label}</p>
+        <p className="text-xs font-bold text-white truncate leading-tight">{fmt}</p>
+        <p className="text-[10px] text-[hsl(var(--admin-text-muted))] truncate leading-tight">{label}</p>
       </div>
       {trend !== undefined && trend !== null && (
-        <span className={cn("text-[clamp(8px,0.55vw,10px)] font-bold shrink-0", trend >= 0 ? "text-emerald-400" : "text-red-400")}>
+        <span className={cn("text-[10px] font-bold shrink-0", trend >= 0 ? "text-emerald-400" : "text-red-400")}>
           {trend >= 0 ? '↑' : '↓'}{Math.abs(trend).toFixed(0)}%
         </span>
       )}
@@ -56,7 +55,7 @@ function M({ label, value, icon: Icon, color, href, format = 'number', trend }: 
   return inner;
 }
 
-// ===== HERO KPI - fluid =====
+// ===== HERO KPI =====
 function HeroKPI({ label, value, icon: Icon, color, format = 'currency', subtitle, trend }: {
   label: string; value: number; icon: React.ElementType; color: string;
   format?: 'currency' | 'number'; subtitle?: string; trend?: number;
@@ -66,24 +65,24 @@ function HeroKPI({ label, value, icon: Icon, color, format = 'currency', subtitl
     : value.toLocaleString('pt-BR');
   return (
     <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-xl overflow-hidden h-full">
-      <CardContent className="p-[0.8vw]">
-        <div className="flex items-start justify-between mb-[0.3vh]">
-          <div className={cn("p-[0.5vw] rounded-lg shadow-lg", color)}>
-            <Icon className="h-[1.5vw] w-[1.5vw] min-h-4 min-w-4 text-white" />
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between mb-1">
+          <div className={cn("p-2.5 rounded-xl shadow-lg", color)}>
+            <Icon className="h-5 w-5 text-white" />
           </div>
           {trend !== undefined && (
             <span className={cn(
-              "flex items-center gap-0.5 text-[clamp(9px,0.65vw,12px)] font-bold px-[0.4vw] py-[0.2vh] rounded-full",
+              "flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-full",
               trend >= 0 ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
             )}>
-              {trend >= 0 ? <ArrowUpRight className="h-[0.8vw] w-[0.8vw] min-h-2.5 min-w-2.5" /> : <ArrowDownRight className="h-[0.8vw] w-[0.8vw] min-h-2.5 min-w-2.5" />}
+              {trend >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
               {Math.abs(trend).toFixed(0)}%
             </span>
           )}
         </div>
-        <p className="text-[clamp(16px,1.6vw,28px)] font-bold text-white leading-tight">{fmt}</p>
-        <p className="text-[clamp(9px,0.7vw,13px)] text-[hsl(var(--admin-text-muted))]">{label}</p>
-        {subtitle && <p className="text-[clamp(8px,0.55vw,11px)] text-[hsl(var(--admin-text-muted)/0.6)]">{subtitle}</p>}
+        <p className="text-2xl font-bold text-white leading-tight mt-2">{fmt}</p>
+        <p className="text-xs text-[hsl(var(--admin-text-muted))]">{label}</p>
+        {subtitle && <p className="text-[10px] text-[hsl(var(--admin-text-muted)/0.6)]">{subtitle}</p>}
       </CardContent>
     </Card>
   );
@@ -92,9 +91,9 @@ function HeroKPI({ label, value, icon: Icon, color, format = 'currency', subtitl
 // ===== SECTION LABEL =====
 function Sec({ children, icon: Icon, color }: { children: string; icon: React.ElementType; color: string }) {
   return (
-    <div className="flex items-center gap-[0.4vw] col-span-full py-[0.3vh]">
-      <div className={cn("p-[0.3vw] rounded-md", color)}><Icon className="h-[1vw] w-[1vw] min-h-3 min-w-3 text-white" /></div>
-      <h2 className="text-[clamp(10px,0.75vw,14px)] font-bold text-white tracking-wide">{children}</h2>
+    <div className="flex items-center gap-2 col-span-full py-1">
+      <div className={cn("p-1.5 rounded-lg", color)}><Icon className="h-3.5 w-3.5 text-white" /></div>
+      <h2 className="text-xs font-bold text-white tracking-wide">{children}</h2>
     </div>
   );
 }
@@ -139,9 +138,7 @@ function MobileDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         </CardContent>
       </Card>
       <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))]">
-        <CardHeader className="pb-1 pt-3 px-3">
-          <CardTitle className="text-xs text-[hsl(var(--admin-text-muted))]">Recebido x aguardando</CardTitle>
-        </CardHeader>
+        <CardHeader className="pb-1 pt-3 px-3"><CardTitle className="text-xs text-[hsl(var(--admin-text-muted))]">Recebido x aguardando</CardTitle></CardHeader>
         <CardContent className="p-2 h-36">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={m.receitaComparativa7d || []}>
@@ -171,7 +168,48 @@ function MobileDashboard({ m, abandoned }: { m: any; abandoned: any }) {
   );
 }
 
-// ===== DESKTOP DASHBOARD - fully fluid =====
+// ===== CHART CARD helper =====
+function ChartCard({ title, children, className, height = 'h-40' }: { title: string; children: React.ReactNode; className?: string; height?: string }) {
+  return (
+    <Card className={cn("border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg", className)}>
+      <CardHeader className="pb-0 pt-3 px-4">
+        <CardTitle className="text-xs text-[hsl(var(--admin-text-muted))]">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className={cn("p-2", height)}>
+        {children}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ===== PIE CARD helper =====
+function PieCard({ title, data, children }: { title: string; data: any[]; children?: React.ReactNode }) {
+  return (
+    <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+      <CardContent className="p-3 flex items-center h-full min-h-[100px]">
+        <div className="w-16 h-16 shrink-0">
+          {data.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart><Pie data={data} cx="50%" cy="50%" innerRadius="40%" outerRadius="75%" paddingAngle={3} dataKey="value">{data.map((_: any, i: number) => <Cell key={i} fill={PIE_COLORS[i] || data[i]?.fill} />)}</Pie></PieChart>
+            </ResponsiveContainer>
+          ) : null}
+        </div>
+        <div className="flex-1 min-w-0 pl-2">
+          <p className="text-[10px] font-bold text-[hsl(var(--admin-text-muted))] mb-1">{title}</p>
+          {data.map((p: any, i: number) => (
+            <div key={p.name} className="flex items-center gap-1 mb-0.5">
+              <div className="w-2 h-2 rounded-full shrink-0" style={{ background: PIE_COLORS[i] || p.fill }} />
+              <span className="text-[10px] text-white truncate">{p.name}: {p.value}</span>
+            </div>
+          ))}
+          {children}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ===== DESKTOP DASHBOARD =====
 function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
   const funnelData = m.funnelData || [];
   const conversaoPorDia = m.conversaoPorDia || [];
@@ -190,23 +228,25 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
   const reviewsDistribution = m.reviewsDistribution || [];
   const whatsappDistribution = m.whatsappDistribution || [];
   const caixaPorDia = m.caixaPorDia || [];
+
   return (
-    <div className="grid grid-cols-12 gap-[0.4vw] auto-rows-min">
+    <div className="grid grid-cols-12 gap-3 auto-rows-min">
       {/* ROW 1: Hero KPIs */}
       <div className="col-span-3"><HeroKPI label="Receita Hoje" value={m.receitaHoje} icon={DollarSign} color="bg-gradient-to-br from-emerald-500 to-emerald-600" subtitle={`${m.vendasHoje} vendas`} /></div>
       <div className="col-span-3"><HeroKPI label="Receita do Mês" value={m.receitaMes} icon={TrendingUp} color="bg-gradient-to-br from-blue-500 to-blue-600" trend={m.crescimentoReceita} subtitle={`${m.vendasMes} vendas`} /></div>
       <div className="col-span-3"><HeroKPI label="Ticket Médio" value={m.ticketMedio} icon={Target} color="bg-gradient-to-br from-purple-500 to-purple-600" subtitle={`Hoje: R$ ${m.ticketMedioHoje.toFixed(2)}`} /></div>
       <div className="col-span-3"><HeroKPI label="Receita Líquida 12m" value={m.receitaLiquida} icon={TrendingUp} color="bg-gradient-to-br from-teal-500 to-teal-600" subtitle={`Margem: ${m.margemLiquida.toFixed(1)}%`} /></div>
 
+      {/* ROW 2: Financial overview cards */}
       <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-        <CardHeader className="pb-1 pt-[0.5vh] px-[0.6vw]">
-          <CardTitle className="text-[clamp(10px,0.7vw,13px)] text-white">Leitura financeira rápida</CardTitle>
+        <CardHeader className="pb-1 pt-3 px-4">
+          <CardTitle className="text-xs text-white">Leitura financeira rápida</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 p-[0.6vw]">
-          <p className="text-[clamp(8px,0.58vw,11px)] text-[hsl(var(--admin-text-muted))]">
+        <CardContent className="space-y-3 p-4">
+          <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">
             Receita considera apenas pedidos com pagamento confirmado. Pedidos aguardando boleto, PIX pendente ou pagamentos falhados ficam fora do faturamento.
           </p>
-          <div className="grid grid-cols-2 gap-[0.3vw]">
+          <div className="grid grid-cols-2 gap-2">
             <M label="Receita Real" value={m.receitaTotal} icon={DollarSign} color="bg-emerald-600" format="currency" />
             <M label="A Receber" value={m.receitaPendente} icon={Clock} color="bg-amber-600" format="currency" />
             <M label="Falhou" value={m.receitaFalhada} icon={AlertTriangle} color="bg-red-600" format="currency" />
@@ -215,109 +255,90 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         </CardContent>
       </Card>
 
-      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]">
-          <CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Status financeiro do mês</CardTitle>
-        </CardHeader>
-        <CardContent className="p-[0.3vw] h-[20vh] min-h-[130px]">
-          {receitaStatusResumoMes.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={receitaStatusResumoMes} cx="50%" cy="50%" innerRadius="42%" outerRadius="76%" paddingAngle={4} dataKey="value">
-                  {receitaStatusResumoMes.map((entry: any, index: number) => <Cell key={index} fill={entry.fill} />)}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-8">Sem movimentação financeira no período</p>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]">
-          <CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Recebido x aguardando (7 dias)</CardTitle>
-        </CardHeader>
-        <CardContent className="p-[0.3vw] h-[20vh] min-h-[130px]">
+      <ChartCard title="Status financeiro do mês" className="col-span-4" height="h-40">
+        {receitaStatusResumoMes.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={receitaComparativa7d}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} />
+            <PieChart>
+              <Pie data={receitaStatusResumoMes} cx="50%" cy="50%" innerRadius="42%" outerRadius="76%" paddingAngle={4} dataKey="value">
+                {receitaStatusResumoMes.map((entry: any, index: number) => <Cell key={index} fill={entry.fill} />)}
+              </Pie>
               <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ fontSize: 10 }} />
-              <Bar dataKey="recebido" fill="hsl(145,63%,42%)" radius={[3, 3, 0, 0]} name="Recebido" />
-              <Bar dataKey="aguardando" fill="hsl(45,93%,47%)" radius={[3, 3, 0, 0]} name="Aguardando" />
-            </BarChart>
+            </PieChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        ) : (
+          <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-8">Sem movimentação financeira no período</p>
+        )}
+      </ChartCard>
 
-      {/* ROW 1.5: Conversion Analytics & Sales Funnel */}
-      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Funil de Vendas (Mês)</CardTitle></CardHeader>
-        <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
-          <div className="h-full flex items-center">
-            <div className="w-full space-y-[0.4vh]">
-              {funnelData.map((stage: any, i: number) => {
-                const maxVal = funnelData[0]?.value || 1;
-                const pct = maxVal > 0 ? (stage.value / maxVal * 100) : 0;
-                const nextStage = funnelData[i + 1];
-                const convRate = nextStage && stage.value > 0 ? (nextStage.value / stage.value * 100) : null;
-                return (
-                  <div key={stage.stage} className="flex items-center gap-[0.4vw]">
-                    <span className="text-[clamp(8px,0.6vw,11px)] text-[hsl(var(--admin-text-muted))] w-[4vw] text-right shrink-0">{stage.stage}</span>
-                    <div className="flex-1 h-[2vh] min-h-[14px] bg-[hsl(var(--admin-sidebar))] rounded-md overflow-hidden relative">
-                      <div className="h-full rounded-md transition-all duration-500" style={{ width: `${Math.max(pct, 3)}%`, background: stage.color }} />
-                      <span className="absolute inset-0 flex items-center justify-center text-[clamp(8px,0.55vw,10px)] font-bold text-white">{stage.value.toLocaleString('pt-BR')}</span>
-                    </div>
-                    {convRate !== null && (
-                      <span className="text-[clamp(7px,0.5vw,9px)] text-[hsl(var(--admin-text-muted))] w-[2.5vw] shrink-0">→{convRate.toFixed(0)}%</span>
-                    )}
+      <ChartCard title="Recebido x aguardando (7 dias)" className="col-span-4" height="h-40">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={receitaComparativa7d}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
+            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend wrapperStyle={{ fontSize: 10 }} />
+            <Bar dataKey="recebido" fill="hsl(145,63%,42%)" radius={[3, 3, 0, 0]} name="Recebido" />
+            <Bar dataKey="aguardando" fill="hsl(45,93%,47%)" radius={[3, 3, 0, 0]} name="Aguardando" />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      {/* ROW 2.5: Conversion + Funnel */}
+      <ChartCard title="Funil de Vendas (Mês)" className="col-span-4" height="h-44">
+        <div className="h-full flex items-center">
+          <div className="w-full space-y-1.5">
+            {funnelData.map((stage: any, i: number) => {
+              const maxVal = funnelData[0]?.value || 1;
+              const pct = maxVal > 0 ? (stage.value / maxVal * 100) : 0;
+              const nextStage = funnelData[i + 1];
+              const convRate = nextStage && stage.value > 0 ? (nextStage.value / stage.value * 100) : null;
+              return (
+                <div key={stage.stage} className="flex items-center gap-2">
+                  <span className="text-[10px] text-[hsl(var(--admin-text-muted))] w-16 text-right shrink-0">{stage.stage}</span>
+                  <div className="flex-1 h-5 bg-[hsl(var(--admin-sidebar))] rounded-md overflow-hidden relative">
+                    <div className="h-full rounded-md transition-all duration-500" style={{ width: `${Math.max(pct, 3)}%`, background: stage.color }} />
+                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white">{stage.value.toLocaleString('pt-BR')}</span>
                   </div>
-                );
-              })}
-            </div>
+                  {convRate !== null && (
+                    <span className="text-[9px] text-[hsl(var(--admin-text-muted))] w-10 shrink-0">→{convRate.toFixed(0)}%</span>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </ChartCard>
 
-      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Conversão Diária (7 dias)</CardTitle></CardHeader>
-        <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
+      <ChartCard title="Conversão Diária (7 dias)" className="col-span-4" height="h-44">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={conversaoPorDia}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
+            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
+            <YAxis yAxisId="left" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={30} />
+            <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={30} tickFormatter={(v: number) => `${v.toFixed(0)}%`} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend wrapperStyle={{ fontSize: 10 }} />
+            <Bar yAxisId="left" dataKey="visitas" fill="hsl(210,80%,55%)" radius={[3,3,0,0]} name="Visitas" opacity={0.6} />
+            <Bar yAxisId="left" dataKey="pedidos" fill="hsl(145,63%,42%)" radius={[3,3,0,0]} name="Pedidos" />
+            <Line yAxisId="right" type="monotone" dataKey="taxa" stroke="hsl(45,93%,47%)" strokeWidth={2} dot={{ r: 3 }} name="Taxa %" />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <div className="col-span-4 grid grid-cols-2 gap-2">
+        <ChartCard title="Ticket Médio (6 meses)" className="col-span-2" height="h-24">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={conversaoPorDia}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
-              <YAxis yAxisId="left" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={30} />
-              <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={30} tickFormatter={(v: number) => `${v.toFixed(0)}%`} />
+            <AreaChart data={ticketPorMes}>
+              <defs><linearGradient id="ticketGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(145,63%,42%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(145,63%,42%)" stopOpacity={0} /></linearGradient></defs>
+              <XAxis dataKey="mes" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} tickFormatter={(v: number) => `R$${v.toFixed(0)}`} />
               <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
-              <Bar yAxisId="left" dataKey="visitas" fill="hsl(210,80%,55%)" radius={[3,3,0,0]} name="Visitas" opacity={0.6} />
-              <Bar yAxisId="left" dataKey="pedidos" fill="hsl(145,63%,42%)" radius={[3,3,0,0]} name="Pedidos" />
-              <Line yAxisId="right" type="monotone" dataKey="taxa" stroke="hsl(45,93%,47%)" strokeWidth={2} dot={{ r: 3 }} name="Taxa %" />
-            </BarChart>
+              <Area type="monotone" dataKey="ticket" stroke="hsl(145,63%,42%)" fill="url(#ticketGrad)" strokeWidth={2} name="Ticket Médio (R$)" />
+            </AreaChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      <div className="col-span-4 grid grid-cols-2 gap-[0.3vw]">
-        <Card className="col-span-2 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-          <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Ticket Médio (6 meses)</CardTitle></CardHeader>
-          <CardContent className="p-[0.3vw] h-[12vh] min-h-[80px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={ticketPorMes}>
-                <defs><linearGradient id="ticketGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(145,63%,42%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(145,63%,42%)" stopOpacity={0} /></linearGradient></defs>
-                <XAxis dataKey="mes" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} tickFormatter={(v: number) => `R$${v.toFixed(0)}`} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="ticket" stroke="hsl(145,63%,42%)" fill="url(#ticketGrad)" strokeWidth={2} name="Ticket Médio (R$)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        </ChartCard>
         <M label="Conv. Geral" value={m.overallConversion} icon={Target} color="bg-emerald-600" format="percent" />
         <M label="Visita→Lead" value={m.visitToLead} icon={UserPlus} color="bg-blue-600" format="percent" />
         <M label="Lead→Orç." value={m.leadToQuote} icon={FileText} color="bg-violet-600" format="percent" />
@@ -332,81 +353,44 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         <M label="Top Abandono" value={abandoned.topProductName} icon={ShoppingBag} color="bg-rose-700" format="text" />
       </div>
 
-      <Card className="col-span-5 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Receita vs Custos (6 meses)</CardTitle></CardHeader>
-        <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={receitaPorMes}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-              <XAxis dataKey="mes" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickFormatter={(v: number) => `${(v/1000).toFixed(0)}k`} width={35} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
-              <Line type="monotone" dataKey="receita" stroke="hsl(145,63%,42%)" strokeWidth={2.5} dot={{ r: 3 }} name="Receita" />
-              <Line type="monotone" dataKey="custos" stroke="hsl(0,72%,51%)" strokeWidth={2} dot={{ r: 3 }} name="Custos" />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      {/* ROW 3: Charts */}
+      <ChartCard title="Receita vs Custos (6 meses)" className="col-span-5" height="h-44">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={receitaPorMes}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
+            <XAxis dataKey="mes" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickFormatter={(v: number) => `${(v/1000).toFixed(0)}k`} width={35} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend wrapperStyle={{ fontSize: 10 }} />
+            <Line type="monotone" dataKey="receita" stroke="hsl(145,63%,42%)" strokeWidth={2.5} dot={{ r: 3 }} name="Receita" />
+            <Line type="monotone" dataKey="custos" stroke="hsl(0,72%,51%)" strokeWidth={2} dot={{ r: 3 }} name="Custos" />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartCard>
 
-      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-        <CardHeader className="pb-0 pt-[0.5vh] px-[0.6vw]"><CardTitle className="text-[clamp(9px,0.65vw,12px)] text-[hsl(var(--admin-text-muted))]">Vendas & Receita (7 dias)</CardTitle></CardHeader>
-        <CardContent className="p-[0.3vw] h-[22vh] min-h-[140px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={vendasPorDia}>
-              <defs><linearGradient id="recGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(270,70%,55%)" stopOpacity={0.3} /><stop offset="100%" stopColor="hsl(270,70%,55%)" stopOpacity={0} /></linearGradient></defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
-              <Area type="monotone" dataKey="receita" stroke="hsl(270,70%,55%)" fill="url(#recGrad)" strokeWidth={2.5} name="Receita recebida" />
-              <Area type="monotone" dataKey="aguardando" stroke="hsl(45,93%,47%)" fillOpacity={0} strokeWidth={2} name="Aguardando pagamento" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <ChartCard title="Vendas & Receita (7 dias)" className="col-span-4" height="h-44">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={vendasPorDia}>
+            <defs><linearGradient id="recGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(270,70%,55%)" stopOpacity={0.3} /><stop offset="100%" stopColor="hsl(270,70%,55%)" stopOpacity={0} /></linearGradient></defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
+            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend wrapperStyle={{ fontSize: 10 }} />
+            <Area type="monotone" dataKey="receita" stroke="hsl(270,70%,55%)" fill="url(#recGrad)" strokeWidth={2.5} name="Receita recebida" />
+            <Area type="monotone" dataKey="aguardando" stroke="hsl(45,93%,47%)" fillOpacity={0} strokeWidth={2} name="Aguardando pagamento" />
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartCard>
 
-      {/* Pie charts - fluid */}
-      <div className="col-span-3 grid grid-rows-2 gap-[0.4vw]">
-        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-          <CardContent className="p-[0.4vw] flex items-center h-full min-h-[10vh]">
-            <div className="w-[6vw] min-w-[60px] h-full shrink-0">
-              {paymentDistribution.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart><Pie data={paymentDistribution} cx="50%" cy="50%" innerRadius="40%" outerRadius="75%" paddingAngle={3} dataKey="value">{paymentDistribution.map((_: any, i: number) => <Cell key={i} fill={PIE_COLORS[i]} />)}</Pie></PieChart>
-                </ResponsiveContainer>
-              ) : null}
-            </div>
-            <div className="flex-1 min-w-0 pl-[0.3vw]">
-              <p className="text-[clamp(8px,0.6vw,11px)] font-bold text-[hsl(var(--admin-text-muted))] mb-1">Pagamentos</p>
-              {paymentDistribution.map((p: any, i: number) => (
-                <div key={p.name} className="flex items-center gap-1 mb-0.5"><div className="w-2 h-2 rounded-full shrink-0" style={{ background: PIE_COLORS[i] }} /><span className="text-[clamp(8px,0.55vw,11px)] text-white truncate">{p.name}: {p.value}</span></div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-          <CardContent className="p-[0.4vw] flex items-center h-full min-h-[10vh]">
-            <div className="w-[6vw] min-w-[60px] h-full shrink-0">
-              {statusDistribution.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart><Pie data={statusDistribution} cx="50%" cy="50%" innerRadius="40%" outerRadius="75%" paddingAngle={3} dataKey="value">{statusDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie></PieChart>
-                </ResponsiveContainer>
-              ) : null}
-            </div>
-            <div className="flex-1 min-w-0 pl-[0.3vw]">
-              <p className="text-[clamp(8px,0.6vw,11px)] font-bold text-[hsl(var(--admin-text-muted))] mb-1">Status Pedidos</p>
-              {statusDistribution.slice(0, 5).map((s: any) => (
-                <div key={s.name} className="flex items-center gap-1 mb-0.5"><div className="w-2 h-2 rounded-full shrink-0" style={{ background: s.fill }} /><span className="text-[clamp(8px,0.55vw,11px)] text-white truncate">{s.name}: {s.value}</span></div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Pie charts */}
+      <div className="col-span-3 grid grid-rows-2 gap-3">
+        <PieCard title="Pagamentos" data={paymentDistribution} />
+        <PieCard title="Status Pedidos" data={statusDistribution.slice(0, 5)} />
       </div>
 
-      {/* ROW 3: Vendas + Financeiro */}
-      <div className="col-span-6 grid grid-cols-5 gap-[0.3vw]">
+      {/* ROW 4: Vendas + Financeiro */}
+      <div className="col-span-6 grid grid-cols-5 gap-2">
         <M label="Vendas Hoje" value={m.vendasHoje} icon={ShoppingCart} color="bg-emerald-600" href="/admin/pedidos" />
         <M label="Vendas Semana" value={m.vendasSemana} icon={ShoppingCart} color="bg-emerald-700" />
         <M label="Vendas Mês" value={m.vendasMes} icon={ShoppingCart} color="bg-teal-600" trend={m.crescimentoVendas} />
@@ -424,7 +408,7 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         <M label="Pgtos Falhados" value={m.pagamentosFalhados} icon={AlertTriangle} color="bg-red-700" />
       </div>
 
-      <div className="col-span-6 grid grid-cols-5 gap-[0.3vw]">
+      <div className="col-span-6 grid grid-cols-5 gap-2">
         <M label="Receita Bruta 12m" value={m.receitaBruta12m} icon={DollarSign} color="bg-emerald-600" format="currency" />
         <M label="Custos Totais" value={m.custoTotal} icon={TrendingDown} color="bg-red-600" format="currency" />
         <M label="Custo Material" value={m.custoMaterial} icon={Boxes} color="bg-red-700" format="currency" />
@@ -442,19 +426,17 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         <M label="Cartão (R$)" value={m.cardTotal} icon={CreditCard} color="bg-blue-600" format="currency" />
       </div>
 
-      {/* ROW 4: Produção + Leads com gráficos */}
+      {/* ROW 5: Produção + Leads + Tráfego + Produtos */}
       <div className="col-span-3">
         <Sec icon={Wrench} color="bg-blue-600">Produção</Sec>
-        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
-          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            {productionDistribution.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart><Pie data={productionDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{productionDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
-              </ResponsiveContainer>
-            ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+        <ChartCard title="" className="mt-1" height="h-24">
+          {productionDistribution.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart><Pie data={productionDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{productionDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+            </ResponsiveContainer>
+          ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+        </ChartCard>
+        <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Aguardando" value={m.prodPending} icon={Clock} color="bg-gray-600" href="/admin/kanban" />
           <M label="Em Produção" value={m.prodInProduction} icon={Wrench} color="bg-blue-600" href="/admin/kanban" />
           <M label="Prontos" value={m.prodReady} icon={CheckCircle} color="bg-green-600" />
@@ -464,19 +446,17 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
 
       <div className="col-span-3">
         <Sec icon={Users} color="bg-pink-600">Clientes & Leads</Sec>
-        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
-          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={leadsPorDia}>
-                <defs><linearGradient id="leadsGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(330,70%,55%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(330,70%,55%)" stopOpacity={0} /></linearGradient></defs>
-                <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="leads" stroke="hsl(330,70%,55%)" fill="url(#leadsGrad)" strokeWidth={2} name="Leads" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+        <ChartCard title="" className="mt-1" height="h-24">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={leadsPorDia}>
+              <defs><linearGradient id="leadsGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(330,70%,55%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(330,70%,55%)" stopOpacity={0} /></linearGradient></defs>
+              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Area type="monotone" dataKey="leads" stroke="hsl(330,70%,55%)" fill="url(#leadsGrad)" strokeWidth={2} name="Leads" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </ChartCard>
+        <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Total Leads" value={m.totalLeads} icon={Users} color="bg-violet-600" href="/admin/leads" />
           <M label="Leads Hoje" value={m.leadsHoje} icon={UserPlus} color="bg-violet-700" />
           <M label="Clientes Únicos" value={m.uniqueCustomers} icon={Users} color="bg-pink-600" />
@@ -486,18 +466,16 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
 
       <div className="col-span-3">
         <Sec icon={Eye} color="bg-cyan-600">Tráfego</Sec>
-        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
-          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={visitasPorDia}>
-                <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="visitas" fill="hsl(190,70%,50%)" radius={[3,3,0,0]} name="Visitas" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+        <ChartCard title="" className="mt-1" height="h-24">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={visitasPorDia}>
+              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="visitas" fill="hsl(190,70%,50%)" radius={[3,3,0,0]} name="Visitas" />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+        <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Visitas Hoje" value={m.visitasHoje} icon={Eye} color="bg-cyan-600" />
           <M label="Visitas Mês" value={m.visitasMes} icon={Eye} color="bg-blue-600" />
           <M label="Sessões Únicas" value={m.sessoesUnicas} icon={Users} color="bg-blue-700" />
@@ -507,16 +485,14 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
 
       <div className="col-span-3">
         <Sec icon={Package} color="bg-orange-600">Produtos & Estoque</Sec>
-        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
-          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            {productsDistribution.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart><Pie data={productsDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{productsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
-              </ResponsiveContainer>
-            ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+        <ChartCard title="" className="mt-1" height="h-24">
+          {productsDistribution.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart><Pie data={productsDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{productsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+            </ResponsiveContainer>
+          ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+        </ChartCard>
+        <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Total" value={m.totalProdutos} icon={Package} color="bg-orange-600" href="/admin/produtos" />
           <M label="Sem Estoque" value={m.produtosSemEstoque} icon={AlertTriangle} color="bg-red-600" />
           <M label="Estoque Baixo" value={m.produtosEstoqueBaixo} icon={AlertTriangle} color="bg-yellow-600" />
@@ -524,19 +500,17 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         </div>
       </div>
 
-      {/* ROW 5: Orçamentos + Avaliações + WhatsApp + Caixa com gráficos */}
+      {/* ROW 6: Orçamentos + Avaliações + WhatsApp + Caixa */}
       <div className="col-span-3">
         <Sec icon={FileText} color="bg-violet-600">Orçamentos</Sec>
-        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
-          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            {quotesDistribution.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart><Pie data={quotesDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{quotesDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
-              </ResponsiveContainer>
-            ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+        <ChartCard title="" className="mt-1" height="h-24">
+          {quotesDistribution.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart><Pie data={quotesDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{quotesDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+            </ResponsiveContainer>
+          ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+        </ChartCard>
+        <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Total" value={m.totalOrcamentos} icon={FileText} color="bg-violet-600" href="/admin/orcamentos" />
           <M label="Pendentes" value={m.orcamentosPendentes} icon={Clock} color="bg-yellow-600" />
           <M label="Convertidos" value={m.orcamentosConvertidos} icon={TrendingUp} color="bg-blue-600" />
@@ -546,20 +520,18 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
 
       <div className="col-span-3">
         <Sec icon={Star} color="bg-amber-600">Avaliações</Sec>
-        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
-          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            {reviewsDistribution.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={reviewsDistribution}>
-                  <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="value" name="Avaliações" radius={[3,3,0,0]}>{reviewsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+        <ChartCard title="" className="mt-1" height="h-24">
+          {reviewsDistribution.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={reviewsDistribution}>
+                <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="value" name="Avaliações" radius={[3,3,0,0]}>{reviewsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+        </ChartCard>
+        <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Total" value={m.totalReviews} icon={Star} color="bg-amber-600" href="/admin/avaliacoes" />
           <M label="Média" value={m.mediaGeral.toFixed(1)} icon={Star} color="bg-amber-700" format="text" />
           <M label="Pendentes" value={m.reviewsPendentes} icon={Clock} color="bg-yellow-600" />
@@ -569,16 +541,14 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
 
       <div className="col-span-3">
         <Sec icon={MessageSquare} color="bg-green-600">WhatsApp</Sec>
-        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
-          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            {whatsappDistribution.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart><Pie data={whatsappDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{whatsappDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
-              </ResponsiveContainer>
-            ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+        <ChartCard title="" className="mt-1" height="h-24">
+          {whatsappDistribution.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart><Pie data={whatsappDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{whatsappDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
+            </ResponsiveContainer>
+          ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+        </ChartCard>
+        <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Enviadas" value={m.whatsappEnviadas} icon={MessageSquare} color="bg-green-600" href="/admin/whatsapp" />
           <M label="Erros" value={m.whatsappErros} icon={AlertTriangle} color="bg-red-600" />
           <M label="Online" value={m.whatsappConectadas} icon={Zap} color="bg-emerald-600" />
@@ -588,19 +558,17 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
 
       <div className="col-span-3">
         <Sec icon={Wallet} color="bg-fuchsia-600">Fluxo de Caixa</Sec>
-        <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] mt-[0.3vw]">
-          <CardContent className="p-[0.4vw] h-[12vh] min-h-[80px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={caixaPorDia}>
-                <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="entradas" fill="hsl(145,63%,42%)" radius={[3,3,0,0]} name="Entradas" />
-                <Bar dataKey="saidas" fill="hsl(0,72%,51%)" radius={[3,3,0,0]} name="Saídas" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-2 gap-[0.3vw] mt-[0.3vw]">
+        <ChartCard title="" className="mt-1" height="h-24">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={caixaPorDia}>
+              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="entradas" fill="hsl(145,63%,42%)" radius={[3,3,0,0]} name="Entradas" />
+              <Bar dataKey="saidas" fill="hsl(0,72%,51%)" radius={[3,3,0,0]} name="Saídas" />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+        <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Cupons Ativos" value={m.cuponsAtivos} icon={Tag} color="bg-fuchsia-600" href="/admin/cupons" />
           <M label="Promoções" value={m.promocoesAtivas} icon={Percent} color="bg-orange-600" href="/admin/promocoes" />
           <M label="Val. Est. MP" value={m.valorEstoqueMateriais} icon={DollarSign} color="bg-amber-700" format="currency" />
@@ -608,8 +576,8 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         </div>
       </div>
 
-      {/* ROW 6: extras */}
-      <div className="col-span-12 grid grid-cols-12 gap-[0.3vw]">
+      {/* ROW 7: extras */}
+      <div className="col-span-12 grid grid-cols-12 gap-2">
         <M label="Boleto (R$)" value={m.boletoTotal} icon={Landmark} color="bg-slate-600" format="currency" />
         <M label="Leads Semana" value={m.leadsSemana} icon={UserPlus} color="bg-violet-600" />
         <M label="Leads Mês" value={m.leadsMes} icon={UserPlus} color="bg-purple-600" />
@@ -634,21 +602,16 @@ const AdminDashboardPage = () => {
   const triggerRecovery = useTriggerAbandonedCartRecovery();
   const isMobile = useIsMobile();
   const abandoned = abandonedInsights || {
-    sessionsAbandoned: 0,
-    sessionsRecovered: 0,
-    remindersSent: 0,
-    recoveryRate: 0,
-    totalAbandonedValue: 0,
-    topProductName: 'N/A',
-    topProducts: [],
+    sessionsAbandoned: 0, sessionsRecovered: 0, remindersSent: 0,
+    recoveryRate: 0, totalAbandonedValue: 0, topProductName: 'N/A', topProducts: [],
   };
 
   if (isLoading || !m) {
     return (
       <AdminLayout title="Dashboard">
-        <div className="grid grid-cols-4 gap-[0.4vw]">
+        <div className="grid grid-cols-4 gap-3">
           {Array.from({ length: 16 }).map((_, i) => (
-            <Skeleton key={i} className="h-[8vh] rounded-lg bg-[hsl(var(--admin-sidebar))]" />
+            <Skeleton key={i} className="h-20 rounded-xl bg-[hsl(var(--admin-sidebar))]" />
           ))}
         </div>
       </AdminLayout>
@@ -659,14 +622,13 @@ const AdminDashboardPage = () => {
     <AdminLayout title="Dashboard">
       <div className="mb-3 flex justify-end">
         <Button
-          variant="outline"
-          size="sm"
+          variant="outline" size="sm"
           onClick={() => triggerRecovery.mutate()}
           disabled={triggerRecovery.isPending}
           className="gap-2 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))]"
         >
           <RefreshCw className={cn("h-4 w-4", triggerRecovery.isPending && "animate-spin")} />
-          {triggerRecovery.isPending ? 'Executando recuperacao...' : 'Executar recuperacao de carrinhos'}
+          {triggerRecovery.isPending ? 'Executando recuperação...' : 'Executar recuperação de carrinhos'}
         </Button>
       </div>
       {isMobile ? <MobileDashboard m={m} abandoned={abandoned} /> : <DesktopDashboard m={m} abandoned={abandoned} />}
@@ -675,4 +637,3 @@ const AdminDashboardPage = () => {
 };
 
 export default AdminDashboardPage;
-

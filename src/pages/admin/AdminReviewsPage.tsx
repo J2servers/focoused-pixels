@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { AdminLayout, DataTable, Column } from '@/components/admin';
+import { AdminSummaryCard } from '@/components/admin/AdminSummaryCard';
+import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Eye, Trash2, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { CheckCircle, XCircle, Eye, Trash2, Loader2, Star, Clock, MessageSquare } from 'lucide-react';
 import { ReviewStars } from '@/components/reviews';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
@@ -21,6 +22,9 @@ const AdminReviewsPage = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const isProcessing = approveReview.isPending || deleteReview.isPending;
+  const pendingCount = reviews.filter(r => !r.is_approved).length;
+  const approvedCount = reviews.filter(r => r.is_approved).length;
+  const avgRating = reviews.length > 0 ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : 0;
 
   const handleDelete = async () => {
     if (!selectedReview) return;
@@ -28,14 +32,15 @@ const AdminReviewsPage = () => {
     setIsDeleteDialogOpen(false);
   };
 
-  const pendingCount = reviews.filter(r => !r.is_approved).length;
-
   const columns: Column<Review>[] = [
-    { key: 'product_slug', header: 'Produto', render: (r) => <span className="font-medium">{r.product_slug}</span> },
+    { key: 'product_slug', header: 'Produto', render: (r) => <span className="font-medium text-white">{r.product_slug}</span> },
     { key: 'customer_name', header: 'Cliente', sortable: true },
     { key: 'rating', header: 'Nota', render: (r) => <ReviewStars rating={r.rating} size="sm" /> },
-    { key: 'comment', header: 'Comentário', render: (r) => <span className="line-clamp-2 max-w-xs">{r.comment}</span> },
-    { key: 'is_approved', header: 'Status', render: (r) => <Badge variant={r.is_approved ? 'default' : 'secondary'}>{r.is_approved ? 'Aprovada' : 'Pendente'}</Badge> },
+    { key: 'comment', header: 'Comentário', render: (r) => <span className="line-clamp-2 max-w-xs text-[hsl(var(--admin-text-muted))]">{r.comment}</span> },
+    {
+      key: 'is_approved', header: 'Status',
+      render: (r) => <AdminStatusBadge label={r.is_approved ? 'Aprovada' : 'Pendente'} variant={r.is_approved ? 'success' : 'warning'} />,
+    },
     { key: 'created_at', header: 'Data', render: (r) => format(new Date(r.created_at), 'dd/MM/yyyy', { locale: ptBR }) },
     {
       key: 'actions', header: 'Ações', className: 'w-40',
@@ -44,12 +49,12 @@ const AdminReviewsPage = () => {
           <Button variant="ghost" size="icon" onClick={() => { setSelectedReview(review); setIsViewDialogOpen(true); }}><Eye className="h-4 w-4" /></Button>
           {!review.is_approved && (
             <Button variant="ghost" size="icon" onClick={() => approveReview.mutate({ id: review.id, approved: true })} disabled={!canEdit() || isProcessing}>
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CheckCircle className="h-4 w-4 text-emerald-400" />
             </Button>
           )}
           {review.is_approved && (
             <Button variant="ghost" size="icon" onClick={() => approveReview.mutate({ id: review.id, approved: false })} disabled={!canEdit() || isProcessing}>
-              <XCircle className="h-4 w-4 text-orange-500" />
+              <XCircle className="h-4 w-4 text-orange-400" />
             </Button>
           )}
           <Button variant="ghost" size="icon" onClick={() => { setSelectedReview(review); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}>
@@ -62,12 +67,16 @@ const AdminReviewsPage = () => {
 
   return (
     <AdminLayout title="Avaliações" requireEditor>
-      <div className="mb-4">
-        <Badge variant="secondary" className="text-sm bg-[hsl(var(--admin-accent-orange)/0.2)] text-[hsl(var(--admin-accent-orange))] border border-[hsl(var(--admin-accent-orange)/0.3)]">
-          {pendingCount} avaliações pendentes de moderação
-        </Badge>
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <AdminSummaryCard title="Total" value={reviews.length} icon={MessageSquare} variant="purple" />
+          <AdminSummaryCard title="Pendentes" value={pendingCount} icon={Clock} variant="orange" />
+          <AdminSummaryCard title="Aprovadas" value={approvedCount} icon={CheckCircle} variant="green" />
+          <AdminSummaryCard title="Média" value={avgRating.toFixed(1)} icon={Star} variant="blue" />
+        </div>
+
+        <DataTable data={reviews} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar avaliações..." />
       </div>
-      <DataTable data={reviews} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar avaliações..." />
 
       {/* View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
@@ -88,8 +97,8 @@ const AdminReviewsPage = () => {
                 </div>
               )}
               <div className="flex items-center gap-4">
-                <Badge variant={selectedReview.is_approved ? 'default' : 'secondary'} className={selectedReview.is_approved ? "bg-[hsl(var(--admin-accent-green))] text-white" : ""}>{selectedReview.is_approved ? 'Aprovada' : 'Pendente'}</Badge>
-                {selectedReview.is_verified_purchase && <Badge variant="outline" className="border-[hsl(var(--admin-accent-blue))] text-[hsl(var(--admin-accent-blue))]">Compra Verificada</Badge>}
+                <AdminStatusBadge label={selectedReview.is_approved ? 'Aprovada' : 'Pendente'} variant={selectedReview.is_approved ? 'success' : 'warning'} />
+                {selectedReview.is_verified_purchase && <AdminStatusBadge label="Compra Verificada" variant="info" />}
               </div>
             </div>
           )}
