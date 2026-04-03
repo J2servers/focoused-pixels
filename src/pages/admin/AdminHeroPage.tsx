@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { AdminLayout, DataTable, Column, ImageUpload } from '@/components/admin';
+import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, Loader2, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Eye, Image } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import {
   useAdminHeroSlides, useCreateHeroSlide, useUpdateHeroSlide, useDeleteHeroSlide,
   type HeroSlide, type HeroSlideFormData,
 } from '@/hooks/useAdminHeroSlides';
+import { AdminSummaryCard } from '@/components/admin/AdminSummaryCard';
 
 const INITIAL_FORM = {
   title: '', subtitle: '', cta_text: '', cta_link: '',
@@ -67,22 +68,35 @@ const AdminHeroPage = () => {
     setIsDeleteDialogOpen(false);
   };
 
+  const activeCount = slides.filter(s => s.status === 'active').length;
+  const inactiveCount = slides.filter(s => s.status !== 'active').length;
+
   const columns: Column<HeroSlide>[] = [
     {
       key: 'desktop_image', header: 'Preview', className: 'w-32',
-      render: (s) => <div className="w-28 h-16 rounded-lg bg-muted overflow-hidden"><img src={s.desktop_image} alt={s.title || 'Slide'} className="w-full h-full object-cover" /></div>,
+      render: (s) => (
+        <div className="w-28 h-16 rounded-lg bg-[hsl(var(--admin-bg))] overflow-hidden border border-[hsl(var(--admin-card-border))]">
+          <img src={s.desktop_image} alt={s.title || 'Slide'} className="w-full h-full object-cover" />
+        </div>
+      ),
     },
-    { key: 'title', header: 'Título', sortable: true },
+    { key: 'title', header: 'Título', sortable: true, render: (s) => <span className="font-medium text-[hsl(var(--admin-text))]">{s.title || '—'}</span> },
     { key: 'display_order', header: 'Ordem', sortable: true },
-    { key: 'status', header: 'Status', render: (s) => <Badge variant={s.status === 'active' ? 'default' : 'secondary'}>{s.status === 'active' ? 'Ativo' : 'Inativo'}</Badge> },
-    { key: 'theme', header: 'Tema', render: (s) => <Badge variant="outline">{s.theme === 'dark' ? 'Escuro' : 'Claro'}</Badge> },
+    {
+      key: 'status', header: 'Status',
+      render: (s) => <AdminStatusBadge label={s.status === 'active' ? 'Ativo' : 'Inativo'} variant={s.status === 'active' ? 'success' : 'neutral'} />,
+    },
+    {
+      key: 'theme', header: 'Tema',
+      render: (s) => <AdminStatusBadge label={s.theme === 'dark' ? 'Escuro' : 'Claro'} variant="info" />,
+    },
     {
       key: 'actions', header: 'Ações', className: 'w-32',
       render: (slide) => (
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" onClick={() => { setSelectedSlide(slide); setIsPreviewOpen(true); }}><Eye className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="icon" onClick={() => openEditDialog(slide)} disabled={!canEdit()}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="icon" onClick={() => { setSelectedSlide(slide); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          <Button variant="ghost" size="icon" className="text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))]" onClick={() => { setSelectedSlide(slide); setIsPreviewOpen(true); }}><Eye className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" className="text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))]" onClick={() => openEditDialog(slide)} disabled={!canEdit()}><Pencil className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300" onClick={() => { setSelectedSlide(slide); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}><Trash2 className="h-4 w-4" /></Button>
         </div>
       ),
     },
@@ -90,47 +104,65 @@ const AdminHeroPage = () => {
 
   return (
     <AdminLayout title="Banner Hero" requireEditor>
-      <DataTable data={slides} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar slides..."
-        actions={<Button onClick={openCreateDialog} disabled={!canEdit()}><Plus className="h-4 w-4 mr-2" />Novo Slide</Button>} />
+      <div className="space-y-5">
+        {/* Summary Cards */}
+        <div className="grid grid-cols-3 gap-4">
+          <AdminSummaryCard title="Total de Slides" value={slides.length} icon={Image} variant="purple" />
+          <AdminSummaryCard title="Ativos" value={activeCount} icon={Eye} variant="green" />
+          <AdminSummaryCard title="Inativos" value={inactiveCount} icon={Eye} variant="orange" />
+        </div>
 
+        <DataTable data={slides} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar slides..."
+          actions={
+            <Button onClick={openCreateDialog} disabled={!canEdit()}
+              className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg">
+              <Plus className="h-4 w-4 mr-2" />Novo Slide
+            </Button>
+          } />
+      </div>
+
+      {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader><DialogTitle>{selectedSlide ? 'Editar Slide' : 'Novo Slide'}</DialogTitle></DialogHeader>
+        <DialogContent className="max-w-2xl bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+          <DialogHeader><DialogTitle className="text-[hsl(var(--admin-text))]">{selectedSlide ? 'Editar Slide' : 'Novo Slide'}</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>Título</Label><Input value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Subtítulo</Label><Input value={formData.subtitle} onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Título</Label><Input className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Subtítulo</Label><Input className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.subtitle} onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>Texto CTA</Label><Input value={formData.cta_text} onChange={(e) => setFormData({ ...formData, cta_text: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Link CTA</Label><Input value={formData.cta_link} onChange={(e) => setFormData({ ...formData, cta_link: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Texto CTA</Label><Input className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.cta_text} onChange={(e) => setFormData({ ...formData, cta_text: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Link CTA</Label><Input className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.cta_link} onChange={(e) => setFormData({ ...formData, cta_link: e.target.value })} /></div>
             </div>
-            <div className="space-y-2"><Label>Imagem Desktop *</Label>
+            <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Imagem Desktop *</Label>
               <ImageUpload value={formData.desktop_image} onChange={(url) => setFormData({ ...formData, desktop_image: url })} folder="hero" aspectRatio="aspect-[16/9]" /></div>
-            <div className="space-y-2"><Label>Imagem Mobile</Label>
+            <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Imagem Mobile</Label>
               <ImageUpload value={formData.mobile_image} onChange={(url) => setFormData({ ...formData, mobile_image: url })} folder="hero" aspectRatio="aspect-[9/16]" /></div>
             <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2"><Label>Ordem</Label><Input type="number" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Status</Label>
-                <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}><SelectTrigger><SelectValue /></SelectTrigger>
+              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Ordem</Label><Input type="number" className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Status</Label>
+                <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}><SelectTrigger className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]"><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="active">Ativo</SelectItem><SelectItem value="inactive">Inativo</SelectItem></SelectContent></Select></div>
-              <div className="space-y-2"><Label>Tema</Label>
-                <Select value={formData.theme} onValueChange={(v) => setFormData({ ...formData, theme: v })}><SelectTrigger><SelectValue /></SelectTrigger>
+              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Tema</Label>
+                <Select value={formData.theme} onValueChange={(v) => setFormData({ ...formData, theme: v })}><SelectTrigger className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]"><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="dark">Escuro</SelectItem><SelectItem value="light">Claro</SelectItem></SelectContent></Select></div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</Button>
+            <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
+              {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader><DialogTitle>Preview do Slide</DialogTitle></DialogHeader>
+        <DialogContent className="max-w-4xl bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+          <DialogHeader><DialogTitle className="text-[hsl(var(--admin-text))]">Preview do Slide</DialogTitle></DialogHeader>
           {selectedSlide && (
-            <div className="relative aspect-[16/9] rounded-lg overflow-hidden">
+            <div className="relative aspect-[16/9] rounded-lg overflow-hidden border border-[hsl(var(--admin-card-border))]">
               <img src={selectedSlide.desktop_image} alt={selectedSlide.title || 'Slide'} className="w-full h-full object-cover" />
               <div className={`absolute inset-0 flex flex-col justify-center p-8 ${selectedSlide.theme === 'dark' ? 'bg-black/50 text-white' : 'bg-white/50 text-black'}`}>
                 {selectedSlide.title && <h2 className="text-4xl font-bold mb-2">{selectedSlide.title}</h2>}
@@ -142,12 +174,13 @@ const AdminHeroPage = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Confirmar exclusão</DialogTitle>
-            <DialogDescription>Tem certeza que deseja excluir este slide?</DialogDescription></DialogHeader>
+        <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+          <DialogHeader><DialogTitle className="text-[hsl(var(--admin-text))]">Confirmar exclusão</DialogTitle>
+            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Tem certeza que deseja excluir este slide?</DialogDescription></DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Excluir</Button>
           </DialogFooter>
         </DialogContent>

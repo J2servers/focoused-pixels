@@ -1,10 +1,10 @@
 import { AdminLayout } from '@/components/admin';
-import WorkflowBuilder from '@/components/admin/workflows/WorkflowBuilder';
+import { VisualWorkflowBuilder } from '@/components/admin/workflows';
 
 const AdminWorkflowsPage = () => {
   return (
     <AdminLayout title="Workflows de Automação" requireEditor>
-      <WorkflowBuilder />
+      <VisualWorkflowBuilder />
     </AdminLayout>
   );
 };
