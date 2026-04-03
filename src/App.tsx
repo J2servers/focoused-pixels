@@ -63,6 +63,7 @@ const AdminWhatsAppPage = lazy(() => import("./pages/admin/AdminWhatsAppPage"));
 const AdminTemplatesPage = lazy(() => import("./pages/admin/AdminEmailTemplatesPage"));
 const AdminMediaPage = lazy(() => import("./pages/admin/AdminMediaPage"));
 const AdminWhyChooseUsPage = lazy(() => import("./pages/admin/AdminWhyChooseUsPage"));
+const AdminWorkflowsPage = lazy(() => import("./pages/admin/AdminWorkflowsPage"));
 
 const queryClient = new QueryClient();
 
