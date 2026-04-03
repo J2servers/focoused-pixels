@@ -1,203 +1,64 @@
-﻿import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AdminLayout, DataTable, Column } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, Eye, Trash2, Loader2 } from 'lucide-react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogFooter,
-  DialogDescription
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { ReviewStars } from '@/components/reviews';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-interface Review {
-  id: string;
-  product_slug: string;
-  customer_name: string;
-  customer_email: string;
-  rating: number;
-  title: string | null;
-  comment: string;
-  images: string[] | null;
-  is_verified_purchase: boolean;
-  is_approved: boolean;
-  created_at: string;
-}
+import { useAdminReviews, useApproveReview, useDeleteReview, type Review } from '@/hooks/useAdminReviews';
 
 const AdminReviewsPage = () => {
   const { canEdit } = useAuthContext();
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: reviews = [], isLoading } = useAdminReviews();
+  const approveReview = useApproveReview();
+  const deleteReview = useDeleteReview();
+
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
 
-  const fetchData = async () => {
-    setIsLoading(true);
-    const { data } = await supabase
-      .from('reviews')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (data) setReviews(data);
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const handleApprove = async (review: Review) => {
-    setIsProcessing(true);
-    try {
-      const { error } = await supabase
-        .from('reviews')
-        .update({ is_approved: true })
-        .eq('id', review.id);
-
-      if (error) throw error;
-      toast.success('Avaliação aprovada!');
-      fetchData();
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao aprovar avaliação';
-      toast.error(message);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleReject = async (review: Review) => {
-    setIsProcessing(true);
-    try {
-      const { error } = await supabase
-        .from('reviews')
-        .update({ is_approved: false })
-        .eq('id', review.id);
-
-      if (error) throw error;
-      toast.success('Avaliação rejeitada!');
-      fetchData();
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao rejeitar avaliação';
-      toast.error(message);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  const isProcessing = approveReview.isPending || deleteReview.isPending;
 
   const handleDelete = async () => {
     if (!selectedReview) return;
-
-    setIsProcessing(true);
-    try {
-      const { error } = await supabase
-        .from('reviews')
-        .delete()
-        .eq('id', selectedReview.id);
-
-      if (error) throw error;
-      toast.success('Avaliação excluída!');
-      setIsDeleteDialogOpen(false);
-      fetchData();
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao excluir avaliação';
-      toast.error(message);
-    } finally {
-      setIsProcessing(false);
-    }
+    await deleteReview.mutateAsync(selectedReview.id);
+    setIsDeleteDialogOpen(false);
   };
 
+  const pendingCount = reviews.filter(r => !r.is_approved).length;
+
   const columns: Column<Review>[] = [
-    { 
-      key: 'product_slug', 
-      header: 'Produto',
-      render: (review) => (
-        <span className="font-medium">{review.product_slug}</span>
-      ),
-    },
+    { key: 'product_slug', header: 'Produto', render: (r) => <span className="font-medium">{r.product_slug}</span> },
     { key: 'customer_name', header: 'Cliente', sortable: true },
-    { 
-      key: 'rating', 
-      header: 'Nota',
-      render: (review) => <ReviewStars rating={review.rating} size="sm" />,
-    },
-    { 
-      key: 'comment', 
-      header: 'Comentário',
-      render: (review) => (
-        <span className="line-clamp-2 max-w-xs">{review.comment}</span>
-      ),
-    },
+    { key: 'rating', header: 'Nota', render: (r) => <ReviewStars rating={r.rating} size="sm" /> },
+    { key: 'comment', header: 'Comentário', render: (r) => <span className="line-clamp-2 max-w-xs">{r.comment}</span> },
+    { key: 'is_approved', header: 'Status', render: (r) => <Badge variant={r.is_approved ? 'default' : 'secondary'}>{r.is_approved ? 'Aprovada' : 'Pendente'}</Badge> },
+    { key: 'created_at', header: 'Data', render: (r) => format(new Date(r.created_at), 'dd/MM/yyyy', { locale: ptBR }) },
     {
-      key: 'is_approved',
-      header: 'Status',
-      render: (review) => (
-        <Badge variant={review.is_approved ? 'default' : 'secondary'}>
-          {review.is_approved ? 'Aprovada' : 'Pendente'}
-        </Badge>
-      ),
-    },
-    { 
-      key: 'created_at', 
-      header: 'Data',
-      render: (review) => format(new Date(review.created_at), 'dd/MM/yyyy', { locale: ptBR }),
-    },
-    {
-      key: 'actions',
-      header: 'Ações',
-      className: 'w-40',
+      key: 'actions', header: 'Ações', className: 'w-40',
       render: (review) => (
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => { setSelectedReview(review); setIsViewDialogOpen(true); }}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
+          <Button variant="ghost" size="icon" onClick={() => { setSelectedReview(review); setIsViewDialogOpen(true); }}><Eye className="h-4 w-4" /></Button>
           {!review.is_approved && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => handleApprove(review)}
-              disabled={!canEdit() || isProcessing}
-            >
+            <Button variant="ghost" size="icon" onClick={() => approveReview.mutate({ id: review.id, approved: true })} disabled={!canEdit() || isProcessing}>
               <CheckCircle className="h-4 w-4 text-green-500" />
             </Button>
           )}
           {review.is_approved && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => handleReject(review)}
-              disabled={!canEdit() || isProcessing}
-            >
+            <Button variant="ghost" size="icon" onClick={() => approveReview.mutate({ id: review.id, approved: false })} disabled={!canEdit() || isProcessing}>
               <XCircle className="h-4 w-4 text-orange-500" />
             </Button>
           )}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => { setSelectedReview(review); setIsDeleteDialogOpen(true); }}
-            disabled={!canEdit()}
-          >
+          <Button variant="ghost" size="icon" onClick={() => { setSelectedReview(review); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}>
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
         </div>
       ),
     },
   ];
-
-  const pendingCount = reviews.filter(r => !r.is_approved).length;
 
   return (
     <AdminLayout title="Avaliações" requireEditor>
@@ -206,87 +67,37 @@ const AdminReviewsPage = () => {
           {pendingCount} avaliações pendentes de moderação
         </Badge>
       </div>
-
-      <DataTable
-        data={reviews}
-        columns={columns}
-        isLoading={isLoading}
-        searchPlaceholder="Buscar avaliações..."
-      />
+      <DataTable data={reviews} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar avaliações..." />
 
       {/* View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="max-w-2xl bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-          <DialogHeader>
-            <DialogTitle className="text-white">Detalhes da Avaliação</DialogTitle>
-          </DialogHeader>
-
+          <DialogHeader><DialogTitle className="text-white">Detalhes da Avaliação</DialogTitle></DialogHeader>
           {selectedReview && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-[hsl(var(--admin-text-muted))]">Produto</p>
-                  <p className="font-medium text-white">{selectedReview.product_slug}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-[hsl(var(--admin-text-muted))]">Cliente</p>
-                  <p className="font-medium text-white">{selectedReview.customer_name}</p>
-                  <p className="text-sm text-[hsl(var(--admin-text-muted))]">{selectedReview.customer_email}</p>
-                </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><p className="text-sm text-[hsl(var(--admin-text-muted))]">Produto</p><p className="font-medium text-white">{selectedReview.product_slug}</p></div>
+                <div><p className="text-sm text-[hsl(var(--admin-text-muted))]">Cliente</p><p className="font-medium text-white">{selectedReview.customer_name}</p><p className="text-sm text-[hsl(var(--admin-text-muted))]">{selectedReview.customer_email}</p></div>
               </div>
-
-              <div>
-                <p className="text-sm text-[hsl(var(--admin-text-muted))] mb-1">Avaliação</p>
-                <ReviewStars rating={selectedReview.rating} size="md" />
-              </div>
-
-              {selectedReview.title && (
-                <div>
-                  <p className="text-sm text-[hsl(var(--admin-text-muted))]">Título</p>
-                  <p className="font-medium text-white">{selectedReview.title}</p>
-                </div>
-              )}
-
-              <div>
-                <p className="text-sm text-[hsl(var(--admin-text-muted))]">Comentário</p>
-                <p className="mt-1 text-white">{selectedReview.comment}</p>
-              </div>
-
+              <div><p className="text-sm text-[hsl(var(--admin-text-muted))] mb-1">Avaliação</p><ReviewStars rating={selectedReview.rating} size="md" /></div>
+              {selectedReview.title && <div><p className="text-sm text-[hsl(var(--admin-text-muted))]">Título</p><p className="font-medium text-white">{selectedReview.title}</p></div>}
+              <div><p className="text-sm text-[hsl(var(--admin-text-muted))]">Comentário</p><p className="mt-1 text-white">{selectedReview.comment}</p></div>
               {selectedReview.images && selectedReview.images.length > 0 && (
-                <div>
-                  <p className="text-sm text-[hsl(var(--admin-text-muted))] mb-2">Imagens</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {selectedReview.images.map((img, i) => (
-                      <img 
-                        key={i} 
-                        src={img} 
-                        alt={`Imagem ${i + 1}`}
-                        className="w-24 h-24 object-cover rounded-lg border border-[hsl(var(--admin-card-border))]"
-                      />
-                    ))}
-                  </div>
+                <div><p className="text-sm text-[hsl(var(--admin-text-muted))] mb-2">Imagens</p>
+                  <div className="flex gap-2 flex-wrap">{selectedReview.images.map((img, i) => <img key={i} src={img} alt={`Imagem ${i+1}`} className="w-24 h-24 object-cover rounded-lg border border-[hsl(var(--admin-card-border))]" />)}</div>
                 </div>
               )}
-
               <div className="flex items-center gap-4">
-                <Badge variant={selectedReview.is_approved ? 'default' : 'secondary'} className={selectedReview.is_approved ? "bg-[hsl(var(--admin-accent-green))] text-white" : "bg-[hsl(var(--admin-accent-orange)/0.2)] text-[hsl(var(--admin-accent-orange))]"}>
-                  {selectedReview.is_approved ? 'Aprovada' : 'Pendente'}
-                </Badge>
-                {selectedReview.is_verified_purchase && (
-                  <Badge variant="outline" className="border-[hsl(var(--admin-accent-blue))] text-[hsl(var(--admin-accent-blue))]">Compra Verificada</Badge>
-                )}
+                <Badge variant={selectedReview.is_approved ? 'default' : 'secondary'} className={selectedReview.is_approved ? "bg-[hsl(var(--admin-accent-green))] text-white" : ""}>{selectedReview.is_approved ? 'Aprovada' : 'Pendente'}</Badge>
+                {selectedReview.is_verified_purchase && <Badge variant="outline" className="border-[hsl(var(--admin-accent-blue))] text-[hsl(var(--admin-accent-blue))]">Compra Verificada</Badge>}
               </div>
             </div>
           )}
-
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">
-              Fechar
-            </Button>
+            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Fechar</Button>
             {selectedReview && !selectedReview.is_approved && (
-              <Button onClick={() => { handleApprove(selectedReview); setIsViewDialogOpen(false); }} className="bg-gradient-to-r from-[hsl(var(--admin-accent-green))] to-emerald-600 text-white">
-                Aprovar
-              </Button>
+              <Button onClick={() => { approveReview.mutate({ id: selectedReview.id, approved: true }); setIsViewDialogOpen(false); }}
+                className="bg-gradient-to-r from-[hsl(var(--admin-accent-green))] to-emerald-600 text-white">Aprovar</Button>
             )}
           </DialogFooter>
         </DialogContent>
@@ -295,20 +106,11 @@ const AdminReviewsPage = () => {
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-          <DialogHeader>
-            <DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
-            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">
-              Tem certeza que deseja excluir esta avaliação? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
+          <DialogHeader><DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
+            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Tem certeza que deseja excluir esta avaliação?</DialogDescription></DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isProcessing}>
-              {isProcessing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Excluir
-            </Button>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white">Cancelar</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isProcessing}>{isProcessing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Excluir</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -317,4 +119,3 @@ const AdminReviewsPage = () => {
 };
 
 export default AdminReviewsPage;
-
