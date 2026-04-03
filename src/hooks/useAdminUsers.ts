@@ -78,7 +78,7 @@ export function useCreateAdminUser() {
 export function useUpdateUserRole() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+    mutationFn: async ({ userId, role }: { userId: string; role: 'admin' | 'editor' | 'support' }) => {
       const { error } = await supabase
         .from('user_roles')
         .update({ role })
