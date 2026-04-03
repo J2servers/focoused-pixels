@@ -1,17 +1,13 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { CompanyInfo } from '@/hooks/useCompanyInfo';
-import { Loader2, Lock } from 'lucide-react';
+import { Loader2, Lock, Bell, ShieldCheck, Package, ShoppingBag, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import {
-  glassCard,
-  inputClass,
-  labelClass,
-  StatPill,
-  ToggleBlock,
+  card, cardInner, sectionGap, gridGap, inputClass,
+  SectionHeader, MetricCard, ToggleBlock, FieldGroup, InfoBanner,
 } from './SettingsShared';
 
 interface Props {
@@ -40,40 +36,56 @@ export const SettingsSecuritySection = ({ settings, u, canMutate, profileName, u
   };
 
   return (
-    <div className="space-y-5">
-      <div className="grid gap-5 xl:grid-cols-2">
-        <div className={cn(glassCard, 'p-6 space-y-5')}>
-          <div>
-            <h3 className="text-lg font-bold text-[hsl(var(--admin-text))]">Alertas operacionais</h3>
-            <p className="text-sm text-[hsl(var(--admin-text-muted))]">Quem recebe avisos críticos.</p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2"><Label className={labelClass}>Limite estoque baixo</Label><Input className={inputClass} type="number" value={settings.low_stock_threshold || 5} onChange={e => u('low_stock_threshold', Number(e.target.value))} /></div>
-            <div className="space-y-2"><Label className={labelClass}>Email alertas</Label><Input className={inputClass} type="email" value={settings.notification_email || ''} onChange={e => u('notification_email', e.target.value)} placeholder="financeiro@loja.com.br" /></div>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <ToggleBlock title="Alerta de estoque" description="Aviso na zona crítica." checked={settings.enable_stock_alerts ?? true} onChange={v => u('enable_stock_alerts', v)} />
-            <ToggleBlock title="Alerta de pedidos" description="Notifica novos pedidos." checked={settings.enable_order_notifications ?? true} onChange={v => u('enable_order_notifications', v)} />
-          </div>
+    <div className={sectionGap}>
+      {/* ── Alertas ── */}
+      <div className={cn(card, cardInner, sectionGap)}>
+        <SectionHeader icon={Bell} title="Alertas operacionais" description="Configure notificações automáticas para eventos críticos." accentVar="--admin-accent-orange" />
+
+        <div className={cn('grid md:grid-cols-2', gridGap)}>
+          <FieldGroup label="Limite estoque baixo">
+            <Input className={inputClass} type="number" value={settings.low_stock_threshold || 5} onChange={e => u('low_stock_threshold', Number(e.target.value))} />
+          </FieldGroup>
+          <FieldGroup label="Email de alertas">
+            <Input className={inputClass} type="email" value={settings.notification_email || ''} onChange={e => u('notification_email', e.target.value)} placeholder="financeiro@sualoja.com.br" />
+          </FieldGroup>
         </div>
 
-        <div className={cn(glassCard, 'p-6 space-y-5')}>
-          <div>
-            <h3 className="text-lg font-bold text-[hsl(var(--admin-text))]">Conta e acesso</h3>
-            <p className="text-sm text-[hsl(var(--admin-text-muted))]">Perfil e senha segura.</p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <StatPill label="Usuário" value={profileName || 'Sem nome'} accentVar="--admin-accent-blue" />
-            <StatPill label="Proteção" value="Senha forte" accentVar="--admin-accent-pink" />
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2"><Label className={labelClass}>Nova senha</Label><Input className={inputClass} type="password" value={pass.n} onChange={e => setPass({ ...pass, n: e.target.value })} /></div>
-            <div className="space-y-2"><Label className={labelClass}>Confirmar</Label><Input className={inputClass} type="password" value={pass.c} onChange={e => setPass({ ...pass, c: e.target.value })} /></div>
-          </div>
-          <Button className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)]" onClick={changePassword} disabled={changingPass || !canMutate}>
-            {changingPass ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+        <div className={cn('grid md:grid-cols-2', gridGap)}>
+          <ToggleBlock icon={Package} title="Alerta de estoque baixo" description="Notifica quando produto atinge limite crítico." checked={settings.enable_stock_alerts ?? true} onChange={v => u('enable_stock_alerts', v)} />
+          <ToggleBlock icon={ShoppingBag} title="Alerta de novos pedidos" description="Notifica a cada pedido recebido." checked={settings.enable_order_notifications ?? true} onChange={v => u('enable_order_notifications', v)} />
+        </div>
+      </div>
+
+      {/* ── Conta ── */}
+      <div className={cn(card, cardInner, sectionGap)}>
+        <SectionHeader icon={ShieldCheck} title="Segurança da conta" description="Altere sua senha e visualize dados do perfil." accentVar="--admin-accent-pink" />
+
+        <div className="grid grid-cols-2 gap-3">
+          <MetricCard label="Usuário" value={profileName || 'Sem nome'} accentVar="--admin-accent-blue" />
+          <MetricCard label="Nível" value="Administrador" accentVar="--admin-accent-purple" />
+        </div>
+
+        <div className={cn('grid md:grid-cols-2', gridGap)}>
+          <FieldGroup label="Nova senha">
+            <Input className={inputClass} type="password" value={pass.n} onChange={e => setPass(p => ({ ...p, n: e.target.value }))} placeholder="Mínimo 6 caracteres" />
+          </FieldGroup>
+          <FieldGroup label="Confirmar senha">
+            <Input className={inputClass} type="password" value={pass.c} onChange={e => setPass(p => ({ ...p, c: e.target.value }))} placeholder="Repita a nova senha" />
+          </FieldGroup>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <Button
+            className="h-10 bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.25)]"
+            onClick={changePassword}
+            disabled={changingPass || !canMutate || !pass.n}
+          >
+            {changingPass ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Lock className="h-4 w-4 mr-2" />}
             Alterar senha
           </Button>
+          <InfoBanner accentVar="--admin-accent-blue" icon={Info}>
+            A senha é atualizada imediatamente após confirmação.
+          </InfoBanner>
         </div>
       </div>
     </div>
