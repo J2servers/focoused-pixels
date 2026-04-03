@@ -1,4 +1,4 @@
-﻿import { 
+import { 
   LayoutDashboard, 
   Package, 
   FolderTree, 
@@ -18,7 +18,13 @@
   Kanban,
   Menu,
   X,
-  Mail
+  Mail,
+  MessageSquare,
+  Users,
+  ScrollText,
+  ImageIcon,
+  Workflow,
+  Code2,
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
