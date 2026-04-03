@@ -1,6 +1,7 @@
-﻿import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { AdminLayout } from '@/components/admin';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AdminSummaryCard, AdminStatusBadge } from '@/components/admin';
+import { DataTable, Column } from '@/components/admin/DataTable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,10 +10,6 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useCoupons, useCreateCoupon, useUpdateCoupon, useDeleteCoupon, type Coupon } from '@/hooks/useCoupons';
-import { Plus, Pencil, Trash2, Tag, Percent, DollarSign } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +20,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useCoupons, useCreateCoupon, useUpdateCoupon, useDeleteCoupon, type Coupon } from '@/hooks/useCoupons';
+import { Plus, Pencil, Trash2, Tag, Percent, DollarSign, TicketPercent } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const initialFormData = {
   code: '',
@@ -47,6 +48,10 @@ const AdminCouponsPage = () => {
   const createCoupon = useCreateCoupon();
   const updateCoupon = useUpdateCoupon();
   const deleteCoupon = useDeleteCoupon();
+
+  const activeCount = useMemo(() => coupons.filter(c => c.is_active).length, [coupons]);
+  const percentCount = useMemo(() => coupons.filter(c => c.type === 'percentage').length, [coupons]);
+  const fixedCount = useMemo(() => coupons.filter(c => c.type === 'fixed').length, [coupons]);
 
   const openCreateDialog = () => {
     setFormData(initialFormData);
@@ -96,172 +101,137 @@ const AdminCouponsPage = () => {
     }
   };
 
+  const columns: Column<Coupon>[] = [
+    {
+      key: 'code',
+      header: 'Código',
+      sortable: true,
+      render: (coupon) => (
+        <div>
+          <span className="font-mono font-bold text-[hsl(var(--admin-accent-purple))]">{coupon.code}</span>
+          {coupon.description && (
+            <p className="text-xs text-[hsl(var(--admin-text-muted))] mt-1">{coupon.description}</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'type',
+      header: 'Tipo',
+      render: (coupon) => (
+        <Badge variant="outline" className="border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))]">
+          {coupon.type === 'percentage' ? 'Percentual' : 'Valor Fixo'}
+        </Badge>
+      ),
+    },
+    {
+      key: 'value',
+      header: 'Valor',
+      sortable: true,
+      render: (coupon) => (
+        <span className="font-semibold text-white">
+          {coupon.type === 'percentage' ? `${coupon.value}%` : `R$ ${coupon.value.toFixed(2).replace('.', ',')}`}
+        </span>
+      ),
+    },
+    {
+      key: 'usage_count',
+      header: 'Uso',
+      render: (coupon) => (
+        <span className="text-sm text-[hsl(var(--admin-text-muted))]">
+          {coupon.usage_count} / {coupon.usage_limit || '∞'}
+        </span>
+      ),
+    },
+    {
+      key: 'end_date',
+      header: 'Validade',
+      render: (coupon) => (
+        <span className="text-sm text-[hsl(var(--admin-text-muted))]">
+          {coupon.start_date && coupon.end_date
+            ? `${format(new Date(coupon.start_date), 'dd/MM', { locale: ptBR })} - ${format(new Date(coupon.end_date), 'dd/MM', { locale: ptBR })}`
+            : coupon.end_date
+            ? `Até ${format(new Date(coupon.end_date), 'dd/MM/yy', { locale: ptBR })}`
+            : 'Sem limite'}
+        </span>
+      ),
+    },
+    {
+      key: 'is_active',
+      header: 'Status',
+      sortable: true,
+      render: (coupon) => (
+        <AdminStatusBadge status={coupon.is_active ? 'success' : 'neutral'}>
+          {coupon.is_active ? 'Ativo' : 'Inativo'}
+        </AdminStatusBadge>
+      ),
+    },
+    {
+      key: 'actions',
+      header: '',
+      className: 'w-24',
+      render: (coupon) => (
+        <div className="flex justify-end gap-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white" onClick={() => openEditDialog(coupon)}>
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:text-red-300" onClick={() => setDeleteId(coupon.id)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <AdminLayout title="Cupons de Desconto" requireEditor>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-muted-foreground">
-              Gerencie cupons de desconto para seus clientes
-            </p>
-          </div>
-          <Button onClick={openCreateDialog}>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Cupom
-          </Button>
-        </div>
-
-        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Total', value: coupons.length, icon: Tag },
-            { label: 'Ativos', value: coupons.filter(c => c.is_active).length, icon: Percent },
-            { label: 'Percentuais', value: coupons.filter(c => c.type === 'percentage').length, icon: Percent },
-            { label: 'Valor Fixo', value: coupons.filter(c => c.type === 'fixed').length, icon: DollarSign },
-          ].map((stat) => (
-            <Card key={stat.label} className="admin-card">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-primary/10">
-                  <stat.icon className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          <AdminSummaryCard title="Total" value={coupons.length} icon={Tag} variant="purple" />
+          <AdminSummaryCard title="Ativos" value={activeCount} icon={TicketPercent} variant="green" />
+          <AdminSummaryCard title="Percentuais" value={percentCount} icon={Percent} variant="blue" />
+          <AdminSummaryCard title="Valor Fixo" value={fixedCount} icon={DollarSign} variant="orange" />
         </div>
 
-        {/* Coupons List */}
-        <Card className="admin-card">
-          <CardHeader>
-            <CardTitle>Lista de Cupons</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="text-center py-8 text-muted-foreground">Carregando...</div>
-            ) : coupons.length === 0 ? (
-              <div className="text-center py-8">
-                <Tag className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
-                <p className="text-muted-foreground mb-4">Nenhum cupom cadastrado</p>
-                <Button onClick={openCreateDialog}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Criar primeiro cupom
-                </Button>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left p-3 font-medium">Código</th>
-                      <th className="text-left p-3 font-medium">Tipo</th>
-                      <th className="text-left p-3 font-medium">Valor</th>
-                      <th className="text-left p-3 font-medium">Uso</th>
-                      <th className="text-left p-3 font-medium">Validade</th>
-                      <th className="text-left p-3 font-medium">Status</th>
-                      <th className="text-right p-3 font-medium">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {coupons.map((coupon) => (
-                      <tr key={coupon.id} className="border-b border-border/50 hover:bg-muted/5">
-                        <td className="p-3">
-                          <span className="font-mono font-bold text-primary">{coupon.code}</span>
-                          {coupon.description && (
-                            <p className="text-xs text-muted-foreground mt-1">{coupon.description}</p>
-                          )}
-                        </td>
-                        <td className="p-3">
-                          <Badge variant="outline">
-                            {coupon.type === 'percentage' ? 'Percentual' : 'Valor Fixo'}
-                          </Badge>
-                        </td>
-                        <td className="p-3 font-semibold">
-                          {coupon.type === 'percentage' 
-                            ? `${coupon.value}%` 
-                            : `R$ ${coupon.value.toFixed(2).replace('.', ',')}`
-                          }
-                        </td>
-                        <td className="p-3">
-                          <span className="text-sm">
-                            {coupon.usage_count} / {coupon.usage_limit || '∞'}
-                          </span>
-                        </td>
-                        <td className="p-3 text-sm text-muted-foreground">
-                          {coupon.start_date && coupon.end_date ? (
-                            <>
-                              {format(new Date(coupon.start_date), "dd/MM", { locale: ptBR })} - {format(new Date(coupon.end_date), "dd/MM", { locale: ptBR })}
-                            </>
-                          ) : coupon.end_date ? (
-                            <>Até {format(new Date(coupon.end_date), "dd/MM/yy", { locale: ptBR })}</>
-                          ) : (
-                            'Sem limite'
-                          )}
-                        </td>
-                        <td className="p-3">
-                          <Badge className={coupon.is_active ? 'bg-green-500' : 'bg-gray-500'}>
-                            {coupon.is_active ? 'Ativo' : 'Inativo'}
-                          </Badge>
-                        </td>
-                        <td className="p-3 text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => openEditDialog(coupon)}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-destructive hover:text-destructive"
-                              onClick={() => setDeleteId(coupon.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <DataTable
+          data={coupons}
+          columns={columns}
+          isLoading={isLoading}
+          searchPlaceholder="Buscar por código ou descrição..."
+          emptyMessage="Nenhum cupom cadastrado"
+          actions={
+            <Button onClick={openCreateDialog} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Cupom
+            </Button>
+          }
+        />
       </div>
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-white">
               {editingCoupon ? 'Editar Cupom' : 'Novo Cupom'}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Código</Label>
+                <Label className="text-[hsl(var(--admin-text-muted))]">Código</Label>
                 <Input
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                   placeholder="PROMO10"
-                  className="uppercase"
+                  className="uppercase bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white"
                 />
               </div>
               <div>
-                <Label>Tipo</Label>
-                <Select
-                  value={formData.type}
-                  onValueChange={(value: 'percentage' | 'fixed') => setFormData({ ...formData, type: value })}
-                >
-                  <SelectTrigger>
+                <Label className="text-[hsl(var(--admin-text-muted))]">Tipo</Label>
+                <Select value={formData.type} onValueChange={(v: 'percentage' | 'fixed') => setFormData({ ...formData, type: v })}>
+                  <SelectTrigger className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -273,110 +243,75 @@ const AdminCouponsPage = () => {
             </div>
 
             <div>
-              <Label>Descrição (opcional)</Label>
+              <Label className="text-[hsl(var(--admin-text-muted))]">Descrição</Label>
               <Textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Cupom especial de inauguração"
                 rows={2}
+                className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Valor do Desconto</Label>
-                <Input
-                  type="number"
-                  value={formData.value}
-                  onChange={(e) => setFormData({ ...formData, value: parseFloat(e.target.value) || 0 })}
-                  placeholder={formData.type === 'percentage' ? '10' : '50'}
-                />
+                <Label className="text-[hsl(var(--admin-text-muted))]">Valor do Desconto</Label>
+                <Input type="number" value={formData.value} onChange={(e) => setFormData({ ...formData, value: parseFloat(e.target.value) || 0 })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white" />
               </div>
               <div>
-                <Label>Pedido Mínimo (R$)</Label>
-                <Input
-                  type="number"
-                  value={formData.min_order_value || ''}
-                  onChange={(e) => setFormData({ ...formData, min_order_value: e.target.value ? parseFloat(e.target.value) : null })}
-                  placeholder="100"
-                />
+                <Label className="text-[hsl(var(--admin-text-muted))]">Pedido Mínimo (R$)</Label>
+                <Input type="number" value={formData.min_order_value || ''} onChange={(e) => setFormData({ ...formData, min_order_value: e.target.value ? parseFloat(e.target.value) : null })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white" />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Desconto Máximo (R$)</Label>
-                <Input
-                  type="number"
-                  value={formData.max_discount || ''}
-                  onChange={(e) => setFormData({ ...formData, max_discount: e.target.value ? parseFloat(e.target.value) : null })}
-                  placeholder="50"
-                />
+                <Label className="text-[hsl(var(--admin-text-muted))]">Desconto Máximo (R$)</Label>
+                <Input type="number" value={formData.max_discount || ''} onChange={(e) => setFormData({ ...formData, max_discount: e.target.value ? parseFloat(e.target.value) : null })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white" />
               </div>
               <div>
-                <Label>Limite de Uso</Label>
-                <Input
-                  type="number"
-                  value={formData.usage_limit || ''}
-                  onChange={(e) => setFormData({ ...formData, usage_limit: e.target.value ? parseInt(e.target.value) : null })}
-                  placeholder="100"
-                />
+                <Label className="text-[hsl(var(--admin-text-muted))]">Limite de Uso</Label>
+                <Input type="number" value={formData.usage_limit || ''} onChange={(e) => setFormData({ ...formData, usage_limit: e.target.value ? parseInt(e.target.value) : null })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white" />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Data Início</Label>
-                <Input
-                  type="date"
-                  value={formData.start_date}
-                  onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                />
+                <Label className="text-[hsl(var(--admin-text-muted))]">Data Início</Label>
+                <Input type="date" value={formData.start_date} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white" />
               </div>
               <div>
-                <Label>Data Fim</Label>
-                <Input
-                  type="date"
-                  value={formData.end_date}
-                  onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                />
+                <Label className="text-[hsl(var(--admin-text-muted))]">Data Fim</Label>
+                <Input type="date" value={formData.end_date} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white" />
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label>Cupom Ativo</Label>
-              <Switch
-                checked={formData.is_active}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-              />
+            <div className="flex items-center justify-between p-3 rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg)/0.6)]">
+              <Label className="text-white">Cupom Ativo</Label>
+              <Switch checked={formData.is_active} onCheckedChange={(c) => setFormData({ ...formData, is_active: c })} />
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleSubmit} disabled={!formData.code || !formData.value}>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</Button>
+            <Button onClick={handleSubmit} disabled={!formData.code || !formData.value} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
               {editingCoupon ? 'Salvar' : 'Criar Cupom'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-white">Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription className="text-[hsl(var(--admin-text-muted))]">
               Tem certeza que deseja excluir este cupom? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Excluir
-            </AlertDialogAction>
+            <AlertDialogCancel className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">Excluir</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -385,4 +320,3 @@ const AdminCouponsPage = () => {
 };
 
 export default AdminCouponsPage;
-
