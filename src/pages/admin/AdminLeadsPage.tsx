@@ -159,9 +159,7 @@ const AdminLeadsPage = () => {
       header: 'Status',
       sortable: true,
       render: (lead) => (
-        <AdminStatusBadge status={lead.is_subscribed ? 'success' : 'error'}>
-          {lead.is_subscribed ? 'Inscrito' : 'Cancelado'}
-        </AdminStatusBadge>
+        <AdminStatusBadge label={lead.is_subscribed ? 'Inscrito' : 'Cancelado'} variant={lead.is_subscribed ? 'success' : 'danger'} />
       ),
     },
     {

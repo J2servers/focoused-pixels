@@ -161,9 +161,7 @@ const AdminCouponsPage = () => {
       header: 'Status',
       sortable: true,
       render: (coupon) => (
-        <AdminStatusBadge status={coupon.is_active ? 'success' : 'neutral'}>
-          {coupon.is_active ? 'Ativo' : 'Inativo'}
-        </AdminStatusBadge>
+        <AdminStatusBadge label={coupon.is_active ? 'Ativo' : 'Inativo'} variant={coupon.is_active ? 'success' : 'neutral'} />
       ),
     },
     {
