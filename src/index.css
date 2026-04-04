@@ -395,7 +395,7 @@
     --neu-inner-blur: 16px;
   }
 
-  /* ═══ Button — Deep Machined with Neon Border ═══ */
+  /* ═══ Button — Deep Machined with Animated Border ═══ */
   .neu-btn {
     position: relative;
     background: hsl(var(--background));
@@ -404,9 +404,23 @@
       -5px -5px 10px hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 0 hsl(var(--neu-light) / 0.5),
       inset 0 -1px 0 hsl(var(--neu-dark) / 0.15);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / var(--neon-opacity));
+    border: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+  }
+  .neu-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.5), hsl(185 100% 55% / 0.5), hsl(280 90% 65% / 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
 
   .neu-btn:hover {
@@ -415,7 +429,6 @@
       -3px -3px 6px hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 0 hsl(var(--neu-light) / 0.6),
       inset 0 -1px 0 hsl(var(--neu-dark) / 0.2);
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
     transform: translateY(-1px);
   }
 
