@@ -35,52 +35,7 @@ import {
   VideoStoriesCarousel,
 } from '@/components/conversion';
 
-/* ── Category visual cards ── */
-function CategoriesShowcase({ categories }: { categories: any[] }) {
-  if (categories.length === 0) return null;
-
-  return (
-    <section className="py-12 lg:py-16">
-      <div className="container mx-auto px-4">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Categorias</h2>
-            <p className="text-sm text-muted-foreground mt-1">Escolha sua base e personalize em poucos passos</p>
-          </div>
-          <Link to="/categorias">
-            <Button variant="ghost" size="sm" className="text-primary font-semibold group">
-              Ver todas
-              <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-            </Button>
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5 stagger-children">
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              to={`/categoria/${cat.slug}`}
-              className="group relative aspect-[4/3] rounded-2xl overflow-hidden neu-raised hover:shadow-product-hover transition-all duration-500"
-            >
-              {cat.image_url && (
-                <img
-                  src={cat.image_url}
-                  alt={cat.name}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  loading="lazy"
-                />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="text-white font-bold text-sm md:text-base leading-tight">{cat.name}</h3>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+import { RainbowCategoryStrip } from '@/components/conversion/RainbowCategoryStrip';
 
 /* ── Category product section ── */
 function CategoryProductsSection({ 
@@ -199,9 +154,9 @@ const Index = () => {
         {/* Hero full-width */}
         <HeroConversion />
 
-        {/* Categories Showcase */}
+        {/* Categories - Rainbow Glass Neumorphism */}
         {!categoriesLoading && (
-          <CategoriesShowcase categories={parentCategories} />
+          <RainbowCategoryStrip categories={parentCategories} />
         )}
 
         {/* Como funciona */}
