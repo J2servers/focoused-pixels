@@ -2,9 +2,9 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Star, ShoppingCart, MessageCircle, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ShoppingCart, MessageCircle, Truck, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '@/hooks/useCart';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,6 +38,7 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const { whatsapp, whatsappMessageTemplate } = useSiteSettings();
+  const navigate = useNavigate();
 
   if (!product) return null;
 
@@ -193,6 +194,37 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
             <div className="flex flex-col gap-3 mt-auto pt-6">
               <Button
                 size="lg"
+                onClick={() => {
+                  addItem({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    quantity,
+                  });
+                  sessionStorage.setItem('pending_payment', JSON.stringify({
+                    orderId: `quick-${Date.now()}`,
+                    amount: product.price * quantity,
+                    customerName: '',
+                    customerEmail: '',
+                    customerCpf: '',
+                    customerPhone: '',
+                    description: product.name,
+                    cartItems: [{ name: product.name, quantity, price: product.price }],
+                  }));
+                  onOpenChange(false);
+                  navigate('/pagamento');
+                }}
+                disabled={!product.inStock}
+                className="w-full"
+              >
+                <Zap className="h-5 w-5 mr-2" />
+                {product.inStock ? 'Comprar Agora' : 'Indisponível'}
+              </Button>
+
+              <Button
+                size="lg"
+                variant="outline"
                 onClick={handleAddToCart}
                 disabled={!product.inStock}
                 className="w-full"

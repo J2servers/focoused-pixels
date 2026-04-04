@@ -4,7 +4,7 @@
 
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Star, Eye, ShoppingCart, Zap } from 'lucide-react';
+import { Star, ShoppingCart, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Product } from '@/data/products';
@@ -102,14 +102,14 @@ export function ProductCardOptimized({
 
   return (
     <>
-      <Link 
-        to={`/produto/${product.slug}`}
-        className="group block h-full rounded-2xl"
-      >
-        <div className="relative h-full rounded-2xl p-[1.5px] bg-[conic-gradient(from_var(--border-angle,0deg),hsl(280_90%_70%),hsl(185_100%_65%),hsl(280_90%_70%))] animate-[borderRotate_1.5s_linear_infinite] shadow-product-hover card-lift">
-          <div className="flex h-full flex-col rounded-[calc(theme(borderRadius.2xl)-1.5px)] bg-[hsl(var(--background))]">
-            {/* Image */}
-            <div className="relative aspect-square overflow-hidden rounded-t-[calc(theme(borderRadius.2xl)-1.5px)]">
+      <div className="group block h-full rounded-2xl">
+        <div className="relative h-full rounded-2xl p-[1.5px] bg-[conic-gradient(from_var(--border-angle,0deg),hsl(280_90%_70%),hsl(185_100%_65%),hsl(280_90%_70%))] animate-[borderRotate_1.5s_linear_infinite] card-lift">
+          <div className="flex h-full flex-col rounded-[calc(theme(borderRadius.2xl)-1.5px)] bg-[hsl(var(--background))] overflow-hidden">
+            {/* Image - clickable for QuickView */}
+            <div
+              className="relative aspect-square overflow-hidden cursor-pointer"
+              onClick={handleQuickView}
+            >
               {highlightBadge && (
                 <Badge className="absolute top-2.5 right-2.5 z-20 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-xl border border-white/40 shadow-lg">
                   {highlightBadge}
@@ -128,28 +128,20 @@ export function ProductCardOptimized({
                 </div>
               )}
 
-              {/* Quick View on hover */}
-              <button
-                onClick={handleQuickView}
-                className={`absolute right-2.5 z-10 neu-btn p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0 ${highlightBadge ? 'top-12' : 'top-2.5'}`}
-              >
-                <Eye className="h-4 w-4 text-foreground/70" />
-              </button>
-
-              <div className={`absolute right-12 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-background/90 rounded-full shadow ${highlightBadge ? 'top-12' : 'top-2.5'}`}>
+              <div className={`absolute right-2.5 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-background/90 rounded-full shadow ${highlightBadge ? 'top-12' : 'top-2.5'}`}>
                 <WishlistButton product={{ id: product.id, name: product.name, price: product.price, image: product.image, slug: product.slug }} size="sm" />
               </div>
 
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-full rounded-t-[calc(theme(borderRadius.2xl)-1.5px)] object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                 loading="lazy"
               />
             </div>
 
             {/* Content */}
-            <div className="flex flex-col flex-1 p-3.5 sm:p-4">
+            <Link to={`/produto/${product.slug}`} className="flex flex-col flex-1 p-3.5 sm:p-4">
           {/* Rating - fixed height */}
           <div className="flex items-center gap-1.5 mb-1.5 h-4">
             <div className="flex items-center gap-0.5">
@@ -218,10 +210,10 @@ export function ProductCardOptimized({
               <ShoppingCart className="h-3.5 w-3.5" />
             </Button>
           </div>
-        </div>
+            </Link>
           </div>
         </div>
-      </Link>
+      </div>
 
       <QuickViewModal
         product={product}
