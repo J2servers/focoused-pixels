@@ -52,9 +52,10 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
                 key={cat.id}
                 initial={{ opacity: 0, x: 40 }}
                 whileInView={{ opacity: 1, x: 0 }}
+                whileHover={{ scale: 1.18, y: -14, zIndex: 30 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, delay: i * 0.07 }}
-                className="flex-1 min-w-0 transition-all duration-500 ease-out hover:z-30 hover:scale-[1.15] hover:-translate-y-3 relative z-10"
+                className="flex-1 min-w-0 relative z-10 cursor-pointer"
                 style={{
                   filter: `
                     drop-shadow(6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)))
