@@ -437,18 +437,18 @@
       inset 4px 4px 8px hsl(var(--neu-dark) / var(--neu-intensity)),
       inset -4px -4px 8px hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 3px hsl(var(--neu-dark) / 0.3);
-    border-color: hsl(var(--neon-cyan) / var(--neon-opacity-hover));
     transform: translateY(1px);
   }
 
   /* ═══ Input — Deep Inset Machined ═══ */
   .neu-input {
+    position: relative;
     background: hsl(var(--background));
     box-shadow:
       inset 4px 4px 8px hsl(var(--neu-dark) / calc(var(--neu-intensity) * 0.7)),
       inset -4px -4px 8px hsl(var(--neu-light) / calc(var(--neu-intensity) * 0.9)),
       inset 0 1px 3px hsl(var(--neu-dark) / 0.2);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / 0.2);
+    border: 1px solid hsl(var(--neon-primary) / 0.15);
     transition: border-color 0.3s ease;
   }
 
