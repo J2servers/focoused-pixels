@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface NotifyRequest {
-  event: "pix_generated" | "boleto_generated" | "card_approved" | "card_pending" | "payment_confirmed";
+  event: "pix_generated" | "boleto_generated" | "card_approved" | "card_pending" | "payment_confirmed" | "order_shipped" | "abandoned_cart" | "new_lead" | "review_received" | "boleto_reminder";
   customer: { name: string; email: string; phone: string };
   order: {
     orderId: string;
@@ -56,6 +56,11 @@ const EVENT_TO_WA_TEMPLATE: Record<string, string[]> = {
   card_approved: ["card_approved", "Pagamento Confirmado"],
   card_pending: ["card_pending"],
   payment_confirmed: ["payment_confirmed", "Pagamento Confirmado"],
+  order_shipped: ["order_shipped", "Pedido Enviado"],
+  abandoned_cart: ["abandoned_cart", "Carrinho Abandonado"],
+  new_lead: ["new_lead", "Boas-vindas com cupom"],
+  review_received: ["review_received", "Avaliação Recebida"],
+  boleto_reminder: ["boleto_reminder", "Lembrete de Boleto"],
 };
 
 // Fallback WhatsApp messages (only used if no DB template found)
@@ -101,8 +106,23 @@ function buildFallbackWhatsApp(data: NotifyRequest): string {
     case "card_pending":
       return `⏳ *Pagamento em Análise*\n\nOlá, ${firstName}! Seu pagamento está sendo analisado. Você receberá uma confirmação em breve.`;
 
+    case "order_shipped":
+      return `📦 *Pedido Enviado!*\n\nOlá ${firstName}, seu pedido foi enviado!\nVocê receberá o código de rastreio em breve. ✨`;
+
+    case "abandoned_cart":
+      return `🛒 *Seu carrinho está te esperando!*\n\nOlá ${firstName}, notamos que você deixou itens no carrinho. Finalize sua compra antes que acabe! ✨`;
+
+    case "new_lead":
+      return `👋 *Bem-vindo(a)!*\n\nOlá ${firstName}, que bom ter você por aqui! Explore nossos produtos e encontre algo especial. ✨`;
+
+    case "review_received":
+      return `⭐ *Obrigado pela avaliação!*\n\nOlá ${firstName}, sua opinião é muito importante para nós. Muito obrigado! 💜`;
+
+    case "boleto_reminder":
+      return `🔔 *Lembrete de Boleto*\n\nOlá ${firstName}, seu boleto vence em breve. Não perca o prazo!`;
+
     default:
-      return `Olá ${firstName}, recebemos seu pagamento. Obrigado!`;
+      return `Olá ${firstName}, recebemos sua solicitação. Obrigado!`;
   }
 }
 
