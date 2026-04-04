@@ -50,7 +50,7 @@ export function ExitIntentPopup() {
           className="relative rounded-3xl overflow-hidden"
         >
           {/* Animated gradient border wrapper */}
-          <div className="rounded-3xl p-[2px] bg-[conic-gradient(from_var(--border-angle,0deg),hsl(280_90%_70%),hsl(185_100%_65%),hsl(280_90%_70%))] animate-[borderRotate_1.5s_linear_infinite]">
+          <div className="rounded-3xl p-[2px] neu-raised">
             <div className="rounded-[calc(1.5rem-2px)] bg-background p-8 text-center relative overflow-hidden">
               {/* Background glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />

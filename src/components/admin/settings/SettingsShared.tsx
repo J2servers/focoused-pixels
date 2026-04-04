@@ -114,7 +114,7 @@ export const InfoBanner = ({ children, accentVar = '--admin-accent-orange', icon
 );
 
 /* ─── Helper types ─── */
-export type SettingsTab = 'geral' | 'pagamentos' | 'email' | 'seguranca' | 'operacoes';
+export type SettingsTab = 'geral' | 'pagamentos' | 'email' | 'seguranca' | 'operacoes' | 'ia';
 
 export interface SettingsContext {
   settings: Partial<CompanyInfo>;

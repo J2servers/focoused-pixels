@@ -9,12 +9,13 @@ import { useSendTestEmail, useTestEmailConnection } from '@/hooks/useEmailGatewa
 import { useTestMercadoPago, useTestEfiBank, useTestStripe } from '@/hooks/usePaymentGateway';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { CreditCard, Loader2, Mail, Save, Settings2, ShieldCheck, Store, type LucideIcon } from 'lucide-react';
+import { Bot, CreditCard, Loader2, Mail, Save, Settings2, ShieldCheck, Store, type LucideIcon } from 'lucide-react';
 import { SettingsGeneralSection } from '@/components/admin/settings/SettingsGeneralSection';
 import { SettingsPaymentsSection } from '@/components/admin/settings/SettingsPaymentsSection';
 import { SettingsEmailSection } from '@/components/admin/settings/SettingsEmailSection';
 import { SettingsSecuritySection } from '@/components/admin/settings/SettingsSecuritySection';
 import { SettingsOperationsSection } from '@/components/admin/settings/SettingsOperationsSection';
+import { SettingsAISection } from '@/components/admin/settings/SettingsAISection';
 import { type SettingsTab } from '@/components/admin/settings/SettingsShared';
 
 /* ─── Tab Config ─── */
@@ -25,8 +26,9 @@ const TABS: Record<SettingsTab, TabMeta> = {
   email:       { label: 'Email',       icon: Mail,        accentVar: '--admin-accent-orange' },
   seguranca:   { label: 'Segurança',   icon: ShieldCheck, accentVar: '--admin-accent-pink' },
   operacoes:   { label: 'Operações',   icon: Settings2,   accentVar: '--admin-accent-purple' },
+  ia:          { label: 'IA',          icon: Bot,         accentVar: '--admin-accent-purple' },
 };
-const TAB_ORDER: SettingsTab[] = ['geral', 'pagamentos', 'email', 'seguranca', 'operacoes'];
+const TAB_ORDER: SettingsTab[] = ['geral', 'pagamentos', 'email', 'seguranca', 'operacoes', 'ia'];
 
 const AdminSettingsPage = () => {
   const { profile, updatePassword, canEdit } = useAuthContext();
@@ -157,6 +159,7 @@ const AdminSettingsPage = () => {
           {tab === 'email' && <SettingsEmailSection emailSettings={email} ue={ue} canMutate={canMutate} handleTestSmtp={handleTestSmtp} handleSendTest={handleSendTest} testSmtpPending={testSmtp.isPending} sendTestPending={sendTest.isPending} updateEmailPending={updateEmail.isPending} />}
           {tab === 'seguranca' && <SettingsSecuritySection settings={settings} u={u} canMutate={canMutate} profileName={profile?.full_name || ''} updatePassword={updatePassword} />}
           {tab === 'operacoes' && <SettingsOperationsSection />}
+          {tab === 'ia' && <SettingsAISection settings={settings} u={u} />}
         </div>
       </div>
     </AdminLayout>

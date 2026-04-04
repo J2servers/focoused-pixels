@@ -7,14 +7,12 @@ const corsHeaders = {
 };
 
 const buildSystemPrompt = (products: any[], categories: any[]) => {
-  // Build product catalog with links (using relative paths for internal navigation)
   const productCatalog = products.map(p => {
     const price = p.promotional_price || p.price;
     const originalPrice = p.promotional_price ? ` (de R$ ${p.price.toFixed(2)})` : '';
     return `- **${p.name}**: R$ ${price.toFixed(2)}${originalPrice} - ${p.short_description || 'Produto personalizado'} → [Clique aqui para comprar](/produto/${p.slug})`;
   }).join('\n');
 
-  // Build category links
   const categoryLinks = categories.map(c => 
     `- ${c.name}: [Ver categoria](/categoria/${c.slug})`
   ).join('\n');
@@ -87,6 +85,17 @@ Para quantidades acima de 10 unidades você ganha 5% de desconto! Quantos crach�
 Ajudar clientes a encontrar o produto ideal, SEMPRE enviando links clicáveis para facilitar a compra. Seja consultiva e demonstre conhecimento sobre os produtos.`;
 };
 
+// Map external provider names to their default API URLs
+const PROVIDER_URLS: Record<string, string> = {
+  openai: "https://api.openai.com/v1/chat/completions",
+  anthropic: "https://api.anthropic.com/v1/messages",
+  google: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+  mistral: "https://api.mistral.ai/v1/chat/completions",
+  groq: "https://api.groq.com/openai/v1/chat/completions",
+  deepseek: "https://api.deepseek.com/v1/chat/completions",
+  cohere: "https://api.cohere.ai/v1/chat",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -97,19 +106,16 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
 
-    // Fetch products and categories from database
+    // Fetch products, categories, and AI config from database
     let products: any[] = [];
     let categories: any[] = [];
+    let aiConfig: any = null;
     
     if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
       
-      const [productsResult, categoriesResult] = await Promise.all([
+      const [productsResult, categoriesResult, configResult] = await Promise.all([
         supabase
           .from('products')
           .select('id, name, slug, price, promotional_price, short_description')
@@ -120,25 +126,61 @@ serve(async (req) => {
           .from('categories')
           .select('id, name, slug')
           .eq('status', 'active')
-          .order('name')
+          .order('name'),
+        supabase
+          .from('company_info')
+          .select('ai_external_enabled, ai_external_provider, ai_external_api_url, ai_external_api_key, ai_external_model')
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .single()
       ]);
 
       products = productsResult.data || [];
       categories = categoriesResult.data || [];
+      aiConfig = configResult.data;
     }
 
     console.log(`AI Assistant - Loaded ${products.length} products and ${categories.length} categories`);
 
     const SYSTEM_PROMPT = buildSystemPrompt(products, categories);
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+    // Determine which AI provider to use
+    const useExternal = aiConfig?.ai_external_enabled && aiConfig?.ai_external_api_key;
+    
+    let apiUrl: string;
+    let apiKey: string;
+    let model: string;
+    let headers: Record<string, string>;
+
+    if (useExternal) {
+      const provider = aiConfig.ai_external_provider || 'openai';
+      apiUrl = aiConfig.ai_external_api_url || PROVIDER_URLS[provider] || PROVIDER_URLS.openai;
+      apiKey = aiConfig.ai_external_api_key;
+      model = aiConfig.ai_external_model || 'gpt-4o';
+      headers = {
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-      },
+      };
+      console.log(`AI Assistant - Using external provider: ${provider}, model: ${model}`);
+    } else {
+      if (!LOVABLE_API_KEY) {
+        throw new Error("LOVABLE_API_KEY is not configured");
+      }
+      apiUrl = "https://ai.gateway.lovable.dev/v1/chat/completions";
+      apiKey = LOVABLE_API_KEY;
+      model = "google/gemini-3-flash-preview";
+      headers = {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      };
+      console.log("AI Assistant - Using native Lovable AI");
+    }
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers,
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           ...messages,
@@ -148,6 +190,32 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      // If external fails, try fallback to native
+      if (useExternal && LOVABLE_API_KEY) {
+        console.warn("External AI failed, falling back to native Lovable AI");
+        const fallbackResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-3-flash-preview",
+            messages: [
+              { role: "system", content: SYSTEM_PROMPT },
+              ...messages,
+            ],
+            stream: true,
+          }),
+        });
+
+        if (fallbackResponse.ok) {
+          return new Response(fallbackResponse.body, {
+            headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+          });
+        }
+      }
+
       if (response.status === 429) {
         console.error("Rate limit exceeded");
         return new Response(
