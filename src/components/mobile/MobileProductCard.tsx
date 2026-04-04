@@ -100,7 +100,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
           </div>
 
           {/* Content - fixed heights for uniformity */}
-          <div className="p-3 flex flex-col flex-grow">
+          <div className="p-3 flex flex-col flex-grow mx-[2px] mb-[2px]">
             <h3 className="font-medium text-xs text-foreground line-clamp-2 h-8 leading-tight">
               {product.name}
             </h3>
