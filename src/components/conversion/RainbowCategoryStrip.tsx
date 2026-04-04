@@ -1,20 +1,20 @@
 /**
- * RainbowCategoryStrip - Glass Neumorphism Mega Menu style category cards
- * Rainbow-colored angled strips with neon purple borders and glass effects
+ * RainbowCategoryStrip - Angled skewed category cards like LG Content Store
+ * Each card is a skewed parallelogram with full visible image and rainbow neon borders
  */
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
-const RAINBOW_COLORS = [
-  { bg: 'from-pink-500/20 to-pink-600/10', border: 'hsl(330 80% 60%)', glow: '330 80% 60%', accent: 'bg-pink-500' },
-  { bg: 'from-emerald-500/20 to-emerald-600/10', border: 'hsl(160 70% 45%)', glow: '160 70% 45%', accent: 'bg-emerald-500' },
-  { bg: 'from-blue-500/20 to-blue-600/10', border: 'hsl(220 80% 60%)', glow: '220 80% 60%', accent: 'bg-blue-500' },
-  { bg: 'from-orange-500/20 to-orange-600/10', border: 'hsl(25 90% 55%)', glow: '25 90% 55%', accent: 'bg-orange-500' },
-  { bg: 'from-violet-500/20 to-violet-600/10', border: 'hsl(270 80% 60%)', glow: '270 80% 60%', accent: 'bg-violet-500' },
-  { bg: 'from-amber-400/20 to-yellow-500/10', border: 'hsl(45 90% 55%)', glow: '45 90% 55%', accent: 'bg-amber-400' },
-  { bg: 'from-cyan-400/20 to-teal-500/10', border: 'hsl(185 80% 50%)', glow: '185 80% 50%', accent: 'bg-cyan-400' },
-  { bg: 'from-rose-400/20 to-fuchsia-500/10', border: 'hsl(340 75% 55%)', glow: '340 75% 55%', accent: 'bg-rose-400' },
+const RAINBOW = [
+  { border: '330 80% 60%', label: 'bg-pink-500' },
+  { border: '160 70% 45%', label: 'bg-emerald-500' },
+  { border: '220 80% 60%', label: 'bg-blue-500' },
+  { border: '25 90% 55%', label: 'bg-orange-500' },
+  { border: '270 80% 60%', label: 'bg-violet-500' },
+  { border: '45 90% 55%', label: 'bg-amber-400' },
+  { border: '185 80% 50%', label: 'bg-cyan-400' },
+  { border: '340 75% 55%', label: 'bg-rose-400' },
 ];
 
 interface Category {
@@ -28,7 +28,7 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
   if (categories.length === 0) return null;
 
   return (
-    <section className="py-12 lg:py-16">
+    <section className="py-12 lg:py-16 overflow-hidden">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex items-end justify-between mb-8">
@@ -50,81 +50,75 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
           </Link>
         </div>
 
-        {/* Rainbow Strip Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
+        {/* Angled Strip Row */}
+        <div className="flex gap-2 -mx-2">
           {categories.map((cat, i) => {
-            const color = RAINBOW_COLORS[i % RAINBOW_COLORS.length];
+            const color = RAINBOW[i % RAINBOW.length];
             return (
               <motion.div
                 key={cat.id}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.06 }}
+                transition={{ duration: 0.5, delay: i * 0.07 }}
+                className="flex-1 min-w-0"
+                style={{ transform: 'skewX(-6deg)' }}
               >
                 <Link
                   to={`/categoria/${cat.slug}`}
-                  className="group relative block overflow-hidden rounded-2xl transition-all duration-500"
+                  className="group relative block h-[180px] md:h-[220px] lg:h-[260px] overflow-hidden rounded-xl transition-all duration-500"
                   style={{
-                    border: `1.5px solid ${color.border}`,
+                    border: `2px solid hsl(${color.border})`,
                     boxShadow: `
-                      0 0 0 0.5px ${color.border},
-                      0 4px 20px -4px hsl(${color.glow} / 0.15),
-                      inset 0 1px 0 hsl(0 0% 100% / 0.12),
-                      inset 0 -1px 0 hsl(0 0% 0% / 0.08),
-                      6px 6px 16px hsl(var(--neu-dark) / var(--neu-intensity)),
-                      -4px -4px 12px hsl(var(--neu-light) / var(--neu-intensity))
+                      0 0 12px -2px hsl(${color.border} / 0.35),
+                      inset 0 0 20px -8px hsl(${color.border} / 0.15)
                     `,
                   }}
                 >
-                  {/* Glass background */}
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${color.bg} backdrop-blur-xl`}
-                  />
-                  <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
-
-                  {/* Angled accent strip */}
-                  <div
-                    className={`absolute -left-4 top-0 bottom-0 w-16 ${color.accent} opacity-[0.08] -skew-x-12`}
-                  />
-
-                  {/* Category image (subtle) */}
-                  {cat.image_url && (
+                  {/* Full image - no glass overlay */}
+                  {cat.image_url ? (
                     <img
                       src={cat.image_url}
                       alt={cat.name}
-                      className="absolute inset-0 w-full h-full object-cover opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      style={{ transform: 'skewX(6deg) scale(1.15)' }}
                       loading="lazy"
                     />
+                  ) : (
+                    <div className="absolute inset-0 bg-muted flex items-center justify-center">
+                      <span className="text-4xl" style={{ transform: 'skewX(6deg)' }}>📦</span>
+                    </div>
                   )}
 
-                  {/* Content */}
-                  <div className="relative z-10 p-4 md:p-5 flex items-center justify-between min-h-[80px] md:min-h-[96px]">
-                    <div className="flex items-center gap-3">
-                      {/* Neon dot */}
-                      <div
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                        style={{
-                          backgroundColor: color.border,
-                          boxShadow: `0 0 8px ${color.border}, 0 0 16px hsl(${color.glow} / 0.4)`,
-                        }}
-                      />
-                      <span className="font-semibold text-sm md:text-base text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-2">
-                        {cat.name}
-                      </span>
-                    </div>
-                    <ChevronRight
-                      className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 flex-shrink-0"
-                    />
+                  {/* Bottom gradient for text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                  {/* Neon top edge glow */}
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[2px]"
+                    style={{
+                      background: `linear-gradient(90deg, transparent, hsl(${color.border}), transparent)`,
+                      boxShadow: `0 0 8px hsl(${color.border} / 0.6)`,
+                    }}
+                  />
+
+                  {/* Category name - unskewed so text is straight */}
+                  <div
+                    className="absolute bottom-0 left-0 right-0 p-3 md:p-4"
+                    style={{ transform: 'skewX(6deg)' }}
+                  >
+                    <h3 className="text-white font-bold text-xs md:text-sm lg:text-base leading-tight drop-shadow-lg line-clamp-2">
+                      {cat.name}
+                    </h3>
                   </div>
 
-                  {/* Hover glow border */}
+                  {/* Hover neon glow */}
                   <div
-                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none"
                     style={{
                       boxShadow: `
-                        inset 0 0 0 1.5px hsl(280 70% 60% / 0.6),
-                        0 0 24px -4px hsl(280 70% 60% / 0.3)
+                        inset 0 0 0 2px hsl(280 70% 60% / 0.5),
+                        0 0 20px -2px hsl(280 70% 60% / 0.4)
                       `,
                     }}
                   />
