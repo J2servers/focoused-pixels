@@ -1,5 +1,5 @@
 ﻿import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+
 import { ShoppingCart, Star, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -52,12 +52,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.3 }}
-      className="h-full"
-    >
+    <div className="h-full">
       <Link
         to={`/produto/${product.slug}`}
         className="block group h-full"
@@ -65,13 +60,11 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
         <div className="relative rounded-2xl overflow-hidden neu-raised transition-all duration-300 active:scale-[0.98] h-full flex flex-col">
           {/* Image - fixed aspect ratio */}
           <div className="relative aspect-square overflow-hidden rounded-t-2xl flex-shrink-0">
-            <motion.img
+            <img
               src={product.image}
               alt={product.name}
               className="w-full h-full object-cover"
               loading="lazy"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.3 }}
             />
             
             {/* Badges */}
@@ -94,11 +87,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             </div>
 
             {/* Quick Add Button */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              className="absolute bottom-2 right-2"
-            >
+            <div className="absolute bottom-2 right-2">
               <Button
                 size="icon"
                 onClick={handleAddToCart}
@@ -107,7 +96,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
               >
                 <ShoppingCart className="h-4 w-4" />
               </Button>
-            </motion.div>
+            </div>
           </div>
 
           {/* Content - fixed heights for uniformity */}
@@ -145,7 +134,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }
 

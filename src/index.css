@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap&subset=latin');
 
 @tailwind base;
 @tailwind components;
@@ -213,6 +213,17 @@
 }
 
 @layer utilities {
+  /* ═══ Animated Border Angle ═══ */
+  @property --border-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  @keyframes borderRotate {
+    to { --border-angle: 360deg; }
+  }
+
   .text-gradient-purple {
     @apply bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent;
   }
@@ -223,29 +234,55 @@
 
   /* ═══ Neumorphism Utilities — Deep Machined ═══ */
   .neu-flat {
+    position: relative;
     background: hsl(var(--background));
     box-shadow:
       var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
       calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 0 hsl(var(--neu-light) / 0.4),
       inset 0 -1px 0 hsl(var(--neu-dark) / 0.2);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / var(--neon-opacity));
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    transition: box-shadow 0.3s ease;
   }
-
-  .neu-flat:hover {
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
+  .neu-flat::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.5), hsl(185 100% 55% / 0.5), hsl(280 90% 65% / 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
 
   .neu-raised {
+    position: relative;
     background: linear-gradient(145deg, hsl(var(--background)), hsl(var(--neu-dark) / 0.1));
     box-shadow:
       var(--neu-distance) var(--neu-distance) calc(var(--neu-blur) * 1.5) hsl(var(--neu-dark) / var(--neu-intensity)),
       calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) calc(var(--neu-blur) * 1.5) hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 2px 0 hsl(var(--neu-light) / 0.5),
       inset 0 -2px 0 hsl(var(--neu-dark) / 0.15);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / calc(var(--neon-opacity) * 0.5));
+    border: none;
     transition: all 0.3s ease;
+  }
+  .neu-raised::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.4), hsl(185 100% 55% / 0.4), hsl(280 90% 65% / 0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
 
   .neu-raised:hover {
@@ -254,47 +291,86 @@
       calc(var(--neu-distance) * -1.3) calc(var(--neu-distance) * -1.3) calc(var(--neu-blur) * 2) hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 2px 0 hsl(var(--neu-light) / 0.6),
       inset 0 -2px 0 hsl(var(--neu-dark) / 0.2);
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
     transform: translateY(-1px);
   }
 
   .neu-pressed {
+    position: relative;
     background: hsl(var(--background));
     box-shadow:
       inset var(--neu-inner-distance) var(--neu-inner-distance) var(--neu-inner-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
       inset calc(var(--neu-inner-distance) * -1) calc(var(--neu-inner-distance) * -1) var(--neu-inner-blur) hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 3px hsl(var(--neu-dark) / 0.3);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / 0.3);
+    border: none;
+  }
+  .neu-pressed::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.3), hsl(185 100% 55% / 0.3), hsl(280 90% 65% / 0.3));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
 
   .neu-concave {
+    position: relative;
     background: linear-gradient(145deg, hsl(var(--neu-dark) / 0.12), hsl(var(--neu-light) / 0.6));
     box-shadow:
       var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
       calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 0 hsl(var(--neu-dark) / 0.15),
       inset 0 -1px 0 hsl(var(--neu-light) / 0.3);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / calc(var(--neon-opacity) * 0.4));
-    transition: border-color 0.3s ease;
+    border: none;
+    transition: box-shadow 0.3s ease;
   }
-
-  .neu-concave:hover {
-    border-color: hsl(var(--neon-cyan) / var(--neon-opacity-hover));
+  .neu-concave::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.4), hsl(185 100% 55% / 0.4), hsl(280 90% 65% / 0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
 
   .neu-convex {
+    position: relative;
     background: linear-gradient(145deg, hsl(var(--neu-light) / 0.6), hsl(var(--neu-dark) / 0.12));
     box-shadow:
       var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
       calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 2px 0 hsl(var(--neu-light) / 0.5),
       inset 0 -1px 0 hsl(var(--neu-dark) / 0.1);
-    border: var(--neon-border-width) solid hsl(var(--neon-accent) / calc(var(--neon-opacity) * 0.4));
+    border: none;
     transition: all 0.3s ease;
+  }
+  .neu-convex::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.4), hsl(185 100% 55% / 0.4), hsl(280 90% 65% / 0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
 
   .neu-convex:hover {
-    border-color: hsl(var(--neon-accent) / var(--neon-opacity-hover));
     transform: translateY(-1px);
   }
 
@@ -319,7 +395,7 @@
     --neu-inner-blur: 16px;
   }
 
-  /* ═══ Button — Deep Machined with Neon Border ═══ */
+  /* ═══ Button — Deep Machined with Animated Border ═══ */
   .neu-btn {
     position: relative;
     background: hsl(var(--background));
@@ -328,9 +404,23 @@
       -5px -5px 10px hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 0 hsl(var(--neu-light) / 0.5),
       inset 0 -1px 0 hsl(var(--neu-dark) / 0.15);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / var(--neon-opacity));
+    border: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+  }
+  .neu-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.5), hsl(185 100% 55% / 0.5), hsl(280 90% 65% / 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
 
   .neu-btn:hover {
@@ -339,7 +429,6 @@
       -3px -3px 6px hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 0 hsl(var(--neu-light) / 0.6),
       inset 0 -1px 0 hsl(var(--neu-dark) / 0.2);
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
     transform: translateY(-1px);
   }
 
@@ -348,18 +437,18 @@
       inset 4px 4px 8px hsl(var(--neu-dark) / var(--neu-intensity)),
       inset -4px -4px 8px hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 3px hsl(var(--neu-dark) / 0.3);
-    border-color: hsl(var(--neon-cyan) / var(--neon-opacity-hover));
     transform: translateY(1px);
   }
 
   /* ═══ Input — Deep Inset Machined ═══ */
   .neu-input {
+    position: relative;
     background: hsl(var(--background));
     box-shadow:
       inset 4px 4px 8px hsl(var(--neu-dark) / calc(var(--neu-intensity) * 0.7)),
       inset -4px -4px 8px hsl(var(--neu-light) / calc(var(--neu-intensity) * 0.9)),
       inset 0 1px 3px hsl(var(--neu-dark) / 0.2);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / 0.2);
+    border: 1px solid hsl(var(--neon-primary) / 0.15);
     transition: border-color 0.3s ease;
   }
 
@@ -415,7 +504,7 @@
     inset: 0;
     border-radius: inherit;
     padding: var(--neon-border-width);
-    background: linear-gradient(135deg, hsl(var(--neon-primary)), hsl(var(--neon-cyan)), hsl(var(--neon-accent)));
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65%), hsl(185 100% 55%), hsl(280 90% 65%));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -423,6 +512,7 @@
     opacity: var(--neon-opacity);
     transition: opacity 0.3s ease;
     pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
   .neon-border-gradient:hover::before {
     opacity: var(--neon-opacity-hover);
@@ -430,12 +520,27 @@
 
   /* ═══ Product Card Shadow — Deep Machined ═══ */
   .shadow-product {
+    position: relative;
     box-shadow:
       8px 8px 16px hsl(var(--neu-dark) / var(--neu-intensity)),
       -8px -8px 16px hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 0 hsl(var(--neu-light) / 0.3);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / calc(var(--neon-opacity) * 0.3));
+    border: none;
     transition: all 0.3s ease;
+  }
+  .shadow-product::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.35), hsl(185 100% 55% / 0.35), hsl(280 90% 65% / 0.35));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
 
   .shadow-product-hover {
@@ -443,7 +548,6 @@
       10px 10px 20px hsl(var(--neu-dark) / var(--neu-intensity)),
       -10px -10px 20px hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 2px 0 hsl(var(--neu-light) / 0.4);
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
     transform: translateY(-2px);
   }
 
@@ -475,6 +579,17 @@
     background: hsl(var(--admin-card));
     box-shadow: none;
     border: 1px solid hsl(var(--admin-card-border));
+  }
+  /* Kill animated ::before borders in admin */
+  .admin-dark .neu-flat::before,
+  .admin-dark .neu-raised::before,
+  .admin-dark .neu-pressed::before,
+  .admin-dark .neu-concave::before,
+  .admin-dark .neu-convex::before,
+  .admin-dark .neu-btn::before,
+  .admin-dark .shadow-product::before,
+  .admin-dark .neon-border-gradient::before {
+    display: none;
   }
   .admin-dark .neu-flat:hover,
   .admin-dark .neu-raised:hover,

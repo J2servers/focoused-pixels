@@ -1,21 +1,20 @@
-﻿/**
+/**
  * Index - Homepage com tema Neumorphism
+ * Performance-optimized with lazy loading for below-fold components
  */
 
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { 
   MobileHeader, 
   MobileBottomNav, 
-  MobileHeroCarousel, 
   MobileCategoryGrid, 
   MobileProductSection,
   MobileFloatingContact 
 } from '@/components/mobile';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
-import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { CookieBanner } from '@/components/CookieBanner';
-import { MiniCart, PromoPopupManager } from '@/components/storefront';
+import { MiniCart } from '@/components/storefront';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight } from 'lucide-react';
@@ -23,19 +22,23 @@ import { Link } from 'react-router-dom';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ProductCardOptimized } from '@/components/conversion/ProductCardOptimized';
-import { DynamicSocialProof } from '@/components/conversion/DynamicSocialProof';
 import {
   TrustBar,
   HeroConversion,
-  SocialProofSection,
   BestSellersSection,
   GuaranteesSection,
   HowItWorksSection,
   WeeklyUrgencySection,
-  VideoStoriesCarousel,
 } from '@/components/conversion';
-
 import { RainbowCategoryStrip } from '@/components/conversion/RainbowCategoryStrip';
+
+// Lazy load below-fold heavy components
+const SocialProofSection = lazy(() => import('@/components/conversion/SocialProofSection').then(m => ({ default: m.SocialProofSection })));
+const VideoStoriesCarousel = lazy(() => import('@/components/conversion/VideoStoriesCarousel').then(m => ({ default: m.VideoStoriesCarousel })));
+const MobileHeroCarousel = lazy(() => import('@/components/mobile/MobileHeroCarousel').then(m => ({ default: m.MobileHeroCarousel })));
+const AIChatWidget = lazy(() => import('@/components/chat/AIChatWidget').then(m => ({ default: m.AIChatWidget })));
+const DynamicSocialProof = lazy(() => import('@/components/conversion/DynamicSocialProof').then(m => ({ default: m.DynamicSocialProof })));
+const PromoPopupManager = lazy(() => import('@/components/storefront/PromoPopup').then(m => ({ default: m.PromoPopupManager })));
 
 /* ── Category product section ── */
 function CategoryProductsSection({ 
@@ -59,7 +62,7 @@ function CategoryProductsSection({
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5 stagger-children">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
           {products.map((product, idx) => (
             <ProductCardOptimized 
               key={product.id}
@@ -98,9 +101,10 @@ const Index = () => {
       <div className="min-h-screen flex flex-col bg-background pb-16">
         <MobileHeader />
         <main className="flex-1">
-          <MobileHeroCarousel />
+          <Suspense fallback={<Skeleton className="aspect-[16/9] mx-4 mt-2 rounded-2xl" />}>
+            <MobileHeroCarousel />
+          </Suspense>
           
-          {/* Categories - Square neumorphic cards for mobile */}
           <MobileCategoryGrid />
 
           {productsLoading ? (
@@ -155,21 +159,15 @@ const Index = () => {
       <NavigationBar />
 
       <main className="flex-1">
-        {/* Hero full-width */}
         <HeroConversion />
 
-        {/* Categories - Rainbow Glass Neumorphism */}
         {!categoriesLoading && (
           <RainbowCategoryStrip categories={parentCategories} />
         )}
 
-        {/* Best Sellers */}
         <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
-
-        {/* Urgência honesta */}
         <WeeklyUrgencySection />
 
-        {/* Category Sections */}
         {productsLoading || categoriesLoading ? (
           <section className="py-12">
             <div className="container mx-auto px-4">
@@ -196,16 +194,15 @@ const Index = () => {
           })
         )}
 
-        {/* Social Proof */}
-        <SocialProofSection />
+        <Suspense fallback={null}>
+          <SocialProofSection />
+        </Suspense>
 
-        {/* Video Stories */}
-        <VideoStoriesCarousel />
+        <Suspense fallback={null}>
+          <VideoStoriesCarousel />
+        </Suspense>
 
-        {/* Guarantees */}
         <GuaranteesSection />
-
-        {/* Como funciona - after all products and guarantees */}
         <HowItWorksSection />
 
         {!productsLoading && products.length === 0 && (
@@ -223,14 +220,17 @@ const Index = () => {
 
       <DynamicFooter />
       <WhatsAppButton />
-      <AIChatWidget />
+      <Suspense fallback={null}>
+        <AIChatWidget />
+      </Suspense>
       <CookieBanner />
       <MiniCart open={miniCartOpen} onOpenChange={setMiniCartOpen} />
-      <PromoPopupManager />
-      <DynamicSocialProof />
+      <Suspense fallback={null}>
+        <PromoPopupManager />
+        <DynamicSocialProof />
+      </Suspense>
     </div>
   );
 };
 
 export default Index;
-
