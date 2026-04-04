@@ -190,7 +190,25 @@ export function ProductCardOptimized({
             </p>
           </div>
 
+          {/* Stock bar visual */}
+          {product.inStock && product.stock !== undefined && product.stock <= 20 && (
+            <div className="px-3.5 sm:px-4 pb-1">
+              <div className="flex items-center gap-1.5">
+                <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-destructive to-orange-400 transition-all"
+                    style={{ width: `${Math.max(5, Math.min(100, (product.stock / 20) * 100))}%` }}
+                  />
+                </div>
+                <span className="text-[9px] font-bold text-destructive whitespace-nowrap">
+                  {product.stock <= 5 ? '🔥' : ''} {product.stock}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* CTA */}
+          <div className="px-3.5 sm:px-4 pb-3.5 sm:pb-4">
           {activePromotion?.end_date && (
             <div className="mt-2 mb-1">
               <PromotionCountdown endDate={activePromotion.end_date} />
