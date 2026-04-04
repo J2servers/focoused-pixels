@@ -140,7 +140,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }
 
