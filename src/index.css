@@ -223,6 +223,12 @@
   to { --border-angle: 360deg; }
 }
 
+/* Fallback for browsers that don't support @property (mobile Safari etc.) */
+@keyframes borderRotateFallback {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @layer utilities {
 
   .text-gradient-purple {
