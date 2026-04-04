@@ -20,7 +20,8 @@ import {
 import { toast } from 'sonner';
 import {
   Plus, Save, Zap, X, Download, Upload, AlertTriangle,
-  Undo2, Redo2, Info, Loader2, TestTube2, Maximize2,
+  Undo2, Redo2, Loader2, TestTube2, Maximize2, Map, Settings,
+  Workflow, Sparkles,
 } from 'lucide-react';
 
 import TriggerNode from './nodes/TriggerNode';
@@ -58,7 +59,7 @@ const EDGE_DEFAULTS = {
   type: 'smoothstep' as const,
   animated: true,
   markerEnd: { type: MarkerType.ArrowClosed },
-  style: { strokeWidth: 2, stroke: 'hsl(var(--primary) / 0.5)' },
+  style: { strokeWidth: 2, stroke: 'hsl(270 60% 60% / 0.4)' },
 };
 
 const delayToMinutes = (value: number, unit: string) => {
@@ -124,7 +125,6 @@ function WorkflowBuilderInner() {
     setEdges(next.edges);
   }, [redoStack, nodes, edges, setNodes, setEdges]);
 
-  // Save handler
   const handleSave = useCallback(async () => {
     if (!currentWorkflow) return toast.error('Nenhum workflow aberto');
     const issues = validateWorkflow(nodes, edges, currentWorkflow, emailTemplates, whatsTemplates);
@@ -145,7 +145,6 @@ function WorkflowBuilderInner() {
     }
   }, [currentWorkflow, nodes, edges, hookSave, emailTemplates, whatsTemplates]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
@@ -164,7 +163,6 @@ function WorkflowBuilderInner() {
   const onNodeClick = useCallback((_: any, node: Node) => setSelectedNode(node), []);
   const onPaneClick = useCallback(() => setSelectedNode(null), []);
 
-  /* ─── Add node ─── */
   const addNode = useCallback((type: string) => {
     pushUndo();
     const newId = `step-${uid()}`;
@@ -186,7 +184,6 @@ function WorkflowBuilderInner() {
     }
   }, [nodes, setNodes, setEdges, pushUndo]);
 
-  /* ─── New workflow ─── */
   const newWorkflow = useCallback((triggerEvent = 'abandoned_cart') => {
     setNodes([{
       id: 'trigger-0', type: 'trigger',
@@ -202,7 +199,6 @@ function WorkflowBuilderInner() {
     setRedoStack([]);
   }, [setNodes, setEdges]);
 
-  /* ─── Load preset ─── */
   const loadPreset = useCallback((preset: PresetDef) => {
     const steps = preset.steps.map((s: any) => ({
       ...s, id: uid(), template_id: '',
@@ -219,7 +215,6 @@ function WorkflowBuilderInner() {
     setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 100);
   }, [setNodes, setEdges, fitView]);
 
-  /* ─── Load saved ─── */
   const loadWorkflow = useCallback((wf: WorkflowMeta & { steps: any[] }) => {
     const { nodes: n, edges: e } = stepsToFlow(wf.steps || [], wf.trigger_event);
     setNodes(n);
@@ -232,7 +227,6 @@ function WorkflowBuilderInner() {
     setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 100);
   }, [setNodes, setEdges, fitView]);
 
-  /* ─── Delete confirmation ─── */
   const confirmDelete = useCallback(async () => {
     if (!deleteConfirmId) return;
     await hookDelete(deleteConfirmId);
@@ -244,7 +238,6 @@ function WorkflowBuilderInner() {
     setDeleteConfirmId(null);
   }, [deleteConfirmId, currentWorkflow, setNodes, setEdges, hookDelete]);
 
-  /* ─── Test ─── */
   const handleTest = useCallback(async () => {
     if (!currentWorkflow) return;
     setTestingWorkflow(true);
@@ -253,7 +246,6 @@ function WorkflowBuilderInner() {
     setTestingWorkflow(false);
   }, [currentWorkflow, hookTest]);
 
-  /* ─── Update selected node ─── */
   const updateSelectedNode = useCallback((patch: Record<string, any>) => {
     if (!selectedNode) return;
     pushUndo();
@@ -275,7 +267,6 @@ function WorkflowBuilderInner() {
     setSelectedNode(null);
   }, [selectedNode, edges, setNodes, setEdges, pushUndo]);
 
-  /* ─── Auto-layout ─── */
   const autoLayout = useCallback(() => {
     pushUndo();
     const steps = flowToSteps(nodes, edges);
@@ -297,7 +288,6 @@ function WorkflowBuilderInner() {
     setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 50);
   }, [nodes, edges, setNodes, setEdges, fitView, pushUndo]);
 
-  /* ─── Export/Import ─── */
   const exportWorkflow = useCallback(() => {
     if (!currentWorkflow) return;
     const steps = flowToSteps(nodes, edges);
@@ -327,7 +317,7 @@ function WorkflowBuilderInner() {
 
   return (
     <TooltipProvider>
-      <div className="flex rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] overflow-hidden" style={{ height: 'calc(100vh - 200px)', minHeight: 550 }}>
+      <div className="flex rounded-2xl border border-white/[0.06] bg-[hsl(var(--admin-card))] overflow-hidden shadow-2xl shadow-black/20" style={{ height: 'calc(100vh - 180px)', minHeight: 600 }}>
         {/* ─── Sidebar ─── */}
         <WorkflowSidebar
           tab={sidebarTab}
@@ -347,29 +337,51 @@ function WorkflowBuilderInner() {
           metrics={metrics}
         />
 
-        {/* ─── Canvas ─── */}
+        {/* ─── Canvas Area ─── */}
         <div className="flex-1 relative" ref={reactFlowWrapper}>
           {!currentWorkflow ? (
-            /* Empty State */
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center max-w-md px-6">
-                <div className="relative mx-auto w-24 h-24 mb-8">
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[hsl(var(--admin-accent-purple)/0.3)] to-[hsl(var(--admin-accent-blue)/0.3)] animate-pulse" />
-                  <div className="absolute inset-3 rounded-xl bg-[hsl(var(--admin-card))] flex items-center justify-center">
-                    <Zap className="h-10 w-10 text-[hsl(var(--admin-accent-purple))]" />
+            /* ── Empty State ── */
+            <div className="flex items-center justify-center h-full bg-gradient-to-br from-[hsl(var(--admin-bg))] via-[hsl(var(--admin-bg))] to-violet-950/10">
+              {/* Subtle grid pattern */}
+              <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+              
+              <div className="relative text-center max-w-lg px-8">
+                {/* Icon */}
+                <div className="relative mx-auto w-28 h-28 mb-10">
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-violet-500/20 to-blue-500/20 blur-xl animate-pulse" />
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-violet-500/10 to-blue-500/10 border border-violet-500/20" />
+                  <div className="absolute inset-4 rounded-2xl bg-[hsl(var(--admin-card))] flex items-center justify-center border border-white/[0.06]">
+                    <Workflow className="h-12 w-12 text-violet-400" />
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Automação de Workflows</h3>
-                <p className="text-sm text-[hsl(var(--admin-text-muted))] mb-8 leading-relaxed">
-                  Automatize comunicações com seus clientes usando fluxos visuais. Selecione um modelo pronto ou crie do zero.
+
+                <h2 className="text-2xl font-bold text-white mb-3 tracking-tight">Centro de Automação</h2>
+                <p className="text-sm text-white/40 mb-10 leading-relaxed max-w-sm mx-auto">
+                  Automatize comunicações com seus clientes usando fluxos visuais inteligentes. Selecione um modelo pronto ou crie do zero.
                 </p>
-                <div className="flex gap-3 justify-center flex-wrap">
-                  <Button onClick={() => newWorkflow()} className="gap-2 h-10 px-6">
+
+                <div className="flex gap-4 justify-center flex-wrap">
+                  <Button onClick={() => newWorkflow()} size="lg" className="gap-2.5 h-12 px-8 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 shadow-lg shadow-violet-500/20 text-sm font-semibold">
                     <Plus className="h-4 w-4" />Novo Workflow
                   </Button>
-                  <Button variant="outline" onClick={() => setShowImportDialog(true)} className="gap-2 h-10">
+                  <Button variant="outline" size="lg" onClick={() => setShowImportDialog(true)} className="gap-2.5 h-12 px-8 rounded-xl border-white/[0.08] hover:bg-white/[0.04] text-sm font-semibold">
                     <Upload className="h-4 w-4" />Importar JSON
                   </Button>
+                </div>
+
+                {/* Quick tips */}
+                <div className="mt-12 grid grid-cols-3 gap-4 max-w-md mx-auto">
+                  {[
+                    { icon: Sparkles, label: 'Modelos prontos', desc: 'Use a aba Modelos' },
+                    { icon: Zap, label: 'Atalhos', desc: 'Ctrl+S, Ctrl+Z' },
+                    { icon: TestTube2, label: 'Teste seguro', desc: 'Simule antes de ativar' },
+                  ].map(tip => (
+                    <div key={tip.label} className="text-center">
+                      <tip.icon className="h-5 w-5 text-white/15 mx-auto mb-2" />
+                      <p className="text-[10px] font-semibold text-white/30">{tip.label}</p>
+                      <p className="text-[9px] text-white/15">{tip.desc}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -383,69 +395,50 @@ function WorkflowBuilderInner() {
               className="bg-[hsl(var(--admin-bg))]"
               proOptions={{ hideAttribution: true }}
             >
-              <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="hsl(var(--admin-card-border) / 0.3)" />
-              <Controls className="!bg-[hsl(var(--admin-card))] !border-[hsl(var(--admin-card-border))] !shadow-lg [&>button]:!bg-[hsl(var(--admin-card))] [&>button]:!border-[hsl(var(--admin-card-border))] [&>button]:!text-white [&>button:hover]:!bg-[hsl(var(--admin-sidebar-hover))]" />
+              <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="hsl(0 0% 100% / 0.04)" />
+              <Controls className="!bg-[hsl(var(--admin-card))] !border-white/[0.06] !shadow-xl !rounded-xl [&>button]:!bg-[hsl(var(--admin-card))] [&>button]:!border-white/[0.06] [&>button]:!text-white/50 [&>button:hover]:!bg-white/[0.06] [&>button:hover]:!text-white" />
 
               {showMiniMap && (
                 <MiniMap
-                  nodeStrokeColor="hsl(var(--admin-card-border))"
-                  nodeColor="hsl(var(--admin-accent-purple) / 0.3)"
-                  maskColor="hsl(var(--admin-bg) / 0.8)"
-                  className="!bg-[hsl(var(--admin-card))] !border-[hsl(var(--admin-card-border))]"
+                  nodeStrokeColor="hsl(0 0% 100% / 0.1)"
+                  nodeColor="hsl(270 60% 60% / 0.2)"
+                  maskColor="hsl(var(--admin-bg) / 0.85)"
+                  className="!bg-[hsl(var(--admin-card))] !border-white/[0.06] !rounded-xl"
                 />
               )}
 
-              {/* Top-left: Workflow name + meta */}
-              <Panel position="top-left" className="flex items-center gap-2 bg-[hsl(var(--admin-card)/0.95)] backdrop-blur border border-[hsl(var(--admin-card-border))] rounded-xl px-3 py-2 shadow-xl">
+              {/* ── Top-left: Name & Status ── */}
+              <Panel position="top-left" className="flex items-center gap-2.5 bg-[hsl(var(--admin-card)/0.95)] backdrop-blur-xl border border-white/[0.08] rounded-xl px-4 py-2.5 shadow-2xl shadow-black/20">
+                <div className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
                 <Input
                   value={currentWorkflow.name}
                   onChange={e => { setCurrentWorkflow({ ...currentWorkflow, name: e.target.value }); setHasUnsavedChanges(true); }}
                   placeholder="Nome do workflow..."
-                  className="h-8 w-56 text-sm font-semibold bg-transparent border-none focus-visible:ring-0 px-2"
+                  className="h-8 w-56 text-sm font-bold bg-transparent border-none focus-visible:ring-0 px-1 text-white placeholder:text-white/20"
                 />
-                {hasUnsavedChanges && <Badge className="text-[8px] h-4 bg-yellow-500/10 text-yellow-400 border-yellow-700">Alterado</Badge>}
-                {currentWorkflow.is_active && <Badge className="text-[8px] h-4 bg-green-500/10 text-green-400 border-green-700">Ativo</Badge>}
+                {hasUnsavedChanges && <Badge className="text-[8px] h-[18px] bg-amber-500/10 text-amber-400 border-amber-500/20 shrink-0">Alterado</Badge>}
+                {currentWorkflow.is_active && <Badge className="text-[8px] h-[18px] bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shrink-0">Ativo</Badge>}
               </Panel>
 
-              {/* Top-right: Actions */}
-              <Panel position="top-right" className="flex items-center gap-1 bg-[hsl(var(--admin-card)/0.95)] backdrop-blur border border-[hsl(var(--admin-card-border))] rounded-xl px-2 py-1.5 shadow-xl">
-                <Tooltip><TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={undo} disabled={undoStack.length === 0}><Undo2 className="h-3.5 w-3.5" /></Button>
-                </TooltipTrigger><TooltipContent>Desfazer (Ctrl+Z)</TooltipContent></Tooltip>
+              {/* ── Top-right: Toolbar ── */}
+              <Panel position="top-right" className="flex items-center gap-1 bg-[hsl(var(--admin-card)/0.95)] backdrop-blur-xl border border-white/[0.08] rounded-xl px-2.5 py-1.5 shadow-2xl shadow-black/20">
+                <ToolbarBtn icon={Undo2} tooltip="Desfazer (Ctrl+Z)" onClick={undo} disabled={undoStack.length === 0} />
+                <ToolbarBtn icon={Redo2} tooltip="Refazer (Ctrl+Y)" onClick={redo} disabled={redoStack.length === 0} />
+                <ToolbarDivider />
+                <ToolbarBtn icon={Maximize2} tooltip="Auto-layout" onClick={autoLayout} />
+                <ToolbarBtn icon={Map} tooltip="MiniMap" onClick={() => setShowMiniMap(!showMiniMap)} active={showMiniMap} />
+                <ToolbarBtn icon={Settings} tooltip="Configurações" onClick={() => setShowDescDialog(true)} />
+                <ToolbarDivider />
+                <ToolbarBtn icon={Download} tooltip="Exportar JSON" onClick={exportWorkflow} />
+                <ToolbarBtn
+                  icon={testingWorkflow ? Loader2 : TestTube2}
+                  tooltip="Testar workflow"
+                  onClick={handleTest}
+                  disabled={testingWorkflow || !currentWorkflow?.id}
+                  spin={testingWorkflow}
+                />
 
-                <Tooltip><TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={redo} disabled={redoStack.length === 0}><Redo2 className="h-3.5 w-3.5" /></Button>
-                </TooltipTrigger><TooltipContent>Refazer (Ctrl+Y)</TooltipContent></Tooltip>
-
-                <div className="w-px h-5 bg-[hsl(var(--admin-card-border)/0.5)] mx-0.5" />
-
-                <Tooltip><TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={autoLayout}><Maximize2 className="h-3.5 w-3.5" /></Button>
-                </TooltipTrigger><TooltipContent>Auto-layout</TooltipContent></Tooltip>
-
-                <Tooltip><TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setShowMiniMap(!showMiniMap)}>
-                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><rect x="7" y="7" width="3" height="3" /><rect x="14" y="14" width="3" height="3" /></svg>
-                  </Button>
-                </TooltipTrigger><TooltipContent>MiniMap</TooltipContent></Tooltip>
-
-                <Tooltip><TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setShowDescDialog(true)}><Info className="h-3.5 w-3.5" /></Button>
-                </TooltipTrigger><TooltipContent>Configurações</TooltipContent></Tooltip>
-
-                <div className="w-px h-5 bg-[hsl(var(--admin-card-border)/0.5)] mx-0.5" />
-
-                <Tooltip><TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={exportWorkflow}><Download className="h-3.5 w-3.5" /></Button>
-                </TooltipTrigger><TooltipContent>Exportar JSON</TooltipContent></Tooltip>
-
-                <Tooltip><TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleTest} disabled={testingWorkflow || !currentWorkflow?.id}>
-                    {testingWorkflow ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <TestTube2 className="h-3.5 w-3.5" />}
-                  </Button>
-                </TooltipTrigger><TooltipContent>Testar workflow</TooltipContent></Tooltip>
-
-                <Button size="sm" onClick={handleSave} disabled={saving} className="h-7 gap-1.5 ml-1 text-[11px]">
+                <Button size="sm" onClick={handleSave} disabled={saving} className="h-8 gap-2 ml-1.5 text-[11px] font-semibold rounded-lg bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 shadow-lg shadow-violet-500/15 px-4">
                   {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
                   Salvar
                 </Button>
@@ -470,7 +463,7 @@ function WorkflowBuilderInner() {
 
         {/* ─── Dialogs ─── */}
         <AlertDialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
-          <AlertDialogContent>
+          <AlertDialogContent className="border-white/[0.08]">
             <AlertDialogHeader>
               <AlertDialogTitle>Excluir workflow?</AlertDialogTitle>
               <AlertDialogDescription>Esta ação não pode ser desfeita. Todas as execuções pendentes serão canceladas.</AlertDialogDescription>
@@ -483,14 +476,14 @@ function WorkflowBuilderInner() {
         </AlertDialog>
 
         <Dialog open={showValidation} onOpenChange={setShowValidation}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md border-white/[0.08]">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-yellow-400" />Validação</DialogTitle>
+              <DialogTitle className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-amber-400" />Validação</DialogTitle>
               <DialogDescription>Corrija os problemas antes de salvar.</DialogDescription>
             </DialogHeader>
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {validationIssues.map((issue, i) => (
-                <div key={i} className={`flex items-start gap-2 p-2 rounded-lg text-xs ${issue.type === 'error' ? 'bg-red-500/10 text-red-400' : 'bg-yellow-500/10 text-yellow-400'}`}>
+                <div key={i} className={`flex items-start gap-2.5 p-3 rounded-xl text-xs ${issue.type === 'error' ? 'bg-red-500/5 text-red-400 border border-red-500/10' : 'bg-amber-500/5 text-amber-400 border border-amber-500/10'}`}>
                   {issue.type === 'error' ? <X className="h-4 w-4 shrink-0 mt-0.5" /> : <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />}
                   <span>{issue.message}</span>
                 </div>
@@ -501,22 +494,25 @@ function WorkflowBuilderInner() {
         </Dialog>
 
         <Dialog open={showDescDialog} onOpenChange={setShowDescDialog}>
-          <DialogContent className="max-w-md">
-            <DialogHeader><DialogTitle>Configurações do Workflow</DialogTitle></DialogHeader>
-            <div className="space-y-4">
+          <DialogContent className="max-w-md border-white/[0.08]">
+            <DialogHeader><DialogTitle className="flex items-center gap-2"><Settings className="h-5 w-5 text-violet-400" />Configurações do Workflow</DialogTitle></DialogHeader>
+            <div className="space-y-5">
               <div className="space-y-2">
-                <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Descrição</label>
+                <label className="text-xs font-semibold text-white/60">Descrição</label>
                 <Textarea
                   value={currentWorkflow?.description || ''}
                   onChange={e => currentWorkflow && setCurrentWorkflow({ ...currentWorkflow, description: e.target.value })}
                   placeholder="Descreva o objetivo deste workflow..." rows={3}
+                  className="border-white/[0.06]"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-medium text-[hsl(var(--admin-text-muted))]">Delay inicial (minutos)</label>
+                <label className="text-xs font-semibold text-white/60">Delay inicial (minutos)</label>
                 <Input type="number" min={0} value={currentWorkflow?.trigger_delay_minutes || 0}
-                  onChange={e => currentWorkflow && setCurrentWorkflow({ ...currentWorkflow, trigger_delay_minutes: parseInt(e.target.value) || 0 })} />
-                <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">Tempo de espera antes de iniciar o primeiro passo.</p>
+                  onChange={e => currentWorkflow && setCurrentWorkflow({ ...currentWorkflow, trigger_delay_minutes: parseInt(e.target.value) || 0 })}
+                  className="border-white/[0.06]"
+                />
+                <p className="text-[10px] text-white/30">Tempo de espera antes de iniciar o primeiro passo.</p>
               </div>
             </div>
             <DialogFooter><Button onClick={() => setShowDescDialog(false)}>Fechar</Button></DialogFooter>
@@ -524,22 +520,44 @@ function WorkflowBuilderInner() {
         </Dialog>
 
         <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg border-white/[0.08]">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2"><Upload className="h-5 w-5" />Importar Workflow</DialogTitle>
+              <DialogTitle className="flex items-center gap-2"><Upload className="h-5 w-5 text-violet-400" />Importar Workflow</DialogTitle>
               <DialogDescription>Cole o JSON de um workflow exportado.</DialogDescription>
             </DialogHeader>
             <Textarea value={importJson} onChange={e => setImportJson(e.target.value)}
-              placeholder='{"name": "...", "trigger_event": "...", "steps": [...]}' rows={8} className="font-mono text-xs" />
+              placeholder='{"name": "...", "trigger_event": "...", "steps": [...]}' rows={8} className="font-mono text-xs border-white/[0.06]" />
             <DialogFooter>
               <Button variant="outline" onClick={() => { setShowImportDialog(false); setImportJson(''); }}>Cancelar</Button>
-              <Button onClick={importWorkflow} disabled={!importJson.trim()}>Importar</Button>
+              <Button onClick={importWorkflow} disabled={!importJson.trim()} className="bg-gradient-to-r from-violet-600 to-violet-500">Importar</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
     </TooltipProvider>
   );
+}
+
+/* ─── Toolbar helpers ─── */
+function ToolbarBtn({ icon: Icon, tooltip, onClick, disabled, active, spin }: { icon: React.ElementType; tooltip: string; onClick: () => void; disabled?: boolean; active?: boolean; spin?: boolean }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          size="icon" variant="ghost"
+          className={`h-8 w-8 rounded-lg ${active ? 'bg-violet-500/15 text-violet-400' : 'text-white/40 hover:text-white hover:bg-white/[0.06]'} disabled:opacity-20`}
+          onClick={onClick} disabled={disabled}
+        >
+          <Icon className={`h-3.5 w-3.5 ${spin ? 'animate-spin' : ''}`} />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent className="text-xs">{tooltip}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+function ToolbarDivider() {
+  return <div className="w-px h-5 bg-white/[0.06] mx-0.5" />;
 }
 
 export default function VisualWorkflowBuilder() {
