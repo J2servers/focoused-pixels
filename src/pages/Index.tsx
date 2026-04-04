@@ -39,6 +39,7 @@ const MobileHeroCarousel = lazy(() => import('@/components/mobile/MobileHeroCaro
 const AIChatWidget = lazy(() => import('@/components/chat/AIChatWidget').then(m => ({ default: m.AIChatWidget })));
 const DynamicSocialProof = lazy(() => import('@/components/conversion/DynamicSocialProof').then(m => ({ default: m.DynamicSocialProof })));
 const PromoPopupManager = lazy(() => import('@/components/storefront/PromoPopup').then(m => ({ default: m.PromoPopupManager })));
+const ExitIntentPopup = lazy(() => import('@/components/conversion/ExitIntentPopup').then(m => ({ default: m.ExitIntentPopup })));
 
 /* ── Category product section ── */
 function CategoryProductsSection({ 
