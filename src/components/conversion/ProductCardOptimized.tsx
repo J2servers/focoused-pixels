@@ -103,7 +103,7 @@ export function ProductCardOptimized({
   return (
     <>
       <div className="group block h-full rounded-2xl">
-        <div className="relative h-full rounded-2xl p-[1.5px] bg-[conic-gradient(from_var(--border-angle,0deg),hsl(280_90%_70%),hsl(185_100%_65%),hsl(280_90%_70%))] animate-[borderRotate_1.5s_linear_infinite] card-lift">
+        <div className="relative h-full rounded-2xl p-[1.5px] neu-raised card-lift">
           <div className="flex h-full flex-col rounded-[calc(theme(borderRadius.2xl)-1.5px)] bg-[hsl(var(--background))] overflow-hidden">
             {/* Image - clickable for QuickView */}
             <div
