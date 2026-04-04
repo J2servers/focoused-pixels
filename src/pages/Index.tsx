@@ -89,7 +89,7 @@ const Index = () => {
     return products.filter(p => {
       const productCategory = categories.find(c => c.slug === p.category);
       return productCategory && allCategoryIds.includes(productCategory.id);
-    }).slice(0, 4);
+    }).slice(0, 8);
   };
 
   // ═══ Mobile ═══
