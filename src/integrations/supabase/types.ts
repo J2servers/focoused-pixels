@@ -333,6 +333,11 @@ export type Database = {
           ai_assistant_enabled: boolean | null
           ai_assistant_greeting: string | null
           ai_assistant_name: string | null
+          ai_external_api_key: string | null
+          ai_external_api_url: string | null
+          ai_external_enabled: boolean | null
+          ai_external_model: string | null
+          ai_external_provider: string | null
           asaas_enabled: boolean | null
           asaas_sandbox: boolean | null
           boleto_extra_days: number | null
@@ -436,6 +441,11 @@ export type Database = {
           ai_assistant_enabled?: boolean | null
           ai_assistant_greeting?: string | null
           ai_assistant_name?: string | null
+          ai_external_api_key?: string | null
+          ai_external_api_url?: string | null
+          ai_external_enabled?: boolean | null
+          ai_external_model?: string | null
+          ai_external_provider?: string | null
           asaas_enabled?: boolean | null
           asaas_sandbox?: boolean | null
           boleto_extra_days?: number | null
@@ -539,6 +549,11 @@ export type Database = {
           ai_assistant_enabled?: boolean | null
           ai_assistant_greeting?: string | null
           ai_assistant_name?: string | null
+          ai_external_api_key?: string | null
+          ai_external_api_url?: string | null
+          ai_external_enabled?: boolean | null
+          ai_external_model?: string | null
+          ai_external_provider?: string | null
           asaas_enabled?: boolean | null
           asaas_sandbox?: boolean | null
           boleto_extra_days?: number | null
