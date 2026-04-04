@@ -99,7 +99,12 @@ const Index = () => {
         <MobileHeader />
         <main className="flex-1">
           <MobileHeroCarousel />
-          <MobileCategoryGrid />
+          
+          {/* Rainbow Categories - same as desktop */}
+          {!categoriesLoading && (
+            <RainbowCategoryStrip categories={parentCategories} />
+          )}
+
           {productsLoading ? (
             <div className="px-4 py-4">
               <Skeleton className="h-6 w-32 mb-3 rounded-xl" />
@@ -135,6 +140,7 @@ const Index = () => {
           <div className="px-4 py-2">
             <GuaranteesSection />
           </div>
+          <HowItWorksSection />
         </main>
         <MobileBottomNav />
         <MobileFloatingContact />
@@ -158,9 +164,6 @@ const Index = () => {
         {!categoriesLoading && (
           <RainbowCategoryStrip categories={parentCategories} />
         )}
-
-        {/* Como funciona */}
-        <HowItWorksSection />
 
         {/* Best Sellers */}
         <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
@@ -203,6 +206,9 @@ const Index = () => {
 
         {/* Guarantees */}
         <GuaranteesSection />
+
+        {/* Como funciona - after all products and guarantees */}
+        <HowItWorksSection />
 
         {!productsLoading && products.length === 0 && (
           <section className="py-16">
