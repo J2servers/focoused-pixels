@@ -154,9 +154,9 @@ const Index = () => {
         {/* Hero full-width */}
         <HeroConversion />
 
-        {/* Categories Showcase */}
+        {/* Categories - Rainbow Glass Neumorphism */}
         {!categoriesLoading && (
-          <CategoriesShowcase categories={parentCategories} />
+          <RainbowCategoryStrip categories={parentCategories} />
         )}
 
         {/* Como funciona */}
