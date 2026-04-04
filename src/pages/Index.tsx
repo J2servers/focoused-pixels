@@ -148,6 +148,9 @@ const Index = () => {
         <MobileBottomNav />
         <MobileFloatingContact />
         <CookieBanner />
+        <Suspense fallback={null}>
+          <AIChatWidget />
+        </Suspense>
       </div>
     );
   }

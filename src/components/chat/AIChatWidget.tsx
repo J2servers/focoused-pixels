@@ -245,7 +245,7 @@ export function AIChatWidget() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleOpenChat}
-            className="fixed bottom-24 right-6 z-50 flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-full shadow-lg"
+            className="fixed bottom-28 sm:bottom-24 right-4 sm:right-6 z-[60] flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-full shadow-lg animate-bounce-slow"
             aria-label="Abrir assistente virtual"
           >
             <Sparkles className="h-5 w-5" />
@@ -262,7 +262,7 @@ export function AIChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] h-[550px] max-h-[calc(100vh-6rem)] bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-20 sm:bottom-6 right-2 sm:right-6 z-[60] w-[380px] max-w-[calc(100vw-1rem)] h-[70vh] sm:h-[550px] max-h-[calc(100vh-6rem)] bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-primary text-primary-foreground px-4 py-3 flex items-center justify-between">
