@@ -93,6 +93,12 @@ export interface CompanyInfo {
   // Integrations
   whatsapp_message_template: string | null;
   why_choose_us_config: Record<string, any> | null;
+  // External AI Fallback
+  ai_external_enabled: boolean | null;
+  ai_external_provider: string | null;
+  ai_external_api_url: string | null;
+  ai_external_api_key: string | null;
+  ai_external_model: string | null;
   enable_reviews_auto_approve: boolean | null;
   reviews_min_rating_to_show: number | null;
   // Payment gateway flags kept for backward compatibility (credentials in payment_credentials table)
