@@ -9,12 +9,13 @@ import { useSendTestEmail, useTestEmailConnection } from '@/hooks/useEmailGatewa
 import { useTestMercadoPago, useTestEfiBank, useTestStripe } from '@/hooks/usePaymentGateway';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { CreditCard, Loader2, Mail, Save, Settings2, ShieldCheck, Store, type LucideIcon } from 'lucide-react';
+import { Bot, CreditCard, Loader2, Mail, Save, Settings2, ShieldCheck, Store, type LucideIcon } from 'lucide-react';
 import { SettingsGeneralSection } from '@/components/admin/settings/SettingsGeneralSection';
 import { SettingsPaymentsSection } from '@/components/admin/settings/SettingsPaymentsSection';
 import { SettingsEmailSection } from '@/components/admin/settings/SettingsEmailSection';
 import { SettingsSecuritySection } from '@/components/admin/settings/SettingsSecuritySection';
 import { SettingsOperationsSection } from '@/components/admin/settings/SettingsOperationsSection';
+import { SettingsAISection } from '@/components/admin/settings/SettingsAISection';
 import { type SettingsTab } from '@/components/admin/settings/SettingsShared';
 
 /* ─── Tab Config ─── */
