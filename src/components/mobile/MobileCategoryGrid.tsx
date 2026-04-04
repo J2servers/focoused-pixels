@@ -72,31 +72,59 @@ export function MobileCategoryGrid() {
                   to={`/categoria/${cat.slug}`}
                   className="block group h-full active:scale-[0.98] transition-all duration-200"
                 >
-                  <div className="relative rounded-2xl p-[1.5px] mobile-rotating-border h-full">
-                    <div className="rounded-[calc(theme(borderRadius.2xl)-1.5px)] neu-raised-surface h-full flex flex-col overflow-hidden">
-                      {/* Image */}
-                      <div className="aspect-square relative overflow-hidden flex-shrink-0 bg-muted">
-                        {cat.image_url ? (
-                          <img
-                            src={cat.image_url}
-                            alt={cat.name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-2xl">📦</span>
-                          </div>
-                        )}
-                      </div>
+                  <div
+                    className="relative rounded-2xl overflow-hidden h-full flex flex-col"
+                    style={{
+                      boxShadow: `
+                        4px 4px 10px hsl(var(--neu-dark) / var(--neu-intensity)),
+                        -3px -3px 8px hsl(var(--neu-light) / var(--neu-intensity)),
+                        inset 0 1px 0 hsl(0 0% 100% / 0.1)
+                      `,
+                      border: '1.5px solid hsl(270 80% 60% / 0.35)',
+                    }}
+                  >
+                    {/* Neon top accent */}
+                    <div
+                      className="absolute top-0 left-0 right-0 h-[2px] z-10"
+                      style={{
+                        background: 'hsl(270 80% 60%)',
+                        boxShadow: '0 0 8px hsl(270 80% 60% / 0.5)',
+                      }}
+                    />
 
-                      {/* Label */}
-                      <div className="p-2 bg-card">
-                        <p className="text-[11px] font-semibold text-foreground leading-tight line-clamp-2 text-center">
-                          {cat.name}
-                        </p>
-                      </div>
+                    {/* Image */}
+                    <div className="aspect-square relative overflow-hidden flex-shrink-0 bg-muted">
+                      {cat.image_url ? (
+                        <img
+                          src={cat.image_url}
+                          alt={cat.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-2xl">📦</span>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Label */}
+                    <div className="p-2 bg-card">
+                      <p className="text-[11px] font-semibold text-foreground leading-tight line-clamp-2 text-center">
+                        {cat.name}
+                      </p>
+                    </div>
+
+                    {/* Inner neumorphic highlight */}
+                    <div
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      style={{
+                        boxShadow: `
+                          inset 0 2px 4px hsl(0 0% 100% / 0.06),
+                          inset 0 -2px 6px hsl(0 0% 0% / 0.1)
+                        `,
+                      }}
+                    />
                   </div>
                 </Link>
               </motion.div>

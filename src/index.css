@@ -223,10 +223,6 @@
   to { --border-angle: 360deg; }
 }
 
-@keyframes borderSpinFallback {
-  to { transform: rotate(1turn); }
-}
-
 @layer utilities {
 
   .text-gradient-purple {
@@ -297,42 +293,6 @@
       inset 0 2px 0 hsl(var(--neu-light) / 0.6),
       inset 0 -2px 0 hsl(var(--neu-dark) / 0.2);
     transform: translateY(-1px);
-  }
-
-  .neu-raised-surface {
-    background: linear-gradient(145deg, hsl(var(--background)), hsl(var(--neu-dark) / 0.1));
-    box-shadow:
-      var(--neu-distance) var(--neu-distance) calc(var(--neu-blur) * 1.5) hsl(var(--neu-dark) / var(--neu-intensity)),
-      calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) calc(var(--neu-blur) * 1.5) hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 0 2px 0 hsl(var(--neu-light) / 0.5),
-      inset 0 -2px 0 hsl(var(--neu-dark) / 0.15);
-    border: none;
-    transition: box-shadow 0.25s ease, transform 0.25s ease;
-  }
-
-  .mobile-rotating-border {
-    position: relative;
-    isolation: isolate;
-  }
-
-  .mobile-rotating-border::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    border-radius: inherit;
-    background: conic-gradient(from 0deg, hsl(var(--neon-primary) / 1), hsl(var(--neon-cyan) / 1), hsl(var(--neon-primary) / 1));
-    animation: borderSpinFallback 1.05s linear infinite;
-    box-shadow:
-      0 0 14px hsl(var(--neon-primary) / 0.35),
-      0 0 22px hsl(var(--neon-cyan) / 0.22);
-    pointer-events: none;
-    will-change: transform;
-  }
-
-  .mobile-rotating-border > * {
-    position: relative;
-    z-index: 1;
   }
 
   .neu-pressed {
