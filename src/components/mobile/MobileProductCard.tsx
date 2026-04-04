@@ -75,7 +75,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
                 </Badge>
               )}
               {hasDiscount && (
-                <Badge className="bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-xl">
+                <Badge className="bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-xl animate-pulse shadow-[0_0_10px_hsl(0_80%_50%/0.5)]">
                   -{discountPercent}%
                 </Badge>
               )}
