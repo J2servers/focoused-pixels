@@ -38,6 +38,7 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const { whatsapp, whatsappMessageTemplate } = useSiteSettings();
+  const navigate = useNavigate();
 
   if (!product) return null;
 
