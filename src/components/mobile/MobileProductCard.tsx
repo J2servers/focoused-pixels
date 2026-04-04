@@ -60,13 +60,11 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
         <div className="relative rounded-2xl overflow-hidden neu-raised transition-all duration-300 active:scale-[0.98] h-full flex flex-col">
           {/* Image - fixed aspect ratio */}
           <div className="relative aspect-square overflow-hidden rounded-t-2xl flex-shrink-0">
-            <motion.img
+            <img
               src={product.image}
               alt={product.name}
               className="w-full h-full object-cover"
               loading="lazy"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.3 }}
             />
             
             {/* Badges */}
