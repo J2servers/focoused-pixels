@@ -104,10 +104,10 @@ export function ProductCardOptimized({
     <>
       <Link 
         to={`/produto/${product.slug}`}
-        className="group flex flex-col h-full rounded-2xl overflow-hidden neu-raised hover:shadow-product-hover card-lift transition-all duration-500"
+        className="group flex flex-col h-full rounded-2xl neu-raised hover:shadow-product-hover card-lift transition-all duration-500"
       >
         {/* Image */}
-        <div className="relative aspect-square overflow-hidden rounded-t-2xl">
+        <div className="relative aspect-square overflow-hidden rounded-t-2xl m-[2px] mb-0">
           {highlightBadge && (
             <Badge className="absolute top-2.5 right-2.5 z-20 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-xl border border-white/40 shadow-lg">
               {highlightBadge}
