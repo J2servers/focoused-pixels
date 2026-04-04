@@ -508,7 +508,7 @@
     inset: 0;
     border-radius: inherit;
     padding: var(--neon-border-width);
-    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65%), hsl(185 100% 55%), hsl(280 90% 65%));
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 70%), hsl(185 100% 60%), hsl(280 90% 70%));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -516,7 +516,7 @@
     opacity: var(--neon-opacity);
     transition: opacity 0.3s ease;
     pointer-events: none;
-    animation: borderRotate 3s linear infinite;
+    animation: borderRotate 1.5s linear infinite;
   }
   .neon-border-gradient:hover::before {
     opacity: var(--neon-opacity-hover);
