@@ -2,9 +2,9 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Star, ShoppingCart, MessageCircle, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ShoppingCart, MessageCircle, Truck, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '@/hooks/useCart';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
