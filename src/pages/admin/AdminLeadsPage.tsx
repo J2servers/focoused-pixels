@@ -4,36 +4,22 @@ import { AdminSummaryCard, AdminStatusBadge } from '@/components/admin';
 import { DataTable, Column } from '@/components/admin/DataTable';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { 
-  MoreVertical, 
-  Trash2, 
-  Mail, 
-  Phone, 
-  Users, 
-  UserCheck, 
-  UserX,
-  Download,
-  Tag,
+import {
+  MoreVertical, Trash2, Mail, Phone, Users, UserCheck, UserX,
+  Download, Tag, TrendingUp, Globe, MessageSquare, Sparkles, BarChart3,
 } from 'lucide-react';
 import { useLeads, useUpdateLead, useDeleteLead, Lead } from '@/hooks/useLeads';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { format, subDays, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const AdminLeadsPage = () => {
@@ -47,6 +33,25 @@ const AdminLeadsPage = () => {
 
   const subscribedCount = useMemo(() => leads.filter(l => l.is_subscribed).length, [leads]);
   const unsubscribedCount = useMemo(() => leads.filter(l => !l.is_subscribed).length, [leads]);
+  const recentLeads = useMemo(() => leads.filter(l => isAfter(new Date(l.created_at), subDays(new Date(), 7))).length, [leads]);
+  const withPhoneCount = useMemo(() => leads.filter(l => l.phone).length, [leads]);
+
+  // Source distribution
+  const sourceDistribution = useMemo(() => {
+    const map: Record<string, number> = {};
+    leads.forEach(l => { map[l.source] = (map[l.source] || 0) + 1; });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  }, [leads]);
+
+  // Tag distribution
+  const tagDistribution = useMemo(() => {
+    const map: Record<string, number> = {};
+    leads.forEach(l => l.tags?.forEach(t => { map[t] = (map[t] || 0) + 1; }));
+    return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  }, [leads]);
+
+  // Conversion rate (subscribed/total)
+  const conversionRate = leads.length > 0 ? Math.round((subscribedCount / leads.length) * 100) : 0;
 
   const filteredLeads = useMemo(() => {
     if (filterSubscribed === 'all') return leads;
@@ -55,146 +60,98 @@ const AdminLeadsPage = () => {
 
   const handleToggleSubscription = async (lead: Lead) => {
     try {
-      await updateLead.mutateAsync({
-        id: lead.id,
-        updates: {
-          is_subscribed: !lead.is_subscribed,
-          unsubscribed_at: !lead.is_subscribed ? null : new Date().toISOString(),
-        },
-      });
-      toast.success(lead.is_subscribed ? 'Lead cancelou inscrição' : 'Lead reativado');
-    } catch {
-      toast.error('Erro ao atualizar lead');
-    }
+      await updateLead.mutateAsync({ id: lead.id, updates: { is_subscribed: !lead.is_subscribed, unsubscribed_at: !lead.is_subscribed ? null : new Date().toISOString() } });
+      toast.success(lead.is_subscribed ? 'Inscrição cancelada' : 'Lead reativado');
+    } catch { toast.error('Erro ao atualizar lead'); }
   };
 
-  const handleDelete = async () => {
-    if (!deleteId) return;
-    try {
-      await deleteLead.mutateAsync(deleteId);
-      toast.success('Lead removido com sucesso');
-      setDeleteId(null);
-    } catch {
-      toast.error('Erro ao remover lead');
-    }
-  };
+  const handleDelete = async () => { if (!deleteId) return; try { await deleteLead.mutateAsync(deleteId); setDeleteId(null); } catch { toast.error('Erro ao remover lead'); } };
 
   const handleBulkDelete = async () => {
-    try {
-      await Promise.all(selectedLeads.map(id => deleteLead.mutateAsync(id)));
-      toast.success(`${selectedLeads.length} leads removidos`);
-      setSelectedLeads([]);
-    } catch {
-      toast.error('Erro ao remover leads');
-    }
+    try { await Promise.all(selectedLeads.map(id => deleteLead.mutateAsync(id))); toast.success(`${selectedLeads.length} leads removidos`); setSelectedLeads([]); }
+    catch { toast.error('Erro ao remover leads'); }
   };
 
   const handleExportCSV = () => {
-    const headers = ['Nome', 'Email', 'Telefone', 'Origem', 'Inscrito', 'Data de Cadastro'];
-    const rows = filteredLeads.map(lead => [
-      lead.name,
-      lead.email,
-      lead.phone || '',
-      lead.source,
-      lead.is_subscribed ? 'Sim' : 'Não',
-      format(new Date(lead.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR }),
-    ]);
-    
+    const headers = ['Nome', 'Email', 'Telefone', 'Origem', 'Inscrito', 'Tags', 'Data'];
+    const rows = filteredLeads.map(lead => [lead.name, lead.email, lead.phone || '', lead.source, lead.is_subscribed ? 'Sim' : 'Não', (lead.tags || []).join(';'), format(new Date(lead.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })]);
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `leads_${format(new Date(), 'yyyy-MM-dd')}.csv`;
-    link.click();
-    toast.success('CSV exportado com sucesso!');
+    const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+    link.download = `leads_${format(new Date(), 'yyyy-MM-dd')}.csv`; link.click();
+    toast.success('CSV exportado!');
   };
 
   const columns: Column<Lead>[] = [
     {
-      key: 'name',
-      header: 'Contato',
-      sortable: true,
+      key: 'name', header: 'Contato', sortable: true,
       render: (lead) => (
-        <div className="space-y-1">
-          <p className="font-medium text-white">{lead.name}</p>
-          <div className="flex items-center gap-1 text-xs text-[hsl(var(--admin-text-muted))]">
-            <Mail className="h-3 w-3" />
-            {lead.email}
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] flex items-center justify-center shrink-0">
+            <span className="text-white text-xs font-bold">{lead.name.charAt(0).toUpperCase()}</span>
           </div>
-          {lead.phone && (
-            <div className="flex items-center gap-1 text-xs text-[hsl(var(--admin-text-muted))]">
-              <Phone className="h-3 w-3" />
-              {lead.phone}
+          <div>
+            <p className="font-medium text-white text-sm">{lead.name}</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-[11px] text-[hsl(var(--admin-text-muted))] flex items-center gap-1"><Mail className="h-3 w-3" />{lead.email}</span>
             </div>
-          )}
+            {lead.phone && <span className="text-[11px] text-[hsl(var(--admin-text-muted))] flex items-center gap-1 mt-0.5"><Phone className="h-3 w-3" />{lead.phone}</span>}
+          </div>
         </div>
       ),
     },
     {
-      key: 'source',
-      header: 'Origem',
-      sortable: true,
+      key: 'source', header: 'Origem', sortable: true,
       render: (lead) => (
-        <Badge variant="outline" className="border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))]">
-          {lead.source}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center">
+            <Globe className="h-3 w-3 text-[hsl(var(--admin-accent-purple))]" />
+          </div>
+          <span className="text-sm text-white">{lead.source}</span>
+        </div>
       ),
     },
     {
-      key: 'tags',
-      header: 'Tags',
+      key: 'tags', header: 'Tags',
       render: (lead) => (
-        <div className="flex flex-wrap gap-1">
-          {lead.tags.map((tag, i) => (
-            <Badge key={i} variant="secondary" className="text-xs bg-[hsl(var(--admin-sidebar))] text-[hsl(var(--admin-text-muted))]">
-              <Tag className="h-3 w-3 mr-1" />
+        <div className="flex flex-wrap gap-1 max-w-[180px]">
+          {(lead.tags || []).slice(0, 3).map((tag, i) => (
+            <span key={i} className="text-[10px] px-1.5 py-0.5 rounded-full bg-[hsl(var(--admin-accent-purple)/0.1)] text-[hsl(var(--admin-accent-purple))] border border-[hsl(var(--admin-accent-purple)/0.2)]">
               {tag}
-            </Badge>
+            </span>
           ))}
+          {(lead.tags || []).length > 3 && <span className="text-[10px] text-[hsl(var(--admin-text-muted))]">+{lead.tags.length - 3}</span>}
         </div>
       ),
     },
     {
-      key: 'is_subscribed',
-      header: 'Status',
-      sortable: true,
-      render: (lead) => (
-        <AdminStatusBadge label={lead.is_subscribed ? 'Inscrito' : 'Cancelado'} variant={lead.is_subscribed ? 'success' : 'danger'} />
-      ),
+      key: 'is_subscribed', header: 'Status', sortable: true,
+      render: (lead) => <AdminStatusBadge label={lead.is_subscribed ? 'Inscrito' : 'Cancelado'} variant={lead.is_subscribed ? 'success' : 'danger'} />,
     },
     {
-      key: 'created_at',
-      header: 'Cadastro',
-      sortable: true,
-      render: (lead) => (
-        <span className="text-sm text-[hsl(var(--admin-text-muted))]">
-          {format(new Date(lead.created_at), 'dd/MM/yyyy', { locale: ptBR })}
-        </span>
-      ),
+      key: 'created_at', header: 'Cadastro', sortable: true,
+      render: (lead) => {
+        const isRecent = isAfter(new Date(lead.created_at), subDays(new Date(), 1));
+        return (
+          <div>
+            <span className="text-sm text-[hsl(var(--admin-text-muted))]">{format(new Date(lead.created_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
+            {isRecent && <Badge className="ml-2 text-[9px] bg-green-500/20 text-green-400 border-0">Novo</Badge>}
+          </div>
+        );
+      },
     },
     {
-      key: 'actions',
-      header: '',
-      className: 'w-12',
+      key: 'actions', header: '', className: 'w-12',
       render: (lead) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"><MoreVertical className="h-4 w-4" /></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
             <DropdownMenuItem onClick={() => handleToggleSubscription(lead)} className="hover:bg-[hsl(var(--admin-sidebar-hover))]">
-              {lead.is_subscribed ? (
-                <><UserX className="h-4 w-4 mr-2" />Cancelar Inscrição</>
-              ) : (
-                <><UserCheck className="h-4 w-4 mr-2" />Reativar</>
-              )}
+              {lead.is_subscribed ? <><UserX className="h-4 w-4 mr-2" />Cancelar Inscrição</> : <><UserCheck className="h-4 w-4 mr-2" />Reativar</>}
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-400 hover:bg-red-500/10" onClick={() => setDeleteId(lead.id)}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Remover
-            </DropdownMenuItem>
+            <DropdownMenuItem className="text-red-400 hover:bg-red-500/10" onClick={() => setDeleteId(lead.id)}><Trash2 className="h-4 w-4 mr-2" />Remover</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
@@ -208,18 +165,9 @@ const AdminLeadsPage = () => {
         { value: 'subscribed', label: 'Inscritos', icon: UserCheck },
         { value: 'unsubscribed', label: 'Cancelados', icon: UserX },
       ].map(f => (
-        <Button
-          key={f.value}
-          variant={filterSubscribed === f.value ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setFilterSubscribed(f.value)}
-          className={filterSubscribed === f.value
-            ? "bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white"
-            : "border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text-muted))] hover:bg-[hsl(var(--admin-sidebar-hover))] hover:text-white"
-          }
-        >
-          {f.icon && <f.icon className="h-4 w-4 mr-1" />}
-          {f.label}
+        <Button key={f.value} variant={filterSubscribed === f.value ? 'default' : 'outline'} size="sm" onClick={() => setFilterSubscribed(f.value)}
+          className={filterSubscribed === f.value ? "bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white" : "border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text-muted))] hover:bg-[hsl(var(--admin-sidebar-hover))] hover:text-white"}>
+          {f.icon && <f.icon className="h-4 w-4 mr-1" />}{f.label}
         </Button>
       ))}
     </div>
@@ -228,24 +176,91 @@ const AdminLeadsPage = () => {
   return (
     <AdminLayout title="Leads">
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Summary Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <AdminSummaryCard title="Total de Leads" value={leads.length} icon={Users} variant="purple" />
           <AdminSummaryCard title="Inscritos" value={subscribedCount} icon={UserCheck} variant="green" />
           <AdminSummaryCard title="Cancelados" value={unsubscribedCount} icon={UserX} variant="orange" />
+          <AdminSummaryCard title="Últimos 7 dias" value={recentLeads} icon={TrendingUp} variant="blue" />
+          <AdminSummaryCard title="Com Telefone" value={withPhoneCount} icon={Phone} variant="purple" />
         </div>
 
+        {/* Insights Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Conversion Rate */}
+          <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <BarChart3 className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />
+                <h3 className="text-sm font-semibold text-white">Taxa de Inscrição</h3>
+              </div>
+              <div className="flex items-end gap-3">
+                <span className="text-3xl font-bold text-white">{conversionRate}%</span>
+                <span className="text-xs text-[hsl(var(--admin-text-muted))] mb-1">dos leads estão inscritos</span>
+              </div>
+              <Progress value={conversionRate} className="h-2 mt-3 bg-[hsl(var(--admin-bg))]" />
+            </CardContent>
+          </Card>
+
+          {/* Source Distribution */}
+          <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Globe className="h-4 w-4 text-green-400" />
+                <h3 className="text-sm font-semibold text-white">Origens</h3>
+              </div>
+              {sourceDistribution.length === 0 ? (
+                <p className="text-sm text-[hsl(var(--admin-text-muted))] text-center py-3">Sem dados</p>
+              ) : (
+                <div className="space-y-2">
+                  {sourceDistribution.map(([source, count]) => (
+                    <div key={source} className="flex items-center justify-between">
+                      <span className="text-xs text-white">{source}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-1.5 rounded-full bg-[hsl(var(--admin-bg))] overflow-hidden">
+                          <div className="h-full rounded-full bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))]"
+                            style={{ width: `${(count / leads.length) * 100}%` }} />
+                        </div>
+                        <span className="text-[10px] text-[hsl(var(--admin-text-muted))] w-6 text-right">{count}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Tag Cloud */}
+          <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Tag className="h-4 w-4 text-[hsl(var(--admin-accent-pink))]" />
+                <h3 className="text-sm font-semibold text-white">Tags Populares</h3>
+              </div>
+              {tagDistribution.length === 0 ? (
+                <p className="text-sm text-[hsl(var(--admin-text-muted))] text-center py-3">Sem tags</p>
+              ) : (
+                <div className="flex flex-wrap gap-1.5">
+                  {tagDistribution.map(([tag, count]) => (
+                    <span key={tag} className="text-xs px-2 py-1 rounded-full bg-[hsl(var(--admin-accent-purple)/0.1)] text-[hsl(var(--admin-accent-purple))] border border-[hsl(var(--admin-accent-purple)/0.2)]">
+                      {tag} <span className="text-[hsl(var(--admin-text-muted))]">({count})</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bulk Actions */}
         {selectedLeads.length > 0 && (
-          <div className="flex items-center gap-4 p-4 bg-[hsl(var(--admin-accent-purple)/0.1)] border border-[hsl(var(--admin-accent-purple)/0.3)] rounded-lg">
-            <span className="text-sm font-medium text-white">
-              {selectedLeads.length} lead(s) selecionado(s)
-            </span>
-            <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Remover Selecionados
-            </Button>
+          <div className="flex items-center gap-4 p-4 bg-[hsl(var(--admin-accent-purple)/0.1)] border border-[hsl(var(--admin-accent-purple)/0.3)] rounded-xl">
+            <span className="text-sm font-medium text-white">{selectedLeads.length} lead(s) selecionado(s)</span>
+            <Button variant="destructive" size="sm" onClick={handleBulkDelete}><Trash2 className="h-4 w-4 mr-2" />Remover Selecionados</Button>
           </div>
         )}
 
+        {/* Table */}
         <DataTable
           data={filteredLeads}
           columns={columns}
@@ -258,8 +273,7 @@ const AdminLeadsPage = () => {
           filterContent={filterButtons}
           actions={
             <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">
-              <Download className="h-4 w-4 mr-2" />
-              Exportar CSV
+              <Download className="h-4 w-4 mr-2" />Exportar CSV
             </Button>
           }
         />
@@ -269,15 +283,11 @@ const AdminLeadsPage = () => {
         <AlertDialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">Remover Lead</AlertDialogTitle>
-            <AlertDialogDescription className="text-[hsl(var(--admin-text-muted))]">
-              Tem certeza que deseja remover este lead? Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
+            <AlertDialogDescription className="text-[hsl(var(--admin-text-muted))]">Tem certeza? Esta ação não pode ser desfeita.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Remover
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">Remover</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
