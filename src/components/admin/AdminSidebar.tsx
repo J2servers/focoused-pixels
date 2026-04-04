@@ -120,7 +120,7 @@ function SidebarInner({
   // Track which groups are open
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
-    MENU_GROUPS.forEach(g => { initial[g.label] = true; });
+    MENU_GROUPS.forEach(g => { initial[g.label] = g.label === 'Visão Geral'; });
     return initial;
   });
 
