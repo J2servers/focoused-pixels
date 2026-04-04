@@ -210,10 +210,10 @@ export function ProductCardOptimized({
               <ShoppingCart className="h-3.5 w-3.5" />
             </Button>
           </div>
-        </div>
+            </Link>
           </div>
         </div>
-      </Link>
+      </div>
 
       <QuickViewModal
         product={product}
