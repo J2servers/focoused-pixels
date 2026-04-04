@@ -87,11 +87,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             </div>
 
             {/* Quick Add Button */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              className="absolute bottom-2 right-2"
-            >
+            <div className="absolute bottom-2 right-2">
               <Button
                 size="icon"
                 onClick={handleAddToCart}
@@ -100,7 +96,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
               >
                 <ShoppingCart className="h-4 w-4" />
               </Button>
-            </motion.div>
+            </div>
           </div>
 
           {/* Content - fixed heights for uniformity */}
