@@ -26,8 +26,9 @@ const TABS: Record<SettingsTab, TabMeta> = {
   email:       { label: 'Email',       icon: Mail,        accentVar: '--admin-accent-orange' },
   seguranca:   { label: 'Segurança',   icon: ShieldCheck, accentVar: '--admin-accent-pink' },
   operacoes:   { label: 'Operações',   icon: Settings2,   accentVar: '--admin-accent-purple' },
+  ia:          { label: 'IA',          icon: Bot,         accentVar: '--admin-accent-purple' },
 };
-const TAB_ORDER: SettingsTab[] = ['geral', 'pagamentos', 'email', 'seguranca', 'operacoes'];
+const TAB_ORDER: SettingsTab[] = ['geral', 'pagamentos', 'email', 'seguranca', 'operacoes', 'ia'];
 
 const AdminSettingsPage = () => {
   const { profile, updatePassword, canEdit } = useAuthContext();
