@@ -81,7 +81,7 @@ const Index = () => {
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
-  const parentCategories = categories.filter(c => !c.parent_id).slice(0, 8);
+  const parentCategories = categories.filter(c => !c.parent_id);
 
   const getProductsByCategory = (categoryId: string) => {
     const childIds = categories.filter(c => c.parent_id === categoryId).map(c => c.id);
