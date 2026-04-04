@@ -580,6 +580,17 @@
     box-shadow: none;
     border: 1px solid hsl(var(--admin-card-border));
   }
+  /* Kill animated ::before borders in admin */
+  .admin-dark .neu-flat::before,
+  .admin-dark .neu-raised::before,
+  .admin-dark .neu-pressed::before,
+  .admin-dark .neu-concave::before,
+  .admin-dark .neu-convex::before,
+  .admin-dark .neu-btn::before,
+  .admin-dark .shadow-product::before,
+  .admin-dark .neon-border-gradient::before {
+    display: none;
+  }
   .admin-dark .neu-flat:hover,
   .admin-dark .neu-raised:hover,
   .admin-dark .neu-concave:hover,
