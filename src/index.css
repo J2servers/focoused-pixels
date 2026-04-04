@@ -244,19 +244,17 @@
   .neu-flat::before {
     content: '';
     position: absolute;
-    inset: -1px;
+    inset: 0;
     border-radius: inherit;
-    background: conic-gradient(from 0deg, hsl(280 90% 70% / 0.9), hsl(185 100% 60% / 0.9), hsl(280 90% 70% / 0.9));
-    z-index: -1;
-    animation: borderRotateFallback 1.5s linear infinite;
-  }
-  .neu-flat::after {
-    content: '';
-    position: absolute;
-    inset: 1.5px;
-    border-radius: inherit;
-    background: inherit;
-    z-index: -1;
+    padding: 1.5px;
+    background: linear-gradient(90deg, hsl(280 90% 70% / 0.9), hsl(185 100% 60% / 0.9), hsl(280 90% 70% / 0.9), hsl(185 100% 60% / 0.9));
+    background-size: 300% 100%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderSlide 2s linear infinite;
   }
 
   .neu-raised {
