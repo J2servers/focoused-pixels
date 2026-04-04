@@ -144,6 +144,19 @@ export function useTemplates() {
     };
   }, [emailTemplates, whatsTemplates, templateStats]);
 
+  // Audit helper
+  const logAudit = useCallback(async (action: string, table: string, recordId: string | undefined, oldData: unknown, newData: unknown) => {
+    try {
+      await supabase.from('audit_logs').insert({
+        action,
+        table_name: table,
+        record_id: recordId || null,
+        old_data: oldData ? (oldData as Record<string, unknown>) : null,
+        new_data: newData ? (newData as Record<string, unknown>) : null,
+      });
+    } catch { /* silent */ }
+  }, []);
+
   // CRUD
   const saveEmail = useCallback(async (template: Partial<EmailTemplate>) => {
     if (!template.name?.trim() || !template.subject?.trim() || !template.body?.trim()) {
@@ -158,14 +171,24 @@ export function useTemplates() {
       variables: autoVars,
       is_active: template.is_active ?? true,
     };
-    const { error } = template.id
-      ? await supabase.from('email_templates').update(payload).eq('id', template.id)
-      : await supabase.from('email_templates').insert(payload);
+
+    const isUpdate = !!template.id;
+    let oldData: unknown = null;
+    if (isUpdate) {
+      const { data } = await supabase.from('email_templates').select('*').eq('id', template.id!).single();
+      oldData = data;
+    }
+
+    const { data: result, error } = isUpdate
+      ? await supabase.from('email_templates').update(payload).eq('id', template.id!).select().single()
+      : await supabase.from('email_templates').insert(payload).select().single();
     if (error) { toast.error('Erro ao salvar template'); return false; }
+
+    await logAudit(isUpdate ? 'UPDATE' : 'INSERT', 'email_templates', result?.id || template.id, oldData, payload);
     toast.success('Template de e-mail salvo');
     loadData();
     return true;
-  }, [loadData]);
+  }, [loadData, logAudit]);
 
   const saveWhats = useCallback(async (template: Partial<WhatsAppTemplate>) => {
     if (!template.name?.trim() || !template.content?.trim()) {
@@ -180,31 +203,42 @@ export function useTemplates() {
       variables: autoVars,
       is_active: template.is_active ?? true,
     };
-    const { error } = template.id
-      ? await supabase.from('whatsapp_templates').update(payload).eq('id', template.id)
-      : await supabase.from('whatsapp_templates').insert(payload as any);
+
+    const isUpdate = !!template.id;
+    let oldData: unknown = null;
+    if (isUpdate) {
+      const { data } = await supabase.from('whatsapp_templates').select('*').eq('id', template.id!).single();
+      oldData = data;
+    }
+
+    const { data: result, error } = isUpdate
+      ? await supabase.from('whatsapp_templates').update(payload).eq('id', template.id!).select().single()
+      : await supabase.from('whatsapp_templates').insert(payload as any).select().single();
     if (error) { toast.error('Erro ao salvar template'); return false; }
+
+    await logAudit(isUpdate ? 'UPDATE' : 'INSERT', 'whatsapp_templates', result?.id || template.id, oldData, payload);
     toast.success('Template WhatsApp salvo');
     loadData();
     return true;
-  }, [loadData]);
+  }, [loadData, logAudit]);
 
   const toggleTemplate = useCallback(async (channel: Channel, id: string, isActive: boolean) => {
-    const { error } = channel === 'email'
-      ? await supabase.from('email_templates').update({ is_active: isActive }).eq('id', id)
-      : await supabase.from('whatsapp_templates').update({ is_active: isActive }).eq('id', id);
+    const table = channel === 'email' ? 'email_templates' : 'whatsapp_templates';
+    const { error } = await supabase.from(table).update({ is_active: isActive }).eq('id', id);
     if (error) { toast.error('Erro ao atualizar'); return; }
+    await logAudit('UPDATE', table, id, { is_active: !isActive }, { is_active: isActive });
     loadData();
-  }, [loadData]);
+  }, [loadData, logAudit]);
 
   const deleteTemplate = useCallback(async (channel: Channel, id: string, name: string) => {
-    const { error } = channel === 'email'
-      ? await supabase.from('email_templates').delete().eq('id', id)
-      : await supabase.from('whatsapp_templates').delete().eq('id', id);
+    const table = channel === 'email' ? 'email_templates' : 'whatsapp_templates';
+    const { data: old } = await supabase.from(table).select('*').eq('id', id).single();
+    const { error } = await supabase.from(table).delete().eq('id', id);
     if (error) { toast.error('Erro ao excluir'); return; }
+    await logAudit('DELETE', table, id, old, null);
     toast.success(`"${name}" excluído`);
     loadData();
-  }, [loadData]);
+  }, [loadData, logAudit]);
 
   const bulkAction = useCallback(async (channel: Channel, ids: string[], action: 'activate' | 'deactivate' | 'delete') => {
     if (ids.length === 0) { toast.error('Selecione pelo menos um'); return; }
