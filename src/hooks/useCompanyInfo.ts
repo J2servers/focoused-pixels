@@ -212,6 +212,11 @@ const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
   // Integrations
   whatsapp_message_template: 'Olá! Gostaria de saber mais sobre os produtos da Pincel de Luz.',
   why_choose_us_config: null,
+  ai_external_enabled: false,
+  ai_external_provider: null,
+  ai_external_api_url: null,
+  ai_external_api_key: null,
+  ai_external_model: null,
   enable_reviews_auto_approve: false,
   reviews_min_rating_to_show: 1,
   // Payment flags (credentials are in payment_credentials table)
