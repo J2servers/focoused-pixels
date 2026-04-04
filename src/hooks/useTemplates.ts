@@ -147,13 +147,13 @@ export function useTemplates() {
   // Audit helper
   const logAudit = useCallback(async (action: string, table: string, recordId: string | undefined, oldData: unknown, newData: unknown) => {
     try {
-      await supabase.from('audit_logs').insert({
+      await supabase.from('audit_logs').insert([{
         action,
         table_name: table,
         record_id: recordId || null,
         old_data: oldData ? (oldData as Record<string, unknown>) : null,
         new_data: newData ? (newData as Record<string, unknown>) : null,
-      });
+      }]);
     } catch { /* silent */ }
   }, []);
 
