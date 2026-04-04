@@ -159,6 +159,7 @@ const AdminSettingsPage = () => {
           {tab === 'email' && <SettingsEmailSection emailSettings={email} ue={ue} canMutate={canMutate} handleTestSmtp={handleTestSmtp} handleSendTest={handleSendTest} testSmtpPending={testSmtp.isPending} sendTestPending={sendTest.isPending} updateEmailPending={updateEmail.isPending} />}
           {tab === 'seguranca' && <SettingsSecuritySection settings={settings} u={u} canMutate={canMutate} profileName={profile?.full_name || ''} updatePassword={updatePassword} />}
           {tab === 'operacoes' && <SettingsOperationsSection />}
+          {tab === 'ia' && <SettingsAISection settings={settings} u={u} />}
         </div>
       </div>
     </AdminLayout>
