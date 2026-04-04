@@ -234,18 +234,29 @@
 
   /* ═══ Neumorphism Utilities — Deep Machined ═══ */
   .neu-flat {
+    position: relative;
     background: hsl(var(--background));
     box-shadow:
       var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
       calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 1px 0 hsl(var(--neu-light) / 0.4),
       inset 0 -1px 0 hsl(var(--neu-dark) / 0.2);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / var(--neon-opacity));
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    transition: box-shadow 0.3s ease;
   }
-
-  .neu-flat:hover {
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
+  .neu-flat::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.5), hsl(185 100% 55% / 0.5), hsl(280 90% 65% / 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
 
   .neu-raised {
