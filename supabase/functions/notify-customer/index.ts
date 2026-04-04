@@ -56,6 +56,11 @@ const EVENT_TO_WA_TEMPLATE: Record<string, string[]> = {
   card_approved: ["card_approved", "Pagamento Confirmado"],
   card_pending: ["card_pending"],
   payment_confirmed: ["payment_confirmed", "Pagamento Confirmado"],
+  order_shipped: ["order_shipped", "Pedido Enviado"],
+  abandoned_cart: ["abandoned_cart", "Carrinho Abandonado"],
+  new_lead: ["new_lead", "Boas-vindas com cupom"],
+  review_received: ["review_received", "Avaliação Recebida"],
+  boleto_reminder: ["boleto_reminder", "Lembrete de Boleto"],
 };
 
 // Fallback WhatsApp messages (only used if no DB template found)
