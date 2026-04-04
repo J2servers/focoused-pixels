@@ -229,6 +229,7 @@ const Index = () => {
       <Suspense fallback={null}>
         <PromoPopupManager />
         <DynamicSocialProof />
+        <ExitIntentPopup />
       </Suspense>
     </div>
   );

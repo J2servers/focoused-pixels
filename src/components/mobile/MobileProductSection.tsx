@@ -92,10 +92,10 @@ export function MobileProductSection({
           </motion.div>
         </motion.div>
 
-        {/* Horizontal Scroll - hidden scrollbar */}
+        {/* Horizontal Scroll - smooth snap swipe */}
         <div 
           ref={scrollContainerRef}
-          className="overflow-x-auto pb-2 scrollbar-none"
+          className="overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory"
           style={{ 
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -103,13 +103,13 @@ export function MobileProductSection({
           }}
         >
           <div className="flex gap-3 px-4">
-            {products.slice(0, 6).map((product, index) => (
+            {products.slice(0, 10).map((product, index) => (
               <motion.div
                 key={product.id}
-                className="w-[160px] flex-shrink-0"
+                className="w-[160px] flex-shrink-0 snap-start"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
+                transition={{ delay: index * 0.03 }}
               >
                 <MobileProductCard product={product} index={index} />
               </motion.div>
