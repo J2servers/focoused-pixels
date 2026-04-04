@@ -27,25 +27,10 @@ export const AdminLayout = ({
 
   useEffect(() => {
     if (!isLoading) {
-      if (!user) {
-        navigate('/admin/login');
-        return;
-      }
-
-      if (!role) {
-        navigate('/admin/login');
-        return;
-      }
-
-      if (requireAdmin && !isAdmin()) {
-        navigate('/admin');
-        return;
-      }
-
-      if (requireEditor && !canEdit()) {
-        navigate('/admin');
-        return;
-      }
+      if (!user) { navigate('/admin/login'); return; }
+      if (!role) { navigate('/admin/login'); return; }
+      if (requireAdmin && !isAdmin()) { navigate('/admin'); return; }
+      if (requireEditor && !canEdit()) { navigate('/admin'); return; }
     }
   }, [user, role, isLoading, navigate, requireEditor, requireAdmin, canEdit, isAdmin]);
 
@@ -54,39 +39,32 @@ export const AdminLayout = ({
       <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--admin-bg))]">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-purple)/0.3)] animate-ping" />
-            <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-pink)/0.2)] animate-pulse delay-75" />
-            <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]">
+            <div className="absolute inset-0 rounded-full bg-violet-500/30 animate-ping" />
+            <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-violet-500 via-pink-500 to-blue-500 flex items-center justify-center shadow-lg shadow-violet-500/40">
               <Loader2 className="h-7 w-7 animate-spin text-white" />
             </div>
           </div>
-          <p className="text-sm text-[hsl(var(--admin-text-muted))] font-medium">Carregando...</p>
+          <p className="text-sm text-white/40 font-medium">Carregando...</p>
         </div>
       </div>
     );
   }
 
-  if (!user || !role) {
-    return null;
-  }
+  if (!user || !role) return null;
 
   return (
     <div className="min-h-screen admin-dark bg-[hsl(var(--admin-bg))]">
-      <AdminSidebar />
-      <div 
-        className={cn(
-          "flex flex-col min-h-screen transition-all duration-300",
-          isMobile ? "ml-0" : sidebarCollapsed ? "ml-[72px]" : "ml-64"
-        )}
-      >
+      <AdminSidebar onCollapseChange={setSidebarCollapsed} />
+      <div className={cn(
+        "flex flex-col min-h-screen transition-all duration-300",
+        isMobile ? "ml-0" : sidebarCollapsed ? "ml-[68px]" : "ml-[260px]"
+      )}>
         <AdminHeader title={title} />
         <main className={cn(
           "flex-1 overflow-y-auto p-3 md:p-4",
           isMobile && "pt-16"
         )}>
-          <div className="w-full">
-            {children}
-          </div>
+          <div className="w-full">{children}</div>
         </main>
       </div>
     </div>
