@@ -100,10 +100,8 @@ const Index = () => {
         <main className="flex-1">
           <MobileHeroCarousel />
           
-          {/* Rainbow Categories - same as desktop */}
-          {!categoriesLoading && (
-            <RainbowCategoryStrip categories={parentCategories} />
-          )}
+          {/* Categories - Square neumorphic cards for mobile */}
+          <MobileCategoryGrid />
 
           {productsLoading ? (
             <div className="px-4 py-4">
