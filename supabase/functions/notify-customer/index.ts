@@ -106,8 +106,23 @@ function buildFallbackWhatsApp(data: NotifyRequest): string {
     case "card_pending":
       return `⏳ *Pagamento em Análise*\n\nOlá, ${firstName}! Seu pagamento está sendo analisado. Você receberá uma confirmação em breve.`;
 
+    case "order_shipped":
+      return `📦 *Pedido Enviado!*\n\nOlá ${firstName}, seu pedido foi enviado!\nVocê receberá o código de rastreio em breve. ✨`;
+
+    case "abandoned_cart":
+      return `🛒 *Seu carrinho está te esperando!*\n\nOlá ${firstName}, notamos que você deixou itens no carrinho. Finalize sua compra antes que acabe! ✨`;
+
+    case "new_lead":
+      return `👋 *Bem-vindo(a)!*\n\nOlá ${firstName}, que bom ter você por aqui! Explore nossos produtos e encontre algo especial. ✨`;
+
+    case "review_received":
+      return `⭐ *Obrigado pela avaliação!*\n\nOlá ${firstName}, sua opinião é muito importante para nós. Muito obrigado! 💜`;
+
+    case "boleto_reminder":
+      return `🔔 *Lembrete de Boleto*\n\nOlá ${firstName}, seu boleto vence em breve. Não perca o prazo!`;
+
     default:
-      return `Olá ${firstName}, recebemos seu pagamento. Obrigado!`;
+      return `Olá ${firstName}, recebemos sua solicitação. Obrigado!`;
   }
 }
 
