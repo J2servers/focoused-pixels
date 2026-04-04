@@ -1,113 +1,106 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
+import { useRef, useState, useEffect } from 'react';
 import { useCategories } from '@/hooks/useProducts';
-
-const RAINBOW = [
-  '330 80% 60%',
-  '160 70% 45%',
-  '220 80% 60%',
-  '25 90% 55%',
-  '270 80% 60%',
-  '45 90% 55%',
-  '185 80% 50%',
-  '340 75% 55%',
-];
 
 export function MobileCategoryGrid() {
   const { data: categories = [] } = useCategories();
-  const parents = categories.filter(c => !c.parent_id).slice(0, 8);
+  const parents = categories.filter(c => !c.parent_id);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showRight, setShowRight] = useState(true);
+  const [showLeft, setShowLeft] = useState(false);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setShowLeft(el.scrollLeft > 10);
+    setShowRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      handleScroll();
+      el.addEventListener('scroll', handleScroll, { passive: true });
+      return () => el.removeEventListener('scroll', handleScroll);
+    }
+  }, [parents]);
 
   if (parents.length === 0) return null;
 
   return (
-    <section className="py-5 px-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-foreground">Categorias</h2>
-        <Link to="/categorias" className="text-sm text-primary font-semibold flex items-center gap-0.5">
+    <section className="py-4">
+      <div className="flex items-center justify-between px-4 mb-3">
+        <h2 className="text-base font-bold text-foreground">Categorias</h2>
+        <Link to="/categorias" className="text-sm text-primary font-medium flex items-center">
           Ver todas <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        {parents.map((cat, i) => {
-          const hsl = RAINBOW[i % RAINBOW.length];
-          return (
-            <motion.div
-              key={cat.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: i * 0.05 }}
-            >
-              <Link
-                to={`/categoria/${cat.slug}`}
-                className="group relative block aspect-square rounded-2xl overflow-hidden active:scale-[0.97] transition-transform duration-200"
-                style={{
-                  boxShadow: `
-                    6px 6px 14px hsl(var(--neu-dark) / var(--neu-intensity)),
-                    -4px -4px 10px hsl(var(--neu-light) / var(--neu-intensity)),
-                    inset 0 1px 0 hsl(0 0% 100% / 0.12),
-                    0 0 0 1.5px hsl(${hsl} / 0.2)
-                  `,
-                }}
+      <div className="relative">
+        {/* Left fade */}
+        <motion.div
+          animate={{ opacity: showLeft ? 1 : 0 }}
+          className="absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"
+        />
+        {/* Right fade */}
+        <motion.div
+          animate={{ opacity: showRight ? 1 : 0 }}
+          className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none flex items-center justify-end pr-1"
+        >
+          <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
+            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+          </motion.div>
+        </motion.div>
+
+        <div
+          ref={scrollRef}
+          className="overflow-x-auto pb-2 scrollbar-none"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+        >
+          <div className="flex gap-3 px-4">
+            {parents.map((cat, i) => (
+              <motion.div
+                key={cat.id}
+                className="w-[100px] flex-shrink-0"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.04 }}
               >
-                {/* Image */}
-                {cat.image_url ? (
-                  <img
-                    src={cat.image_url}
-                    alt={cat.name}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-muted flex items-center justify-center">
-                    <span className="text-4xl">📦</span>
+                <Link
+                  to={`/categoria/${cat.slug}`}
+                  className="group block rounded-2xl overflow-hidden bg-card border border-border/50 active:scale-[0.96] transition-transform duration-150"
+                  style={{
+                    boxShadow: '2px 2px 8px hsl(var(--neu-dark) / 0.12), -2px -2px 6px hsl(var(--neu-light) / 0.08)',
+                  }}
+                >
+                  {/* Image */}
+                  <div className="aspect-square relative overflow-hidden bg-muted">
+                    {cat.image_url ? (
+                      <img
+                        src={cat.image_url}
+                        alt={cat.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-2xl">📦</span>
+                      </div>
+                    )}
                   </div>
-                )}
-
-                {/* Gradient for text */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
-
-                {/* Neon top accent */}
-                <div
-                  className="absolute top-0 left-0 right-0 h-[2.5px]"
-                  style={{
-                    background: `hsl(${hsl})`,
-                    boxShadow: `0 0 8px hsl(${hsl} / 0.5)`,
-                  }}
-                />
-
-                {/* Inner neumorphic highlight */}
-                <div
-                  className="absolute inset-0 rounded-2xl pointer-events-none"
-                  style={{
-                    boxShadow: `
-                      inset 0 2px 4px hsl(0 0% 100% / 0.08),
-                      inset 0 -2px 6px hsl(0 0% 0% / 0.15)
-                    `,
-                  }}
-                />
-
-                {/* Label */}
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <div className="flex items-center gap-1.5">
-                    <div
-                      className="w-2 h-2 rounded-full flex-shrink-0"
-                      style={{
-                        backgroundColor: `hsl(${hsl})`,
-                        boxShadow: `0 0 6px hsl(${hsl})`,
-                      }}
-                    />
-                    <h3 className="text-white font-bold text-sm leading-tight drop-shadow-lg line-clamp-1">
+                  {/* Label */}
+                  <div className="px-2 py-2">
+                    <p className="text-[11px] font-semibold text-foreground leading-tight line-clamp-2 text-center">
                       {cat.name}
-                    </h3>
+                    </p>
                   </div>
-                </div>
-              </Link>
-            </motion.div>
-          );
-        })}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
