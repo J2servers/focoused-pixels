@@ -207,6 +207,9 @@ const Index = () => {
         {/* Guarantees */}
         <GuaranteesSection />
 
+        {/* Como funciona - after all products and guarantees */}
+        <HowItWorksSection />
+
         {!productsLoading && products.length === 0 && (
           <section className="py-16">
             <div className="container mx-auto px-4 text-center">
