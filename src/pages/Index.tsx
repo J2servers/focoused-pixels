@@ -182,7 +182,7 @@ const Index = () => {
             </div>
           </section>
         ) : (
-          parentCategories.slice(0, 3).map((category) => {
+          parentCategories.map((category) => {
             const categoryProducts = getProductsByCategory(category.id);
             if (categoryProducts.length === 0) return null;
             return (
