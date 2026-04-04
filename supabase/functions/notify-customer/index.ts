@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface NotifyRequest {
-  event: "pix_generated" | "boleto_generated" | "card_approved" | "card_pending" | "payment_confirmed";
+  event: "pix_generated" | "boleto_generated" | "card_approved" | "card_pending" | "payment_confirmed" | "order_shipped" | "abandoned_cart" | "new_lead" | "review_received" | "boleto_reminder";
   customer: { name: string; email: string; phone: string };
   order: {
     orderId: string;
