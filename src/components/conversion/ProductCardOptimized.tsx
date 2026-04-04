@@ -141,7 +141,7 @@ export function ProductCardOptimized({
             </div>
 
             {/* Content */}
-            <div className="flex flex-col flex-1 p-3.5 sm:p-4">
+            <Link to={`/produto/${product.slug}`} className="flex flex-col flex-1 p-3.5 sm:p-4">
           {/* Rating - fixed height */}
           <div className="flex items-center gap-1.5 mb-1.5 h-4">
             <div className="flex items-center gap-0.5">
