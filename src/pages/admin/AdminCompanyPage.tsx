@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { VideoStoriesManager } from '@/components/admin/VideoStoriesManager';
 import { AdminLayout } from '@/components/admin';
+import { AdminSummaryCard } from '@/components/admin/AdminSummaryCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Save, MessageSquare, Settings, FolderOpen } from 'lucide-react';
+import { Loader2, Save, MessageSquare, Settings, FolderOpen, Building2, Palette, Phone, Globe } from 'lucide-react';
 import { useCompanyInfo, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -16,6 +17,9 @@ import {
   CompanyContactSection,
   CompanyPoliciesSection,
 } from '@/components/admin/company/CompanySections';
+
+const cardCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]";
+const mutedText = "text-[hsl(var(--admin-text-muted))]";
 
 const AdminCompanyPage = () => {
   const { canEdit } = useAuthContext();
@@ -118,12 +122,15 @@ const AdminCompanyPage = () => {
     accent: normalizeHexColor(formData.accent_color, '#f59e0b'),
   }), [formData.primary_color, formData.secondary_color, formData.accent_color]);
 
+  const completionScore = useMemo(() => {
+    const fields = [formData.company_name, formData.cnpj, formData.email, formData.phone, formData.whatsapp, formData.address, formData.header_logo, formData.footer_logo, formData.privacy_policy, formData.terms_of_service];
+    return fields.filter(f => f && String(f).trim()).length;
+  }, [formData]);
+
   if (isLoading) {
     return (
       <AdminLayout title="Empresa e Branding">
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin text-[hsl(var(--admin-text-muted))]" /></div>
       </AdminLayout>
     );
   }
@@ -131,38 +138,54 @@ const AdminCompanyPage = () => {
   return (
     <AdminLayout title="Empresa e Branding" requireEditor>
       <div className="space-y-6">
+        {/* ─── Header ─── */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-white">Central de marca e dados da empresa</h2>
-            <p className="text-sm text-[hsl(var(--admin-text-muted))]">
-              Logos, cores, contatos, políticas e ajustes que impactam a credibilidade da loja.
-            </p>
+            <h1 className="text-xl font-bold flex items-center gap-2 text-white">
+              <div className="w-9 h-9 rounded-xl bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center">
+                <Building2 className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
+              </div>
+              Empresa e Branding
+            </h1>
+            <p className={`${mutedText} mt-1 text-sm`}>Logos, cores, contatos, políticas e ajustes de credibilidade da loja</p>
           </div>
-          <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} size="lg">
+          <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white" size="lg">
             {updateCompany.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             Salvar alterações
           </Button>
         </div>
 
-        {/* Quick links */}
+        {/* ─── Summary Cards ─── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <AdminSummaryCard title="Completude" value={`${completionScore}/10`} icon={Building2} variant={completionScore >= 8 ? 'green' : 'orange'} />
+          <AdminSummaryCard title="Cor Primária" value={previewColors.primary} icon={Palette} variant="purple" />
+          <AdminSummaryCard title="Contato" value={formData.phone ? '✓ Configurado' : '✗ Pendente'} icon={Phone} variant={formData.phone ? 'green' : 'orange'} />
+          <AdminSummaryCard title="Redes Sociais" value={[formData.social_instagram, formData.social_facebook, formData.social_tiktok, formData.social_youtube].filter(Boolean).length.toString()} icon={Globe} variant="blue" />
+        </div>
+
+        {/* ─── Quick Links ─── */}
         <div className="grid gap-3 md:grid-cols-3">
           {[
-            { title: 'Templates', desc: 'Edite mensagens de e-mail e WhatsApp.', icon: MessageSquare, to: '/admin/templates' },
-            { title: 'Configurações', desc: 'Checkout, operação, pagamentos e alertas.', icon: Settings, to: '/admin/configuracoes' },
-            { title: 'Mídia avançada', desc: 'Biblioteca de arquivos.', icon: FolderOpen, to: '/admin/midia' },
+            { title: 'Templates', desc: 'E-mail e WhatsApp.', icon: MessageSquare, to: '/admin/templates' },
+            { title: 'Configurações', desc: 'Checkout, pagamentos, alertas.', icon: Settings, to: '/admin/configuracoes' },
+            { title: 'Mídia', desc: 'Biblioteca de arquivos.', icon: FolderOpen, to: '/admin/midia' },
           ].map(({ title, desc, icon: Icon, to }) => (
-            <Card key={to} className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+            <Card key={to} className={`${cardCls} hover:border-[hsl(var(--admin-accent-purple)/0.3)] transition-colors`}>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2"><Icon className="h-4 w-4" /> {title}</CardTitle>
-                <CardDescription>{desc}</CardDescription>
+                <CardTitle className="text-sm flex items-center gap-2 text-white">
+                  <div className="w-7 h-7 rounded-lg bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center"><Icon className="h-3.5 w-3.5 text-[hsl(var(--admin-accent-purple))]" /></div>
+                  {title}
+                </CardTitle>
+                <CardDescription className={mutedText}>{desc}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" asChild className="w-full"><Link to={to}>Abrir {title.toLowerCase()}</Link></Button>
+                <Button variant="outline" asChild className="w-full border-[hsl(var(--admin-card-border))] text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"><Link to={to}>Abrir {title.toLowerCase()}</Link></Button>
               </CardContent>
             </Card>
           ))}
         </div>
 
+        {/* ─── Form Sections ─── */}
         <CompanyIdentitySection formData={formData} setFormData={setFormData} previewColors={previewColors} />
         <CompanyConversionSection formData={formData} setFormData={setFormData} freeShippingPreview={freeShippingPreview} />
         <CompanyDataSection formData={formData} setFormData={setFormData} />
@@ -170,8 +193,9 @@ const AdminCompanyPage = () => {
         <CompanyPoliciesSection formData={formData} setFormData={setFormData} />
         <VideoStoriesManager />
 
+        {/* ─── Bottom Save ─── */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} size="lg">
+          <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white" size="lg">
             {updateCompany.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             Salvar alterações
           </Button>

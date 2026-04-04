@@ -1,12 +1,16 @@
-﻿import { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { AdminSummaryCard } from '@/components/admin/AdminSummaryCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageSquare, Wifi, WifiOff, Phone } from 'lucide-react';
+import { MessageSquare, Wifi, WifiOff, Phone, CheckCircle, AlertTriangle, Activity } from 'lucide-react';
 import WhatsAppInstanceCard from '@/components/admin/whatsapp/WhatsAppInstanceCard';
 import WhatsAppTestMessage from '@/components/admin/whatsapp/WhatsAppTestMessage';
 import WhatsAppMessageLog from '@/components/admin/whatsapp/WhatsAppMessageLog';
+
+const cardCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]";
+const mutedText = "text-[hsl(var(--admin-text-muted))]";
 
 const AdminWhatsAppPage = () => {
   const [instanceStatuses, setInstanceStatuses] = useState<Record<string, string>>({});
@@ -20,30 +24,43 @@ const AdminWhatsAppPage = () => {
     setInstancePhones(prev => ({ ...prev, [name]: phone }));
   }, []);
 
-  const connectedInstances = Object.entries(instanceStatuses).filter(([, s]) => s === 'connected');
+  const connectedCount = Object.values(instanceStatuses).filter(s => s === 'connected').length;
+  const totalInstances = 2;
 
   return (
     <AdminLayout title="WhatsApp Business">
       <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-            <MessageSquare className="h-7 w-7 text-green-400" />
-            WhatsApp Business
-          </h1>
-          <p className="text-[hsl(var(--admin-text-muted))] mt-1">
-            Gerencie seus números com failover automático e acompanhe todas as mensagens
-          </p>
+        {/* ─── Header ─── */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-xl font-bold flex items-center gap-2 text-white">
+              <div className="w-9 h-9 rounded-xl bg-green-500/15 flex items-center justify-center">
+                <MessageSquare className="h-5 w-5 text-green-400" />
+              </div>
+              WhatsApp Business
+            </h1>
+            <p className={`${mutedText} mt-1 text-sm`}>Gerencie números com failover automático e acompanhe mensagens</p>
+          </div>
         </div>
 
-        {/* Connected Numbers Summary */}
-        <Card className="bg-gradient-to-r from-green-900/30 to-emerald-900/20 border-green-700/40">
+        {/* ─── Summary Cards ─── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <AdminSummaryCard title="Números Online" value={`${connectedCount}/${totalInstances}`} icon={Wifi} variant={connectedCount > 0 ? 'green' : 'orange'} />
+          <AdminSummaryCard title="Status Geral" value={connectedCount === totalInstances ? 'Operacional' : connectedCount > 0 ? 'Parcial' : 'Offline'} icon={connectedCount === totalInstances ? CheckCircle : AlertTriangle} variant={connectedCount === totalInstances ? 'green' : 'orange'} />
+          <AdminSummaryCard title="Failover" value={connectedCount >= 2 ? 'Ativo' : 'Limitado'} icon={Activity} variant={connectedCount >= 2 ? 'blue' : 'orange'} />
+          <AdminSummaryCard title="Instâncias" value={totalInstances} icon={Phone} variant="purple" />
+        </div>
+
+        {/* ─── Connected Numbers Panel ─── */}
+        <Card className="bg-gradient-to-r from-green-900/20 to-emerald-900/10 border-green-700/30">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-4">
-              <Phone className="h-5 w-5 text-green-400" />
-              <h2 className="text-white font-semibold text-lg">Números Conectados</h2>
-              <Badge className={`ml-auto text-xs ${connectedInstances.length > 0 ? 'bg-green-600' : 'bg-red-600'}`}>
-                {connectedInstances.length} de 2 online
+              <div className="w-9 h-9 rounded-xl bg-green-500/15 flex items-center justify-center">
+                <Phone className="h-5 w-5 text-green-400" />
+              </div>
+              <h2 className="text-white font-semibold">Números Conectados</h2>
+              <Badge className={`ml-auto text-xs ${connectedCount === totalInstances ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'} border-0`}>
+                {connectedCount} de {totalInstances} online
               </Badge>
             </div>
 
@@ -58,14 +75,14 @@ const AdminWhatsAppPage = () => {
 
                 return (
                   <div key={inst.key}
-                    className={`flex items-center gap-3 rounded-lg p-3 border ${
+                    className={`flex items-center gap-3 rounded-xl p-3.5 border transition-colors ${
                       isConnected
-                        ? 'bg-green-500/10 border-green-600/30'
-                        : 'bg-red-500/10 border-red-600/30'
+                        ? 'bg-green-500/5 border-green-600/20 hover:border-green-500/40'
+                        : 'bg-red-500/5 border-red-600/20 hover:border-red-500/40'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                      isConnected ? 'bg-green-500/20' : 'bg-red-500/20'
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                      isConnected ? 'bg-green-500/15' : 'bg-red-500/15'
                     }`}>
                       {isConnected
                         ? <Wifi className="h-5 w-5 text-green-400" />
@@ -75,12 +92,10 @@ const AdminWhatsAppPage = () => {
                     <div className="flex-1 min-w-0">
                       <p className="text-white font-medium text-sm flex items-center gap-2">
                         {inst.label}
-                        <span className="text-[hsl(var(--admin-text-muted))] text-xs">#{inst.priority}</span>
+                        <span className={`${mutedText} text-xs`}>#{inst.priority}</span>
                       </p>
                       {isConnected && phone ? (
-                        <p className="text-green-400 text-sm font-mono">
-                          📱 {phone}
-                        </p>
+                        <p className="text-green-400 text-sm font-mono">📱 {phone}</p>
                       ) : (
                         <p className="text-red-400 text-xs">
                           {status === 'connecting' ? 'Conectando...' : 'Desconectado'}
@@ -97,52 +112,42 @@ const AdminWhatsAppPage = () => {
           </CardContent>
         </Card>
 
-        {/* Tabs for management */}
+        {/* ─── Tabs ─── */}
         <Tabs defaultValue="instances" className="space-y-4">
-          <TabsList className="bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))]">
+          <TabsList className={`border ${cardCls}`}>
             <TabsTrigger value="instances">🔌 Conexões</TabsTrigger>
             <TabsTrigger value="messages">📨 Mensagens</TabsTrigger>
             <TabsTrigger value="test">🧪 Testar</TabsTrigger>
           </TabsList>
 
-          {/* Connections Tab */}
           <TabsContent value="instances" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <WhatsAppInstanceCard
-                instanceName="pinceldeluz1"
-                displayName="WhatsApp Principal"
-                priority={1}
-                onStatusChange={handleStatusChange}
-                onPhoneChange={handlePhoneChange}
-              />
-              <WhatsAppInstanceCard
-                instanceName="pinceldeluz2"
-                displayName="WhatsApp Secundário"
-                priority={2}
-                onStatusChange={handleStatusChange}
-                onPhoneChange={handlePhoneChange}
-              />
+              <WhatsAppInstanceCard instanceName="pinceldeluz1" displayName="WhatsApp Principal" priority={1} onStatusChange={handleStatusChange} onPhoneChange={handlePhoneChange} />
+              <WhatsAppInstanceCard instanceName="pinceldeluz2" displayName="WhatsApp Secundário" priority={2} onStatusChange={handleStatusChange} onPhoneChange={handlePhoneChange} />
             </div>
 
-            {/* How failover works */}
-            <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">🔄 Como funciona o failover?</CardTitle>
+            {/* Failover explanation */}
+            <Card className={cardCls}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white text-base flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center">🔄</div>
+                  Como funciona o failover?
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="pt-0">
+                <div className="space-y-3">
                   {[
-                    { num: '1', color: 'green', title: 'Tenta o Principal', desc: 'O sistema envia pelo número de maior prioridade.' },
-                    { num: '2', color: 'yellow', title: 'Falhou? Tenta o Secundário', desc: 'Se o primeiro falhar, o sistema automaticamente tenta o segundo número.' },
-                    { num: '3', color: 'blue', title: 'Tudo é registrado', desc: 'Cada tentativa é logada com qual número enviou, status e erros.' },
+                    { num: '1', color: 'green', title: 'Tenta o Principal', desc: 'Envia pelo número de maior prioridade.' },
+                    { num: '2', color: 'amber', title: 'Falhou? Tenta o Secundário', desc: 'Se falhar, tenta automaticamente o segundo.' },
+                    { num: '3', color: 'blue', title: 'Tudo é registrado', desc: 'Cada tentativa é logada com status e erros.' },
                   ].map(step => (
-                    <div key={step.num} className="flex gap-3">
-                      <div className={`w-8 h-8 rounded-lg bg-${step.color}-500/20 flex items-center justify-center shrink-0`}>
+                    <div key={step.num} className="flex gap-3 items-start">
+                      <div className={`w-8 h-8 rounded-lg bg-${step.color}-500/15 flex items-center justify-center shrink-0`}>
                         <span className={`text-${step.color}-400 font-bold text-sm`}>{step.num}</span>
                       </div>
                       <div>
                         <h3 className="text-white font-medium text-sm">{step.title}</h3>
-                        <p className="text-[hsl(var(--admin-text-muted))] text-xs">{step.desc}</p>
+                        <p className={`${mutedText} text-xs`}>{step.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -151,17 +156,8 @@ const AdminWhatsAppPage = () => {
             </Card>
           </TabsContent>
 
-          {/* Messages Tab */}
-          <TabsContent value="messages">
-            <WhatsAppMessageLog />
-          </TabsContent>
-
-          {/* Test Tab */}
-          <TabsContent value="test">
-            <div className="max-w-lg">
-              <WhatsAppTestMessage instanceStatuses={instanceStatuses} />
-            </div>
-          </TabsContent>
+          <TabsContent value="messages"><WhatsAppMessageLog /></TabsContent>
+          <TabsContent value="test"><div className="max-w-lg"><WhatsAppTestMessage instanceStatuses={instanceStatuses} /></div></TabsContent>
         </Tabs>
       </div>
     </AdminLayout>
@@ -169,4 +165,3 @@ const AdminWhatsAppPage = () => {
 };
 
 export default AdminWhatsAppPage;
-
