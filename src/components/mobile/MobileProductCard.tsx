@@ -57,9 +57,9 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
         to={`/produto/${product.slug}`}
         className="block group h-full"
       >
-        <div className="relative rounded-2xl overflow-hidden neu-raised transition-all duration-300 active:scale-[0.98] h-full flex flex-col">
+        <div className="relative rounded-2xl neu-raised transition-all duration-300 active:scale-[0.98] h-full flex flex-col">
           {/* Image - fixed aspect ratio */}
-          <div className="relative aspect-square overflow-hidden rounded-t-2xl flex-shrink-0">
+          <div className="relative aspect-square overflow-hidden rounded-t-2xl m-[2px] mb-0 flex-shrink-0">
             <img
               src={product.image}
               alt={product.name}
@@ -100,7 +100,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
           </div>
 
           {/* Content - fixed heights for uniformity */}
-          <div className="p-3 flex flex-col flex-grow">
+          <div className="p-3 flex flex-col flex-grow mx-[2px] mb-[2px]">
             <h3 className="font-medium text-xs text-foreground line-clamp-2 h-8 leading-tight">
               {product.name}
             </h3>
