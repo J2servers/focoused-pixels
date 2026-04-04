@@ -54,7 +54,7 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
                 whileInView={{ opacity: 1, x: 0 }}
                 whileHover={{ scale: 1.18, y: -14, zIndex: 30 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.07 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25, mass: 0.8 }}
                 className="flex-1 min-w-0 relative z-10 cursor-pointer"
                 style={{
                   filter: `
