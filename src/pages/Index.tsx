@@ -81,7 +81,7 @@ const Index = () => {
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
-  const parentCategories = categories.filter(c => !c.parent_id).slice(0, 8);
+  const parentCategories = categories.filter(c => !c.parent_id);
 
   const getProductsByCategory = (categoryId: string) => {
     const childIds = categories.filter(c => c.parent_id === categoryId).map(c => c.id);
@@ -89,7 +89,7 @@ const Index = () => {
     return products.filter(p => {
       const productCategory = categories.find(c => c.slug === p.category);
       return productCategory && allCategoryIds.includes(productCategory.id);
-    }).slice(0, 4);
+    }).slice(0, 8);
   };
 
   // ═══ Mobile ═══
@@ -182,7 +182,7 @@ const Index = () => {
             </div>
           </section>
         ) : (
-          parentCategories.slice(0, 3).map((category) => {
+          parentCategories.map((category) => {
             const categoryProducts = getProductsByCategory(category.id);
             if (categoryProducts.length === 0) return null;
             return (
