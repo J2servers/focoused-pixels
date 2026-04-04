@@ -422,4 +422,3 @@ function WorkflowSidebar({
 }
 
 export default memo(WorkflowSidebar);
-export type { SidebarTab };
