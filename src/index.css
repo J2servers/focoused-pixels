@@ -260,14 +260,29 @@
   }
 
   .neu-raised {
+    position: relative;
     background: linear-gradient(145deg, hsl(var(--background)), hsl(var(--neu-dark) / 0.1));
     box-shadow:
       var(--neu-distance) var(--neu-distance) calc(var(--neu-blur) * 1.5) hsl(var(--neu-dark) / var(--neu-intensity)),
       calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) calc(var(--neu-blur) * 1.5) hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 2px 0 hsl(var(--neu-light) / 0.5),
       inset 0 -2px 0 hsl(var(--neu-dark) / 0.15);
-    border: var(--neon-border-width) solid hsl(var(--neon-primary) / calc(var(--neon-opacity) * 0.5));
+    border: none;
     transition: all 0.3s ease;
+  }
+  .neu-raised::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.4), hsl(185 100% 55% / 0.4), hsl(280 90% 65% / 0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
   }
 
   .neu-raised:hover {
@@ -276,7 +291,6 @@
       calc(var(--neu-distance) * -1.3) calc(var(--neu-distance) * -1.3) calc(var(--neu-blur) * 2) hsl(var(--neu-light) / var(--neu-intensity)),
       inset 0 2px 0 hsl(var(--neu-light) / 0.6),
       inset 0 -2px 0 hsl(var(--neu-dark) / 0.2);
-    border-color: hsl(var(--neon-primary) / var(--neon-opacity-hover));
     transform: translateY(-1px);
   }
 
