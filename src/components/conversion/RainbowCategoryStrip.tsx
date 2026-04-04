@@ -44,7 +44,7 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
         </div>
 
         {/* Skewed parallelogram grid */}
-        <div className="flex gap-4 px-6">
+        <div className="flex gap-3 md:gap-4 px-2 md:px-6 overflow-x-auto md:overflow-visible scrollbar-none snap-x snap-mandatory md:snap-none pb-2">
           {categories.map((cat, i) => {
             const hsl = RAINBOW[i % RAINBOW.length];
             return (
