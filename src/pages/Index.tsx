@@ -165,9 +165,6 @@ const Index = () => {
           <RainbowCategoryStrip categories={parentCategories} />
         )}
 
-        {/* Como funciona */}
-        <HowItWorksSection />
-
         {/* Best Sellers */}
         <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
 
