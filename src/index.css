@@ -224,6 +224,10 @@
     to { --border-angle: 360deg; }
   }
 
+  @keyframes borderRotateFast {
+    to { --border-angle: 360deg; }
+  }
+
   .text-gradient-purple {
     @apply bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent;
   }
