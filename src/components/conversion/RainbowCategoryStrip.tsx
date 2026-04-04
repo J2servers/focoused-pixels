@@ -54,8 +54,7 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, delay: i * 0.07 }}
-                className="flex-1 min-w-0"
-                /* drop-shadow respects the skewed shape */
+                className="flex-1 min-w-0 transition-all duration-500 ease-out hover:z-30 hover:scale-[1.15] hover:-translate-y-3 relative z-10"
                 style={{
                   filter: `
                     drop-shadow(6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)))
