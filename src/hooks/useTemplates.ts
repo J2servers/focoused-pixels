@@ -151,8 +151,8 @@ export function useTemplates() {
         action,
         table_name: table,
         record_id: recordId || null,
-        old_data: oldData ? (oldData as Record<string, unknown>) : null,
-        new_data: newData ? (newData as Record<string, unknown>) : null,
+        old_data: oldData ? JSON.parse(JSON.stringify(oldData)) : null,
+        new_data: newData ? JSON.parse(JSON.stringify(newData)) : null,
       }]);
     } catch { /* silent */ }
   }, []);
