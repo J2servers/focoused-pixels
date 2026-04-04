@@ -116,11 +116,18 @@ export function ProductCardOptimized({
                 </Badge>
               )}
 
-              {/* Badge */}
+              {/* Discount Badge - pulsing */}
               {savings > 0 && product.inStock && (
-                <Badge className="absolute top-2.5 left-2.5 z-10 bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-xl">
+                <Badge className="absolute top-2.5 left-2.5 z-10 bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-xl animate-pulse shadow-[0_0_12px_hsl(0_80%_50%/0.5)]">
                   -{savings}%
                 </Badge>
+              )}
+
+              {/* Combo badge */}
+              {product.customizable && product.inStock && (
+                <div className="absolute bottom-2 left-2 z-10 flex items-center gap-1 bg-accent/90 text-accent-foreground px-2 py-0.5 rounded-lg text-[10px] font-bold shadow-lg backdrop-blur-sm">
+                  <span>🔗</span> COMBO
+                </div>
               )}
               {!product.inStock && (
                 <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-[2px] flex items-center justify-center">
@@ -183,7 +190,25 @@ export function ProductCardOptimized({
             </p>
           </div>
 
+          {/* Stock bar visual */}
+          {product.inStock && (product as any).stock != null && (product as any).stock <= 20 && (
+            <div className="px-3.5 sm:px-4 pb-1">
+              <div className="flex items-center gap-1.5">
+                <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-destructive to-orange-400 transition-all"
+                    style={{ width: `${Math.max(5, Math.min(100, ((product as any).stock / 20) * 100))}%` }}
+                  />
+                </div>
+                <span className="text-[9px] font-bold text-destructive whitespace-nowrap">
+                  {(product as any).stock <= 5 ? '🔥' : ''} {(product as any).stock}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* CTA */}
+          <div className="px-3.5 sm:px-4 pb-3.5 sm:pb-4">
           {activePromotion?.end_date && (
             <div className="mt-2 mb-1">
               <PromotionCountdown endDate={activePromotion.end_date} />
@@ -209,6 +234,7 @@ export function ProductCardOptimized({
             >
               <ShoppingCart className="h-3.5 w-3.5" />
             </Button>
+          </div>
           </div>
             </Link>
           </div>
