@@ -224,6 +224,10 @@
     to { --border-angle: 360deg; }
   }
 
+  @keyframes borderRotateFast {
+    to { --border-angle: 360deg; }
+  }
+
   .text-gradient-purple {
     @apply bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent;
   }
@@ -249,14 +253,14 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    padding: 1px;
-    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.5), hsl(185 100% 55% / 0.5), hsl(280 90% 65% / 0.5));
+    padding: 1.5px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 70% / 0.9), hsl(185 100% 60% / 0.9), hsl(280 90% 70% / 0.9));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: borderRotate 3s linear infinite;
+    animation: borderRotate 1.5s linear infinite;
   }
 
   .neu-raised {
@@ -275,14 +279,14 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    padding: 1px;
-    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.4), hsl(185 100% 55% / 0.4), hsl(280 90% 65% / 0.4));
+    padding: 1.5px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 70% / 1), hsl(185 100% 65% / 1), hsl(280 90% 70% / 1));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: borderRotate 3s linear infinite;
+    animation: borderRotate 1.5s linear infinite;
   }
 
   .neu-raised:hover {
@@ -308,14 +312,14 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    padding: 1px;
-    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.3), hsl(185 100% 55% / 0.3), hsl(280 90% 65% / 0.3));
+    padding: 1.5px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 70% / 0.8), hsl(185 100% 60% / 0.8), hsl(280 90% 70% / 0.8));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: borderRotate 3s linear infinite;
+    animation: borderRotate 1.5s linear infinite;
   }
 
   .neu-concave {
@@ -334,14 +338,14 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    padding: 1px;
-    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.4), hsl(185 100% 55% / 0.4), hsl(280 90% 65% / 0.4));
+    padding: 1.5px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 70% / 0.9), hsl(185 100% 60% / 0.9), hsl(280 90% 70% / 0.9));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: borderRotate 3s linear infinite;
+    animation: borderRotate 1.5s linear infinite;
   }
 
   .neu-convex {
@@ -360,14 +364,14 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    padding: 1px;
-    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.4), hsl(185 100% 55% / 0.4), hsl(280 90% 65% / 0.4));
+    padding: 1.5px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 70% / 0.9), hsl(185 100% 60% / 0.9), hsl(280 90% 70% / 0.9));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: borderRotate 3s linear infinite;
+    animation: borderRotate 1.5s linear infinite;
   }
 
   .neu-convex:hover {
@@ -413,14 +417,14 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    padding: 1px;
-    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.5), hsl(185 100% 55% / 0.5), hsl(280 90% 65% / 0.5));
+    padding: 1.5px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 70% / 0.9), hsl(185 100% 60% / 0.9), hsl(280 90% 70% / 0.9));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: borderRotate 3s linear infinite;
+    animation: borderRotate 1.5s linear infinite;
   }
 
   .neu-btn:hover {
@@ -504,7 +508,7 @@
     inset: 0;
     border-radius: inherit;
     padding: var(--neon-border-width);
-    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65%), hsl(185 100% 55%), hsl(280 90% 65%));
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 70%), hsl(185 100% 60%), hsl(280 90% 70%));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -512,7 +516,7 @@
     opacity: var(--neon-opacity);
     transition: opacity 0.3s ease;
     pointer-events: none;
-    animation: borderRotate 3s linear infinite;
+    animation: borderRotate 1.5s linear infinite;
   }
   .neon-border-gradient:hover::before {
     opacity: var(--neon-opacity-hover);
@@ -533,14 +537,14 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    padding: 1px;
-    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 65% / 0.35), hsl(185 100% 55% / 0.35), hsl(280 90% 65% / 0.35));
+    padding: 1.5px;
+    background: conic-gradient(from var(--border-angle, 0deg), hsl(280 90% 70% / 1), hsl(185 100% 65% / 1), hsl(280 90% 70% / 1));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: borderRotate 3s linear infinite;
+    animation: borderRotate 1.5s linear infinite;
   }
 
   .shadow-product-hover {
