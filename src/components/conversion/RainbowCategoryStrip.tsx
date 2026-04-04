@@ -1,6 +1,6 @@
 /**
- * RainbowCategoryStrip - Heavily angled parallelogram category cards
- * Inspired by LG Content Store bottom menu style
+ * RainbowCategoryStrip - Premium Neumorphism angled category cards
+ * Individual cards with deep neumorphic shadows and subtle angular cuts
  */
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -42,91 +42,100 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
           </Link>
         </div>
 
-        {/* Angled parallelogram strip */}
-        <div className="flex items-stretch gap-0 mx-auto overflow-hidden rounded-2xl"
-          style={{
-            border: '2px solid hsl(270 80% 60% / 0.3)',
-            boxShadow: '0 0 30px -8px hsl(270 80% 60% / 0.2)',
-          }}
-        >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
           {categories.map((cat, i) => {
             const hsl = RAINBOW[i % RAINBOW.length];
-            const isFirst = i === 0;
-            const isLast = i === categories.length - 1;
-
             return (
               <motion.div
                 key={cat.id}
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="relative flex-1 min-w-0"
-                style={{
-                  clipPath: isFirst
-                    ? 'polygon(0 0, 100% 0, calc(100% - 28px) 100%, 0 100%)'
-                    : isLast
-                    ? 'polygon(28px 0, 100% 0, 100% 100%, 0 100%)'
-                    : 'polygon(28px 0, 100% 0, calc(100% - 28px) 100%, 0 100%)',
-                  marginLeft: i === 0 ? 0 : '-14px',
-                }}
+                transition={{ duration: 0.5, delay: i * 0.06 }}
               >
                 <Link
                   to={`/categoria/${cat.slug}`}
-                  className="group relative block h-[200px] md:h-[240px] lg:h-[280px] overflow-hidden"
+                  className="group relative block overflow-hidden transition-all duration-500 hover:-translate-y-1"
+                  style={{
+                    borderRadius: '20px 20px 20px 4px',
+                    clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%)',
+                  }}
                 >
-                  {/* Full image */}
-                  {cat.image_url ? (
-                    <img
-                      src={cat.image_url}
-                      alt={cat.name}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 bg-muted flex items-center justify-center">
-                      <span className="text-4xl">📦</span>
-                    </div>
-                  )}
-
-                  {/* Gradient for text */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-
-                  {/* Colored neon line at top */}
+                  {/* Neumorphism outer shell */}
                   <div
-                    className="absolute top-0 left-0 right-0 h-[3px]"
+                    className="relative aspect-[3/4] overflow-hidden"
                     style={{
-                      background: `hsl(${hsl})`,
-                      boxShadow: `0 0 12px hsl(${hsl} / 0.7), 0 0 24px hsl(${hsl} / 0.3)`,
+                      borderRadius: '20px 20px 20px 4px',
+                      boxShadow: `
+                        8px 8px 20px hsl(var(--neu-dark) / var(--neu-intensity)),
+                        -6px -6px 16px hsl(var(--neu-light) / var(--neu-intensity)),
+                        inset 0 1px 0 hsl(0 0% 100% / 0.15),
+                        0 0 0 1.5px hsl(${hsl} / 0.25)
+                      `,
                     }}
-                  />
+                  >
+                    {/* Full image */}
+                    {cat.image_url ? (
+                      <img
+                        src={cat.image_url}
+                        alt={cat.name}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-muted flex items-center justify-center">
+                        <span className="text-5xl">📦</span>
+                      </div>
+                    )}
 
-                  {/* Neon side separator */}
-                  {!isFirst && (
+                    {/* Gradient overlay for text */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
+
+                    {/* Neon accent line - top */}
                     <div
-                      className="absolute top-0 bottom-0 left-0 w-[2px]"
+                      className="absolute top-0 left-0 right-0 h-[3px] opacity-70 group-hover:opacity-100 transition-opacity"
                       style={{
-                        background: `linear-gradient(180deg, hsl(${hsl} / 0.6), transparent)`,
-                        boxShadow: `0 0 6px hsl(${hsl} / 0.4)`,
+                        background: `hsl(${hsl})`,
+                        boxShadow: `0 0 10px hsl(${hsl} / 0.6), 0 2px 20px hsl(${hsl} / 0.25)`,
                       }}
                     />
-                  )}
 
-                  {/* Category name */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
-                    <h3 className="text-white font-bold text-xs md:text-sm lg:text-base leading-tight drop-shadow-lg line-clamp-2">
-                      {cat.name}
-                    </h3>
+                    {/* Neon accent line - diagonal cut corner */}
+                    <div
+                      className="absolute bottom-0 right-0 w-[26px] h-[26px] opacity-60 group-hover:opacity-100 transition-opacity"
+                      style={{
+                        background: `linear-gradient(135deg, transparent 48%, hsl(${hsl}) 49%, hsl(${hsl}) 51%, transparent 52%)`,
+                        filter: `drop-shadow(0 0 4px hsl(${hsl} / 0.5))`,
+                      }}
+                    />
+
+                    {/* Inner neumorphic inset glow */}
+                    <div
+                      className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        boxShadow: `
+                          inset 0 0 30px -8px hsl(${hsl} / 0.2),
+                          0 0 20px -4px hsl(${hsl} / 0.3)
+                        `,
+                      }}
+                    />
+
+                    {/* Category name + neon dot */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          style={{
+                            backgroundColor: `hsl(${hsl})`,
+                            boxShadow: `0 0 6px hsl(${hsl}), 0 0 12px hsl(${hsl} / 0.4)`,
+                          }}
+                        />
+                        <h3 className="text-white font-bold text-sm lg:text-base leading-tight drop-shadow-lg line-clamp-2">
+                          {cat.name}
+                        </h3>
+                      </div>
+                    </div>
                   </div>
-
-                  {/* Hover overlay */}
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none"
-                    style={{
-                      background: `linear-gradient(135deg, hsl(${hsl} / 0.15), transparent)`,
-                      boxShadow: `inset 0 0 40px -10px hsl(${hsl} / 0.3)`,
-                    }}
-                  />
                 </Link>
               </motion.div>
             );
