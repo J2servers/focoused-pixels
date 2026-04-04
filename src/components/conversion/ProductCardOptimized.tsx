@@ -219,6 +219,8 @@ export function ProductCardOptimized({
             </Button>
           </div>
         </div>
+          </div>
+        </div>
       </Link>
 
       <QuickViewModal
