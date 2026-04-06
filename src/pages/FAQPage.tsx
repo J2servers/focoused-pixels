@@ -120,6 +120,9 @@ const faqCategories = [
   },
 ];
 
+  return null;
+};
+
 const FAQPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
