@@ -268,6 +268,28 @@ export function usePaymentFlow() {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (uuidRegex.test(state.orderId)) return state.orderId;
 
+    // Idempotency check: prevent duplicate order creation
+    let cartItemsForKey: Array<{ id: string; quantity: number }> = [];
+    try {
+      const storedPayment = sessionStorage.getItem('pending_payment');
+      if (storedPayment) {
+        const parsed = JSON.parse(storedPayment);
+        cartItemsForKey = (parsed.cartItems || []).map((i: { id?: string; quantity?: number }) => ({
+          id: i.id || '',
+          quantity: i.quantity || 1,
+        }));
+      }
+    } catch { /* empty */ }
+
+    const idemKey = generateIdempotencyKey(state.customerEmail, cartItemsForKey, state.amount);
+    const existingEntry = getIdempotencyEntry(idemKey);
+    if (existingEntry && (existingEntry.status === 'processing' || existingEntry.status === 'completed')) {
+      if (existingEntry.orderId) return existingEntry.orderId;
+      toast.info('Pedido já está sendo processado...');
+      return null;
+    }
+    setIdempotencyEntry(idemKey, 'processing');
+
     const orderId = crypto.randomUUID();
     const orderNumber = generateOrderNumber();
     let cartItems: unknown[] = [];
@@ -307,9 +329,12 @@ export function usePaymentFlow() {
 
     if (error) {
       console.error('Error creating order:', error);
+      setIdempotencyEntry(idemKey, 'failed');
       toast.error('Erro ao criar pedido. Tente novamente.');
       return null;
     }
+    setIdempotencyEntry(idemKey, 'completed', orderId);
+    cleanupIdempotencyEntries();
     sessionStorage.removeItem('pending_payment');
     await saveCustomerAsLead(state.customerName, state.customerEmail, state.customerPhone);
     return orderId;
