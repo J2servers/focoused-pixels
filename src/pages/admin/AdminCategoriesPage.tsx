@@ -5,247 +5,326 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Plus, Pencil, Trash2, Loader2, ImageIcon, ChevronDown, FolderOpen, Folder } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Plus, Trash2, Loader2, Save, X, ImageIcon, FolderOpen, Folder, Layers, Eye, Hash, Link2,
+} from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import {
   useAdminCategoriesAll, useCreateCategory, useUpdateCategory, useDeleteCategory,
   type Category, type CategoryFormData,
 } from '@/hooks/useAdminCategories';
 
-type CategoryType = 'parent' | 'child';
-
 const generateSlug = (name: string) =>
-  name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-const INITIAL_FORM = { name: '', slug: '', description: '', image_url: '', parent_id: '', display_order: '0', status: 'active' };
+/* ═══ Vivid helpers ═══ */
+const SECTION_COLORS = {
+  cyan: { border: 'border-[hsl(var(--admin-accent-cyan)/0.2)]', headerBg: 'bg-[hsl(var(--admin-accent-cyan)/0.06)]', text: 'text-[hsl(var(--admin-accent-cyan))]', glow: 'shadow-[0_0_10px_hsl(var(--admin-accent-cyan)/0.08)]' },
+  purple: { border: 'border-[hsl(var(--admin-accent-purple)/0.2)]', headerBg: 'bg-[hsl(var(--admin-accent-purple)/0.06)]', text: 'text-[hsl(var(--admin-accent-purple))]', glow: 'shadow-[0_0_10px_hsl(var(--admin-accent-purple)/0.08)]' },
+  pink: { border: 'border-[hsl(var(--admin-accent-pink)/0.2)]', headerBg: 'bg-[hsl(var(--admin-accent-pink)/0.06)]', text: 'text-[hsl(var(--admin-accent-pink))]', glow: 'shadow-[0_0_10px_hsl(var(--admin-accent-pink)/0.08)]' },
+};
 
+function VSection({ icon: Icon, title, color = 'cyan', children }: { icon: React.ComponentType<{ className?: string }>; title: string; color?: keyof typeof SECTION_COLORS; children: React.ReactNode }) {
+  const c = SECTION_COLORS[color];
+  return (
+    <div className={`rounded-xl border ${c.border} ${c.glow} overflow-hidden`}>
+      <div className={`flex items-center gap-2 px-3 py-2 ${c.headerBg} border-b ${c.border}`}>
+        <Icon className={`h-3.5 w-3.5 ${c.text}`} />
+        <span className={`text-[11px] font-bold uppercase tracking-[0.1em] ${c.text}`}>{title}</span>
+      </div>
+      <div className="p-3">{children}</div>
+    </div>
+  );
+}
+
+function Field({ label, value, onChange, type = 'text', placeholder }: {
+  label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string;
+}) {
+  return (
+    <div className="space-y-1">
+      <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">{label}</label>
+      <Input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
+        className="h-8 text-xs bg-white/[0.04] border-white/[0.08] text-white/90 focus:border-[hsl(var(--admin-accent-cyan)/0.5)]" />
+    </div>
+  );
+}
+
+/* ═══ FORM STATE ═══ */
+function buildForm(cat?: Category) {
+  if (!cat) return { name: '', slug: '', description: '', image_url: '' as string | null, parent_id: '', display_order: '0', status: 'active' };
+  return {
+    name: cat.name, slug: cat.slug, description: cat.description || '',
+    image_url: cat.image_url || null, parent_id: cat.parent_id || '',
+    display_order: cat.display_order.toString(), status: cat.status,
+  };
+}
+
+/* ═══ DETAIL PANEL — 3/5, split 2/3 fields + 1/3 image ═══ */
+function CategoryPanel({ category, parentCategories, canEdit, onSave, isSaving, onDelete, onClose, isNew, childCount }: {
+  category: Category | null; parentCategories: Category[]; canEdit: boolean;
+  onSave: (data: CategoryFormData, id?: string) => Promise<void>;
+  isSaving: boolean; onDelete?: (c: Category) => void; onClose?: () => void; isNew?: boolean; childCount?: number;
+}) {
+  const [form, setForm] = useState(() => buildForm(category || undefined));
+  const [lastId, setLastId] = useState(category?.id || '__new__');
+
+  const currentId = category?.id || '__new__';
+  if (currentId !== lastId) {
+    setLastId(currentId);
+    setForm(buildForm(category || undefined));
+  }
+
+  const set = (k: string, v: any) => setForm(prev => ({ ...prev, [k]: v }));
+  const isChild = !!form.parent_id;
+
+  const handleSave = async () => {
+    if (!form.name) { toast.error('Nome é obrigatório'); return; }
+    const slug = form.slug || generateSlug(form.name);
+    const data: CategoryFormData = {
+      name: form.name, slug, description: form.description || null,
+      image_url: form.image_url || null,
+      parent_id: form.parent_id || null,
+      display_order: parseInt(form.display_order) || 0,
+      status: form.status,
+    };
+    await onSave(data, category?.id);
+  };
+
+  return (
+    <div className="h-full flex flex-col bg-[hsl(var(--admin-bg))]">
+      {/* Header */}
+      <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-[hsl(var(--admin-accent-purple)/0.2)] bg-[hsl(var(--admin-card))]"
+        style={{ boxShadow: '0 4px 20px hsl(var(--admin-accent-purple) / 0.06)' }}>
+        <div className="flex items-center gap-2 min-w-0">
+          {isChild ? <Folder className="h-4 w-4 text-[hsl(var(--admin-accent-cyan))] shrink-0" /> : <FolderOpen className="h-4 w-4 text-[hsl(var(--admin-accent-purple))] shrink-0" />}
+          <h3 className="text-sm font-bold text-white truncate">
+            {isNew ? (isChild ? '✨ Nova Subcategoria' : '✨ Nova Categoria') : category?.name || 'Categoria'}
+          </h3>
+          {childCount !== undefined && childCount > 0 && (
+            <Badge variant="outline" className="border-[hsl(var(--admin-accent-cyan)/0.3)] text-[hsl(var(--admin-accent-cyan))] text-[9px] shrink-0">{childCount} sub</Badge>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          <Button size="sm" className="h-8 text-xs bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 text-emerald-400 hover:from-emerald-500/30 hover:to-emerald-600/30 border border-emerald-500/30"
+            onClick={handleSave} disabled={isSaving || !canEdit}>
+            {isSaving ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Save className="h-3 w-3 mr-1" />}Salvar
+          </Button>
+          {category && onDelete && (
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400/60 hover:text-red-400 hover:bg-red-400/5" onClick={() => onDelete(category)} disabled={!canEdit}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          {onClose && <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white hover:bg-white/5" onClick={onClose}><X className="h-4 w-4" /></Button>}
+        </div>
+      </div>
+
+      {/* Body: 2/3 fields + 1/3 image */}
+      <ScrollArea className="flex-1">
+        <div className="flex h-full">
+          {/* LEFT 2/3 */}
+          <div className="w-2/3 p-4 space-y-3 border-r border-white/[0.04]">
+            <VSection icon={Layers} title="Informações" color="cyan">
+              <div className="space-y-2">
+                <Field label="Nome *" value={form.name} onChange={(v) => set('name', v)} placeholder="Nome da categoria" />
+                <Field label="Slug (URL)" value={form.slug} onChange={(v) => set('slug', v)} placeholder="auto-gerado" />
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium mb-1 block">Descrição</label>
+                  <Textarea value={form.description} onChange={(e) => set('description', e.target.value)}
+                    className="text-xs bg-white/[0.04] border-white/[0.08] text-white/90 min-h-[60px]" rows={3} />
+                </div>
+              </div>
+            </VSection>
+
+            <VSection icon={Layers} title="Organização" color="purple">
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Categoria Pai</label>
+                    <Select value={form.parent_id || '__none__'} onValueChange={(v) => set('parent_id', v === '__none__' ? '' : v)}>
+                      <SelectTrigger className="h-8 text-xs bg-white/[0.04] border-white/[0.08] text-white/90"><SelectValue placeholder="Nenhuma (principal)" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">Nenhuma (principal)</SelectItem>
+                        {parentCategories.filter(c => c.id !== category?.id).map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Status</label>
+                    <Select value={form.status} onValueChange={(v) => set('status', v)}>
+                      <SelectTrigger className="h-8 text-xs bg-white/[0.04] border-white/[0.08] text-white/90"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">✅ Ativa</SelectItem>
+                        <SelectItem value="inactive">⏸️ Inativa</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Field label="Ordem de exibição" value={form.display_order} onChange={(v) => set('display_order', v)} type="number" />
+              </div>
+            </VSection>
+          </div>
+
+          {/* RIGHT 1/3 */}
+          <div className="w-1/3 p-4">
+            <VSection icon={ImageIcon} title="Imagem" color="pink">
+              <ImageUpload value={form.image_url} onChange={(url) => set('image_url', url)} folder="categories" aspectRatio="aspect-square" />
+            </VSection>
+          </div>
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+
+/* ═══ MAIN PAGE ═══ */
 const AdminCategoriesPage = () => {
   const { canEdit } = useAuthContext();
+  const isMobile = useIsMobile();
   const { data: categories = [], isLoading } = useAdminCategoriesAll();
   const createCat = useCreateCategory();
   const updateCat = useUpdateCategory();
   const deleteCat = useDeleteCategory();
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [dialogType, setDialogType] = useState<CategoryType>('parent');
-  const [parentSectionOpen, setParentSectionOpen] = useState(true);
-  const [childSectionOpen, setChildSectionOpen] = useState(true);
-  const [formData, setFormData] = useState(INITIAL_FORM);
+  const [isCreating, setIsCreating] = useState(false);
+  const [createAsChild, setCreateAsChild] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
+  const [activeTab, setActiveTab] = useState('parents');
 
-  const isSaving = createCat.isPending || updateCat.isPending || deleteCat.isPending;
+  const isSaving = createCat.isPending || updateCat.isPending;
+  const panelOpen = !!selectedCategory || isCreating;
   const parentCategories = categories.filter(c => !c.parent_id);
   const childCategories = categories.filter(c => c.parent_id);
 
-  const openCreateDialog = (type: CategoryType) => {
-    setDialogType(type); setSelectedCategory(null); setFormData(INITIAL_FORM); setIsDialogOpen(true);
-  };
-
-  const openEditDialog = (cat: Category, type: CategoryType) => {
-    setDialogType(type); setSelectedCategory(cat);
-    setFormData({
-      name: cat.name, slug: cat.slug, description: cat.description || '',
-      image_url: cat.image_url || '', parent_id: cat.parent_id || '',
-      display_order: cat.display_order.toString(), status: cat.status,
-    });
-    setIsDialogOpen(true);
-  };
-
-  const handleSave = async () => {
-    if (!formData.name) { toast.error('Nome é obrigatório'); return; }
-    if (dialogType === 'child' && !formData.parent_id) { toast.error('Categoria pai é obrigatória'); return; }
-
-    const slug = formData.slug || generateSlug(formData.name);
-    const data: CategoryFormData = {
-      name: formData.name, slug,
-      description: formData.description || null,
-      image_url: formData.image_url || null,
-      parent_id: dialogType === 'parent' ? null : formData.parent_id || null,
-      display_order: parseInt(formData.display_order) || 0,
-      status: formData.status,
-    };
-
-    if (selectedCategory) { await updateCat.mutateAsync({ id: selectedCategory.id, data }); }
-    else { await createCat.mutateAsync(data); }
-    setIsDialogOpen(false);
+  const handleSave = async (data: CategoryFormData, id?: string) => {
+    if (id) { await updateCat.mutateAsync({ id, data }); }
+    else { await createCat.mutateAsync(data); setIsCreating(false); }
   };
 
   const handleDelete = async () => {
-    if (!selectedCategory) return;
-    if (!selectedCategory.parent_id) {
-      const hasChildren = childCategories.some(c => c.parent_id === selectedCategory.id);
-      if (hasChildren) { toast.error('Remova as subcategorias antes'); setIsDeleteDialogOpen(false); return; }
+    if (!deleteTarget) return;
+    if (!deleteTarget.parent_id && childCategories.some(c => c.parent_id === deleteTarget.id)) {
+      toast.error('Remova as subcategorias antes'); setIsDeleteDialogOpen(false); return;
     }
-    await deleteCat.mutateAsync(selectedCategory.id);
+    await deleteCat.mutateAsync(deleteTarget.id);
     setIsDeleteDialogOpen(false);
+    if (selectedCategory?.id === deleteTarget.id) setSelectedCategory(null);
   };
 
-  const getParentName = (parentId: string | null) => {
-    if (!parentId) return '-';
-    return categories.find(c => c.id === parentId)?.name || '-';
-  };
-
-  const imageColumn = (cat: Category) => (
-    <div className="w-12 h-12 rounded-lg bg-[hsl(var(--admin-sidebar))] overflow-hidden flex items-center justify-center border border-[hsl(var(--admin-card-border))]">
-      {cat.image_url ? <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-        : <ImageIcon className="w-5 h-5 text-[hsl(var(--admin-text-muted))]" />}
-    </div>
-  );
-
-  const statusColumn = (cat: Category) => (
-    <Badge variant={cat.status === 'active' ? 'default' : 'secondary'}
-      className={cat.status === 'active' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' : 'bg-[hsl(var(--admin-sidebar))] text-[hsl(var(--admin-text-muted))]'}>
-      {cat.status === 'active' ? 'Ativa' : 'Inativa'}
-    </Badge>
-  );
-
-  const actionsColumn = (cat: Category, type: CategoryType) => (
-    <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-      <Button variant="ghost" size="icon" onClick={() => openEditDialog(cat, type)} disabled={!canEdit()}
-        className="hover:bg-[hsl(var(--admin-sidebar-hover))] text-[hsl(var(--admin-text-muted))] hover:text-white"><Pencil className="h-4 w-4" /></Button>
-      <Button variant="ghost" size="icon" onClick={() => { setSelectedCategory(cat); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}
-        className="hover:bg-red-500/20 text-red-400"><Trash2 className="h-4 w-4" /></Button>
+  const imgCol = (cat: Category) => (
+    <div className="w-9 h-9 rounded-lg bg-[hsl(var(--admin-sidebar))] overflow-hidden flex items-center justify-center border border-white/[0.06]">
+      {cat.image_url ? <img src={cat.image_url} alt="" className="w-full h-full object-cover" /> : <ImageIcon className="h-3.5 w-3.5 text-white/15" />}
     </div>
   );
 
   const parentColumns: Column<Category>[] = [
-    { key: 'image_url', header: 'Imagem', className: 'w-16', render: imageColumn },
+    { key: 'image_url', header: '', className: 'w-10', render: imgCol },
     { key: 'name', header: 'Nome', sortable: true },
-    { key: 'slug', header: 'Slug' },
-    { key: 'children_count', header: 'Subcategorias', render: (cat) => {
-      const count = childCategories.filter(c => c.parent_id === cat.id).length;
-      return <Badge variant="outline" className="border-[hsl(var(--admin-accent-cyan))] text-[hsl(var(--admin-accent-cyan))]">{count} {count === 1 ? 'subcategoria' : 'subcategorias'}</Badge>;
-    }},
-    { key: 'display_order', header: 'Ordem', sortable: true },
-    { key: 'status', header: 'Status', render: statusColumn },
-    { key: 'actions', header: 'Ações', className: 'w-24', render: (cat) => actionsColumn(cat, 'parent') },
+    { key: 'children_count', header: 'Sub', className: 'w-12', render: (c) => <Badge variant="outline" className="text-[9px] border-[hsl(var(--admin-accent-cyan)/0.3)] text-[hsl(var(--admin-accent-cyan))]">{childCategories.filter(ch => ch.parent_id === c.id).length}</Badge> },
+    { key: 'display_order', header: 'Ord.', sortable: true, className: 'w-12' },
+    { key: 'status', header: '', className: 'w-14', render: (c) => <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className="text-[9px] px-1.5">{c.status === 'active' ? '✅' : '⏸️'}</Badge> },
   ];
 
   const childColumns: Column<Category>[] = [
-    { key: 'image_url', header: 'Imagem', className: 'w-16', render: imageColumn },
+    { key: 'image_url', header: '', className: 'w-10', render: imgCol },
     { key: 'name', header: 'Nome', sortable: true },
-    { key: 'slug', header: 'Slug' },
-    { key: 'parent_id', header: 'Categoria Pai', render: (cat) => <Badge variant="outline" className="border-[hsl(var(--admin-accent-purple))] text-[hsl(var(--admin-accent-purple))]">{getParentName(cat.parent_id)}</Badge> },
-    { key: 'display_order', header: 'Ordem', sortable: true },
-    { key: 'status', header: 'Status', render: statusColumn },
-    { key: 'actions', header: 'Ações', className: 'w-24', render: (cat) => actionsColumn(cat, 'child') },
+    { key: 'parent_id', header: 'Pai', render: (c) => <span className="text-[11px] text-white/50">{categories.find(p => p.id === c.parent_id)?.name || '-'}</span> },
+    { key: 'display_order', header: 'Ord.', sortable: true, className: 'w-12' },
+    { key: 'status', header: '', className: 'w-14', render: (c) => <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className="text-[9px] px-1.5">{c.status === 'active' ? '✅' : '⏸️'}</Badge> },
   ];
+
+  const childCount = selectedCategory ? childCategories.filter(c => c.parent_id === selectedCategory.id).length : undefined;
+
+  const panelContent = (
+    <CategoryPanel
+      category={isCreating ? null : selectedCategory}
+      parentCategories={parentCategories}
+      canEdit={canEdit()}
+      onSave={handleSave}
+      isSaving={isSaving}
+      isNew={isCreating}
+      childCount={childCount}
+      onDelete={(c) => { setDeleteTarget(c); setIsDeleteDialogOpen(true); }}
+      onClose={() => { setSelectedCategory(null); setIsCreating(false); }}
+    />
+  );
 
   return (
     <AdminLayout title="Categorias" requireEditor>
-      <div className="space-y-6">
-        <div className="flex justify-end">
-          <ExportButtons data={[...parentCategories, ...childCategories].map(c => ({ nome: c.name, slug: c.slug, status: c.status || 'active', ordem: c.display_order ?? 0 }))} filename="categorias" title="Categorias" columns={[{key:'nome',header:'Nome'},{key:'slug',header:'Slug'},{key:'status',header:'Status'},{key:'ordem',header:'Ordem'}]} />
-        </div>
-        <Collapsible open={parentSectionOpen} onOpenChange={setParentSectionOpen}>
-          <div className="bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))] rounded-xl overflow-hidden">
-            <CollapsibleTrigger asChild>
-              <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-[hsl(var(--admin-sidebar-hover))] transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))]"><FolderOpen className="h-5 w-5 text-white" /></div>
-                  <div><h3 className="text-lg font-semibold text-white">Categorias Principais</h3><p className="text-sm text-[hsl(var(--admin-text-muted))]">{parentCategories.length} categorias</p></div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Button onClick={(e) => { e.stopPropagation(); openCreateDialog('parent'); }} disabled={!canEdit()}
-                    className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg"><Plus className="h-4 w-4 mr-2" />Nova Categoria</Button>
-                  <ChevronDown className={`h-5 w-5 text-[hsl(var(--admin-text-muted))] transition-transform ${parentSectionOpen ? 'rotate-180' : ''}`} />
-                </div>
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent><div className="border-t border-[hsl(var(--admin-card-border))]"><DataTable data={parentCategories} columns={parentColumns} isLoading={isLoading} searchPlaceholder="Buscar categorias..." /></div></CollapsibleContent>
-          </div>
-        </Collapsible>
+      <div className={cn("flex h-[calc(100vh-8rem)]", !isMobile && "flex-row")}>
 
-        <Collapsible open={childSectionOpen} onOpenChange={setChildSectionOpen}>
-          <div className="bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))] rounded-xl overflow-hidden">
-            <CollapsibleTrigger asChild>
-              <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-[hsl(var(--admin-sidebar-hover))] transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-[hsl(var(--admin-accent-cyan))] to-[hsl(var(--admin-accent-purple))]"><Folder className="h-5 w-5 text-white" /></div>
-                  <div><h3 className="text-lg font-semibold text-white">Subcategorias</h3><p className="text-sm text-[hsl(var(--admin-text-muted))]">{childCategories.length} subcategorias</p></div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Button onClick={(e) => { e.stopPropagation(); openCreateDialog('child'); }} disabled={!canEdit() || parentCategories.length === 0}
-                    className="bg-gradient-to-r from-[hsl(var(--admin-accent-cyan))] to-[hsl(var(--admin-accent-purple))] text-white shadow-lg"><Plus className="h-4 w-4 mr-2" />Nova Subcategoria</Button>
-                  <ChevronDown className={`h-5 w-5 text-[hsl(var(--admin-text-muted))] transition-transform ${childSectionOpen ? 'rotate-180' : ''}`} />
-                </div>
+        {/* LEFT: List — 2/5 */}
+        <div className={cn(
+          "flex flex-col min-h-0 overflow-hidden transition-all duration-300",
+          panelOpen && !isMobile ? "w-2/5" : "w-full",
+        )}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
+            <div className="px-3 pt-3 flex items-center justify-between">
+              <TabsList className="bg-[hsl(var(--admin-sidebar))]">
+                <TabsTrigger value="parents" className="text-xs gap-1 data-[state=active]:bg-[hsl(var(--admin-accent-purple)/0.2)] data-[state=active]:text-[hsl(var(--admin-accent-purple))]">
+                  <FolderOpen className="h-3 w-3" />Principais ({parentCategories.length})
+                </TabsTrigger>
+                <TabsTrigger value="children" className="text-xs gap-1 data-[state=active]:bg-[hsl(var(--admin-accent-cyan)/0.2)] data-[state=active]:text-[hsl(var(--admin-accent-cyan))]">
+                  <Folder className="h-3 w-3" />Sub ({childCategories.length})
+                </TabsTrigger>
+              </TabsList>
+              <div className="flex gap-2">
+                <ExportButtons data={categories.map(c => ({ nome: c.name, slug: c.slug, status: c.status, ordem: c.display_order }))} filename="categorias" title="Categorias" columns={[{ key: 'nome', header: 'Nome' }, { key: 'slug', header: 'Slug' }, { key: 'status', header: 'Status' }, { key: 'ordem', header: 'Ordem' }]} />
+                <Button onClick={() => { setSelectedCategory(null); setCreateAsChild(activeTab === 'children'); setIsCreating(true); }} disabled={!canEdit()} size="sm"
+                  className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg">
+                  <Plus className="h-4 w-4 mr-1" />Nova
+                </Button>
               </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="border-t border-[hsl(var(--admin-card-border))]">
-                {parentCategories.length === 0 ? (
-                  <div className="p-8 text-center text-[hsl(var(--admin-text-muted))]"><Folder className="h-12 w-12 mx-auto mb-3 opacity-50" /><p>Crie uma categoria principal primeiro.</p></div>
-                ) : <DataTable data={childCategories} columns={childColumns} isLoading={isLoading} searchPlaceholder="Buscar subcategorias..." />}
-              </div>
-            </CollapsibleContent>
+            </div>
+            <TabsContent value="parents" className="flex-1 min-h-0 mt-0">
+              <DataTable data={parentCategories} columns={parentColumns} isLoading={isLoading} searchPlaceholder="Buscar categorias..." showAllRows
+                onRowClick={(c) => { setIsCreating(false); setSelectedCategory(c); }} />
+            </TabsContent>
+            <TabsContent value="children" className="flex-1 min-h-0 mt-0">
+              <DataTable data={childCategories} columns={childColumns} isLoading={isLoading} searchPlaceholder="Buscar subcategorias..." showAllRows
+                onRowClick={(c) => { setIsCreating(false); setSelectedCategory(c); }} />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* RIGHT: Detail Panel — 3/5 (desktop) */}
+        {!isMobile && panelOpen && (
+          <div className="w-3/5 border-l border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] overflow-hidden animate-in slide-in-from-right-5 duration-300">
+            {panelContent}
           </div>
-        </Collapsible>
+        )}
       </div>
 
-      {/* Form Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-          <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              {dialogType === 'parent' ? <><FolderOpen className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />{selectedCategory ? 'Editar Categoria' : 'Nova Categoria'}</> :
-                <><Folder className="h-5 w-5 text-[hsl(var(--admin-accent-cyan))]" />{selectedCategory ? 'Editar Subcategoria' : 'Nova Subcategoria'}</>}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2"><Label className="text-white">Nome *</Label>
-              <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white" /></div>
-            <div className="space-y-2"><Label className="text-white">Slug</Label>
-              <Input value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="gerado-automaticamente" className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white" /></div>
-            <div className="space-y-2"><Label className="text-white">Descrição</Label>
-              <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white" /></div>
-            {dialogType === 'child' && (
-              <div className="space-y-2"><Label className="text-white">Categoria Pai *</Label>
-                <Select value={formData.parent_id || 'none'} onValueChange={(v) => setFormData({ ...formData, parent_id: v === 'none' ? '' : v })}>
-                  <SelectTrigger className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  <SelectContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-                    <SelectItem value="none" className="text-white">Selecione...</SelectItem>
-                    {parentCategories.map(cat => <SelectItem key={cat.id} value={cat.id} className="text-white">{cat.name}</SelectItem>)}
-                  </SelectContent>
-                </Select></div>
-            )}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-white">Ordem</Label>
-                <Input type="number" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })} className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white" /></div>
-              <div className="space-y-2"><Label className="text-white">Status</Label>
-                <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}>
-                  <SelectTrigger className="bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-                    <SelectItem value="active" className="text-white">Ativa</SelectItem><SelectItem value="inactive" className="text-white">Inativa</SelectItem>
-                  </SelectContent></Select></div>
-            </div>
-            <div className="space-y-2"><Label className="text-white">Imagem</Label>
-              <ImageUpload value={formData.image_url} onChange={(url) => setFormData({ ...formData, image_url: url || '' })} folder="categories" aspectRatio="aspect-square" /></div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white">Cancelar</Button>
-            <Button onClick={handleSave} disabled={isSaving}
-              className={dialogType === 'parent' ? "bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white" : "bg-gradient-to-r from-[hsl(var(--admin-accent-cyan))] to-[hsl(var(--admin-accent-purple))] text-white"}>
-              {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Mobile Sheet */}
+      {isMobile && (
+        <Sheet open={panelOpen} onOpenChange={(open) => { if (!open) { setSelectedCategory(null); setIsCreating(false); } }}>
+          <SheetContent side="bottom" className="h-[90vh] p-0 bg-[hsl(var(--admin-card))] border-t border-[hsl(var(--admin-accent-cyan)/0.2)] rounded-t-2xl">
+            {panelContent}
+          </SheetContent>
+        </Sheet>
+      )}
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-          <DialogHeader><DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
-            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Excluir "{selectedCategory?.name}"? Esta ação não pode ser desfeita.</DialogDescription></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
+            <DialogDescription>Excluir "{deleteTarget?.name}"? Esta ação não pode ser desfeita.</DialogDescription>
+          </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white">Cancelar</Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Excluir</Button>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleteCat.isPending}>
+              {deleteCat.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Excluir
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
