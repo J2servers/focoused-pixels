@@ -11,6 +11,8 @@
  */
 
 import { useEffect, useState } from 'react';
+import { PageSEO } from '@/components/seo/PageSEO';
+import { analytics } from '@/components/analytics/EventTracker';
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
