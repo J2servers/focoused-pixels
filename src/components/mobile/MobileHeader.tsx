@@ -127,6 +127,8 @@ export function MobileHeader() {
                       border: '2px solid hsl(var(--background))',
                       boxShadow: '0 2px 6px hsl(var(--primary) / 0.4)',
                     }}
+                    aria-live="polite"
+                    aria-label={`${itemCount} itens no carrinho`}
                   >
                     {itemCount > 9 ? '9+' : itemCount}
                   </span>
