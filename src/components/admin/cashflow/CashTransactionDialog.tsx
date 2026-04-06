@@ -218,7 +218,7 @@ export function CashTransactionDialog({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-white/[0.08] bg-transparent text-white">
               Cancelar
             </Button>
             <Button

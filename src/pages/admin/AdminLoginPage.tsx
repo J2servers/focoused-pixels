@@ -90,9 +90,9 @@ const AdminLoginPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white/[0.03]">
         <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-purple)/0.3)] animate-ping" />
-          <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-pink)/0.2)] animate-pulse delay-75" />
-          <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]">
+          <div className="absolute inset-0 rounded-full bg-purple-500/[0.3] animate-ping" />
+          <div className="absolute inset-0 rounded-full bg-pink-500/[0.2] animate-pulse delay-75" />
+          <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 via-[hsl(330 80% 60%)] to-[hsl(210 100% 60%)] flex items-center justify-center shadow-lg shadow-[rgb(168 85 247 / 0.4)]">
             <Loader2 className="h-7 w-7 animate-spin text-white" />
           </div>
         </div>
@@ -103,14 +103,14 @@ const AdminLoginPage = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Decorative */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[hsl(var(--admin-sidebar))]">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-white/[0.04]">
         {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--admin-accent-purple)/0.15)] via-transparent to-[hsl(var(--admin-accent-pink)/0.1)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--admin-accent-blue)/0.1),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,hsl(var(--admin-accent-pink)/0.1),transparent_50%)]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[rgb(168 85 247 / 0.15)] via-transparent to-[rgb(236 72 153 / 0.1)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgb(59 130 246 / 0.1),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgb(236 72 153 / 0.1),transparent_50%)]" />
         
         <div className="relative z-10 flex flex-col justify-center px-16">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-2xl shadow-[hsl(var(--admin-accent-purple)/0.4)] mb-8 animate-pulse">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 via-[hsl(330 80% 60%)] to-[hsl(210 100% 60%)] flex items-center justify-center shadow-2xl shadow-[rgb(168 85 247 / 0.4)] mb-8 animate-pulse">
             <Sparkles className="h-8 w-8 text-white drop-shadow-[0_0_8px_white]" />
           </div>
           <h1 className="text-4xl font-bold admin-gradient-text mb-4">
@@ -135,17 +135,17 @@ const AdminLoginPage = () => {
         </div>
 
         {/* Decorative elements */}
-        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-purple)/0.1)] to-[hsl(var(--admin-accent-pink)/0.1)] blur-3xl" />
-        <div className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-blue)/0.1)] to-transparent blur-3xl" />
-        <div className="absolute top-1/2 right-20 w-32 h-32 rounded-full bg-[hsl(var(--admin-accent-cyan)/0.1)] blur-2xl animate-pulse" />
+        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[rgb(168 85 247 / 0.1)] to-[rgb(236 72 153 / 0.1)] blur-3xl" />
+        <div className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full bg-gradient-to-br from-[rgb(59 130 246 / 0.1)] to-transparent blur-3xl" />
+        <div className="absolute top-1/2 right-20 w-32 h-32 rounded-full bg-cyan-500/[0.1] blur-2xl animate-pulse" />
       </div>
 
       {/* Right Side - Form */}
       <div className="flex-1 flex items-center justify-center bg-white/[0.03] p-6">
-        <Card className="w-full max-w-md border-white/[0.08] bg-[hsl(var(--admin-card))] shadow-2xl shadow-black/20">
+        <Card className="w-full max-w-md border-white/[0.08] bg-white/[0.04] shadow-2xl shadow-black/20">
           <CardHeader className="text-center space-y-4 pb-2">
             <div className="lg:hidden mx-auto">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] mx-auto">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 via-[hsl(330 80% 60%)] to-[hsl(210 100% 60%)] flex items-center justify-center shadow-lg shadow-[rgb(168 85 247 / 0.3)] mx-auto">
                 <Sparkles className="h-7 w-7 text-white" />
               </div>
             </div>
@@ -173,7 +173,7 @@ const AdminLoginPage = () => {
                       type="email"
                       {...resetForm.register('email')}
                       placeholder="seu@email.com"
-                      className="pl-10 h-11 bg-[hsl(var(--admin-sidebar))] border-white/[0.08] text-white placeholder:text-white/50 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-[hsl(var(--admin-accent-purple))]"
+                      className="pl-10 h-11 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/50 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-[hsl(270 70% 60%)]"
                     />
                   </div>
                   {resetForm.formState.errors.email && (
@@ -183,7 +183,7 @@ const AdminLoginPage = () => {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-purple))] hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-purple-500 via-[hsl(330 80% 60%)] to-purple-500 hover:opacity-90 text-white shadow-lg shadow-[rgb(168 85 247 / 0.3)] transition-all duration-300" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -215,7 +215,7 @@ const AdminLoginPage = () => {
                       type="email"
                       {...loginForm.register('email')}
                       placeholder="seu@email.com"
-                      className="pl-10 h-11 bg-[hsl(var(--admin-sidebar))] border-white/[0.08] text-white placeholder:text-white/50 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-[hsl(var(--admin-accent-purple))]"
+                      className="pl-10 h-11 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/50 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-[hsl(270 70% 60%)]"
                     />
                   </div>
                   {loginForm.formState.errors.email && (
@@ -234,7 +234,7 @@ const AdminLoginPage = () => {
                       type={showPassword ? 'text' : 'password'}
                       {...loginForm.register('password')}
                       placeholder="••••••••"
-                      className="pl-10 pr-10 h-11 bg-[hsl(var(--admin-sidebar))] border-white/[0.08] text-white placeholder:text-white/50 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-[hsl(var(--admin-accent-purple))]"
+                      className="pl-10 pr-10 h-11 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/50 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-[hsl(270 70% 60%)]"
                     />
                     <button
                       type="button"
@@ -251,7 +251,7 @@ const AdminLoginPage = () => {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-purple))] hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-purple-500 via-[hsl(330 80% 60%)] to-purple-500 hover:opacity-90 text-white shadow-lg shadow-[rgb(168 85 247 / 0.3)] transition-all duration-300" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />

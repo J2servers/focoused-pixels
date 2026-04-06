@@ -10,31 +10,31 @@ import { EmailCredentials } from '@/hooks/useEmailCredentials';
 import { type LucideIcon } from 'lucide-react';
 
 /* ─── Design Tokens ─── */
-export const card = 'rounded-2xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))]';
+export const card = 'rounded-2xl border border-white/[0.08] bg-white/[0.04]';
 export const cardInner = 'p-5 md:p-6';
 export const sectionGap = 'space-y-6';
 export const gridGap = 'gap-5';
 
 export const inputClass = cn(
-  'h-10 rounded-lg border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))]',
-  'text-sm text-[hsl(var(--admin-text))] placeholder:text-[hsl(var(--admin-text-muted)/0.5)]',
-  'focus-visible:ring-1 focus-visible:ring-[hsl(var(--admin-accent-purple)/0.5)] focus-visible:border-[hsl(var(--admin-accent-purple)/0.5)]',
+  'h-10 rounded-lg border-white/[0.08] bg-white/[0.03]',
+  'text-sm text-white placeholder:text-white/30',
+  'focus-visible:ring-1 focus-visible:ring-purple-500/[0.5] focus-visible:border-purple-500/[0.5]',
   'transition-colors'
 );
 
 export const textareaClass = cn(
-  'min-h-[100px] rounded-lg border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))]',
-  'text-sm text-[hsl(var(--admin-text))] placeholder:text-[hsl(var(--admin-text-muted)/0.5)]',
-  'focus-visible:ring-1 focus-visible:ring-[hsl(var(--admin-accent-purple)/0.5)]',
+  'min-h-[100px] rounded-lg border-white/[0.08] bg-white/[0.03]',
+  'text-sm text-white placeholder:text-white/30',
+  'focus-visible:ring-1 focus-visible:ring-purple-500/[0.5]',
   'transition-colors'
 );
 
 export const selectClass = cn(
-  'h-10 rounded-lg border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))]',
-  'text-sm text-[hsl(var(--admin-text))]'
+  'h-10 rounded-lg border-white/[0.08] bg-white/[0.03]',
+  'text-sm text-white'
 );
 
-export const labelClass = 'text-xs font-semibold uppercase tracking-wide text-[hsl(var(--admin-text-muted))]';
+export const labelClass = 'text-xs font-semibold uppercase tracking-wide text-white/50';
 
 /* ─── Section Header ─── */
 export const SectionHeader = ({ title, description, icon: Icon, accentVar = '--admin-accent-purple' }: {
@@ -47,8 +47,8 @@ export const SectionHeader = ({ title, description, icon: Icon, accentVar = '--a
       </div>
     )}
     <div>
-      <h3 className="text-base font-bold text-[hsl(var(--admin-text))]">{title}</h3>
-      <p className="mt-0.5 text-sm leading-relaxed text-[hsl(var(--admin-text-muted))]">{description}</p>
+      <h3 className="text-base font-bold text-white">{title}</h3>
+      <p className="mt-0.5 text-sm leading-relaxed text-white/50">{description}</p>
     </div>
   </div>
 );
@@ -63,7 +63,7 @@ export const MetricCard = ({ label, value, accentVar = '--admin-accent-purple' }
     `hover:bg-[hsl(var(${accentVar})/0.1)]`
   )}>
     <p className={cn('text-[11px] font-semibold uppercase tracking-widest', `text-[hsl(var(${accentVar}))]`)}>{label}</p>
-    <p className="mt-1 text-lg font-bold text-[hsl(var(--admin-text))]">{value}</p>
+    <p className="mt-1 text-lg font-bold text-white">{value}</p>
   </div>
 );
 
@@ -77,15 +77,15 @@ export const ToggleBlock = ({ title, description, checked, onChange, icon: Icon 
 }) => (
   <label className={cn(
     'flex cursor-pointer items-center justify-between gap-4 rounded-xl border p-4 transition-colors',
-    'border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg)/0.4)]',
-    'hover:bg-[hsl(var(--admin-bg)/0.7)]',
-    checked && 'border-[hsl(var(--admin-accent-purple)/0.25)] bg-[hsl(var(--admin-accent-purple)/0.04)]'
+    'border-white/[0.08] bg-white/[0.03]',
+    'hover:bg-white/[0.05]',
+    checked && 'border-purple-500/[0.25] bg-purple-500/[0.04]'
   )}>
     <div className="flex items-center gap-3 min-w-0">
-      {Icon && <Icon className="h-4 w-4 shrink-0 text-[hsl(var(--admin-text-muted))]" />}
+      {Icon && <Icon className="h-4 w-4 shrink-0 text-white/50" />}
       <div className="min-w-0">
-        <p className="text-sm font-medium text-[hsl(var(--admin-text))]">{title}</p>
-        <p className="text-xs text-[hsl(var(--admin-text-muted))] leading-relaxed">{description}</p>
+        <p className="text-sm font-medium text-white">{title}</p>
+        <p className="text-xs text-white/50 leading-relaxed">{description}</p>
       </div>
     </div>
     <Switch checked={checked} onCheckedChange={onChange} className="shrink-0 admin-switch-orange" />

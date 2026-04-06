@@ -23,7 +23,7 @@ function WaitForEventNode({ data, selected }: NodeProps) {
         <div className="min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-widest text-sky-400">Aguardar Evento</p>
           <p className="text-sm font-medium truncate max-w-[140px]">{EVENT_LABELS[event] || event}</p>
-          <p className="text-[9px] text-[hsl(var(--admin-text-muted))]">Timeout: {timeoutLabel}</p>
+          <p className="text-[9px] text-white/50">Timeout: {timeoutLabel}</p>
         </div>
       </div>
       <Handle type="source" position={Position.Bottom} className="!w-3 !h-3 !bg-sky-500 !border-2 !border-background" />

@@ -24,7 +24,7 @@ export const SettingsGeneralSection = ({ settings, u }: Props) => (
         <FieldGroup label="Status atual">
           <Select value={settings.store_status || 'open'} onValueChange={v => u('store_status', v)}>
             <SelectTrigger className={selectClass}><SelectValue /></SelectTrigger>
-            <SelectContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text))]">
+            <SelectContent className="bg-white/[0.04] border-white/[0.08] text-white">
               <SelectItem value="open">🟢 Aberta</SelectItem>
               <SelectItem value="closed">🔴 Fechada</SelectItem>
               <SelectItem value="vacation">🏖️ Férias</SelectItem>

@@ -79,18 +79,18 @@ export const UniversalSearch = ({ open, onOpenChange }: { open: boolean; onOpenC
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg p-0 gap-0 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-        <div className="flex items-center border-b border-[hsl(var(--admin-card-border))] px-4">
-          <Search className="h-4 w-4 text-[hsl(var(--admin-text-muted))] shrink-0" />
+      <DialogContent className="sm:max-w-lg p-0 gap-0 bg-white/[0.04] border-white/[0.08]">
+        <div className="flex items-center border-b border-white/[0.08] px-4">
+          <Search className="h-4 w-4 text-white/50 shrink-0" />
           <Input
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Buscar produtos, vendas, leads, categorias..."
-            className="border-0 focus-visible:ring-0 bg-transparent text-white placeholder:text-[hsl(var(--admin-text-muted))]"
+            className="border-0 focus-visible:ring-0 bg-transparent text-white placeholder:text-white/50"
             autoFocus
           />
           {query && (
-            <button onClick={() => setQuery('')} className="text-[hsl(var(--admin-text-muted))] hover:text-white">
+            <button onClick={() => setQuery('')} className="text-white/50 hover:text-white">
               <X className="h-4 w-4" />
             </button>
           )}
@@ -98,11 +98,11 @@ export const UniversalSearch = ({ open, onOpenChange }: { open: boolean; onOpenC
 
         <ScrollArea className="max-h-[400px]">
           {isSearching && (
-            <div className="p-4 text-center text-sm text-[hsl(var(--admin-text-muted))]">Buscando...</div>
+            <div className="p-4 text-center text-sm text-white/50">Buscando...</div>
           )}
           
           {!isSearching && query.length >= 2 && results.length === 0 && (
-            <div className="p-8 text-center text-sm text-[hsl(var(--admin-text-muted))]">
+            <div className="p-8 text-center text-sm text-white/50">
               Nenhum resultado para "{query}"
             </div>
           )}
@@ -114,7 +114,7 @@ export const UniversalSearch = ({ open, onOpenChange }: { open: boolean; onOpenC
                 if (!typeResults.length) return null;
                 return (
                   <div key={type} className="mb-2">
-                    <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[hsl(var(--admin-text-muted))]">
+                    <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/50">
                       {config.label}s
                     </div>
                     {typeResults.map(result => {
@@ -123,12 +123,12 @@ export const UniversalSearch = ({ open, onOpenChange }: { open: boolean; onOpenC
                         <button
                           key={result.id}
                           onClick={() => handleSelect(result)}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-[hsl(var(--admin-sidebar-hover))] transition-colors text-left"
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/[0.06] transition-colors text-left"
                         >
                           <Icon className={`h-4 w-4 ${config.color} shrink-0`} />
                           <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium text-white truncate">{result.title}</p>
-                            <p className="text-xs text-[hsl(var(--admin-text-muted))] truncate">{result.subtitle}</p>
+                            <p className="text-xs text-white/50 truncate">{result.subtitle}</p>
                           </div>
                         </button>
                       );
@@ -140,8 +140,8 @@ export const UniversalSearch = ({ open, onOpenChange }: { open: boolean; onOpenC
           )}
 
           {!query && (
-            <div className="p-6 text-center text-sm text-[hsl(var(--admin-text-muted))]">
-              <p>Use <kbd className="px-1.5 py-0.5 bg-[hsl(var(--admin-bg))] rounded text-xs">Ctrl+K</kbd> para abrir</p>
+            <div className="p-6 text-center text-sm text-white/50">
+              <p>Use <kbd className="px-1.5 py-0.5 bg-white/[0.03] rounded text-xs">Ctrl+K</kbd> para abrir</p>
               <p className="mt-1">Busque por produtos, vendas, leads e mais</p>
             </div>
           )}

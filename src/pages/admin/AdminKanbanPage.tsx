@@ -123,7 +123,7 @@ const AdminKanbanPage = () => {
         <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${visibleColumns.length}, 1fr)` }}>
           {visibleColumns.map(({ status, icon: Icon, color, borderColor, label }) => (
             <Card key={status} className={cn(
-              'flex flex-col border-white/[0.08] bg-[hsl(var(--admin-card))] border-t-4',
+              'flex flex-col border-white/[0.08] bg-white/[0.04] border-t-4',
               borderColor
             )}>
               <CardHeader className="pb-2 px-3">
@@ -198,7 +198,7 @@ const AdminKanbanPage = () => {
           <div className="space-y-3">
             {columns.map((col, idx) => (
               <div key={col.status} className="flex items-center gap-2 p-2 rounded-lg border border-white/[0.08] bg-white/[0.03]">
-                <input type="checkbox" checked={col.visible} onChange={() => toggleColumn(col.status)} className="rounded accent-[hsl(var(--admin-accent-purple))]" />
+                <input type="checkbox" checked={col.visible} onChange={() => toggleColumn(col.status)} className="rounded accent-[hsl(270 70% 60%)]" />
                 {editingColumn === col.status ? (
                   <div className="flex-1 flex gap-2">
                     <Input value={editLabel} onChange={e => setEditLabel(e.target.value)} className="h-7 text-sm border-white/[0.08] bg-white/[0.03] text-white" autoFocus />

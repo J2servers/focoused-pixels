@@ -136,6 +136,6 @@ export const isNew = (createdAt?: string) => {
 };
 
 // Admin theme classes
-export const cardCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]";
-export const inputCls = "bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white";
-export const mutedText = "text-[hsl(var(--admin-text-muted))]";
+export const cardCls = "bg-white/[0.04] border-white/[0.08]";
+export const inputCls = "bg-white/[0.03] border-white/[0.08] text-white";
+export const mutedText = "text-white/50";

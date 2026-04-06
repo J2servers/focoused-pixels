@@ -15,11 +15,11 @@ interface ActivityItem {
 }
 
 const tableConfig: Record<string, { icon: typeof ShoppingCart; color: string; label: string }> = {
-  orders: { icon: ShoppingCart, color: 'text-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.15)]', label: 'Pedido' },
-  quotes: { icon: FileText, color: 'text-[hsl(var(--admin-accent-blue))] bg-[hsl(var(--admin-accent-blue)/0.15)]', label: 'Orçamento' },
-  products: { icon: Package, color: 'text-[hsl(var(--admin-accent-cyan))] bg-[hsl(var(--admin-accent-cyan)/0.15)]', label: 'Produto' },
-  reviews: { icon: Star, color: 'text-[hsl(var(--admin-accent-orange))] bg-[hsl(var(--admin-accent-orange)/0.15)]', label: 'Avaliação' },
-  leads: { icon: UserPlus, color: 'text-[hsl(var(--admin-accent-green))] bg-[hsl(var(--admin-accent-green)/0.15)]', label: 'Lead' },
+  orders: { icon: ShoppingCart, color: 'text-purple-400 bg-purple-500/[0.15]', label: 'Pedido' },
+  quotes: { icon: FileText, color: 'text-[hsl(210 100% 60%)] bg-[rgb(59 130 246 / 0.15)]', label: 'Orçamento' },
+  products: { icon: Package, color: 'text-cyan-400 bg-cyan-500/[0.15]', label: 'Produto' },
+  reviews: { icon: Star, color: 'text-orange-400 bg-orange-500/[0.15]', label: 'Avaliação' },
+  leads: { icon: UserPlus, color: 'text-emerald-400 bg-emerald-500/[0.15]', label: 'Lead' },
 };
 
 const actionLabels: Record<string, string> = {
@@ -48,10 +48,10 @@ export function RealActivityFeed() {
   }, []);
 
   return (
-    <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
+    <Card className="border-white/[0.08] bg-white/[0.04] shadow-lg">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg text-white">
-          <Activity className="h-5 w-5 text-[hsl(var(--admin-accent-pink))]" />
+          <Activity className="h-5 w-5 text-pink-400" />
           Atividade Recente
         </CardTitle>
       </CardHeader>
@@ -59,11 +59,11 @@ export function RealActivityFeed() {
         {loading ? (
           <div className="space-y-3">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-12 bg-[hsl(var(--admin-sidebar))] animate-pulse rounded-lg" />
+              <div key={i} className="h-12 bg-white/[0.04] animate-pulse rounded-lg" />
             ))}
           </div>
         ) : activities.length === 0 ? (
-          <p className="text-sm text-[hsl(var(--admin-text-muted))] text-center py-8">
+          <p className="text-sm text-white/50 text-center py-8">
             Nenhuma atividade recente registrada.
           </p>
         ) : (
@@ -72,7 +72,7 @@ export function RealActivityFeed() {
               const config = tableConfig[item.table_name] || { icon: Activity, color: 'text-gray-400 bg-gray-400/15', label: item.table_name };
               const Icon = config.icon;
               return (
-                <div key={item.id} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[hsl(var(--admin-sidebar-hover))] transition-colors">
+                <div key={item.id} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/[0.06] transition-colors">
                   <div className={cn("p-2 rounded-lg shrink-0", config.color)}>
                     <Icon className="h-4 w-4" />
                   </div>
@@ -80,7 +80,7 @@ export function RealActivityFeed() {
                     <p className="text-sm text-white truncate">
                       {config.label} {actionLabels[item.action] || item.action.toLowerCase()}
                     </p>
-                    <p className="text-xs text-[hsl(var(--admin-text-muted))]">
+                    <p className="text-xs text-white/50">
                       {formatDistanceToNow(new Date(item.created_at), { addSuffix: true, locale: ptBR })}
                     </p>
                   </div>

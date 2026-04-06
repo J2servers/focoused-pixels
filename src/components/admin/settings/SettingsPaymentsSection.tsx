@@ -65,20 +65,20 @@ export const SettingsPaymentsSection = ({ payment, up, canMutate, testMP, testEF
           <FieldGroup label="Gateway principal">
             <Select value={payment.payment_gateway_primary || 'mercadopago'} onValueChange={v => up('payment_gateway_primary', v)}>
               <SelectTrigger className={selectClass}><SelectValue /></SelectTrigger>
-              <SelectContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text))]">
+              <SelectContent className="bg-white/[0.04] border-white/[0.08] text-white">
                 {GATEWAYS.map(g => <SelectItem key={g.id} value={g.id}>{g.label}</SelectItem>)}
               </SelectContent>
             </Select>
           </FieldGroup>
           <div className="space-y-1.5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[hsl(var(--admin-text-muted))]">Métodos aceitos</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/50">Métodos aceitos</p>
             <div className="flex gap-2">
               {['pix', 'credit_card', 'boleto'].map(m => (
                 <label key={m} className={cn(
                   'flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2.5 text-sm transition-colors',
                   methods.includes(m)
-                    ? 'border-[hsl(var(--admin-accent-purple)/0.3)] bg-[hsl(var(--admin-accent-purple)/0.08)] text-[hsl(var(--admin-text))]'
-                    : 'border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg)/0.4)] text-[hsl(var(--admin-text-muted))]'
+                    ? 'border-purple-500/[0.3] bg-purple-500/[0.08] text-white'
+                    : 'border-white/[0.08] bg-white/[0.03] text-white/50'
                 )}>
                   <Checkbox checked={methods.includes(m)} onCheckedChange={() => toggleMethod(m)} />
                   <span className="font-medium">{METHOD_LABELS[m]}</span>
@@ -118,14 +118,14 @@ export const SettingsPaymentsSection = ({ payment, up, canMutate, testMP, testEF
             { id: 'efi', label: 'EFI Bank', test: testEFI },
             { id: 'stripe', label: 'Stripe', test: testStripe },
           ].map(gw => (
-            <div key={gw.id} className="flex items-center justify-between rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg)/0.4)] p-4">
+            <div key={gw.id} className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
               <div className="flex items-center gap-3">
                 {gw.test.isSuccess
-                  ? <CheckCircle2 className="h-5 w-5 text-[hsl(var(--admin-accent-green))]" />
-                  : <XCircle className="h-5 w-5 text-[hsl(var(--admin-text-muted)/0.5)]" />}
+                  ? <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                  : <XCircle className="h-5 w-5 text-white/30" />}
                 <div>
-                  <p className="text-sm font-semibold text-[hsl(var(--admin-text))]">{gw.label}</p>
-                  <p className="text-xs text-[hsl(var(--admin-text-muted))]">{gw.test.isSuccess ? 'Conectado' : 'Não testado'}</p>
+                  <p className="text-sm font-semibold text-white">{gw.label}</p>
+                  <p className="text-xs text-white/50">{gw.test.isSuccess ? 'Conectado' : 'Não testado'}</p>
                 </div>
               </div>
               <Button className="admin-btn admin-btn-edit !min-h-0 !py-1.5 !px-3 h-8 text-xs" onClick={() => runTest(gw.label, gw.test.mutateAsync)} disabled={!canMutate || gw.test.isPending}>
@@ -149,7 +149,7 @@ export const SettingsPaymentsSection = ({ payment, up, canMutate, testMP, testEF
                   <span className={cn('inline-flex h-8 items-center rounded-lg px-3 text-xs font-bold uppercase tracking-wider', `bg-[hsl(var(${gw.accentVar})/0.12)] text-[hsl(var(${gw.accentVar}))]`)}>{gw.label}</span>
                   {test && (
                     <span className={cn('inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium',
-                      test.isSuccess ? 'bg-[hsl(var(--admin-accent-green)/0.1)] text-[hsl(var(--admin-accent-green))]' : 'bg-[hsl(var(--admin-card-border)/0.2)] text-[hsl(var(--admin-text-muted)/0.6)]'
+                      test.isSuccess ? 'bg-emerald-500/[0.1] text-emerald-400' : 'bg-[rgb(255 255 255 / 0.2)] text-white/30'
                     )}>
                       {test.isSuccess ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
                       {test.isSuccess ? 'OK' : 'pendente'}
@@ -158,7 +158,7 @@ export const SettingsPaymentsSection = ({ payment, up, canMutate, testMP, testEF
                 </div>
               </div>
 
-              <p className="text-sm text-[hsl(var(--admin-text-muted))]">{gw.description}</p>
+              <p className="text-sm text-white/50">{gw.description}</p>
 
               <ToggleBlock title={`Ativar ${gw.label}`} description="Disponibiliza no checkout." checked={enabled} onChange={v => up(gw.enabledKey, v as any)} />
 
