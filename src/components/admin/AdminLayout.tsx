@@ -6,6 +6,7 @@ import { AdminHeader } from './AdminHeader';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { Helmet } from 'react-helmet-async';
 
 interface AdminLayoutProps {
   children: ReactNode;
