@@ -6,7 +6,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// --- Input Validation ---
+const MAX_MESSAGES = 50;
+const MAX_MESSAGE_LENGTH = 2000;
+const ALLOWED_ROLES = ["user", "assistant"] as const;
+
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 interface ProductInfo {
+  id: string;
   name: string;
   slug: string;
   price: number;
@@ -15,6 +26,7 @@ interface ProductInfo {
 }
 
 interface CategoryInfo {
+  id: string;
   name: string;
   slug: string;
 }
@@ -27,6 +39,51 @@ interface AIExternalConfig {
   ai_external_model: string | null;
 }
 
+function validateMessages(raw: unknown): ChatMessage[] {
+  if (!Array.isArray(raw)) throw new Error("messages must be an array");
+  if (raw.length === 0) throw new Error("messages cannot be empty");
+  if (raw.length > MAX_MESSAGES) throw new Error(`max ${MAX_MESSAGES} messages allowed`);
+
+  return raw.map((msg, i) => {
+    if (typeof msg !== "object" || msg === null) throw new Error(`message[${i}] invalid`);
+    const m = msg as Record<string, unknown>;
+    
+    if (!ALLOWED_ROLES.includes(m.role as typeof ALLOWED_ROLES[number])) {
+      throw new Error(`message[${i}].role must be 'user' or 'assistant'`);
+    }
+    if (typeof m.content !== "string" || m.content.trim().length === 0) {
+      throw new Error(`message[${i}].content must be non-empty string`);
+    }
+    
+    return {
+      role: m.role as ChatMessage["role"],
+      content: m.content.trim().substring(0, MAX_MESSAGE_LENGTH),
+    };
+  });
+}
+
+// --- Rate Limiting (in-memory, per-instance) ---
+const rateLimit = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string, maxReqs = 15, windowMs = 60_000): boolean {
+  const now = Date.now();
+  const entry = rateLimit.get(ip);
+  if (entry && entry.resetAt > now) {
+    if (entry.count >= maxReqs) return false;
+    entry.count++;
+    return true;
+  }
+  rateLimit.set(ip, { count: 1, resetAt: now + windowMs });
+  // Cleanup old entries periodically
+  if (rateLimit.size > 1000) {
+    for (const [k, v] of rateLimit) {
+      if (v.resetAt <= now) rateLimit.delete(k);
+    }
+  }
+  return true;
+}
+
+// --- System Prompt Builder ---
 const buildSystemPrompt = (products: ProductInfo[], categories: CategoryInfo[]) => {
   const productCatalog = products.map(p => {
     const price = p.promotional_price || p.price;
@@ -85,23 +142,6 @@ ${categoryLinks}
 12. Use emojis ocasionalmente para deixar a conversa mais amigável ✨
 13. Sempre que possível, faça perguntas para entender melhor a necessidade do cliente
 
-## Exemplos de Respostas
-
-**Cliente:** "Quero comprar um letreiro neon"
-**Resposta:** "Que ótima escolha! ✨ Temos lindos letreiros neon LED personalizados. Aqui estão as opções:
-
-- **Letreiro Neon LED Personalizado**: R$ 189,90 → [Clique aqui para comprar](/produto/letreiro-neon-led-personalizado)
-
-Você pode personalizar o texto, cor e tamanho! Posso ajudar com alguma dúvida?"
-
-**Cliente:** "Preciso de crachás para minha empresa"
-**Resposta:** "Perfeito! Temos várias opções de crachás profissionais:
-
-- **Crachá com QR Code Dinâmico**: R$ 24,90 → [Clique aqui para comprar](/produto/cracha-qr-code-dinamico)
-- **Crachá Magnético Premium**: R$ 18,90 → [Clique aqui para comprar](/produto/cracha-magnetico-premium)
-
-Para quantidades acima de 10 unidades você ganha 5% de desconto! Quantos crachás você precisa?"
-
 ## Objetivo Principal
 Ajudar clientes a encontrar o produto ideal, SEMPRE enviando links clicáveis para facilitar a compra. Seja consultiva e demonstre conhecimento sobre os produtos.`;
 };
@@ -123,7 +163,19 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    // Rate limiting
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (!checkRateLimit(clientIp)) {
+      return new Response(
+        JSON.stringify({ error: "Muitas mensagens enviadas. Aguarde um momento." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Parse and validate input
+    const body = await req.json();
+    const messages = validateMessages(body.messages);
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -156,12 +208,12 @@ serve(async (req) => {
           .single()
       ]);
 
-      products = productsResult.data || [];
-      categories = categoriesResult.data || [];
-      aiConfig = configResult.data;
+      products = (productsResult.data || []) as ProductInfo[];
+      categories = (categoriesResult.data || []) as CategoryInfo[];
+      aiConfig = configResult.data as AIExternalConfig | null;
     }
 
-    console.log(`AI Assistant - Loaded ${products.length} products and ${categories.length} categories`);
+    console.log(`AI Assistant - ${products.length} products, ${categories.length} categories, ${messages.length} messages`);
 
     const SYSTEM_PROMPT = buildSystemPrompt(products, categories);
 
@@ -173,16 +225,16 @@ serve(async (req) => {
     let model: string;
     let headers: Record<string, string>;
 
-    if (useExternal) {
+    if (useExternal && aiConfig) {
       const provider = aiConfig.ai_external_provider || 'openai';
       apiUrl = aiConfig.ai_external_api_url || PROVIDER_URLS[provider] || PROVIDER_URLS.openai;
-      apiKey = aiConfig.ai_external_api_key;
+      apiKey = aiConfig.ai_external_api_key!;
       model = aiConfig.ai_external_model || 'gpt-4o';
       headers = {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       };
-      console.log(`AI Assistant - Using external provider: ${provider}, model: ${model}`);
+      console.log(`AI Assistant - External provider: ${provider}, model: ${model}`);
     } else {
       if (!LOVABLE_API_KEY) {
         throw new Error("LOVABLE_API_KEY is not configured");
@@ -194,20 +246,22 @@ serve(async (req) => {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       };
-      console.log("AI Assistant - Using native Lovable AI");
+      console.log("AI Assistant - Native Lovable AI");
     }
+
+    const requestBody = JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        ...messages,
+      ],
+      stream: true,
+    });
 
     const response = await fetch(apiUrl, {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...messages,
-        ],
-        stream: true,
-      }),
+      body: requestBody,
     });
 
     if (!response.ok) {
@@ -238,14 +292,12 @@ serve(async (req) => {
       }
 
       if (response.status === 429) {
-        console.error("Rate limit exceeded");
         return new Response(
           JSON.stringify({ error: "Muitas mensagens enviadas. Por favor, aguarde um momento." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (response.status === 402) {
-        console.error("Payment required");
         return new Response(
           JSON.stringify({ error: "Serviço temporariamente indisponível." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -263,10 +315,14 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (error) {
-    console.error("AI Assistant error:", error);
+    const message = error instanceof Error ? error.message : "Erro desconhecido";
+    console.error("AI Assistant error:", message);
+    
+    // Return 400 for validation errors
+    const isValidation = message.includes("must be") || message.includes("cannot be") || message.includes("invalid");
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Erro desconhecido" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: isValidation ? message : "Erro ao processar sua mensagem." }),
+      { status: isValidation ? 400 : 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
