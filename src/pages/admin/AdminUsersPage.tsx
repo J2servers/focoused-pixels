@@ -77,13 +77,13 @@ const AdminUsersPage = () => {
       render: (user) => (
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
           <Button variant="ghost" size="icon"
-            className="text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))]"
+            className="admin-btn admin-btn-edit !min-h-0 !p-1 h-8 w-8"
             onClick={() => { setSelectedUser(user); setEditRole(user.role || 'support'); setIsEditRoleOpen(true); }}
             disabled={user.id === currentUser?.id}>
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon"
-            className="text-red-400 hover:text-red-300"
+            className="admin-btn admin-btn-delete !min-h-0 !p-1 h-8 w-8"
             onClick={() => { setSelectedUser(user); setIsDeleteDialogOpen(true); }}
             disabled={user.id === currentUser?.id}>
             <Trash2 className="h-4 w-4" />
@@ -116,8 +116,8 @@ const AdminUsersPage = () => {
         <DataTable data={users} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar usuários..."
           emptyMessage="Nenhum usuário com acesso ao painel"
           actions={
-            <Button onClick={() => setIsDialogOpen(true)}
-              className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg">
+             <Button onClick={() => setIsDialogOpen(true)}
+              className="admin-btn admin-btn-create">
               <Plus className="h-4 w-4 mr-2" />Novo Usuário
             </Button>
           } />
@@ -159,7 +159,7 @@ const AdminUsersPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
-            <Button onClick={handleAddUser} disabled={isSaving} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
+            <Button onClick={handleAddUser} disabled={isSaving} className="admin-btn admin-btn-create">
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Criar Usuário
             </Button>
           </DialogFooter>
@@ -187,7 +187,7 @@ const AdminUsersPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditRoleOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
-            <Button onClick={handleEditRole} disabled={isSaving} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
+            <Button onClick={handleEditRole} disabled={isSaving} className="admin-btn admin-btn-save">
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar
             </Button>
           </DialogFooter>
@@ -205,7 +205,7 @@ const AdminUsersPage = () => {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
-            <Button variant="destructive" onClick={handleDeleteRole} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Remover</Button>
+            <Button className="admin-btn admin-btn-delete" onClick={handleDeleteRole} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

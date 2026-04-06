@@ -59,8 +59,8 @@ const AdminReviewsPage = () => {
               <XCircle className="h-4 w-4 text-orange-400" />
             </Button>
           )}
-          <Button variant="ghost" size="icon" onClick={() => { setSelectedReview(review); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}>
-            <Trash2 className="h-4 w-4 text-destructive" />
+          <Button variant="ghost" size="icon" className="admin-btn admin-btn-delete !min-h-0 !p-1 h-8 w-8" onClick={() => { setSelectedReview(review); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}>
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -124,7 +124,7 @@ const AdminReviewsPage = () => {
             <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Fechar</Button>
             {selectedReview && !selectedReview.is_approved && (
               <Button onClick={() => { approveReview.mutate({ id: selectedReview.id, approved: true }); setIsViewDialogOpen(false); }}
-                className="bg-gradient-to-r from-[hsl(var(--admin-accent-green))] to-emerald-600 text-white">Aprovar</Button>
+                className="admin-btn admin-btn-save">Aprovar</Button>
             )}
           </DialogFooter>
         </DialogContent>
@@ -137,7 +137,7 @@ const AdminReviewsPage = () => {
             <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Tem certeza que deseja excluir esta avaliação?</DialogDescription></DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white">Cancelar</Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isProcessing}>{isProcessing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Excluir</Button>
+            <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={isProcessing}>{isProcessing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

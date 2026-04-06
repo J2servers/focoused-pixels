@@ -163,7 +163,7 @@ const AdminCompanyPage = () => {
             </h1>
             <p className={`${mutedText} mt-1 text-sm`}>Logos, cores, contatos, políticas e ajustes de credibilidade da loja</p>
           </div>
-          <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white" size="lg">
+          <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} className="admin-btn admin-btn-save" size="lg">
             {updateCompany.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             Salvar alterações
           </Button>
@@ -209,7 +209,7 @@ const AdminCompanyPage = () => {
 
         {/* ─── Bottom Save ─── */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white" size="lg">
+          <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} className="admin-btn admin-btn-save" size="lg">
             {updateCompany.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             Salvar alterações
           </Button>
