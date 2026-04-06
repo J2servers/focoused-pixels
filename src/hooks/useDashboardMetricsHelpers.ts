@@ -19,12 +19,12 @@ export function filterByDateRange<T extends DateFilterable>(arr: T[], start: Dat
   return arr.filter(o => { const d = new Date(o.created_at); return d >= start && d <= end; });
 }
 
-export function buildDailyTimeSeries<T extends DateFilterable>(
+export function buildDailyTimeSeries<T extends DateFilterable, R extends Record<string, unknown>>(
   arr: T[],
   days: number,
-  extractor: (items: T[], day: Date, nextDay: Date) => Record<string, number>
-) {
-  const result: (Record<string, number> & { date: string })[] = [];
+  extractor: (items: T[], day: Date, nextDay: Date) => R
+): (R & { date: string })[] {
+  const result: (R & { date: string })[] = [];
   for (let i = days - 1; i >= 0; i--) {
     const day = startOfDay(daysAgo(i));
     const nextDay = new Date(day.getTime() + 86400000);
@@ -32,18 +32,18 @@ export function buildDailyTimeSeries<T extends DateFilterable>(
     result.push({
       date: day.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' }),
       ...extractor(items, day, nextDay),
-    });
+    } as R & { date: string });
   }
   return result;
 }
 
-export function buildMonthlyTimeSeries<T extends DateFilterable>(
+export function buildMonthlyTimeSeries<T extends DateFilterable, R extends Record<string, unknown>>(
   arr: T[],
   months: number,
-  extractor: (items: T[], mStart: Date, mEnd: Date) => Record<string, number>
-) {
+  extractor: (items: T[], mStart: Date, mEnd: Date) => R
+): (R & { mes: string })[] {
   const now = new Date();
-  const result: (Record<string, number> & { mes: string })[] = [];
+  const result: (R & { mes: string })[] = [];
   for (let i = months - 1; i >= 0; i--) {
     const mStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const mEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
@@ -51,7 +51,7 @@ export function buildMonthlyTimeSeries<T extends DateFilterable>(
     result.push({
       mes: mStart.toLocaleDateString('pt-BR', { month: 'short' }),
       ...extractor(items, mStart, mEnd),
-    });
+    } as R & { mes: string });
   }
   return result;
 }
