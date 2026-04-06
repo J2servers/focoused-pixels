@@ -100,7 +100,7 @@ function ApiKeysSection() {
               <Label className={`${mutedText} text-xs uppercase tracking-wide`}>Nome da integração</Label>
               <Input placeholder="Ex: CRM Principal, ERP, Sistema Externo..." value={newKeyName} onChange={(e) => setNewKeyName(e.target.value)} className={`${inputCls} mt-1`} />
             </div>
-            <Button className="self-end bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white" onClick={() => newKeyName && createKey.mutate(newKeyName)} disabled={!newKeyName || createKey.isPending}>
+            <Button className="admin-btn admin-btn-create self-end" onClick={() => newKeyName && createKey.mutate(newKeyName)} disabled={!newKeyName || createKey.isPending}>
               <Key className="h-4 w-4 mr-2" />Gerar Chave
             </Button>
           </div>
@@ -137,7 +137,7 @@ function ApiKeysSection() {
                     <p className={`text-[10px] uppercase tracking-wider ${mutedText}`}>Último uso</p>
                     <p className="text-xs text-white">{key.last_used_at ? format(new Date(key.last_used_at), 'dd/MM/yy HH:mm', { locale: ptBR }) : 'Nunca'}</p>
                   </div>
-                  <Button size="icon" variant="ghost" className="text-red-400 hover:text-red-300 hover:bg-red-500/10 shrink-0" onClick={() => deleteKey.mutate(key.id)}><Trash2 className="h-4 w-4" /></Button>
+                  <Button size="icon" variant="ghost" className="admin-btn admin-btn-delete !min-h-0 !p-1 h-8 w-8 shrink-0" onClick={() => deleteKey.mutate(key.id)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
               ))}
             </div>

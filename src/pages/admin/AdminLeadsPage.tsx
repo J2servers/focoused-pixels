@@ -269,7 +269,7 @@ const AdminLeadsPage = () => {
         {selectedLeads.length > 0 && (
           <div className="flex items-center gap-4 p-4 bg-[hsl(var(--admin-accent-purple)/0.1)] border border-[hsl(var(--admin-accent-purple)/0.3)] rounded-xl">
             <span className="text-sm font-medium text-white">{selectedLeads.length} lead(s) selecionado(s)</span>
-            <Button variant="destructive" size="sm" onClick={handleBulkDelete}><Trash2 className="h-4 w-4 mr-2" />Remover Selecionados</Button>
+            <Button className="admin-btn admin-btn-delete" size="sm" onClick={handleBulkDelete}><Trash2 className="h-4 w-4 mr-2" />Deletar Selecionados</Button>
           </div>
         )}
 
@@ -285,7 +285,7 @@ const AdminLeadsPage = () => {
           emptyMessage="Nenhum lead encontrado"
           filterContent={filterButtons}
           actions={
-            <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">
+            <Button onClick={handleExportCSV} className="admin-btn admin-btn-view">
               <Download className="h-4 w-4 mr-2" />Exportar CSV
             </Button>
           }
@@ -300,7 +300,7 @@ const AdminLeadsPage = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">Remover</AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete} className="admin-btn admin-btn-delete"><Trash2 className="h-4 w-4 mr-1" />Deletar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

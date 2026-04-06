@@ -220,10 +220,10 @@ const AdminEmailTemplatesPage = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className={`h-7 text-xs ${btnOutline}`} onClick={tpl.installSuggestedEmails}>
+                    <Button size="sm" className="admin-btn admin-btn-save h-7 text-xs !min-h-0 !px-2" onClick={tpl.installSuggestedEmails}>
                       <Sparkles className="h-3 w-3 mr-1.5" />Instalar e-mails
                     </Button>
-                    <Button size="sm" variant="outline" className={`h-7 text-xs ${btnOutline}`} onClick={tpl.installSuggestedWhats}>
+                    <Button size="sm" className="admin-btn admin-btn-save h-7 text-xs !min-h-0 !px-2" onClick={tpl.installSuggestedWhats}>
                       <Sparkles className="h-3 w-3 mr-1.5" />Instalar WhatsApp
                     </Button>
                   </div>
@@ -331,7 +331,7 @@ const AdminEmailTemplatesPage = () => {
                   {(channelTab === 'all' || channelTab === 'email') && (
                     <Button
                       onClick={() => setEditEmail({ name: '', subject: '', body: '', variables: [], is_active: true })}
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/15 h-9"
+                      className="admin-btn admin-btn-create h-9"
                     >
                       <Plus className="h-4 w-4 mr-1.5" />Novo E-mail
                     </Button>
@@ -339,7 +339,7 @@ const AdminEmailTemplatesPage = () => {
                   {(channelTab === 'all' || channelTab === 'whatsapp') && (
                     <Button
                       onClick={() => setEditWhats({ name: '', category: 'transacional', content: '', variables: [], is_active: true })}
-                      className="bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/15 h-9"
+                      className="admin-btn admin-btn-create h-9"
                     >
                       <Plus className="h-4 w-4 mr-1.5" />Novo WhatsApp
                     </Button>
