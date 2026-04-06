@@ -241,11 +241,13 @@ export function ProductCardOptimized({
         </div>
       </div>
 
-      <QuickViewModal
-        product={product}
-        open={quickViewOpen}
-        onOpenChange={setQuickViewOpen}
-      />
+      {quickViewOpen && (
+        <QuickViewModal
+          product={product}
+          open={quickViewOpen}
+          onOpenChange={setQuickViewOpen}
+        />
+      )}
     </>
   );
 }
