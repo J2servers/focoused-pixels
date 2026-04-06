@@ -357,6 +357,6 @@ async function attemptSend(
 
     return { success: true, data };
   } catch (e) {
-    return { success: false, error: e.message || "Network error" };
+    return { success: false, error: e instanceof Error ? e.message : "Network error" };
   }
 }
