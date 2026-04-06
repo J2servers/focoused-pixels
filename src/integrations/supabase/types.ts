@@ -378,8 +378,11 @@ export type Database = {
           lgpd_contact_email: string | null
           login_bg_image: string | null
           login_logo: string | null
+          login_logo_height: number | null
           login_subtitle: string | null
+          login_subtitle_size: number | null
           login_title: string | null
+          login_title_size: number | null
           logo_header_size: number | null
           logo_mobile_size: number | null
           logo_sidebar_size: number | null
@@ -490,8 +493,11 @@ export type Database = {
           lgpd_contact_email?: string | null
           login_bg_image?: string | null
           login_logo?: string | null
+          login_logo_height?: number | null
           login_subtitle?: string | null
+          login_subtitle_size?: number | null
           login_title?: string | null
+          login_title_size?: number | null
           logo_header_size?: number | null
           logo_mobile_size?: number | null
           logo_sidebar_size?: number | null
@@ -602,8 +608,11 @@ export type Database = {
           lgpd_contact_email?: string | null
           login_bg_image?: string | null
           login_logo?: string | null
+          login_logo_height?: number | null
           login_subtitle?: string | null
+          login_subtitle_size?: number | null
           login_title?: string | null
+          login_title_size?: number | null
           logo_header_size?: number | null
           logo_mobile_size?: number | null
           logo_sidebar_size?: number | null
@@ -2528,6 +2537,20 @@ export type Database = {
           start_date?: string | null
           type?: string | null
           value?: number | null
+        }
+        Relationships: []
+      }
+      login_page_settings: {
+        Row: {
+          company_name: string | null
+          header_logo: string | null
+          login_bg_image: string | null
+          login_logo: string | null
+          login_logo_height: number | null
+          login_subtitle: string | null
+          login_subtitle_size: number | null
+          login_title: string | null
+          login_title_size: number | null
         }
         Relationships: []
       }

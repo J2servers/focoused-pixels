@@ -56,15 +56,28 @@ const MatrixRain = () => {
 // ─── Intruder Info Modal ───
 interface IntruderInfo {
   ip: string;
+  city: string;
+  region: string;
+  country: string;
+  isp: string;
+  org: string;
+  lat: string;
+  lon: string;
   userAgent: string;
   platform: string;
   language: string;
+  languages: string;
   screenRes: string;
+  viewportSize: string;
+  colorDepth: string;
   timezone: string;
+  timezoneOffset: string;
   cores: number;
   memory: string;
   gpu: string;
+  gpuVendor: string;
   connectionType: string;
+  downlink: string;
   timestamp: string;
   fingerprint: string;
   attemptCount: number;
@@ -74,6 +87,15 @@ interface IntruderInfo {
   online: boolean;
   plugins: string[];
   touchSupport: boolean;
+  maxTouchPoints: number;
+  webdriver: boolean;
+  pdfViewerEnabled: boolean;
+  canvasFingerprint: string;
+  audioFingerprint: string;
+  webglVendor: string;
+  batteryLevel: string;
+  charging: string;
+  localTime: string;
 }
 
 const IntruderModal = ({ info, onClose }: { info: IntruderInfo; onClose: () => void }) => {
@@ -111,22 +133,43 @@ const IntruderModal = ({ info, onClose }: { info: IntruderInfo; onClose: () => v
 
   const dataRows: [string, string][] = [
     ['ENDEREÇO IP', info.ip],
+    ['CIDADE', info.city],
+    ['ESTADO/REGIÃO', info.region],
+    ['PAÍS', info.country],
+    ['PROVEDOR (ISP)', info.isp],
+    ['ORGANIZAÇÃO', info.org],
+    ['LATITUDE', info.lat],
+    ['LONGITUDE', info.lon],
+    ['HORA LOCAL', info.localTime],
     ['NAVEGADOR', info.userAgent.slice(0, 80)],
     ['PLATAFORMA', info.platform],
     ['IDIOMA', info.language],
-    ['RESOLUÇÃO', info.screenRes],
+    ['IDIOMAS', info.languages],
+    ['RESOLUÇÃO TELA', info.screenRes],
+    ['VIEWPORT', info.viewportSize],
+    ['PROF. CORES', info.colorDepth],
     ['FUSO HORÁRIO', info.timezone],
+    ['OFFSET UTC', info.timezoneOffset],
     ['NÚCLEOS CPU', String(info.cores)],
-    ['MEMÓRIA', info.memory],
+    ['MEMÓRIA RAM', info.memory],
     ['GPU', info.gpu],
+    ['GPU VENDOR', info.gpuVendor],
+    ['WEBGL VENDOR', info.webglVendor],
     ['CONEXÃO', info.connectionType],
-    ['FINGERPRINT', info.fingerprint],
+    ['VELOCIDADE', info.downlink],
+    ['CANVAS FP', info.canvasFingerprint],
+    ['AUDIO FP', info.audioFingerprint],
+    ['DEVICE FP', info.fingerprint],
+    ['BATERIA', info.batteryLevel],
+    ['CARREGANDO', info.charging],
+    ['WEBDRIVER', info.webdriver ? '⚠ DETECTADO (BOT)' : 'NÃO'],
+    ['TOUCH', info.touchSupport ? `SIM (${info.maxTouchPoints} pontos)` : 'NÃO'],
+    ['PDF VIEWER', info.pdfViewerEnabled ? 'SIM' : 'NÃO'],
     ['TENTATIVAS', String(info.attemptCount)],
     ['COOKIES', info.cookiesEnabled ? 'ATIVO' : 'INATIVO'],
     ['DO NOT TRACK', info.doNotTrack],
     ['ONLINE', info.online ? 'SIM' : 'NÃO'],
-    ['TOUCH', info.touchSupport ? 'SIM' : 'NÃO'],
-    ['REFERRER', info.referrer || 'DIRETO'],
+    ['REFERRER', info.referrer],
     ['PLUGINS', info.plugins.length > 0 ? info.plugins.join(', ') : 'NENHUM'],
     ['TIMESTAMP', info.timestamp],
   ];
@@ -308,20 +351,23 @@ const AdminLoginPage = () => {
 
   const form = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
-  // Background image & branding from company_info
+  // Background image & branding from login_page_settings (public view - no auth needed)
   const [loginSettings, setLoginSettings] = useState<{
     login_logo?: string | null;
     login_bg_image?: string | null;
     login_title?: string | null;
     login_subtitle?: string | null;
+    login_logo_height?: number | null;
+    login_title_size?: number | null;
+    login_subtitle_size?: number | null;
     company_name?: string | null;
     header_logo?: string | null;
   }>({});
 
   useEffect(() => {
     supabase
-      .from('company_info')
-      .select('login_logo, login_bg_image, login_title, login_subtitle, company_name, header_logo')
+      .from('login_page_settings' as any)
+      .select('*')
       .limit(1)
       .single()
       .then(({ data }) => {
@@ -394,45 +440,117 @@ const AdminLoginPage = () => {
   const collectIntruderInfo = useCallback((): IntruderInfo => {
     const nav = navigator as any;
     let gpu = 'Desconhecido';
+    let gpuVendor = 'Desconhecido';
+    let canvasFp = 'N/A';
+    let webglVendor = 'N/A';
+
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       if (gl) {
         const dbg = (gl as any).getExtension('WEBGL_debug_renderer_info');
-        if (dbg) gpu = (gl as any).getParameter(dbg.UNMASKED_RENDERER_WEBGL) || 'Desconhecido';
+        if (dbg) {
+          gpu = (gl as any).getParameter(dbg.UNMASKED_RENDERER_WEBGL) || 'Desconhecido';
+          gpuVendor = (gl as any).getParameter(dbg.UNMASKED_VENDOR_WEBGL) || 'Desconhecido';
+        }
+        webglVendor = (gl as any).getParameter((gl as any).VENDOR) || 'N/A';
       }
+      // Canvas fingerprint
+      const c2 = document.createElement('canvas');
+      c2.width = 200; c2.height = 50;
+      const ctx = c2.getContext('2d');
+      if (ctx) {
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillText('IntruderFP_2026', 2, 2);
+        canvasFp = c2.toDataURL().slice(-32);
+      }
+    } catch { /* silent */ }
+
+    // Audio fingerprint
+    let audioFp = 'N/A';
+    try {
+      const actx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioFp = `sr:${actx.sampleRate}_ch:${actx.destination.maxChannelCount}`;
+      actx.close();
     } catch { /* silent */ }
 
     return {
       ip: 'Rastreando...',
+      city: '...',
+      region: '...',
+      country: '...',
+      isp: '...',
+      org: '...',
+      lat: '...',
+      lon: '...',
       userAgent: navigator.userAgent,
-      platform: navigator.platform || 'Desconhecido',
+      platform: navigator.platform || nav.userAgentData?.platform || 'Desconhecido',
       language: navigator.language,
+      languages: (navigator.languages || []).join(', '),
       screenRes: `${screen.width}x${screen.height} @${window.devicePixelRatio}x`,
+      viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+      colorDepth: `${screen.colorDepth}bit`,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timezoneOffset: `UTC${new Date().getTimezoneOffset() > 0 ? '-' : '+'}${Math.abs(new Date().getTimezoneOffset() / 60)}`,
       cores: navigator.hardwareConcurrency || 0,
       memory: nav.deviceMemory ? `${nav.deviceMemory} GB` : 'N/A',
       gpu,
+      gpuVendor,
       connectionType: nav.connection?.effectiveType || 'Desconhecido',
+      downlink: nav.connection?.downlink ? `${nav.connection.downlink} Mbps` : 'N/A',
       timestamp: new Date().toISOString(),
       fingerprint: fpRef.current,
       attemptCount: fails + 1,
-      referrer: document.referrer,
+      referrer: document.referrer || 'Acesso Direto',
       cookiesEnabled: navigator.cookieEnabled,
       doNotTrack: navigator.doNotTrack || 'Não definido',
       online: navigator.onLine,
       plugins: Array.from(navigator.plugins || []).map(p => p.name).slice(0, 5),
       touchSupport: 'ontouchstart' in window,
+      maxTouchPoints: navigator.maxTouchPoints || 0,
+      webdriver: !!(nav.webdriver),
+      pdfViewerEnabled: !!(nav.pdfViewerEnabled),
+      canvasFingerprint: canvasFp,
+      audioFingerprint: audioFp,
+      webglVendor,
+      batteryLevel: '...',
+      charging: '...',
+      localTime: new Date().toLocaleString('pt-BR'),
     };
   }, [fails]);
 
   const showIntruderWarning = useCallback(() => {
     const info = collectIntruderInfo();
-    // Try to get real IP
-    fetch('https://api.ipify.org?format=json')
+
+    // Battery API
+    if ('getBattery' in navigator) {
+      (navigator as any).getBattery().then((b: any) => {
+        info.batteryLevel = `${Math.round(b.level * 100)}%`;
+        info.charging = b.charging ? 'Carregando' : 'Bateria';
+        setIntruderInfo({ ...info });
+      }).catch(() => {});
+    }
+
+    // IP + Geolocation via free API
+    fetch('https://ipapi.co/json/')
       .then(r => r.json())
-      .then(d => { info.ip = d.ip || 'Oculto por VPN'; setIntruderInfo({ ...info }); })
-      .catch(() => { info.ip = 'Protegido / VPN detectada'; setIntruderInfo({ ...info }); });
+      .then(d => {
+        info.ip = d.ip || 'Oculto';
+        info.city = d.city || 'Desconhecido';
+        info.region = d.region || 'Desconhecido';
+        info.country = `${d.country_name || '??'} (${d.country_code || '??'})`;
+        info.isp = d.org || 'Desconhecido';
+        info.org = d.asn || 'N/A';
+        info.lat = String(d.latitude || '??');
+        info.lon = String(d.longitude || '??');
+        setIntruderInfo({ ...info });
+      })
+      .catch(() => {
+        info.ip = 'Protegido / VPN';
+        setIntruderInfo({ ...info });
+      });
+
     setIntruderInfo(info);
     setShowIntruderModal(true);
   }, [collectIntruderInfo]);
@@ -516,6 +634,9 @@ const AdminLoginPage = () => {
   const subtitle = loginSettings.login_subtitle || 'Acesse o centro de comando do seu negócio com segurança máxima.';
   const logoUrl = loginSettings.login_logo || loginSettings.header_logo;
   const bgImage = loginSettings.login_bg_image;
+  const logoHeight = loginSettings.login_logo_height || 48;
+  const titleSize = loginSettings.login_title_size || 48;
+  const subtitleSize = loginSettings.login_subtitle_size || 14;
 
   if (isLoading) {
     return (
@@ -567,7 +688,7 @@ const AdminLoginPage = () => {
         <div className="hidden lg:flex flex-col max-w-md">
           <div className="flex items-center gap-3 mb-8">
             {logoUrl ? (
-              <img src={logoUrl} alt={brandName} className="h-12 w-auto object-contain" />
+              <img src={logoUrl} alt={brandName} style={{ height: `${logoHeight}px` }} className="w-auto object-contain" />
             ) : (
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#e8a817] to-[#c8951a] flex items-center justify-center shadow-xl shadow-[#e8a817]/30">
                 <div className="w-4 h-6 bg-white rounded-full" />
@@ -575,10 +696,10 @@ const AdminLoginPage = () => {
             )}
             <span className="text-2xl font-bold text-white tracking-tight">{brandName}</span>
           </div>
-          <h1 className="text-5xl font-extrabold leading-tight mb-5">
+          <h1 className="font-extrabold leading-tight mb-5" style={{ fontSize: `${titleSize}px` }}>
             <span className="text-white">{title}</span>
           </h1>
-          <p className="text-white/50 text-base leading-relaxed max-w-sm">{subtitle}</p>
+          <p className="text-white/50 leading-relaxed max-w-sm" style={{ fontSize: `${subtitleSize}px` }}>{subtitle}</p>
         </div>
 
         {/* Right — Glass Login Card */}
@@ -593,7 +714,7 @@ const AdminLoginPage = () => {
               {/* Mobile branding */}
               <div className="lg:hidden flex items-center gap-2 mb-6 justify-center">
                 {logoUrl ? (
-                  <img src={logoUrl} alt={brandName} className="h-10 w-auto" />
+                  <img src={logoUrl} alt={brandName} style={{ height: `${Math.min(logoHeight, 40)}px` }} className="w-auto object-contain" />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#e8a817] to-[#c8951a] flex items-center justify-center">
                     <div className="w-3 h-5 bg-white rounded-full" />
