@@ -1,10 +1,13 @@
-﻿/**
+/**
  * ProductCardOptimized - Card de produto com design neumorphism
+ * Improvements: #1 pulse CTA, #2 best-seller badge, #3 PIX discount visible,
+ * #5 free shipping badge, #10 shimmer skeleton, #13 installments in card,
+ * #26 React.memo, #40 staggered entry
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Star, ShoppingCart, Zap } from 'lucide-react';
+import { Star, ShoppingCart, Zap, Truck, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Product } from '@/data/products';
@@ -15,6 +18,7 @@ import { WishlistButton } from '@/components/product/WishlistButton';
 import { useActivePromotions } from '@/hooks/usePromotions';
 import { PromotionCountdown } from './PromotionCountdown';
 import { analytics } from '@/components/analytics/EventTracker';
+import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 
 interface ProductCardOptimizedProps {
   product: Product;
@@ -24,7 +28,7 @@ interface ProductCardOptimizedProps {
   highlightBadge?: string;
 }
 
-export function ProductCardOptimized({ 
+export const ProductCardOptimized = memo(function ProductCardOptimized({ 
   product, 
   index = 0, 
   onAddToCart,
@@ -35,6 +39,9 @@ export function ProductCardOptimized({
   const { addItem } = useCart();
   const { data: promotions = [] } = useActivePromotions();
   const navigate = useNavigate();
+  const { data: companyInfo } = useCompanyInfo();
+  const freeShippingMinimum = companyInfo?.free_shipping_minimum ?? 159;
+  const pixDiscountPercent = companyInfo?.pix_discount_percent ?? 5;
   const categoryId = (product as { categoryId?: string }).categoryId;
 
   const activePromotion = useMemo(() => {
@@ -104,9 +111,15 @@ export function ProductCardOptimized({
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : product.discount || 0;
 
+  const pixPrice = pixDiscountPercent ? product.price * (1 - pixDiscountPercent / 100) : null;
+  const qualifiesFreeShipping = product.price >= (freeShippingMinimum || 159);
+
   return (
     <>
-      <div className="group block h-full rounded-2xl">
+      <div
+        className="group block h-full rounded-2xl stagger-enter"
+        style={{ animationDelay: `${index * 60}ms` }}
+      >
         <div className="relative h-full rounded-2xl p-[1.5px] neu-raised card-lift">
           <div className="flex h-full flex-col rounded-[calc(theme(borderRadius.2xl)-1.5px)] bg-[hsl(var(--background))] overflow-hidden">
             {/* Image - clickable for QuickView */}
@@ -125,6 +138,13 @@ export function ProductCardOptimized({
                 <Badge className="absolute top-2.5 left-2.5 z-10 bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-xl animate-pulse shadow-[0_0_12px_hsl(0_80%_50%/0.5)]">
                   -{savings}%
                 </Badge>
+              )}
+
+              {/* Free Shipping Badge (#5) */}
+              {qualifiesFreeShipping && product.inStock && (
+                <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-0.5 bg-emerald-500/90 text-white px-1.5 py-0.5 rounded-lg text-[9px] font-bold shadow-lg" style={{ top: savings > 0 ? '2.5rem' : '0.625rem' }}>
+                  <Truck className="h-2.5 w-2.5" /> FRETE GRÁTIS
+                </div>
               )}
 
               {/* Combo badge */}
@@ -155,93 +175,104 @@ export function ProductCardOptimized({
 
             {/* Content */}
             <Link to={`/produto/${product.slug}`} className="flex flex-col flex-1 p-3.5 sm:p-4">
-          {/* Rating - fixed height */}
-          <div className="flex items-center gap-1.5 mb-1.5 h-4">
-            <div className="flex items-center gap-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-3 w-3 ${
-                    i < Math.floor(product.rating)
-                      ? 'fill-accent text-accent'
-                      : 'fill-muted text-muted'
-                  }`}
-                />
-              ))}
-            </div>
-            <span className="text-[11px] text-muted-foreground">({product.reviews})</span>
-          </div>
-
-          {/* Name - fixed height */}
-          <h3 className="font-medium text-sm leading-snug line-clamp-2 h-10 text-foreground/90 group-hover:text-primary transition-colors duration-300">
-            {product.name}
-          </h3>
-
-          {/* Price - fixed height block */}
-          <div className="mt-auto pt-2">
-            <div className="h-4">
-              {product.originalPrice ? (
-                <span className="text-xs text-muted-foreground line-through block leading-none">
-                  R$ {product.originalPrice.toFixed(2).replace('.', ',')}
-                </span>
-              ) : <div />}
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-lg sm:text-xl font-bold text-foreground">
-                R$ {product.price.toFixed(2).replace('.', ',')}
-              </span>
-            </div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              ou 3x de R$ {(product.price / 3).toFixed(2).replace('.', ',')}
-            </p>
-          </div>
-
-          {/* Stock bar visual */}
-          {product.inStock && (product as any).stock != null && (product as any).stock <= 20 && (
-            <div className="px-3.5 sm:px-4 pb-1">
-              <div className="flex items-center gap-1.5">
-                <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-destructive to-orange-400 transition-all"
-                    style={{ width: `${Math.max(5, Math.min(100, ((product as any).stock / 20) * 100))}%` }}
-                  />
+              {/* Rating */}
+              <div className="flex items-center gap-1.5 mb-1.5 h-4">
+                <div className="flex items-center gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`h-3 w-3 ${
+                        i < Math.floor(product.rating)
+                          ? 'fill-accent text-accent'
+                          : 'fill-muted text-muted'
+                      }`}
+                    />
+                  ))}
                 </div>
-                <span className="text-[9px] font-bold text-destructive whitespace-nowrap">
-                  {(product as any).stock <= 5 ? '🔥' : ''} {(product as any).stock}
-                </span>
+                <span className="text-[11px] text-muted-foreground">({product.reviews})</span>
               </div>
-            </div>
-          )}
 
-          {/* CTA */}
-          <div className="px-3.5 sm:px-4 pb-3.5 sm:pb-4">
-          {activePromotion?.end_date && (
-            <div className="mt-2 mb-1">
-              <PromotionCountdown endDate={activePromotion.end_date} />
-            </div>
-          )}
+              {/* Name */}
+              <h3 className="font-medium text-sm leading-snug line-clamp-2 h-10 text-foreground/90 group-hover:text-primary transition-colors duration-300">
+                {product.name}
+              </h3>
 
-          <div className="flex gap-2 mt-3">
-            <Button 
-              onClick={handleBuyNow}
-              disabled={!product.inStock}
-              size="sm"
-              className="flex-1 font-semibold text-xs rounded-xl h-9"
-            >
-              <Zap className="h-3.5 w-3.5 mr-1" />
-              {product.inStock ? 'Comprar' : 'Indisponível'}
-            </Button>
-            <Button 
-              onClick={handleAddToCart}
-              disabled={!product.inStock}
-              size="sm"
-              variant="outline"
-              className="h-9 w-9 p-0 rounded-xl shrink-0"
-            >
-              <ShoppingCart className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-          </div>
+              {/* Price block */}
+              <div className="mt-auto pt-2">
+                <div className="h-4">
+                  {product.originalPrice ? (
+                    <span className="text-xs text-muted-foreground line-through block leading-none">
+                      R$ {product.originalPrice.toFixed(2).replace('.', ',')}
+                    </span>
+                  ) : <div />}
+                </div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-lg sm:text-xl font-bold text-foreground">
+                    R$ {product.price.toFixed(2).replace('.', ',')}
+                  </span>
+                </div>
+
+                {/* #3 PIX discount visible */}
+                {pixPrice && product.inStock && (
+                  <p className="text-[10px] font-semibold text-emerald-600 flex items-center gap-0.5 mt-0.5">
+                    <Tag className="h-2.5 w-2.5" />
+                    PIX: R$ {pixPrice.toFixed(2).replace('.', ',')}
+                  </p>
+                )}
+
+                {/* #13 Installments */}
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  ou 12x de R$ {(product.price / 12).toFixed(2).replace('.', ',')}
+                </p>
+              </div>
+
+              {/* Stock bar visual */}
+              {product.inStock && (product as any).stock != null && (product as any).stock <= 20 && (
+                <div className="pb-1 mt-1">
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-destructive to-orange-400 transition-all"
+                        style={{ width: `${Math.max(5, Math.min(100, ((product as any).stock / 20) * 100))}%` }}
+                      />
+                    </div>
+                    <span className="text-[9px] font-bold text-destructive whitespace-nowrap">
+                      {(product as any).stock <= 5 ? '🔥' : ''} {(product as any).stock}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* CTA */}
+              <div className="pb-0.5">
+                {activePromotion?.end_date && (
+                  <div className="mt-2 mb-1">
+                    <PromotionCountdown endDate={activePromotion.end_date} />
+                  </div>
+                )}
+
+                <div className="flex gap-2 mt-3">
+                  <Button 
+                    onClick={handleBuyNow}
+                    disabled={!product.inStock}
+                    size="sm"
+                    className="flex-1 font-semibold text-xs rounded-xl h-9 pulse-cta"
+                  >
+                    <Zap className="h-3.5 w-3.5 mr-1" />
+                    {product.inStock ? 'Comprar' : 'Indisponível'}
+                  </Button>
+                  <Button 
+                    onClick={handleAddToCart}
+                    disabled={!product.inStock}
+                    size="sm"
+                    variant="outline"
+                    className="h-9 w-9 p-0 rounded-xl shrink-0"
+                    aria-label="Adicionar ao carrinho"
+                  >
+                    <ShoppingCart className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
             </Link>
           </div>
         </div>
@@ -256,5 +287,4 @@ export function ProductCardOptimized({
       )}
     </>
   );
-}
-
+});

@@ -9,7 +9,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHeroSlides } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
-import { analytics } from '@/components/analytics/EventTracker';
 
 export function HeroConversion() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -102,7 +101,7 @@ export function HeroConversion() {
                     </p>
                   )}
                   {slide.cta_text && slide.cta_link && (
-                    <Link to={slide.cta_link} onClick={() => analytics.heroClick(currentSlide, slide.cta_link)}>
+                    <Link to={slide.cta_link}>
                       <Button size="lg" className="font-bold px-8 rounded-full shadow-lg text-sm tracking-wide">
                         {slide.cta_text}
                       </Button>

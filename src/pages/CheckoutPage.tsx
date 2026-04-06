@@ -11,8 +11,6 @@
  */
 
 import { useEffect, useState } from 'react';
-import { PageSEO } from '@/components/seo/PageSEO';
-import { analytics } from '@/components/analytics/EventTracker';
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
@@ -348,12 +346,11 @@ const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <PageSEO title="Solicitar Orçamento" description="Monte seu orçamento personalizado com letreiros LED, displays e produtos em acrílico e MDF." path="/checkout" noindex />
       <DynamicTopBar />
       <DynamicMainHeader />
       <NavigationBar />
 
-      <main id="main-content" className="flex-1" role="main">
+      <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold mb-2 text-foreground">Solicitar Orçamento</h1>
           <p className="text-muted-foreground mb-8">

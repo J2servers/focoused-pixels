@@ -11,20 +11,12 @@ import { Search } from 'lucide-react';
 import { useSearchProducts } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { PageSEO } from '@/components/seo/PageSEO';
-import { analytics } from '@/components/analytics/EventTracker';
-import { useEffect } from 'react';
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const { data: results = [], isLoading } = useSearchProducts(query);
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    if (query && !isLoading) {
-      analytics.search(query, results.length);
-    }
-  }, [query, isLoading, results.length]);
 
   // Mobile Version
   if (isMobile) {

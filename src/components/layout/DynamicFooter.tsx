@@ -110,7 +110,7 @@ export function DynamicFooter() {
               ) : (
                 parentCategories.map((category) => (
                   <li key={category.id}>
-                    <Link to={`/categoria/${category.slug}`} className="text-muted-foreground hover:text-primary transition-colors">
+                    <Link to={`/categoria/${category.slug}`} className="text-muted-foreground hover:text-primary transition-colors footer-link">
                       {category.name}
                     </Link>
                   </li>
@@ -125,14 +125,14 @@ export function DynamicFooter() {
             <ul className="space-y-2 text-sm">
               {institutionalLinks.map((link) => (
                 <li key={link.href}>
-                  <Link to={link.href} className="text-muted-foreground hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-muted-foreground hover:text-primary transition-colors footer-link">
                     {link.name}
                   </Link>
                 </li>
               ))}
               {helpLinks.map((link) => (
                 <li key={link.href}>
-                  <Link to={link.href} className="text-muted-foreground hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-muted-foreground hover:text-primary transition-colors footer-link">
                     {link.name}
                   </Link>
                 </li>

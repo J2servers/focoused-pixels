@@ -1,5 +1,4 @@
-import { useState, type ElementType } from 'react';
-import { PageSEO } from '@/components/seo/PageSEO';
+﻿import { useState, type ElementType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DynamicTopBar } from '@/components/layout/DynamicTopBar';
 import { DynamicMainHeader } from '@/components/layout/DynamicMainHeader';
@@ -159,10 +158,9 @@ const CustomerAreaPage = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
-        <PageSEO title="Minha Área" description="Acompanhe seus pedidos e gerencie sua conta na Pincel de Luz." path="/minha-area" noindex />
         <DynamicTopBar />
         <DynamicMainHeader />
-        <main id="main-content" className="container mx-auto px-4 py-12" role="main">
+        <main className="container mx-auto px-4 py-12">
           <Card className="max-w-md mx-auto text-center">
             <CardContent className="pt-8 pb-6">
               <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
@@ -184,11 +182,10 @@ const CustomerAreaPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <PageSEO title="Minha Área" description="Acompanhe seus pedidos e gerencie sua conta na Pincel de Luz." path="/minha-area" noindex />
       <DynamicTopBar />
       <DynamicMainHeader />
       
-      <main id="main-content" className="container mx-auto px-4 py-8" role="main">
+      <main className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

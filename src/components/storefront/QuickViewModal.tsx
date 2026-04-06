@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+﻿import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -9,7 +9,6 @@ import { useCart } from '@/hooks/useCart';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
-import { analytics } from '@/components/analytics/EventTracker';
 
 interface Product {
   id: string;
@@ -53,7 +52,6 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
       image: product.image,
       quantity,
     });
-    analytics.addToCart({ id: product.id, name: product.name, price: product.price });
     toast.success(`${quantity}x ${product.name} adicionado ao carrinho!`);
     onOpenChange(false);
   };
@@ -158,39 +156,48 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
               </span>
             </div>
 
-            {product.freeShipping && (
-              <div className="flex items-center gap-2 mt-3 text-success text-sm">
-                <Truck className="h-4 w-4" />
-                <span>Frete grátis</span>
+              {product.freeShipping && (
+                <div className="flex items-center gap-2 mt-3 text-success text-sm">
+                  <Truck className="h-4 w-4" />
+                  <span>Frete grátis</span>
+                </div>
+              )}
+
+              {/* #7 Low stock warning */}
+              {product.inStock && (product as any).stock != null && (product as any).stock <= 10 && (
+                <div className="flex items-center gap-2 mt-2 text-destructive text-xs font-semibold animate-pulse">
+                  🔥 Apenas {(product as any).stock} unidades restantes!
+                </div>
+              )}
+
+              <Separator className="my-4" />
+
+              {/* Description */}
+              {product.description && (
+                <p className="text-sm text-muted-foreground line-clamp-3">{product.description}</p>
+              )}
+
+              {/* Quantity */}
+              <div className="flex items-center gap-4 mt-4">
+                <span className="text-sm font-medium">Quantidade:</span>
+                <div className="flex items-center border rounded-lg">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="px-3 py-2 hover:bg-muted transition-colors"
+                    aria-label="Diminuir quantidade"
+                  >
+                    -
+                  </button>
+                  <span className="px-4 py-2 border-x">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="px-3 py-2 hover:bg-muted transition-colors"
+                    aria-label="Aumentar quantidade"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-            )}
-
-            <Separator className="my-4" />
-
-            {/* Description */}
-            {product.description && (
-              <p className="text-sm text-muted-foreground line-clamp-3">{product.description}</p>
-            )}
-
-            {/* Quantity */}
-            <div className="flex items-center gap-4 mt-4">
-              <span className="text-sm font-medium">Quantidade:</span>
-              <div className="flex items-center border rounded-lg">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-2 hover:bg-muted transition-colors"
-                >
-                  -
-                </button>
-                <span className="px-4 py-2 border-x">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="px-3 py-2 hover:bg-muted transition-colors"
-                >
-                  +
-                </button>
-              </div>
-            </div>
 
             {/* Actions */}
             <div className="flex flex-col gap-3 mt-auto pt-6">

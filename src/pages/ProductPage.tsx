@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { analytics } from '@/components/analytics/EventTracker';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
@@ -79,10 +78,9 @@ const ProductPage = () => {
       addRecentlyViewed({
         slug: product.slug,
         name: product.name,
-        price: product.price,
         image: product.image,
+        price: product.price,
       });
-      analytics.productView({ id: product.id, name: product.name, price: product.price });
     }
   }, [product?.slug]);
 
@@ -104,7 +102,7 @@ const ProductPage = () => {
         <TrustBar />
         <DynamicMainHeader />
         <NavigationBar />
-        <main id="main-content" className="flex-1" role="main">
+        <main className="flex-1">
           <div className="container mx-auto px-4 py-6">
             <Skeleton className="h-6 w-64 mb-6 rounded-xl" />
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
@@ -131,7 +129,7 @@ const ProductPage = () => {
         <TrustBar />
         <DynamicMainHeader />
         <NavigationBar />
-        <main id="main-content" className="flex-1 container mx-auto px-4 py-16 text-center" role="main">
+        <main className="flex-1 container mx-auto px-4 py-16 text-center">
           <div className="rounded-2xl neu-concave p-12 max-w-md mx-auto">
             <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
             <Link to="/">
