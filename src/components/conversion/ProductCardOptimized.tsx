@@ -21,7 +21,7 @@ import { analytics } from '@/components/analytics/EventTracker';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 
 interface ProductCardOptimizedProps {
-  product: Product;
+  product: Product & { stock?: number; categoryId?: string };
   index?: number;
   onAddToCart?: () => void;
   variant?: 'default' | 'compact' | 'featured';
@@ -42,7 +42,7 @@ export const ProductCardOptimized = memo(function ProductCardOptimized({
   const { data: companyInfo } = useCompanyInfo();
   const freeShippingMinimum = companyInfo?.free_shipping_minimum ?? 159;
   const pixDiscountPercent = companyInfo?.pix_discount_percent ?? 5;
-  const categoryId = (product as { categoryId?: string }).categoryId;
+  const categoryId = product.categoryId;
 
   const activePromotion = useMemo(() => {
     return promotions.find((promo) => {
@@ -227,17 +227,17 @@ export const ProductCardOptimized = memo(function ProductCardOptimized({
               </div>
 
               {/* Stock bar visual */}
-              {product.inStock && (product as any).stock != null && (product as any).stock <= 20 && (
+              {product.inStock && product.stock != null && product.stock <= 20 && (
                 <div className="pb-1 mt-1">
                   <div className="flex items-center gap-1.5">
                     <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
                         className="h-full rounded-full bg-gradient-to-r from-destructive to-orange-400 transition-all"
-                        style={{ width: `${Math.max(5, Math.min(100, ((product as any).stock / 20) * 100))}%` }}
+                        style={{ width: `${Math.max(5, Math.min(100, (product.stock / 20) * 100))}%` }}
                       />
                     </div>
                     <span className="text-[9px] font-bold text-destructive whitespace-nowrap">
-                      {(product as any).stock <= 5 ? '🔥' : ''} {(product as any).stock}
+                      {product.stock <= 5 ? '🔥' : ''} {product.stock}
                     </span>
                   </div>
                 </div>
