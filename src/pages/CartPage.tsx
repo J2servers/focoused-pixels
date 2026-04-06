@@ -43,7 +43,7 @@ const CartPage = () => {
       return;
     }
 
-    window.open(`${`https://wa.me/${settings.whatsapp?.replace(/\\D/g, "") || ""}`}?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`${`https://wa.me/${siteSettings.whatsapp?.replace(/\\D/g, "") || ""}`}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handlePayNow = () => {
@@ -66,8 +66,8 @@ const CartPage = () => {
     navigate('/pagamento');
   };
 
-  const freeShippingRemaining = settings.freeShippingMinimum - total;
-  const hasFreeShipping = total >= settings.freeShippingMinimum;
+  const freeShippingRemaining = siteSettings.freeShippingMinimum - total;
+  const hasFreeShipping = total >= siteSettings.freeShippingMinimum;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -107,7 +107,7 @@ const CartPage = () => {
                     <div className="mt-2 h-2 rounded-full overflow-hidden neu-pressed">
                       <div 
                         className="h-full bg-primary transition-all duration-300 rounded-full"
-                        style={{ width: `${Math.min((total / settings.freeShippingMinimum) * 100, 100)}%` }}
+                        style={{ width: `${Math.min((total / siteSettings.freeShippingMinimum) * 100, 100)}%` }}
                       />
                     </div>
                   </div>
@@ -226,7 +226,7 @@ const CartPage = () => {
                   </div>
 
                   <p className="text-xs text-muted-foreground mb-4 text-center">
-                    ou em até {settings.installments}x de R$ {(total / settings.installments).toFixed(2)} sem juros
+                    ou em até {siteSettings.installments}x de R$ {(total / siteSettings.installments).toFixed(2)} sem juros
                   </p>
 
                   <div className="space-y-3">
