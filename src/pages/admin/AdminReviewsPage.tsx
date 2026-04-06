@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AdminLayout, DataTable, Column } from '@/components/admin';
+import { ExportButtons } from '@/components/admin/ExportButtons';
 import { AdminSummaryCard } from '@/components/admin/AdminSummaryCard';
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge';
 import { Button } from '@/components/ui/button';
@@ -75,7 +76,11 @@ const AdminReviewsPage = () => {
           <AdminSummaryCard title="Média" value={avgRating.toFixed(1)} icon={Star} variant="blue" />
         </div>
 
-        <DataTable data={reviews} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar avaliações..." />
+        <DataTable data={reviews} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar avaliações..."
+          actions={
+            <ExportButtons data={reviews.map(r => ({ cliente: r.customer_name, produto: r.product_slug, nota: r.rating, comentario: r.comment, aprovada: r.is_approved ? 'Sim' : 'Não', data: r.created_at }))} filename="avaliacoes" title="Avaliações" columns={[{key:'cliente',header:'Cliente'},{key:'produto',header:'Produto'},{key:'nota',header:'Nota'},{key:'comentario',header:'Comentário'},{key:'aprovada',header:'Aprovada'},{key:'data',header:'Data'}]} />
+          }
+        />
       </div>
 
       {/* View Dialog */}

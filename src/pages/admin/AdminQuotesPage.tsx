@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { AdminLayout, DataTable, Column, AdminFilterBar } from '@/components/admin';
+import { ExportButtons } from '@/components/admin/ExportButtons';
 import { AdminSummaryCard } from '@/components/admin/AdminSummaryCard';
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge';
 import { Button } from '@/components/ui/button';
@@ -227,7 +228,11 @@ const AdminQuotesPage = () => {
           </Select>
         </AdminFilterBar>
 
-        <DataTable data={filteredQuotes} columns={columns} isLoading={isLoading} emptyMessage="Nenhum orçamento encontrado" />
+        <DataTable data={filteredQuotes} columns={columns} isLoading={isLoading} emptyMessage="Nenhum orçamento encontrado"
+          actions={
+            <ExportButtons data={filteredQuotes.map(q => ({ cliente: q.customer_name, email: q.customer_email, telefone: q.customer_phone, quantidade: q.quantity, status: q.status || 'pending', data: q.created_at }))} filename="orcamentos" title="Orçamentos" columns={[{key:'cliente',header:'Cliente'},{key:'email',header:'Email'},{key:'telefone',header:'Telefone'},{key:'quantidade',header:'Qtd'},{key:'status',header:'Status'},{key:'data',header:'Data'}]} />
+          }
+        />
       </div>
 
       {/* Quote Detail Dialog */}
