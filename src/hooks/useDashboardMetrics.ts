@@ -3,8 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { calculateSimplesTax } from '@/hooks/useFinancialData';
 import {
   startOfDay, startOfWeek, startOfMonth, startOfYear, daysAgo,
-  sum, filterByDate, filterByDateRange, buildDistribution, buildCashDailyTimeSeries,
+  sum, buildDistribution, buildCashDailyTimeSeries,
 } from './useDashboardMetricsHelpers';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const byDate = (arr: any[], start: Date) => arr.filter((o: any) => new Date(o.created_at) >= start);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const byDateRange = (arr: any[], start: Date, end: Date) => arr.filter((o: any) => { const d = new Date(o.created_at); return d >= start && d <= end; });
 
 export function useDashboardMetrics() {
   return useQuery({
