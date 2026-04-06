@@ -24,7 +24,7 @@ import {
 } from '@/hooks/useAdminProducts';
 
 const INITIAL_FORM = {
-  name: '', slug: '', short_description: '', price: '', promotional_price: '',
+  name: '', slug: '', short_description: '', full_description: '', price: '', promotional_price: '',
   stock: '0', sku: '', status: 'draft', category_id: '', is_featured: false,
   cover_image: '' as string | null, gallery_images: [] as string[],
   cost_material: '', cost_labor: '', cost_shipping: '',
@@ -62,6 +62,7 @@ const AdminProductsPage = () => {
     setFormData({
       name: product.name, slug: product.slug,
       short_description: product.short_description || '',
+      full_description: (product as any).full_description || '',
       price: product.price.toString(),
       promotional_price: product.promotional_price?.toString() || '',
       stock: product.stock.toString(), sku: product.sku || '',
@@ -87,6 +88,7 @@ const AdminProductsPage = () => {
     const data: ProductFormData = {
       name: formData.name, slug,
       short_description: formData.short_description || null,
+      full_description: (formData as any).full_description || null,
       price: parseFloat(formData.price),
       promotional_price: formData.promotional_price ? parseFloat(formData.promotional_price) : null,
       stock: parseInt(formData.stock) || 0, sku: formData.sku || null,
