@@ -38,6 +38,8 @@ export function NavigationBar() {
   return (
     <nav
       className="hidden lg:block relative z-40"
+      role="navigation"
+      aria-label="Categorias de produtos"
       style={{
         background: 'hsl(var(--background))',
         boxShadow: `0 6px 18px hsl(var(--neu-dark) / 0.28),

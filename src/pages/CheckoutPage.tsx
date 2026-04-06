@@ -348,11 +348,12 @@ const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <PageSEO title="Solicitar Orçamento" description="Monte seu orçamento personalizado com letreiros LED, displays e produtos em acrílico e MDF." path="/checkout" noindex />
       <DynamicTopBar />
       <DynamicMainHeader />
       <NavigationBar />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1" role="main">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold mb-2 text-foreground">Solicitar Orçamento</h1>
           <p className="text-muted-foreground mb-8">
