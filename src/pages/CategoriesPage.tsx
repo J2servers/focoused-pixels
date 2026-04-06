@@ -9,9 +9,9 @@
  */
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { HelmetProvider } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Search, ChevronRight, Package } from 'lucide-react';
+import { PageSEO } from '@/components/seo/PageSEO';
 import { Search, ChevronRight, Package } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -78,12 +78,11 @@ export default function CategoriesPage() {
 
   const content = (
     <div className="px-4 py-6">
-      <HelmetProvider>
-        <Helmet>
-          <title>Categorias | Produtos Personalizados</title>
-          <meta name="description" content="Explore todas as categorias de produtos personalizados" />
-        </Helmet>
-      </HelmetProvider>
+      <PageSEO
+        title="Categorias | Produtos Personalizados"
+        description="Explore todas as categorias de produtos personalizados da Pincel de Luz: letreiros LED, displays, crachás e mais."
+        path="/categorias"
+      />
 
       {/* Header */}
       <div className="mb-6">
