@@ -8,6 +8,9 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import {
+  MetricCard as M, HeroKPI, SectionLabel as Sec, ChartCard, PieCard, CustomTooltip, PIE_COLORS,
+} from '@/components/admin/dashboard';
+import {
   LineChart, Line, PieChart, Pie, Cell, ResponsiveContainer,
   XAxis, YAxis, Tooltip, CartesianGrid, Legend, AreaChart, Area,
   BarChart, Bar,
