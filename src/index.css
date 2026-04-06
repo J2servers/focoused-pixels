@@ -1123,24 +1123,35 @@
 
 /* ═══ Mobile overflow fix & zoom ═══ */
 @media (max-width: 768px) {
-  html, body {
-    overflow-x: hidden;
-    max-width: 100vw;
-  }
   html {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
     zoom: 0.8;
     -moz-transform: scale(0.8);
     -moz-transform-origin: 0 0;
   }
-  /* Compensate zoom for viewport height */
   body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
     min-height: 125vh;
     min-height: calc(100vh / 0.8);
+    /* Clip shadows at page edges */
+    overflow-x: clip !important;
   }
 
   /* Clip all edge overflow from shadows/borders */
   #root {
-    overflow-x: hidden;
+    overflow-x: clip;
+    max-width: 100vw;
+    width: 100%;
+  }
+
+  /* Every section wrapper must not bleed */
+  #root > div,
+  main,
+  section,
+  .py-4 {
+    overflow-x: clip;
     max-width: 100vw;
   }
 
