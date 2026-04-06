@@ -269,10 +269,10 @@ export function useCompanyInfo() {
         .limit(1)
         .single();
 
-      if (!publicError && publicData) {
+      if (!publicError && publicData && typeof publicData === 'object') {
         return {
           ...defaultCompanyInfo,
-          ...publicData,
+          ...(publicData as Record<string, unknown>),
         } as CompanyInfo;
       }
 
