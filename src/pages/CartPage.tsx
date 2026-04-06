@@ -2,7 +2,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { TrustBar } from '@/components/conversion';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
-import { AIChatWidget } from '@/components/chat/AIChatWidget';
+import { lazy, Suspense } from 'react';
+
+const AIChatWidget = lazy(() => import('@/components/chat/AIChatWidget').then(m => ({ default: m.AIChatWidget })));
 import { Button } from '@/components/ui/button';
 import { Trash2, Minus, Plus, MessageCircle, ShoppingBag, FileText, CreditCard } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
