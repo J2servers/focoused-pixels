@@ -88,12 +88,12 @@ const AdminWhyChooseUsPage = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" asChild>
+            <Button className="admin-btn admin-btn-view" asChild>
               <Link to="/por-que-escolher" target="_blank" rel="noreferrer">
                 <ExternalLink className="h-4 w-4 mr-2" /> Ver ao vivo
               </Link>
             </Button>
-            <Button onClick={handleSave} disabled={updateCompany.isPending}>
+            <Button onClick={handleSave} disabled={updateCompany.isPending} className="admin-btn admin-btn-save">
               {updateCompany.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
               Salvar alterações
             </Button>
@@ -389,10 +389,10 @@ const AdminWhyChooseUsPage = () => {
               <CardContent>
                 <LivePreview config={config} />
                 <div className="mt-4 flex gap-2">
-                  <Button variant="outline" asChild>
+                  <Button className="admin-btn admin-btn-view" asChild>
                     <Link to="/por-que-escolher" target="_blank" rel="noreferrer"><ExternalLink className="h-4 w-4 mr-2" /> Abrir página real</Link>
                   </Button>
-                  <Button onClick={handleSave} disabled={updateCompany.isPending}>
+                  <Button onClick={handleSave} disabled={updateCompany.isPending} className="admin-btn admin-btn-save">
                     {updateCompany.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                     Salvar e publicar
                   </Button>
