@@ -38,18 +38,28 @@ export function useAbandonedCartInsights() {
         return defaultInsights;
       }
 
-      const { data, error } = await supabase.functions.invoke('abandoned-cart-insights', {
-        body: {},
-      });
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) return defaultInsights;
 
-      if (error) {
+      try {
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/abandoned-cart-insights`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({}),
+        });
+
+        const data = await response.json();
+        if (!response.ok || data?.success === false) return defaultInsights;
+        return (data?.insights as AbandonedCartInsights) || defaultInsights;
+      } catch {
         return defaultInsights;
       }
-      if (data?.success === false) {
-        return defaultInsights;
-      }
-
-      return (data?.insights as AbandonedCartInsights) || defaultInsights;
     },
     staleTime: 30000,
     refetchInterval: 60000,
