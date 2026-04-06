@@ -6,7 +6,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const buildSystemPrompt = (products: any[], categories: any[]) => {
+interface ProductInfo {
+  name: string;
+  slug: string;
+  price: number;
+  promotional_price: number | null;
+  short_description: string | null;
+}
+
+interface CategoryInfo {
+  name: string;
+  slug: string;
+}
+
+interface AIExternalConfig {
+  ai_external_enabled: boolean | null;
+  ai_external_provider: string | null;
+  ai_external_api_url: string | null;
+  ai_external_api_key: string | null;
+  ai_external_model: string | null;
+}
+
+const buildSystemPrompt = (products: ProductInfo[], categories: CategoryInfo[]) => {
   const productCatalog = products.map(p => {
     const price = p.promotional_price || p.price;
     const originalPrice = p.promotional_price ? ` (de R$ ${p.price.toFixed(2)})` : '';
@@ -108,9 +129,9 @@ serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     // Fetch products, categories, and AI config from database
-    let products: any[] = [];
-    let categories: any[] = [];
-    let aiConfig: any = null;
+    let products: ProductInfo[] = [];
+    let categories: CategoryInfo[] = [];
+    let aiConfig: AIExternalConfig | null = null;
     
     if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
