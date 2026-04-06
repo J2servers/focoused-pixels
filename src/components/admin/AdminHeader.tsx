@@ -18,6 +18,9 @@ export const AdminHeader = ({ title }: AdminHeaderProps) => {
   const { profile, role, signOut } = useAuthContext();
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
+  const { data: companyInfo } = useCompanyInfo();
+  const updateCompany = useUpdateCompanyInfo();
+  const isDarkMode = companyInfo?.dark_mode_enabled ?? true;
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
