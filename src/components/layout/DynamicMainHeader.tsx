@@ -77,8 +77,8 @@ export function DynamicMainHeader() {
           <div className="lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <FloatingIconBtn>
-                  <Menu className="h-5 w-5" />
+                <FloatingIconBtn ariaLabel="Abrir menu de navegação">
+                  <Menu className="h-5 w-5" aria-hidden="true" />
                 </FloatingIconBtn>
               </SheetTrigger>
               <SheetContent side="left" className="w-[320px] p-0 border-r-0" style={{
