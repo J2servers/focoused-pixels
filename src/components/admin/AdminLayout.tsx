@@ -69,7 +69,7 @@ export const AdminLayout = ({
           "flex-1 overflow-y-auto p-3 md:p-4",
           isMobile && "pt-16"
         )}>
-          <div className="w-full">{children}</div>
+          <div className="w-full motion-fade-up">{children}</div>
         </main>
       </div>
     </div>
