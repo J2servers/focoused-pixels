@@ -219,7 +219,11 @@
   100% { background-position: 0% 50%; }
 }
 
-@layer utilities {
+@keyframes bounce-x {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+
 
   .text-gradient-purple {
     @apply bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent;
