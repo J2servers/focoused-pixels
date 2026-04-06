@@ -1057,6 +1057,13 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       orders: {
@@ -2215,7 +2222,6 @@ export type Database = {
           store_status: string | null
           stripe_enabled: boolean | null
           terms_of_service: string | null
-          updated_at: string | null
           warranty: string | null
           whatsapp: string | null
           whatsapp_message_template: string | null
@@ -2316,7 +2322,6 @@ export type Database = {
           store_status?: string | null
           stripe_enabled?: boolean | null
           terms_of_service?: string | null
-          updated_at?: string | null
           warranty?: string | null
           whatsapp?: string | null
           whatsapp_message_template?: string | null
@@ -2417,11 +2422,165 @@ export type Database = {
           store_status?: string | null
           stripe_enabled?: boolean | null
           terms_of_service?: string | null
-          updated_at?: string | null
           warranty?: string | null
           whatsapp?: string | null
           whatsapp_message_template?: string | null
           why_choose_us_config?: Json | null
+        }
+        Relationships: []
+      }
+      coupons_public: {
+        Row: {
+          code: string | null
+          end_date: string | null
+          id: string | null
+          max_discount: number | null
+          min_order_value: number | null
+          start_date: string | null
+          type: string | null
+          value: number | null
+        }
+        Insert: {
+          code?: string | null
+          end_date?: string | null
+          id?: string | null
+          max_discount?: number | null
+          min_order_value?: number | null
+          start_date?: string | null
+          type?: string | null
+          value?: number | null
+        }
+        Update: {
+          code?: string | null
+          end_date?: string | null
+          id?: string | null
+          max_discount?: number | null
+          min_order_value?: number | null
+          start_date?: string | null
+          type?: string | null
+          value?: number | null
+        }
+        Relationships: []
+      }
+      products_public: {
+        Row: {
+          attributes: Json | null
+          category_id: string | null
+          cover_image: string | null
+          created_at: string | null
+          full_description: string | null
+          gallery_images: string[] | null
+          height_cm: number | null
+          id: string | null
+          is_featured: boolean | null
+          length_cm: number | null
+          name: string | null
+          price: number | null
+          promotional_price: number | null
+          short_description: string | null
+          sku: string | null
+          slug: string | null
+          status: string | null
+          stock: number | null
+          tags: string[] | null
+          updated_at: string | null
+          weight_kg: number | null
+          width_cm: number | null
+        }
+        Insert: {
+          attributes?: Json | null
+          category_id?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          full_description?: string | null
+          gallery_images?: string[] | null
+          height_cm?: number | null
+          id?: string | null
+          is_featured?: boolean | null
+          length_cm?: number | null
+          name?: string | null
+          price?: number | null
+          promotional_price?: number | null
+          short_description?: string | null
+          sku?: string | null
+          slug?: string | null
+          status?: string | null
+          stock?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+          weight_kg?: number | null
+          width_cm?: number | null
+        }
+        Update: {
+          attributes?: Json | null
+          category_id?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          full_description?: string | null
+          gallery_images?: string[] | null
+          height_cm?: number | null
+          id?: string | null
+          is_featured?: boolean | null
+          length_cm?: number | null
+          name?: string | null
+          price?: number | null
+          promotional_price?: number | null
+          short_description?: string | null
+          sku?: string | null
+          slug?: string | null
+          status?: string | null
+          stock?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+          weight_kg?: number | null
+          width_cm?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews_public: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          customer_name: string | null
+          id: string | null
+          images: string[] | null
+          is_verified_purchase: boolean | null
+          product_slug: string | null
+          rating: number | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          id?: string | null
+          images?: string[] | null
+          is_verified_purchase?: boolean | null
+          product_slug?: string | null
+          rating?: number | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          id?: string | null
+          images?: string[] | null
+          is_verified_purchase?: boolean | null
+          product_slug?: string | null
+          rating?: number | null
+          title?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
