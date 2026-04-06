@@ -311,7 +311,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("[Evolution] Error:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
@@ -357,6 +357,6 @@ async function attemptSend(
 
     return { success: true, data };
   } catch (e) {
-    return { success: false, error: e.message || "Network error" };
+    return { success: false, error: e instanceof Error ? e.message : "Network error" };
   }
 }
