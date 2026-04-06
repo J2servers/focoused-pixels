@@ -20,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProducts, useCategories } from '@/hooks/useProducts';
+import type { Product } from '@/data/products';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ProductCardOptimized } from '@/components/conversion/ProductCardOptimized';
 import {
