@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FirstPurchaseBanner } from '@/components/conversion/FirstPurchaseBanner';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyFormReturn = UseFormReturn<any>;
+type LoginFormData = { email: string; password: string };
+type SignupFormData = { fullName: string; email: string; password: string; confirmPassword: string; acceptTerms: boolean };
+type ResetFormData = { email: string };
 
 interface Props {
   formMode: 'login' | 'signup' | 'reset';
