@@ -2,12 +2,14 @@
 import { Badge } from '@/components/ui/badge';
 import { Product } from '@/data/products';
 import { storeInfo } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 interface ProductSpecificationsProps {
   product: Product;
 }
 
 export const ProductSpecifications = ({ product }: ProductSpecificationsProps) => {
+  const settings = useSiteSettings();
   return (
     <div className="space-y-6">
       <Accordion type="single" collapsible className="w-full">
@@ -108,10 +110,10 @@ export const ProductSpecifications = ({ product }: ProductSpecificationsProps) =
           </AccordionTrigger>
           <AccordionContent className="space-y-3 text-muted-foreground">
             <p>
-              <strong className="text-foreground">Prazo de produção:</strong> {storeInfo.productionTime}
+              <strong className="text-foreground">Prazo de produção:</strong> {settings.productionTime}
             </p>
             <p>
-              <strong className="text-foreground">Frete grátis:</strong> para pedidos acima de R$ {storeInfo.freeShippingMinimum}
+              <strong className="text-foreground">Frete grátis:</strong> para pedidos acima de R$ {settings.freeShippingMinimum}
             </p>
             <p>
               Enviamos para todo o Brasil via Correios (PAC ou SEDEX) e transportadoras parceiras.
@@ -126,7 +128,7 @@ export const ProductSpecifications = ({ product }: ProductSpecificationsProps) =
           </AccordionTrigger>
           <AccordionContent className="space-y-3 text-muted-foreground">
             <p>
-              <strong className="text-foreground">Garantia:</strong> {storeInfo.warranty} contra defeitos de fabricação.
+              <strong className="text-foreground">Garantia:</strong> {settings.warranty} contra defeitos de fabricação.
             </p>
             <p>
               Confira nossa <a href="/trocas" className="text-primary hover:underline">política de trocas e devoluções</a>.
