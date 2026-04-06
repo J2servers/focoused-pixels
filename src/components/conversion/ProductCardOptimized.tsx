@@ -59,6 +59,7 @@ export function ProductCardOptimized({
       price: product.price,
       image: product.image,
     });
+    analytics.addToCart({ id: product.id, name: product.name, price: product.price });
     toast.success('Adicionado ao carrinho!', {
       action: {
         label: 'Ver carrinho',
@@ -71,12 +72,14 @@ export function ProductCardOptimized({
   const handleQuickView = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    analytics.quickView(product.id);
     setQuickViewOpen(true);
   };
 
   const handleBuyNow = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    analytics.buyNow({ id: product.id, name: product.name, price: product.price });
     addItem({
       id: product.id,
       name: product.name,
