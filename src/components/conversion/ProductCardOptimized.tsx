@@ -14,6 +14,7 @@ import { QuickViewModal } from '@/components/storefront/QuickViewModal';
 import { WishlistButton } from '@/components/product/WishlistButton';
 import { useActivePromotions } from '@/hooks/usePromotions';
 import { PromotionCountdown } from './PromotionCountdown';
+import { analytics } from '@/components/analytics/EventTracker';
 
 interface ProductCardOptimizedProps {
   product: Product;
