@@ -4,7 +4,7 @@ import {
   Settings, Star, LogOut, ChevronLeft, ChevronRight, Sparkles, UserPlus,
   ShoppingCart, Tag, Kanban, Menu, Mail, MessageSquare, Users, ScrollText,
   ImageIcon, Workflow, Code2, ChevronDown, Store, Megaphone, Wrench,
-  Shield, BarChart3, Zap,
+  Shield, BarChart3, Zap, Wallet, Boxes,
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -48,6 +48,7 @@ const MENU_GROUPS: MenuGroup[] = [
       { title: 'Vendas Feitas', url: '/admin/pedidos', icon: ShoppingCart },
       { title: 'Orçamentos', url: '/admin/orcamentos', icon: FileText },
       { title: 'Produção', url: '/admin/kanban', icon: Kanban },
+      { title: 'Fluxo de Caixa', url: '/admin/caixa', icon: Wallet },
     ],
   },
   {
@@ -57,6 +58,7 @@ const MENU_GROUPS: MenuGroup[] = [
     items: [
       { title: 'Produtos', url: '/admin/produtos', icon: Package },
       { title: 'Categorias', url: '/admin/categorias', icon: FolderTree },
+      { title: 'Matérias-Primas', url: '/admin/materiais', icon: Boxes },
     ],
   },
   {

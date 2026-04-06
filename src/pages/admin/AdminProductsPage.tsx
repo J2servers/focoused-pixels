@@ -231,7 +231,11 @@ const AdminProductsPage = () => {
             </div>
             <div className="space-y-2">
               <FormFieldInfo label="Descrição Curta" description="Resumo em 1-2 frases" showsIn="Card e busca" />
-              <Textarea value={formData.short_description} onChange={(e) => setFormData({ ...formData, short_description: e.target.value })} rows={3} />
+              <Textarea value={formData.short_description} onChange={(e) => setFormData({ ...formData, short_description: e.target.value })} rows={2} />
+            </div>
+            <div className="space-y-2">
+              <FormFieldInfo label="Descrição Completa" description="Texto detalhado do produto" showsIn="Página do produto" />
+              <Textarea value={(formData as any).full_description || ''} onChange={(e) => setFormData({ ...formData, full_description: e.target.value } as any)} rows={5} placeholder="Descreva o produto em detalhes..." />
             </div>
 
             <Separator />
