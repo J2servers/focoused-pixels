@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 
 // ===== MOBILE DASHBOARD =====
-function MobileDashboard({ m, abandoned }: { m: Record<string, number | string | unknown[]>; abandoned: Record<string, number | string> }) {
+function MobileDashboard({ m, abandoned }: { m: any; abandoned: any }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
