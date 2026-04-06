@@ -3,7 +3,7 @@ import { Instagram, Facebook, Youtube, Mail, Phone, MapPin } from 'lucide-react'
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { storeInfo } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useCategories } from '@/hooks/useProducts';
 import logo from '@/assets/logo-pincel-de-luz.png';
 import { useMemo } from 'react';
