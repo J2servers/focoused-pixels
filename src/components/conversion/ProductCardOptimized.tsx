@@ -21,7 +21,7 @@ import { analytics } from '@/components/analytics/EventTracker';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 
 interface ProductCardOptimizedProps {
-  product: Product & { stock?: number; categoryId?: string };
+  product: Product;
   index?: number;
   onAddToCart?: () => void;
   variant?: 'default' | 'compact' | 'featured';
