@@ -488,21 +488,14 @@ const AdminLoginPage = () => {
       const ok = await gate(email);
       if (!ok) {
         record(false);
-        const r = MAX_ATTEMPTS - (fails + 1);
-        toast.error(r <= 0 ? '🔒 Bloqueado por tentativas excessivas.' : 'Acesso negado.');
+        showIntruderWarning();
         return;
       }
 
       const { error } = await signIn(email, password);
       if (error) {
         record(false);
-        const r = MAX_ATTEMPTS - (fails + 1);
-        if (isAuthError(error, 'Invalid login credentials'))
-          toast.error(r <= 0 ? '🔒 Bloqueado por 15 minutos.' : `Credenciais inválidas. ${r} tentativa${r !== 1 ? 's' : ''}.`);
-        else if (isAuthError(error, 'Email not confirmed'))
-          toast.error('Email não confirmado.');
-        else
-          toast.error('Erro de autenticação.');
+        showIntruderWarning();
       } else {
         record(true);
         saveSecData([], null, 0, false);
