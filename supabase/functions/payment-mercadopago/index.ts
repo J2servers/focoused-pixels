@@ -102,9 +102,40 @@ async function getPaymentConfig(supabaseClient: any): Promise<MercadoPagoConfig>
   };
 }
 
+// Simple in-memory rate limiter (per edge function instance)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 10; // max 10 payment requests per IP per minute
+
+function checkRateLimit(identifier: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(identifier);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(identifier, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return false;
+  entry.count++;
+  return true;
+}
+
+// Idempotency cache (per instance, short-lived)
+const idempotencyCache = new Map<string, { response: string; timestamp: number }>();
+const IDEM_TTL_MS = 5 * 60 * 1000; // 5 min
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Rate limit by IP
+  const clientIp = req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for") || "unknown";
+  if (!checkRateLimit(clientIp)) {
+    console.warn(`[MercadoPago] Rate limited: ${clientIp}`);
+    return new Response(
+      JSON.stringify({ success: false, error: "Muitas requisições. Tente novamente em 1 minuto." }),
+      { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   }
 
   try {
@@ -120,6 +151,18 @@ serve(async (req) => {
     } = requestData;
 
     console.log(`[MercadoPago] Action: ${action}, OrderId: ${orderId}`);
+
+    // Idempotency check for payment creation actions
+    if (orderId && ["create_pix", "create_boleto", "create_card_payment"].includes(action)) {
+      const idemKey = `${action}-${orderId}`;
+      const cached = idempotencyCache.get(idemKey);
+      if (cached && Date.now() - cached.timestamp < IDEM_TTL_MS) {
+        console.log(`[MercadoPago] Idempotency hit: ${idemKey}`);
+        return new Response(cached.response, {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
 
     const config = await getPaymentConfig(supabase);
     const baseUrl = "https://api.mercadopago.com";
