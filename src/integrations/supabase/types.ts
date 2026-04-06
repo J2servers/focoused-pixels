@@ -377,6 +377,7 @@ export type Database = {
           installments: number | null
           lgpd_contact_email: string | null
           login_bg_image: string | null
+          login_brand_text: string | null
           login_logo: string | null
           login_logo_height: number | null
           login_subtitle: string | null
@@ -492,6 +493,7 @@ export type Database = {
           installments?: number | null
           lgpd_contact_email?: string | null
           login_bg_image?: string | null
+          login_brand_text?: string | null
           login_logo?: string | null
           login_logo_height?: number | null
           login_subtitle?: string | null
@@ -607,6 +609,7 @@ export type Database = {
           installments?: number | null
           lgpd_contact_email?: string | null
           login_bg_image?: string | null
+          login_brand_text?: string | null
           login_logo?: string | null
           login_logo_height?: number | null
           login_subtitle?: string | null
@@ -2545,6 +2548,7 @@ export type Database = {
           company_name: string | null
           header_logo: string | null
           login_bg_image: string | null
+          login_brand_text: string | null
           login_logo: string | null
           login_logo_height: number | null
           login_subtitle: string | null
