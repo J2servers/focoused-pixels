@@ -159,14 +159,14 @@ function ProductPanel({ product, categories, canEdit, onSave, isSaving, onDelete
           {isNew ? '✨ Novo Produto' : product?.name || 'Produto'}
         </h3>
         <div className="flex items-center gap-1">
-          <Button size="sm" className="h-8 text-xs bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 text-emerald-400 hover:from-emerald-500/30 hover:to-emerald-600/30 border border-emerald-500/30"
+          <Button size="sm" className="admin-btn admin-btn-save h-8 text-xs !min-h-0 !px-3"
             onClick={handleSave} disabled={isSaving || !canEdit}>
             {isSaving ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Save className="h-3 w-3 mr-1" />}
             Salvar
           </Button>
           {product && onDelete && (
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400/60 hover:text-red-400 hover:bg-red-400/5" onClick={() => onDelete(product)} disabled={!canEdit}>
-              <Trash2 className="h-3.5 w-3.5" />
+            <Button size="sm" className="admin-btn admin-btn-delete h-8 text-xs !min-h-0 !px-3" onClick={() => onDelete(product)} disabled={!canEdit}>
+              <Trash2 className="h-3.5 w-3.5 mr-1" />Deletar
             </Button>
           )}
           {onClose && (
@@ -432,8 +432,8 @@ const AdminProductsPage = () => {
             actions={
               <div className="flex items-center gap-2">
                 <ExportButtons data={filteredProducts.map(p => ({ nome: p.name, sku: p.sku || '', preco: p.price, estoque: p.stock ?? 0, status: p.status }))} filename="produtos" title="Produtos" columns={[{ key: 'nome', header: 'Nome' }, { key: 'sku', header: 'SKU' }, { key: 'preco', header: 'Preço' }, { key: 'estoque', header: 'Estoque' }, { key: 'status', header: 'Status' }]} />
-                <Button onClick={handleNewProduct} disabled={!canEdit()} size="sm" className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)]">
-                  <Plus className="h-4 w-4 mr-1" />Novo
+                <Button onClick={handleNewProduct} disabled={!canEdit()} className="admin-btn admin-btn-create">
+                  <Plus className="h-4 w-4 mr-1" />Novo Produto
                 </Button>
               </div>
             }
@@ -466,8 +466,8 @@ const AdminProductsPage = () => {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleteProduct.isPending}>
-              {deleteProduct.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Excluir
+            <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={deleteProduct.isPending}>
+              {deleteProduct.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar
             </Button>
           </DialogFooter>
         </DialogContent>

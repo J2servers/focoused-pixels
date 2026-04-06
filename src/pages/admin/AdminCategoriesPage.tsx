@@ -114,13 +114,13 @@ function CategoryPanel({ category, parentCategories, canEdit, onSave, isSaving, 
           )}
         </div>
         <div className="flex items-center gap-1">
-          <Button size="sm" className="h-8 text-xs bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 text-emerald-400 hover:from-emerald-500/30 hover:to-emerald-600/30 border border-emerald-500/30"
+          <Button size="sm" className="admin-btn admin-btn-save h-8 text-xs !min-h-0 !px-3"
             onClick={handleSave} disabled={isSaving || !canEdit}>
             {isSaving ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Save className="h-3 w-3 mr-1" />}Salvar
           </Button>
           {category && onDelete && (
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400/60 hover:text-red-400 hover:bg-red-400/5" onClick={() => onDelete(category)} disabled={!canEdit}>
-              <Trash2 className="h-3.5 w-3.5" />
+            <Button size="sm" className="admin-btn admin-btn-delete h-8 text-xs !min-h-0 !px-3" onClick={() => onDelete(category)} disabled={!canEdit}>
+              <Trash2 className="h-3.5 w-3.5 mr-1" />Deletar
             </Button>
           )}
           {onClose && <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white hover:bg-white/5" onClick={onClose}><X className="h-4 w-4" /></Button>}
@@ -293,9 +293,8 @@ const AdminCategoriesPage = () => {
               </TabsList>
               <div className="flex gap-2">
                 <ExportButtons data={categories.map(c => ({ nome: c.name, slug: c.slug, status: c.status, ordem: c.display_order }))} filename="categorias" title="Categorias" columns={[{ key: 'nome', header: 'Nome' }, { key: 'slug', header: 'Slug' }, { key: 'status', header: 'Status' }, { key: 'ordem', header: 'Ordem' }]} />
-                <Button onClick={() => { setSelectedCategory(null); setCreateAsChild(activeTab === 'children'); setIsCreating(true); }} disabled={!canEdit()} size="sm"
-                  className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg">
-                  <Plus className="h-4 w-4 mr-1" />Nova
+                <Button onClick={() => { setSelectedCategory(null); setCreateAsChild(activeTab === 'children'); setIsCreating(true); }} disabled={!canEdit()} className="admin-btn admin-btn-create">
+                  <Plus className="h-4 w-4 mr-1" />Nova Categoria
                 </Button>
               </div>
             </div>
@@ -336,8 +335,8 @@ const AdminCategoriesPage = () => {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleteCat.isPending}>
-              {deleteCat.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Excluir
+            <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={deleteCat.isPending}>
+              {deleteCat.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar
             </Button>
           </DialogFooter>
         </DialogContent>
