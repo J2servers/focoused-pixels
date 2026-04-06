@@ -714,7 +714,7 @@ const AdminLoginPage = () => {
               {/* Mobile branding */}
               <div className="lg:hidden flex items-center gap-2 mb-6 justify-center">
                 {logoUrl ? (
-                  <img src={logoUrl} alt={brandName} className="h-10 w-auto" />
+                  <img src={logoUrl} alt={brandName} style={{ height: `${Math.min(logoHeight, 40)}px` }} className="w-auto object-contain" />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#e8a817] to-[#c8951a] flex items-center justify-center">
                     <div className="w-3 h-5 bg-white rounded-full" />
