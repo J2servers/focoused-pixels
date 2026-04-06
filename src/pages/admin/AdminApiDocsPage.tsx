@@ -19,10 +19,10 @@ import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const API_BASE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/crm-webhook`;
 
-const cardCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]";
-const inputCls = "bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white";
-const mutedText = "text-[hsl(var(--admin-text-muted))]";
-const btnOutline = "border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]";
+const cardCls = "liquid-glass";
+const inputCls = "liquid-input text-white";
+const mutedText = "text-white/50";
+const btnOutline = "border-white/10 bg-transparent text-white hover:bg-white/[0.06] transition-colors";
 
 function generateApiKey(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -81,7 +81,7 @@ function ApiKeysSection() {
               <div className="flex-1">
                 <p className="text-sm font-semibold text-amber-300 mb-2">Copie esta chave agora! Ela não será exibida novamente.</p>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 text-xs bg-[hsl(var(--admin-bg))] p-2.5 rounded-lg font-mono break-all text-white border border-[hsl(var(--admin-card-border))]">{showKey ? generatedKey : '••••••••••••••••••••••••••'}</code>
+                  <code className="flex-1 text-xs bg-white/[0.03] p-2.5 rounded-lg font-mono break-all text-white border border-white/[0.08]">{showKey ? generatedKey : '••••••••••••••••••••••••••'}</code>
                   <Button size="icon" variant="outline" className={btnOutline} onClick={() => setShowKey(!showKey)}>{showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</Button>
                   <Button size="icon" variant="outline" className={btnOutline} onClick={() => copyText(generatedKey)}><Copy className="h-4 w-4" /></Button>
                 </div>
@@ -94,7 +94,7 @@ function ApiKeysSection() {
       {/* Create Key */}
       <Card className={cardCls}>
         <CardContent className="p-5">
-          <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2"><Zap className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />Criar Nova Chave</h3>
+          <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2"><Zap className="h-4 w-4 text-purple-400" />Criar Nova Chave</h3>
           <div className="flex gap-3">
             <div className="flex-1">
               <Label className={`${mutedText} text-xs uppercase tracking-wide`}>Nome da integração</Label>
@@ -112,11 +112,11 @@ function ApiKeysSection() {
         <CardContent className="p-5">
           <h3 className="text-sm font-semibold text-white mb-3">Chaves Existentes</h3>
           {isLoading ? (
-            <div className="space-y-2">{[1,2].map(i => <div key={i} className="h-14 bg-[hsl(var(--admin-bg))] animate-pulse rounded-lg" />)}</div>
+            <div className="space-y-2">{[1,2].map(i => <div key={i} className="h-14 bg-white/[0.03] animate-pulse rounded-lg" />)}</div>
           ) : apiKeys.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 rounded-2xl bg-[hsl(var(--admin-accent-purple)/0.1)] flex items-center justify-center mx-auto mb-3">
-                <Key className="h-8 w-8 text-[hsl(var(--admin-accent-purple))]" />
+              <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-3">
+                <Key className="h-8 w-8 text-purple-400" />
               </div>
               <p className="text-white font-medium">Nenhuma chave API criada</p>
               <p className={`text-sm ${mutedText} mt-1`}>Crie sua primeira chave para integrar com sistemas externos</p>
@@ -124,9 +124,9 @@ function ApiKeysSection() {
           ) : (
             <div className="space-y-2">
               {apiKeys.map((key) => (
-                <div key={key.id} className="flex items-center gap-4 p-3 rounded-xl bg-[hsl(var(--admin-bg)/0.5)] border border-[hsl(var(--admin-card-border))] hover:border-[hsl(var(--admin-accent-purple)/0.3)] transition-colors">
-                  <div className="w-10 h-10 rounded-xl bg-[hsl(var(--admin-accent-purple)/0.1)] flex items-center justify-center shrink-0">
-                    <Key className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
+                <div key={key.id} className="flex items-center gap-4 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-purple-500/30 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center shrink-0">
+                    <Key className="h-5 w-5 text-purple-400" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white">{key.name}</p>
@@ -172,15 +172,15 @@ function WebhookLogsSection() {
       <Card className={cardCls}>
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2"><RefreshCw className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />Últimos 50 webhooks</h3>
+            <h3 className="text-sm font-semibold text-white flex items-center gap-2"><RefreshCw className="h-4 w-4 text-purple-400" />Últimos 50 webhooks</h3>
             <Badge className="bg-green-500/15 text-green-400 border-0 text-[10px]">Auto-refresh 10s</Badge>
           </div>
           {isLoading ? (
-            <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-12 bg-[hsl(var(--admin-bg))] animate-pulse rounded" />)}</div>
+            <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-12 bg-white/[0.03] animate-pulse rounded" />)}</div>
           ) : logs.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 rounded-2xl bg-[hsl(var(--admin-accent-purple)/0.1)] flex items-center justify-center mx-auto mb-3">
-                <Webhook className="h-8 w-8 text-[hsl(var(--admin-accent-purple))]" />
+              <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-3">
+                <Webhook className="h-8 w-8 text-purple-400" />
               </div>
               <p className="text-white font-medium">Nenhum webhook registrado</p>
               <p className={`text-sm ${mutedText} mt-1`}>Quando sua API receber ou enviar chamadas, os logs aparecerão aqui</p>
@@ -188,10 +188,10 @@ function WebhookLogsSection() {
           ) : (
             <div className="max-h-[500px] overflow-y-auto space-y-1.5">
               {logs.map((log) => (
-                <div key={log.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-[hsl(var(--admin-bg)/0.3)] border border-[hsl(var(--admin-card-border))] hover:border-[hsl(var(--admin-accent-purple)/0.2)] transition-colors">
+                <div key={log.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-[hsl(var(--admin-bg)/0.3)] border border-white/[0.08] hover:border-purple-500/20 transition-colors">
                   <div className={`w-2 h-2 rounded-full shrink-0 ${log.status_code === 200 ? 'bg-green-400' : 'bg-red-400'}`} />
                   <span className={`text-xs ${mutedText} w-28 shrink-0`}>{format(new Date(log.created_at), 'dd/MM HH:mm:ss', { locale: ptBR })}</span>
-                  <span className="text-xs px-2 py-0.5 rounded bg-[hsl(var(--admin-accent-purple)/0.1)] text-[hsl(var(--admin-accent-purple))] font-mono">{log.event_type}</span>
+                  <span className="text-xs px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 font-mono">{log.event_type}</span>
                   <AdminStatusBadge label={log.direction === 'inbound' ? '⬇ IN' : '⬆ OUT'} variant={log.direction === 'inbound' ? 'info' : 'neutral'} />
                   <span className="flex-1" />
                   <AdminStatusBadge label={String(log.status_code)} variant={log.status_code === 200 ? 'success' : 'danger'} />
@@ -212,32 +212,32 @@ function EndpointCard({ method, event, title, description, payload, response }: 
 }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <Card className={`${cardCls} hover:border-[hsl(var(--admin-accent-purple)/0.3)] transition-colors`}>
+    <Card className={`${cardCls} hover:border-purple-500/30 transition-colors`}>
       <CardContent className="p-0">
         <button onClick={() => setExpanded(!expanded)} className="w-full text-left p-4 flex items-center gap-3">
           <span className="text-[10px] font-bold px-2 py-1 rounded bg-green-500/15 text-green-400 shrink-0">{method}</span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <h4 className="text-sm font-semibold text-white">{title}</h4>
-              <code className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-accent-purple))]">{event}</code>
+              <code className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.03] text-purple-400">{event}</code>
             </div>
             <p className={`text-xs ${mutedText} mt-0.5`}>{description}</p>
           </div>
           <span className={`text-xs ${mutedText} transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
         </button>
         {expanded && (
-          <div className="px-4 pb-4 space-y-3 border-t border-[hsl(var(--admin-card-border))]">
+          <div className="px-4 pb-4 space-y-3 border-t border-white/[0.08]">
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1">
                 <span className={`text-[10px] uppercase tracking-wider ${mutedText}`}>Payload</span>
-                <Button size="sm" variant="ghost" className="h-6 text-[10px] text-[hsl(var(--admin-text-muted))] hover:text-white" onClick={() => copyText(payload)}><Copy className="h-3 w-3 mr-1" />Copiar</Button>
+                <Button size="sm" variant="ghost" className="h-6 text-[10px] text-white/50 hover:text-white" onClick={() => copyText(payload)}><Copy className="h-3 w-3 mr-1" />Copiar</Button>
               </div>
-              <pre className="bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))] rounded-lg p-3 overflow-x-auto text-xs font-mono text-[hsl(var(--admin-text-muted))]">{payload}</pre>
+              <pre className="bg-white/[0.03] border border-white/[0.08] rounded-lg p-3 overflow-x-auto text-xs font-mono text-white/50">{payload}</pre>
             </div>
             {response && (
               <div>
                 <span className={`text-[10px] uppercase tracking-wider ${mutedText}`}>Resposta</span>
-                <pre className="bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))] rounded-lg p-3 overflow-x-auto text-xs font-mono text-green-400/70 mt-1">{response}</pre>
+                <pre className="bg-white/[0.03] border border-white/[0.08] rounded-lg p-3 overflow-x-auto text-xs font-mono text-green-400/70 mt-1">{response}</pre>
               </div>
             )}
           </div>
@@ -255,10 +255,10 @@ function ApiDocumentation() {
         <Card className={cardCls}>
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-3">
-              <Webhook className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />
+              <Webhook className="h-4 w-4 text-purple-400" />
               <h3 className="text-sm font-semibold text-white">URL Base</h3>
             </div>
-            <div className="flex items-center gap-2 p-2.5 bg-[hsl(var(--admin-bg))] rounded-lg border border-[hsl(var(--admin-card-border))]">
+            <div className="flex items-center gap-2 p-2.5 bg-white/[0.03] rounded-lg border border-white/[0.08]">
               <code className={`flex-1 text-xs font-mono break-all ${mutedText}`}>{API_BASE_URL}</code>
               <Button size="icon" variant="ghost" className="h-7 w-7 text-white shrink-0" onClick={() => copyText(API_BASE_URL)}><Copy className="h-3 w-3" /></Button>
             </div>
@@ -271,9 +271,9 @@ function ApiDocumentation() {
               <Shield className="h-4 w-4 text-green-400" />
               <h3 className="text-sm font-semibold text-white">Autenticação</h3>
             </div>
-            <div className="p-2.5 bg-[hsl(var(--admin-bg))] rounded-lg border border-[hsl(var(--admin-card-border))]">
-              <code className="text-xs font-mono text-[hsl(var(--admin-text-muted))]">
-                Header: <span className="text-[hsl(var(--admin-accent-purple))]">x-api-key</span>: <span className="text-green-400">pdl_SuaChave...</span>
+            <div className="p-2.5 bg-white/[0.03] rounded-lg border border-white/[0.08]">
+              <code className="text-xs font-mono text-white/50">
+                Header: <span className="text-purple-400">x-api-key</span>: <span className="text-green-400">pdl_SuaChave...</span>
               </code>
             </div>
             <p className={`text-[11px] ${mutedText} mt-2`}>Gere chaves na aba "Chaves de API". Sem chave válida → <span className="text-red-400">401</span></p>
@@ -284,7 +284,7 @@ function ApiDocumentation() {
       {/* Endpoints */}
       <div>
         <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-          <Package className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />
+          <Package className="h-4 w-4 text-purple-400" />
           Endpoints Disponíveis
         </h3>
         <div className="space-y-3">
@@ -332,8 +332,8 @@ export default function AdminApiDocsPage() {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2 text-white">
-              <div className="w-9 h-9 rounded-xl bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center">
-                <Webhook className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
+              <div className="w-9 h-9 rounded-xl bg-purple-500/15 flex items-center justify-center">
+                <Webhook className="h-5 w-5 text-purple-400" />
               </div>
               API & Integração CRM
             </h1>
@@ -342,7 +342,7 @@ export default function AdminApiDocsPage() {
         </div>
 
         <Tabs defaultValue="docs" className="space-y-4">
-          <TabsList className="admin-tabs-vivid bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))]">
+          <TabsList className="admin-tabs-vivid bg-[hsl(var(--admin-card))] border border-white/[0.08]">
             <TabsTrigger value="docs">📄 Documentação</TabsTrigger>
             <TabsTrigger value="keys">🔑 Chaves de API</TabsTrigger>
             <TabsTrigger value="logs">📊 Logs</TabsTrigger>

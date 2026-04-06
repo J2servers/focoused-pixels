@@ -10,8 +10,8 @@ import WhatsAppTestMessage from '@/components/admin/whatsapp/WhatsAppTestMessage
 import WhatsAppMessageLog from '@/components/admin/whatsapp/WhatsAppMessageLog';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
-const cardCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]";
-const mutedText = "text-[hsl(var(--admin-text-muted))]";
+const cardCls = "liquid-glass";
+const mutedText = "text-white/50";
 
 const AdminWhatsAppPage = () => {
   const [instanceStatuses, setInstanceStatuses] = useState<Record<string, string>>({});
@@ -142,7 +142,7 @@ const AdminWhatsAppPage = () => {
             <Card className={cardCls}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-white text-base flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center">🔄</div>
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center">🔄</div>
                   Como funciona o failover?
                 </CardTitle>
               </CardHeader>

@@ -72,13 +72,13 @@ const AdminQuotesPage = () => {
       key: 'customer_name', header: 'Cliente', sortable: true,
       render: (q) => (
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
             <span className="text-white text-xs font-bold">{q.customer_name.charAt(0).toUpperCase()}</span>
           </div>
           <div>
             <p className="font-medium text-white text-sm">{q.customer_name}</p>
-            <p className="text-[11px] text-[hsl(var(--admin-text-muted))]">{q.customer_email}</p>
-            {q.customer_company && <p className="text-[10px] text-[hsl(var(--admin-text-muted))] flex items-center gap-1"><Building2 className="h-3 w-3" />{q.customer_company}</p>}
+            <p className="text-[11px] text-white/50">{q.customer_email}</p>
+            {q.customer_company && <p className="text-[10px] text-white/50 flex items-center gap-1"><Building2 className="h-3 w-3" />{q.customer_company}</p>}
           </div>
         </div>
       ),
@@ -88,9 +88,9 @@ const AdminQuotesPage = () => {
       render: (q) => (
         <div className="flex flex-wrap gap-1">
           {q.product_types.slice(0, 2).map((type) => (
-            <span key={type} className="text-[10px] px-2 py-0.5 rounded-full bg-[hsl(var(--admin-accent-purple)/0.1)] text-[hsl(var(--admin-accent-purple))] border border-[hsl(var(--admin-accent-purple)/0.2)]">{type}</span>
+            <span key={type} className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">{type}</span>
           ))}
-          {q.product_types.length > 2 && <span className="text-[10px] text-[hsl(var(--admin-text-muted))]">+{q.product_types.length - 2}</span>}
+          {q.product_types.length > 2 && <span className="text-[10px] text-white/50">+{q.product_types.length - 2}</span>}
         </div>
       ),
     },
@@ -102,7 +102,7 @@ const AdminQuotesPage = () => {
       key: 'cart_total', header: 'Valor', sortable: true,
       render: (q) => (
         <span className="text-sm font-bold text-white">
-          {q.cart_total ? `R$ ${q.cart_total.toFixed(2).replace('.', ',')}` : <span className="text-[hsl(var(--admin-text-muted))] font-normal">A calcular</span>}
+          {q.cart_total ? `R$ ${q.cart_total.toFixed(2).replace('.', ',')}` : <span className="text-white/50 font-normal">A calcular</span>}
         </span>
       ),
     },
@@ -119,7 +119,7 @@ const AdminQuotesPage = () => {
         const isRecent = isAfter(new Date(q.created_at), subDays(new Date(), 1));
         return (
           <div>
-            <span className="text-sm text-[hsl(var(--admin-text-muted))]">{format(new Date(q.created_at), "dd/MM/yy", { locale: ptBR })}</span>
+            <span className="text-sm text-white/50">{format(new Date(q.created_at), "dd/MM/yy", { locale: ptBR })}</span>
             {isRecent && <Badge className="ml-2 text-[9px] bg-green-500/20 text-green-400 border-0">Novo</Badge>}
           </div>
         );
@@ -170,27 +170,27 @@ const AdminQuotesPage = () => {
         {/* Pipeline + Insights Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Pipeline Funnel */}
-          <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] lg:col-span-2">
+          <Card className="liquid-glass lg:col-span-2">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />
+                <BarChart3 className="h-4 w-4 text-purple-400" />
                 <h3 className="text-sm font-semibold text-white">Pipeline de Orçamentos</h3>
               </div>
               <div className="flex items-stretch gap-2">
                 {pipeline.filter(p => p.key !== 'rejected').map((stage, i) => (
                   <div key={stage.key} className="flex-1 relative">
-                    <div className={`p-3 rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg)/0.5)] text-center ${statusFilter === stage.key ? 'ring-1 ring-[hsl(var(--admin-accent-purple))]' : ''}`}
+                    <div className={`p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] text-center ${statusFilter === stage.key ? 'ring-1 ring-purple-500' : ''}`}
                       role="button" onClick={() => setStatusFilter(statusFilter === stage.key ? 'all' : stage.key)}>
                       <p className="text-2xl font-bold text-white">{stage.count}</p>
-                      <p className="text-[10px] uppercase tracking-wider text-[hsl(var(--admin-text-muted))] mt-0.5">{stage.label}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-white/50 mt-0.5">{stage.label}</p>
                       {stage.value > 0 && (
-                        <p className="text-xs text-[hsl(var(--admin-accent-purple))] mt-1 font-medium">
+                        <p className="text-xs text-purple-400 mt-1 font-medium">
                           R$ {stage.value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
                         </p>
                       )}
                     </div>
                     {i < 2 && (
-                      <div className="absolute top-1/2 -right-2.5 -translate-y-1/2 text-[hsl(var(--admin-text-muted))] z-10">→</div>
+                      <div className="absolute top-1/2 -right-2.5 -translate-y-1/2 text-white/50 z-10">→</div>
                     )}
                   </div>
                 ))}
@@ -199,7 +199,7 @@ const AdminQuotesPage = () => {
           </Card>
 
           {/* Conversion Stats */}
-          <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+          <Card className="liquid-glass">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <DollarSign className="h-4 w-4 text-green-400" />
@@ -207,19 +207,19 @@ const AdminQuotesPage = () => {
               </div>
               <div className="space-y-4">
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-[hsl(var(--admin-text-muted))]">Valor Total Orçado</p>
+                  <p className="text-[10px] uppercase tracking-wider text-white/50">Valor Total Orçado</p>
                   <p className="text-xl font-bold text-white">R$ {totalValue.toFixed(2).replace('.', ',')}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-[hsl(var(--admin-text-muted))]">Aprovado / Convertido</p>
+                  <p className="text-[10px] uppercase tracking-wider text-white/50">Aprovado / Convertido</p>
                   <p className="text-lg font-bold text-green-400">R$ {approvedValue.toFixed(2).replace('.', ',')}</p>
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-[10px] uppercase tracking-wider text-[hsl(var(--admin-text-muted))]">Taxa de Conversão</p>
+                    <p className="text-[10px] uppercase tracking-wider text-white/50">Taxa de Conversão</p>
                     <span className="text-sm font-bold text-white">{conversionRate}%</span>
                   </div>
-                  <Progress value={conversionRate} className="h-2 bg-[hsl(var(--admin-bg))]" />
+                  <Progress value={conversionRate} className="h-2 bg-white/[0.03]" />
                 </div>
               </div>
             </CardContent>
@@ -229,7 +229,7 @@ const AdminQuotesPage = () => {
         {/* Filters + Table */}
         <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar por nome ou email...">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full md:w-[200px] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
+            <SelectTrigger className="w-full md:w-[200px] liquid-glass text-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -250,15 +250,15 @@ const AdminQuotesPage = () => {
 
       {/* Quote Detail Dialog */}
       <Dialog open={!!selectedQuote} onOpenChange={() => setSelectedQuote(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
+        <DialogContent className="max-w-2xl max-h-[90vh] liquid-glass text-white">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center">
-                <FileText className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
+              <div className="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center">
+                <FileText className="h-5 w-5 text-purple-400" />
               </div>
               <div>
                 <p>Orçamento</p>
-                <p className="text-xs font-normal text-[hsl(var(--admin-text-muted))]">
+                <p className="text-xs font-normal text-white/50">
                   {selectedQuote && format(new Date(selectedQuote.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                 </p>
               </div>
@@ -269,22 +269,22 @@ const AdminQuotesPage = () => {
             <ScrollArea className="max-h-[60vh]">
               <div className="space-y-5 p-1">
                 {/* Customer Info */}
-                <div className="bg-[hsl(var(--admin-bg))] rounded-xl p-4">
-                  <h4 className="text-xs uppercase tracking-wider text-[hsl(var(--admin-text-muted))] mb-3">Dados do Cliente</h4>
+                <div className="bg-white/[0.03] rounded-xl p-4">
+                  <h4 className="text-xs uppercase tracking-wider text-white/50 mb-3">Dados do Cliente</h4>
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2"><User className="h-4 w-4 text-[hsl(var(--admin-text-muted))]" /><span className="text-sm text-white">{selectedQuote.customer_name}</span></div>
-                    <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-[hsl(var(--admin-text-muted))]" /><span className="text-sm text-white">{selectedQuote.customer_email}</span></div>
-                    <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-[hsl(var(--admin-text-muted))]" /><span className="text-sm text-white">{selectedQuote.customer_phone}</span></div>
-                    {selectedQuote.customer_company && <div className="flex items-center gap-2"><Building2 className="h-4 w-4 text-[hsl(var(--admin-text-muted))]" /><span className="text-sm text-white">{selectedQuote.customer_company}</span></div>}
+                    <div className="flex items-center gap-2"><User className="h-4 w-4 text-white/50" /><span className="text-sm text-white">{selectedQuote.customer_name}</span></div>
+                    <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-white/50" /><span className="text-sm text-white">{selectedQuote.customer_email}</span></div>
+                    <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-white/50" /><span className="text-sm text-white">{selectedQuote.customer_phone}</span></div>
+                    {selectedQuote.customer_company && <div className="flex items-center gap-2"><Building2 className="h-4 w-4 text-white/50" /><span className="text-sm text-white">{selectedQuote.customer_company}</span></div>}
                   </div>
                 </div>
 
                 {/* Products */}
                 <div>
-                  <h4 className="text-xs uppercase tracking-wider text-[hsl(var(--admin-text-muted))] mb-2">Produtos Solicitados</h4>
+                  <h4 className="text-xs uppercase tracking-wider text-white/50 mb-2">Produtos Solicitados</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedQuote.product_types.map((type) => (
-                      <span key={type} className="text-xs px-3 py-1.5 rounded-lg bg-[hsl(var(--admin-accent-purple)/0.1)] text-[hsl(var(--admin-accent-purple))] border border-[hsl(var(--admin-accent-purple)/0.2)] flex items-center gap-1.5">
+                      <span key={type} className="text-xs px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1.5">
                         <Package className="h-3 w-3" />{type}
                       </span>
                     ))}
@@ -295,9 +295,9 @@ const AdminQuotesPage = () => {
 
                 {/* Status Update */}
                 <div>
-                  <Label className="text-xs uppercase tracking-wider text-[hsl(var(--admin-text-muted))]">Alterar Status</Label>
+                  <Label className="text-xs uppercase tracking-wider text-white/50">Alterar Status</Label>
                   <Select value={selectedQuote.status} onValueChange={(value) => updateStatus.mutate({ id: selectedQuote.id, status: value })}>
-                    <SelectTrigger className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white mt-1"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="bg-white/[0.03] border-white/[0.08] text-white mt-1"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {Object.entries(STATUS_MAP).map(([key, { label }]) => (
                         <SelectItem key={key} value={key}>{label}</SelectItem>
@@ -308,8 +308,8 @@ const AdminQuotesPage = () => {
 
                 {/* Value */}
                 {selectedQuote.cart_total && (
-                  <div className="bg-[hsl(var(--admin-bg))] rounded-xl p-4 flex items-center justify-between">
-                    <span className="text-sm text-[hsl(var(--admin-text-muted))]">Valor do Orçamento</span>
+                  <div className="bg-white/[0.03] rounded-xl p-4 flex items-center justify-between">
+                    <span className="text-sm text-white/50">Valor do Orçamento</span>
                     <span className="text-xl font-bold text-white">R$ {selectedQuote.cart_total.toFixed(2).replace('.', ',')}</span>
                   </div>
                 )}

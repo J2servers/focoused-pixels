@@ -83,7 +83,7 @@ const AdminWhyChooseUsPage = () => {
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-white">Controle total da página comercial</h2>
-            <p className="text-sm text-[hsl(var(--admin-text-muted))]">
+            <p className="text-sm text-white/50">
               Cada alteração aqui reflete em tempo real na página <code className="text-purple-400">/por-que-escolher</code>
             </p>
           </div>

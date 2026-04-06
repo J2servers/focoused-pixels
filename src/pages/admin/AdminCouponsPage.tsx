@@ -125,18 +125,18 @@ const AdminCouponsPage = () => {
       key: 'code', header: 'Código', sortable: true,
       render: (coupon) => (
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${coupon.type === 'percentage' ? 'bg-[hsl(var(--admin-accent-purple)/0.15)]' : 'bg-green-500/15'}`}>
-            {coupon.type === 'percentage' ? <Percent className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" /> : <DollarSign className="h-5 w-5 text-green-400" />}
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${coupon.type === 'percentage' ? 'bg-purple-500/15' : 'bg-green-500/15'}`}>
+            {coupon.type === 'percentage' ? <Percent className="h-5 w-5 text-purple-400" /> : <DollarSign className="h-5 w-5 text-green-400" />}
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono font-bold text-white">{coupon.code}</span>
-              <Button variant="ghost" size="icon" className="h-5 w-5 text-[hsl(var(--admin-text-muted))] hover:text-white"
+              <Button variant="ghost" size="icon" className="h-5 w-5 text-white/50 hover:text-white"
                 onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(coupon.code); toast.success('Código copiado!'); }}>
                 <Copy className="h-3 w-3" />
               </Button>
             </div>
-            {coupon.description && <p className="text-xs text-[hsl(var(--admin-text-muted))] mt-0.5 max-w-[200px] truncate">{coupon.description}</p>}
+            {coupon.description && <p className="text-xs text-white/50 mt-0.5 max-w-[200px] truncate">{coupon.description}</p>}
           </div>
         </div>
       ),
@@ -149,7 +149,7 @@ const AdminCouponsPage = () => {
             {coupon.type === 'percentage' ? `${coupon.value}%` : `R$ ${coupon.value.toFixed(2).replace('.', ',')}`}
           </span>
           {coupon.max_discount && coupon.type === 'percentage' && (
-            <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">máx R$ {coupon.max_discount.toFixed(2).replace('.', ',')}</p>
+            <p className="text-[10px] text-white/50">máx R$ {coupon.max_discount.toFixed(2).replace('.', ',')}</p>
           )}
         </div>
       ),
@@ -162,10 +162,10 @@ const AdminCouponsPage = () => {
           <div className="space-y-1 min-w-[120px]">
             <div className="flex items-center justify-between text-xs">
               <span className="text-white font-medium">{coupon.usage_count}</span>
-              <span className="text-[hsl(var(--admin-text-muted))]">{coupon.usage_limit ? `de ${coupon.usage_limit}` : '∞'}</span>
+              <span className="text-white/50">{coupon.usage_limit ? `de ${coupon.usage_limit}` : '∞'}</span>
             </div>
             {coupon.usage_limit && (
-              <Progress value={pct} className="h-1.5 bg-[hsl(var(--admin-bg))]" />
+              <Progress value={pct} className="h-1.5 bg-white/[0.03]" />
             )}
           </div>
         );
@@ -174,7 +174,7 @@ const AdminCouponsPage = () => {
     {
       key: 'min_order_value', header: 'Pedido Mín.',
       render: (coupon) => (
-        <span className="text-sm text-[hsl(var(--admin-text-muted))]">
+        <span className="text-sm text-white/50">
           {coupon.min_order_value ? `R$ ${coupon.min_order_value.toFixed(2).replace('.', ',')}` : '—'}
         </span>
       ),
@@ -182,17 +182,17 @@ const AdminCouponsPage = () => {
     {
       key: 'end_date', header: 'Validade',
       render: (coupon) => {
-        if (!coupon.end_date) return <span className="text-xs text-[hsl(var(--admin-text-muted))]">Sem limite</span>;
+        if (!coupon.end_date) return <span className="text-xs text-white/50">Sem limite</span>;
         const endDate = new Date(coupon.end_date);
         const isExpired = isPast(endDate);
         const daysLeft = differenceInDays(endDate, new Date());
         const isExpiring = !isExpired && daysLeft <= 7;
         return (
           <div className="space-y-0.5">
-            <span className={`text-sm font-medium ${isExpired ? 'text-red-400' : isExpiring ? 'text-amber-400' : 'text-[hsl(var(--admin-text-muted))]'}`}>
+            <span className={`text-sm font-medium ${isExpired ? 'text-red-400' : isExpiring ? 'text-amber-400' : 'text-white/50'}`}>
               {format(endDate, 'dd/MM/yy', { locale: ptBR })}
             </span>
-            <p className={`text-[10px] ${isExpired ? 'text-red-400' : isExpiring ? 'text-amber-400' : 'text-[hsl(var(--admin-text-muted))]'}`}>
+            <p className={`text-[10px] ${isExpired ? 'text-red-400' : isExpiring ? 'text-amber-400' : 'text-white/50'}`}>
               {isExpired ? 'Expirado' : `${daysLeft}d restantes`}
             </p>
           </div>
@@ -288,14 +288,14 @@ const AdminCouponsPage = () => {
         {/* Top Performers + Quick Templates */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Top Performers */}
-          <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+          <Card className="liquid-glass">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />
+                <TrendingUp className="h-4 w-4 text-purple-400" />
                 <h3 className="text-sm font-semibold text-white">Cupons Mais Utilizados</h3>
               </div>
               {topCoupons.length === 0 ? (
-                <p className="text-sm text-[hsl(var(--admin-text-muted))] text-center py-4">Nenhum dado de uso ainda</p>
+                <p className="text-sm text-white/50 text-center py-4">Nenhum dado de uso ainda</p>
               ) : (
                 <div className="space-y-3">
                   {topCoupons.map((coupon, i) => (
@@ -306,10 +306,10 @@ const AdminCouponsPage = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <span className="font-mono text-sm font-semibold text-white">{coupon.code}</span>
-                          <span className="text-xs font-medium text-[hsl(var(--admin-accent-purple))]">{coupon.usage_count} usos</span>
+                          <span className="text-xs font-medium text-purple-400">{coupon.usage_count} usos</span>
                         </div>
                         {coupon.usage_limit && (
-                          <Progress value={(coupon.usage_count / coupon.usage_limit) * 100} className="h-1 mt-1.5 bg-[hsl(var(--admin-bg))]" />
+                          <Progress value={(coupon.usage_count / coupon.usage_limit) * 100} className="h-1 mt-1.5 bg-white/[0.03]" />
                         )}
                       </div>
                     </div>
@@ -320,23 +320,23 @@ const AdminCouponsPage = () => {
           </Card>
 
           {/* Quick Create Templates */}
-          <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+          <Card className="liquid-glass">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="h-4 w-4 text-[hsl(var(--admin-accent-pink))]" />
+                <Sparkles className="h-4 w-4 text-pink-400" />
                 <h3 className="text-sm font-semibold text-white">Criação Rápida</h3>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {QUICK_TEMPLATES.map((tpl) => (
                   <button key={tpl.code} onClick={() => handleQuickCreate(tpl)}
-                    className="group p-3 rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg)/0.5)] hover:bg-[hsl(var(--admin-sidebar-hover))] hover:border-[hsl(var(--admin-accent-purple)/0.4)] transition-all text-left">
+                    className="group p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:border-purple-500/40 transition-all text-left">
                     <div className="flex items-center gap-2 mb-1">
-                      <Gift className="h-3.5 w-3.5 text-[hsl(var(--admin-accent-purple))] group-hover:text-[hsl(var(--admin-accent-pink))] transition-colors" />
+                      <Gift className="h-3.5 w-3.5 text-purple-400 group-hover:text-pink-400 transition-colors" />
                       <span className="text-xs font-semibold text-white">{tpl.name}</span>
                     </div>
-                    <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">{tpl.desc}</p>
+                    <p className="text-[10px] text-white/50">{tpl.desc}</p>
                     <div className="mt-1.5">
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[hsl(var(--admin-accent-purple)/0.1)] text-[hsl(var(--admin-accent-purple))]">
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400">
                         {tpl.code}
                       </span>
                     </div>
@@ -367,11 +367,11 @@ const AdminCouponsPage = () => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
+        <DialogContent className="max-w-lg liquid-glass text-white">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center">
-                <TicketPercent className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />
+              <div className="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center">
+                <TicketPercent className="h-4 w-4 text-purple-400" />
               </div>
               {editingCoupon ? 'Editar Cupom' : 'Novo Cupom'}
             </DialogTitle>
@@ -380,10 +380,10 @@ const AdminCouponsPage = () => {
           <div className="space-y-4">
             {/* Preview Banner */}
             {formData.code && (
-              <div className="p-3 rounded-xl bg-gradient-to-r from-[hsl(var(--admin-accent-purple)/0.1)] to-[hsl(var(--admin-accent-pink)/0.1)] border border-[hsl(var(--admin-accent-purple)/0.2)] text-center">
-                <p className="text-[10px] uppercase tracking-wider text-[hsl(var(--admin-text-muted))] mb-1">Prévia do cupom</p>
+              <div className="p-3 rounded-xl bg-gradient-to-r from-[hsl(var(--admin-accent-purple)/0.1)] to-[hsl(var(--admin-accent-pink)/0.1)] border border-purple-500/20 text-center">
+                <p className="text-[10px] uppercase tracking-wider text-white/50 mb-1">Prévia do cupom</p>
                 <p className="text-lg font-bold font-mono text-white">{formData.code}</p>
-                <p className="text-sm text-[hsl(var(--admin-accent-purple))]">
+                <p className="text-sm text-purple-400">
                   {formData.type === 'percentage' ? `${formData.value}% OFF` : `R$ ${formData.value.toFixed(2).replace('.', ',')} OFF`}
                 </p>
               </div>
@@ -391,13 +391,13 @@ const AdminCouponsPage = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-[hsl(var(--admin-text-muted))] text-xs uppercase tracking-wide">Código</Label>
-                <Input value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })} placeholder="PROMO10" className="uppercase bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white mt-1" />
+                <Label className="text-white/50 text-xs uppercase tracking-wide">Código</Label>
+                <Input value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })} placeholder="PROMO10" className="uppercase bg-white/[0.03] border-white/[0.08] text-white mt-1" />
               </div>
               <div>
-                <Label className="text-[hsl(var(--admin-text-muted))] text-xs uppercase tracking-wide">Tipo</Label>
+                <Label className="text-white/50 text-xs uppercase tracking-wide">Tipo</Label>
                 <Select value={formData.type} onValueChange={(v: 'percentage' | 'fixed') => setFormData({ ...formData, type: v })}>
-                  <SelectTrigger className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white mt-1"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="bg-white/[0.03] border-white/[0.08] text-white mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="percentage">Percentual (%)</SelectItem>
                     <SelectItem value="fixed">Valor Fixo (R$)</SelectItem>
@@ -407,54 +407,54 @@ const AdminCouponsPage = () => {
             </div>
 
             <div>
-              <Label className="text-[hsl(var(--admin-text-muted))] text-xs uppercase tracking-wide">Descrição</Label>
-              <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Cupom especial de inauguração" rows={2} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white mt-1" />
+              <Label className="text-white/50 text-xs uppercase tracking-wide">Descrição</Label>
+              <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Cupom especial de inauguração" rows={2} className="bg-white/[0.03] border-white/[0.08] text-white mt-1" />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-[hsl(var(--admin-text-muted))] text-xs uppercase tracking-wide">Valor do Desconto</Label>
-                <Input type="number" value={formData.value} onChange={(e) => setFormData({ ...formData, value: parseFloat(e.target.value) || 0 })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white mt-1" />
+                <Label className="text-white/50 text-xs uppercase tracking-wide">Valor do Desconto</Label>
+                <Input type="number" value={formData.value} onChange={(e) => setFormData({ ...formData, value: parseFloat(e.target.value) || 0 })} className="bg-white/[0.03] border-white/[0.08] text-white mt-1" />
               </div>
               <div>
-                <Label className="text-[hsl(var(--admin-text-muted))] text-xs uppercase tracking-wide">Pedido Mínimo (R$)</Label>
-                <Input type="number" value={formData.min_order_value || ''} onChange={(e) => setFormData({ ...formData, min_order_value: e.target.value ? parseFloat(e.target.value) : null })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white mt-1" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-[hsl(var(--admin-text-muted))] text-xs uppercase tracking-wide">Desconto Máximo (R$)</Label>
-                <Input type="number" value={formData.max_discount || ''} onChange={(e) => setFormData({ ...formData, max_discount: e.target.value ? parseFloat(e.target.value) : null })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white mt-1" />
-              </div>
-              <div>
-                <Label className="text-[hsl(var(--admin-text-muted))] text-xs uppercase tracking-wide">Limite de Uso</Label>
-                <Input type="number" value={formData.usage_limit || ''} onChange={(e) => setFormData({ ...formData, usage_limit: e.target.value ? parseInt(e.target.value) : null })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white mt-1" />
+                <Label className="text-white/50 text-xs uppercase tracking-wide">Pedido Mínimo (R$)</Label>
+                <Input type="number" value={formData.min_order_value || ''} onChange={(e) => setFormData({ ...formData, min_order_value: e.target.value ? parseFloat(e.target.value) : null })} className="bg-white/[0.03] border-white/[0.08] text-white mt-1" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-[hsl(var(--admin-text-muted))] text-xs uppercase tracking-wide">Data Início</Label>
-                <Input type="date" value={formData.start_date} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white mt-1" />
+                <Label className="text-white/50 text-xs uppercase tracking-wide">Desconto Máximo (R$)</Label>
+                <Input type="number" value={formData.max_discount || ''} onChange={(e) => setFormData({ ...formData, max_discount: e.target.value ? parseFloat(e.target.value) : null })} className="bg-white/[0.03] border-white/[0.08] text-white mt-1" />
               </div>
               <div>
-                <Label className="text-[hsl(var(--admin-text-muted))] text-xs uppercase tracking-wide">Data Fim</Label>
-                <Input type="date" value={formData.end_date} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white mt-1" />
+                <Label className="text-white/50 text-xs uppercase tracking-wide">Limite de Uso</Label>
+                <Input type="number" value={formData.usage_limit || ''} onChange={(e) => setFormData({ ...formData, usage_limit: e.target.value ? parseInt(e.target.value) : null })} className="bg-white/[0.03] border-white/[0.08] text-white mt-1" />
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg)/0.6)]">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-white/50 text-xs uppercase tracking-wide">Data Início</Label>
+                <Input type="date" value={formData.start_date} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} className="bg-white/[0.03] border-white/[0.08] text-white mt-1" />
+              </div>
+              <div>
+                <Label className="text-white/50 text-xs uppercase tracking-wide">Data Fim</Label>
+                <Input type="date" value={formData.end_date} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} className="bg-white/[0.03] border-white/[0.08] text-white mt-1" />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 rounded-xl border border-white/[0.08] bg-white/[0.04]">
               <div>
                 <Label className="text-white text-sm font-medium">Cupom Ativo</Label>
-                <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">Desativado, o cupom não poderá ser utilizado</p>
+                <p className="text-[10px] text-white/50">Desativado, o cupom não poderá ser utilizado</p>
               </div>
               <Switch checked={formData.is_active} onCheckedChange={(c) => setFormData({ ...formData, is_active: c })} className="admin-switch-orange" />
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-white/[0.08] bg-transparent text-white hover:bg-white/[0.06]">Cancelar</Button>
             <Button onClick={handleSubmit} disabled={!formData.code || !formData.value} className="admin-btn admin-btn-save">
               {editingCoupon ? 'Salvar Alterações' : 'Criar Cupom'}
             </Button>
@@ -463,15 +463,15 @@ const AdminCouponsPage = () => {
       </Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <AlertDialogContent className="liquid-glass">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription className="text-[hsl(var(--admin-text-muted))]">
+            <AlertDialogDescription className="text-white/50">
               Tem certeza que deseja excluir este cupom? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="border-white/[0.08] bg-transparent text-white hover:bg-white/[0.06]">Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="admin-btn admin-btn-delete"><Trash2 className="h-4 w-4 mr-1" />Deletar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
