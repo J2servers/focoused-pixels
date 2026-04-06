@@ -141,6 +141,30 @@ export function MobileHeader() {
             </Link>
           </div>
         </div>
+
+        {/* #6 Free Shipping Progress Bar */}
+        {itemCount > 0 && !hasFreeShipping && (
+          <div className="px-4 pb-1.5">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-500"
+                  style={{ width: `${freeShippingProgress}%` }}
+                />
+              </div>
+              <span className="text-[9px] text-muted-foreground font-medium whitespace-nowrap">
+                Falta R$ {((freeShippingMinimum || 159) - total).toFixed(0)} p/ frete grátis
+              </span>
+            </div>
+          </div>
+        )}
+        {itemCount > 0 && hasFreeShipping && (
+          <div className="px-4 pb-1.5">
+            <p className="text-[9px] text-center font-semibold" style={{ color: 'hsl(var(--success))' }}>
+              🎉 Frete grátis desbloqueado!
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Search Overlay */}
