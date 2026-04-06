@@ -12,9 +12,9 @@ describe('exportToCSV', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLink = { href: '', download: '', click: vi.fn() };
-    vi.spyOn(document, 'createElement').mockReturnValue(mockLink as any);
-    vi.spyOn(document.body, 'appendChild').mockReturnValue(null as any);
-    vi.spyOn(document.body, 'removeChild').mockReturnValue(null as any);
+    vi.spyOn(document, 'createElement').mockReturnValue(mockLink as unknown as HTMLElement);
+    vi.spyOn(document.body, 'appendChild').mockReturnValue(null as unknown as Node);
+    vi.spyOn(document.body, 'removeChild').mockReturnValue(null as unknown as Node);
   });
 
   it('creates CSV blob with BOM and correct data', async () => {
@@ -31,18 +31,15 @@ describe('exportToCSV', () => {
 
     exportToCSV(data, 'test', columns);
 
-    // Verify Blob was created
     expect(mockCreateObjectURL).toHaveBeenCalledTimes(1);
-    const blobArg = mockCreateObjectURL.mock.calls[0][0];
+    const blobArg = mockCreateObjectURL.mock.calls[0]?.[0] as Blob | undefined;
     expect(blobArg).toBeInstanceOf(Blob);
 
-    // Read content
-    const text = await blobArg.text();
-    expect(text).toContain('\uFEFF'); // BOM
+    const text = await blobArg!.text();
+    expect(text).toContain('\uFEFF');
     expect(text).toContain('Nome,Preço');
-    expect(text).toContain('"Display, especial"'); // Comma escaped
+    expect(text).toContain('"Display, especial"');
 
-    // Verify download triggered
     expect(mockLink.click).toHaveBeenCalled();
     expect(mockRevokeObjectURL).toHaveBeenCalled();
   });
@@ -57,9 +54,9 @@ describe('exportToCSV', () => {
     ];
 
     exportToCSV(data, 'test', columns);
-    const blobArg = mockCreateObjectURL.mock.calls[0][0];
-    const text = await blobArg.text();
-    expect(text).toContain(','); // Empty values
+    const blobArg = mockCreateObjectURL.mock.calls[0]?.[0] as Blob | undefined;
+    const text = await blobArg!.text();
+    expect(text).toContain(',');
   });
 });
 
@@ -67,9 +64,9 @@ describe('exportToJSON', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     const mockLink = { href: '', download: '', click: vi.fn() };
-    vi.spyOn(document, 'createElement').mockReturnValue(mockLink as any);
-    vi.spyOn(document.body, 'appendChild').mockReturnValue(null as any);
-    vi.spyOn(document.body, 'removeChild').mockReturnValue(null as any);
+    vi.spyOn(document, 'createElement').mockReturnValue(mockLink as unknown as HTMLElement);
+    vi.spyOn(document.body, 'appendChild').mockReturnValue(null as unknown as Node);
+    vi.spyOn(document.body, 'removeChild').mockReturnValue(null as unknown as Node);
   });
 
   it('creates valid JSON blob', async () => {
@@ -78,8 +75,8 @@ describe('exportToJSON', () => {
     const data = [{ id: 1, name: 'Test' }];
     exportToJSON(data, 'test');
 
-    const blobArg = mockCreateObjectURL.mock.calls[0][0];
-    const text = await blobArg.text();
+    const blobArg = mockCreateObjectURL.mock.calls[0]?.[0] as Blob | undefined;
+    const text = await blobArg!.text();
     const parsed = JSON.parse(text);
     expect(parsed).toEqual(data);
   });
