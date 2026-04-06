@@ -156,7 +156,23 @@ const AdminLoginCustomizePage = () => {
             )}
           </div>
 
-          {/* BG Image */}
+          {/* Texto ao lado da Logo */}
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl p-6 space-y-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-amber-500 flex items-center justify-center">
+                <Type className="h-4 w-4 text-white" />
+              </div>
+              <h3 className="text-white font-semibold">Texto ao Lado da Logo</h3>
+            </div>
+            <p className="text-white/40 text-xs">Texto que aparece ao lado do logotipo. Deixe vazio para usar o nome da empresa.</p>
+            <Input
+              value={settings.login_brand_text || ''}
+              onChange={(e) => update('login_brand_text', e.target.value || null)}
+              className="border-white/[0.08] bg-white/[0.04] text-white"
+              placeholder="Ex: Minha Empresa"
+            />
+          </div>
+
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl p-6 space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
