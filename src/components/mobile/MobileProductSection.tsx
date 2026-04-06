@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useState, useRef, useEffect } from 'react';
+import { ChevronRight } from 'lucide-react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { MobileProductCard } from './MobileProductCard';
 
 interface Product {
