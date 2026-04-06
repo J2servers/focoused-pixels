@@ -62,7 +62,7 @@ const AdminProductsPage = () => {
     setFormData({
       name: product.name, slug: product.slug,
       short_description: product.short_description || '',
-      full_description: (product as any).full_description || '',
+      full_description: product.full_description || '',
       price: product.price.toString(),
       promotional_price: product.promotional_price?.toString() || '',
       stock: product.stock.toString(), sku: product.sku || '',
@@ -88,7 +88,7 @@ const AdminProductsPage = () => {
     const data: ProductFormData = {
       name: formData.name, slug,
       short_description: formData.short_description || null,
-      full_description: (formData as any).full_description || null,
+      full_description: formData.full_description || null,
       price: parseFloat(formData.price),
       promotional_price: formData.promotional_price ? parseFloat(formData.promotional_price) : null,
       stock: parseInt(formData.stock) || 0, sku: formData.sku || null,
@@ -237,7 +237,7 @@ const AdminProductsPage = () => {
             </div>
             <div className="space-y-2">
               <FormFieldInfo label="Descrição Completa" description="Texto detalhado do produto" showsIn="Página do produto" />
-              <Textarea value={(formData as any).full_description || ''} onChange={(e) => setFormData({ ...formData, full_description: e.target.value } as any)} rows={5} placeholder="Descreva o produto em detalhes..." />
+              <Textarea value={formData.full_description || ''} onChange={(e) => setFormData({ ...formData, full_description: e.target.value })} rows={5} placeholder="Descreva o produto em detalhes..." />
             </div>
 
             <Separator />
