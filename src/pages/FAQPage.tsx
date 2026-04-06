@@ -20,7 +20,7 @@ const faqCategories = [
       },
       {
         question: 'Quais formas de pagamento vocês aceitam?',
-        answer: `Aceitamos ${storeInfo.footerLinks.payment.join(', ')}. O parcelamento em até ${storeInfo.installments}x sem juros está disponível para cartão de crédito.`,
+        answer: `Aceitamos ${storeInfo.footerLinks.payment.join(', ')}. O parcelamento em até ${settings.installments}x sem juros está disponível para cartão de crédito.`,
       },
       {
         question: 'O pagamento é seguro?',
@@ -37,7 +37,7 @@ const faqCategories = [
     questions: [
       {
         question: 'Qual o prazo de produção?',
-        answer: `O prazo de produção é de ${storeInfo.productionTime}, contados a partir da aprovação do layout e confirmação do pagamento. Pedidos com maior volume podem ter prazos diferenciados.`,
+        answer: `O prazo de produção é de ${settings.productionTime}, contados a partir da aprovação do layout e confirmação do pagamento. Pedidos com maior volume podem ter prazos diferenciados.`,
       },
       {
         question: 'Em qual formato devo enviar minha arte/logo?',
@@ -62,7 +62,7 @@ const faqCategories = [
     questions: [
       {
         question: 'Como funciona o frete?',
-        answer: `O frete é calculado com base no CEP de entrega. Oferecemos frete grátis para pedidos acima de R$ ${storeInfo.freeShippingMinimum}. Enviamos para todo o Brasil via Correios ou transportadora.`,
+        answer: `O frete é calculado com base no CEP de entrega. Oferecemos frete grátis para pedidos acima de R$ ${settings.freeShippingMinimum}. Enviamos para todo o Brasil via Correios ou transportadora.`,
       },
       {
         question: 'Qual o prazo de entrega?',
@@ -83,7 +83,7 @@ const faqCategories = [
     questions: [
       {
         question: 'Os produtos têm garantia?',
-        answer: `Sim! Oferecemos garantia de ${storeInfo.warranty} contra defeitos de fabricação. A garantia não cobre danos por mau uso, quedas ou exposição inadequada.`,
+        answer: `Sim! Oferecemos garantia de ${settings.warranty} contra defeitos de fabricação. A garantia não cobre danos por mau uso, quedas ou exposição inadequada.`,
       },
       {
         question: 'Posso devolver um produto personalizado?',
@@ -221,7 +221,7 @@ const FAQPage = () => {
                   Nossa equipe está pronta para ajudar! Entre em contato pelo WhatsApp.
                 </p>
                 <a
-                  href={storeInfo.whatsappLink}
+                  href={`https://wa.me/${settings.whatsapp?.replace(/\\D/g, "") || ""}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

@@ -152,7 +152,7 @@ const ProductPage = () => {
 
   const currentDiscount = getDiscountPercent(quantity);
   const discountedPrice = product.price * (1 - currentDiscount / 100);
-  const installments = companyInfo?.max_installments || storeInfo.installments;
+  const installments = companyInfo?.max_installments || settings.installments;
   const minInstallmentValue = companyInfo?.min_installment_value || 50;
   const maxInstallments = Math.min(installments, Math.floor(product.price / minInstallmentValue) || 1);
 
@@ -339,7 +339,7 @@ const ProductPage = () => {
                     { icon: Shield, text: 'Compra Segura' },
                     { icon: Clock, text: 'Entrega Rápida' },
                     { icon: CreditCard, text: `Até ${maxInstallments}x s/ juros` },
-                    { icon: Package, text: companyInfo?.production_time || storeInfo.productionTime },
+                    { icon: Package, text: companyInfo?.production_time || settings.productionTime },
                   ].map(({ icon: Icon, text }) => (
                     <div key={text} role="listitem" className="flex items-center gap-2 rounded-xl border border-border/40 bg-muted/30 p-2.5 sm:p-3 text-xs sm:text-sm text-foreground">
                       <Icon className="h-4 w-4 text-primary shrink-0" />
@@ -393,7 +393,7 @@ const ProductPage = () => {
                   <SectionTitle>Entrega</SectionTitle>
                   <FreightCalculator productPrice={product.price * quantity} onFreightSelect={setSelectedFreight} />
                   {selectedFreight && (
-                    <DeliveryEstimate freightDays={selectedFreight.days} productionDays={companyInfo?.production_time || storeInfo.productionTime} />
+                    <DeliveryEstimate freightDays={selectedFreight.days} productionDays={companyInfo?.production_time || settings.productionTime} />
                   )}
                 </Section>
 
