@@ -162,6 +162,7 @@ const App = () => (
                 <Route path="/admin/workflows" element={<AdminWorkflowsPage />} />
                 <Route path="/admin/caixa" element={<AdminCashFlowPage />} />
                 <Route path="/admin/materiais" element={<AdminRawMaterialsPage />} />
+                <Route path="/admin/login-config" element={<AdminLoginCustomizePage />} />
                 
                 <Route path="/teste" element={<TestePage />} />
                 <Route path="/teste2" element={<Teste2Page />} />
@@ -176,4 +177,4 @@ const App = () => (
 );
 
 export default App;
-
+const AdminLoginCustomizePage = lazy(() => import("./pages/admin/AdminLoginCustomizePage"));

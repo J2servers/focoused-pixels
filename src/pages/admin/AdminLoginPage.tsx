@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Loader2, Mail, Lock, Shield, ShieldAlert, AlertTriangle, Skull, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Mail, Lock, ShieldAlert, AlertTriangle, Skull, ArrowRight } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { isAuthError } from '@/lib/auth-error';
@@ -12,11 +12,11 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, MeshTransmissionMaterial, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
-// ─── Security constants ───
+// ─── Security ───
 const MAX_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 15 * 60 * 1000;
-const ATTEMPT_WINDOW_MS = 5 * 60 * 1000;
-const PERMANENT_BAN_THRESHOLD = 15;
+const LOCKOUT_MS = 15 * 60 * 1000;
+const WINDOW_MS = 5 * 60 * 1000;
+const BAN_THRESHOLD = 15;
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -24,415 +24,377 @@ const loginSchema = z.object({
 });
 type LoginFormData = z.infer<typeof loginSchema>;
 
-interface LoginAttempt { timestamp: number; success: boolean; }
-interface SecurityData { attempts: LoginAttempt[]; lockedUntil: number | null; totalFails: number; permanentBan: boolean; }
-
-const getSecurityData = (): SecurityData => {
-  try {
-    const raw = sessionStorage.getItem('_sec_gate');
-    if (!raw) return { attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false };
-    return JSON.parse(raw);
-  } catch { return { attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false }; }
-};
-const saveSecurityData = (data: SecurityData) => sessionStorage.setItem('_sec_gate', JSON.stringify(data));
-
-// ─── 3D Scene Components ───
-
-function LaserMachineBody() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.15) * 0.08;
-    }
-  });
-  return (
-    <group position={[0, -0.5, 0]}>
-      {/* Main machine body */}
-      <mesh ref={meshRef} position={[0, 0, 0]}>
-        <boxGeometry args={[3.5, 2, 2.5]} />
-        <meshStandardMaterial color="#1a1a2e" metalness={0.95} roughness={0.15} />
-      </mesh>
-      {/* Machine arm */}
-      <mesh position={[0, 1.3, 0]}>
-        <boxGeometry args={[2.8, 0.3, 0.3]} />
-        <meshStandardMaterial color="#16213e" metalness={0.9} roughness={0.2} />
-      </mesh>
-      {/* Laser head */}
-      <mesh position={[0.8, 1.1, 0]}>
-        <cylinderGeometry args={[0.08, 0.12, 0.5, 16]} />
-        <meshStandardMaterial color="#0f3460" metalness={0.85} roughness={0.1} />
-      </mesh>
-      {/* Laser beam glow */}
-      <mesh position={[0.8, 0.5, 0]}>
-        <cylinderGeometry args={[0.015, 0.015, 1.2, 8]} />
-        <meshBasicMaterial color="#e94560" transparent opacity={0.7} />
-      </mesh>
-      {/* Work bed */}
-      <mesh position={[0, -1.2, 0]}>
-        <boxGeometry args={[3.8, 0.15, 2.8]} />
-        <meshStandardMaterial color="#0a0a1a" metalness={0.8} roughness={0.3} />
-      </mesh>
-      {/* Grid lines on bed */}
-      <gridHelper args={[3.2, 12, '#e94560', '#1a1a3e']} position={[0, -1.1, 0]} />
-    </group>
-  );
+interface SecurityData {
+  attempts: { timestamp: number; success: boolean }[];
+  lockedUntil: number | null;
+  totalFails: number;
+  permanentBan: boolean;
 }
+const getSec = (): SecurityData => {
+  try { const r = sessionStorage.getItem('_sg'); return r ? JSON.parse(r) : { attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false }; }
+  catch { return { attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false }; }
+};
+const saveSec = (d: SecurityData) => sessionStorage.setItem('_sg', JSON.stringify(d));
 
-function FloatingSphere({ position, scale, color, speed }: { position: [number, number, number]; scale: number; color: string; speed: number }) {
+// ─── 3D Components ───
+
+function GoldenSphere({ pos, scale, speed }: { pos: [number, number, number]; scale: number; speed: number }) {
   const ref = useRef<THREE.Mesh>(null);
-  useFrame((state) => {
+  useFrame((s) => {
     if (ref.current) {
-      ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * speed) * 0.3;
-      ref.current.position.x = position[0] + Math.cos(state.clock.elapsedTime * speed * 0.7) * 0.15;
+      ref.current.position.y = pos[1] + Math.sin(s.clock.elapsedTime * speed) * 0.4;
+      ref.current.position.x = pos[0] + Math.cos(s.clock.elapsedTime * speed * 0.6) * 0.2;
     }
   });
   return (
-    <Float speed={speed} rotationIntensity={0.3} floatIntensity={0.5}>
-      <mesh ref={ref} position={position} scale={scale}>
-        <sphereGeometry args={[1, 32, 32]} />
+    <Float speed={speed} rotationIntensity={0.2} floatIntensity={0.4}>
+      <mesh ref={ref} position={pos} scale={scale}>
+        <sphereGeometry args={[1, 48, 48]} />
         <MeshTransmissionMaterial
-          backside
-          samples={6}
-          thickness={0.4}
-          chromaticAberration={0.15}
-          anisotropy={0.2}
-          distortion={0.3}
-          distortionScale={0.4}
-          temporalDistortion={0.1}
-          color={color}
-          transmission={0.9}
-          roughness={0.05}
-          metalness={0.1}
+          backside samples={8} thickness={0.5}
+          chromaticAberration={0.1} anisotropy={0.3}
+          distortion={0.2} distortionScale={0.3}
+          temporalDistortion={0.05}
+          color="#e8a817" transmission={0.85}
+          roughness={0.08} metalness={0.15}
         />
       </mesh>
     </Float>
   );
 }
 
-function SparkParticles() {
-  const count = 60;
+function LaserDevice() {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((s) => {
+    if (ref.current) ref.current.rotation.y = Math.sin(s.clock.elapsedTime * 0.12) * 0.06;
+  });
+  return (
+    <group ref={ref} position={[0, -0.3, -1]}>
+      {/* Screen frame */}
+      <mesh position={[0, 0.4, 0]}>
+        <boxGeometry args={[2.8, 2, 0.12]} />
+        <meshStandardMaterial color="#1a1a2e" metalness={0.9} roughness={0.15} />
+      </mesh>
+      {/* Inner screen */}
+      <mesh position={[0, 0.4, 0.07]}>
+        <boxGeometry args={[2.4, 1.6, 0.01]} />
+        <meshStandardMaterial color="#c8951a" metalness={0.4} roughness={0.6} emissive="#c8951a" emissiveIntensity={0.15} />
+      </mesh>
+      {/* Stand */}
+      <mesh position={[0, -0.8, 0.3]}>
+        <boxGeometry args={[0.4, 0.5, 0.6]} />
+        <meshStandardMaterial color="#111122" metalness={0.85} roughness={0.2} />
+      </mesh>
+      {/* Base */}
+      <mesh position={[0, -1.1, 0.3]}>
+        <boxGeometry args={[1.8, 0.1, 0.8]} />
+        <meshStandardMaterial color="#0f0f1e" metalness={0.9} roughness={0.1} />
+      </mesh>
+    </group>
+  );
+}
+
+function Particles() {
+  const count = 40;
   const ref = useRef<THREE.Points>(null);
   const positions = useMemo(() => {
-    const pos = new Float32Array(count * 3);
+    const p = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 12;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 8;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 6;
+      p[i * 3] = (Math.random() - 0.5) * 14;
+      p[i * 3 + 1] = (Math.random() - 0.5) * 10;
+      p[i * 3 + 2] = (Math.random() - 0.5) * 6;
     }
-    return pos;
+    return p;
   }, []);
-
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.rotation.y = state.clock.elapsedTime * 0.02;
-      ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.01) * 0.05;
-    }
-  });
-
+  useFrame((s) => { if (ref.current) ref.current.rotation.y = s.clock.elapsedTime * 0.015; });
   return (
     <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
-      </bufferGeometry>
-      <pointsMaterial size={0.04} color="#e94560" transparent opacity={0.6} sizeAttenuation />
+      <bufferGeometry><bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} /></bufferGeometry>
+      <pointsMaterial size={0.03} color="#e8a817" transparent opacity={0.5} sizeAttenuation />
     </points>
   );
 }
 
-function Scene3D() {
+function Scene() {
   return (
     <>
-      <ambientLight intensity={0.15} />
-      <directionalLight position={[5, 5, 5]} intensity={0.4} color="#e94560" />
-      <directionalLight position={[-5, 3, -3]} intensity={0.2} color="#533483" />
-      <pointLight position={[0.8, 0.5, 1]} intensity={2} color="#e94560" distance={4} />
-      <pointLight position={[-2, 2, -1]} intensity={0.8} color="#533483" distance={5} />
-
-      <LaserMachineBody />
-      <FloatingSphere position={[-3, 2, -1]} scale={0.8} color="#e94560" speed={1.2} />
-      <FloatingSphere position={[3.5, -1, -2]} scale={0.5} color="#533483" speed={0.8} />
-      <FloatingSphere position={[-1.5, -2, 1]} scale={0.35} color="#e94560" speed={1.5} />
-      <FloatingSphere position={[2, 3, 0]} scale={1.2} color="#e9456088" speed={0.6} />
-      <SparkParticles />
-
-      <Environment preset="night" />
+      <ambientLight intensity={0.2} color="#e8a817" />
+      <directionalLight position={[5, 5, 5]} intensity={0.5} color="#e8a817" />
+      <directionalLight position={[-4, 3, -3]} intensity={0.3} color="#c8951a" />
+      <pointLight position={[0, 0, 3]} intensity={1.5} color="#e8a817" distance={8} />
+      <LaserDevice />
+      <GoldenSphere pos={[-3.5, 2.5, -1]} scale={1.2} speed={0.8} />
+      <GoldenSphere pos={[4, -1.5, -2]} scale={0.6} speed={1.2} />
+      <GoldenSphere pos={[-1, -2.5, 1]} scale={0.4} speed={1.6} />
+      <GoldenSphere pos={[2.5, 3, 0.5]} scale={0.9} speed={0.6} />
+      <GoldenSphere pos={[0, -3, -1.5]} scale={0.3} speed={2} />
+      <Particles />
+      <Environment preset="sunset" />
     </>
   );
 }
 
-// ─── Main Component ───
+// ─── Login Page ───
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
   const { user, role, isLoading, signIn } = useAuthContext();
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
-  const [isPermanentBan, setIsPermanentBan] = useState(false);
-  const [lockRemaining, setLockRemaining] = useState(0);
-  const [failedCount, setFailedCount] = useState(0);
-  const lockTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [showPw, setShowPw] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const [banned, setBanned] = useState(false);
+  const [remaining, setRemaining] = useState(0);
+  const [fails, setFails] = useState(0);
+  const [serverBlocked, setServerBlocked] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const form = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
-  const loginForm = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
+  // Login page settings from company_info
+  const [loginSettings, setLoginSettings] = useState<{
+    login_logo?: string | null;
+    login_title?: string | null;
+    login_subtitle?: string | null;
+    company_name?: string | null;
+  }>({});
 
   useEffect(() => {
-    const data = getSecurityData();
-    if (data.permanentBan) { setIsPermanentBan(true); return; }
-    if (data.lockedUntil && Date.now() < data.lockedUntil) {
-      setIsLocked(true);
-      setLockRemaining(Math.ceil((data.lockedUntil - Date.now()) / 1000));
-    }
-    setFailedCount(data.attempts.filter(a => !a.success && Date.now() - a.timestamp < ATTEMPT_WINDOW_MS).length);
+    supabase.from('company_info').select('login_logo, login_title, login_subtitle, company_name, header_logo').limit(1).single()
+      .then(({ data }) => {
+        if (data) setLoginSettings(data as typeof loginSettings);
+      });
   }, []);
 
   useEffect(() => {
-    if (isLocked && !isPermanentBan) {
-      lockTimerRef.current = setInterval(() => {
-        const data = getSecurityData();
-        if (!data.lockedUntil || Date.now() >= data.lockedUntil) {
-          setIsLocked(false); setLockRemaining(0); setFailedCount(0);
-          saveSecurityData({ ...data, attempts: [], lockedUntil: null });
-          if (lockTimerRef.current) clearInterval(lockTimerRef.current);
-        } else { setLockRemaining(Math.ceil((data.lockedUntil - Date.now()) / 1000)); }
+    const d = getSec();
+    if (d.permanentBan) { setBanned(true); return; }
+    if (d.lockedUntil && Date.now() < d.lockedUntil) {
+      setLocked(true); setRemaining(Math.ceil((d.lockedUntil - Date.now()) / 1000));
+    }
+    setFails(d.attempts.filter(a => !a.success && Date.now() - a.timestamp < WINDOW_MS).length);
+  }, []);
+
+  useEffect(() => {
+    if (locked && !banned) {
+      timerRef.current = setInterval(() => {
+        const d = getSec();
+        if (!d.lockedUntil || Date.now() >= d.lockedUntil) {
+          setLocked(false); setRemaining(0); setFails(0);
+          saveSec({ ...d, attempts: [], lockedUntil: null });
+          if (timerRef.current) clearInterval(timerRef.current);
+        } else setRemaining(Math.ceil((d.lockedUntil - Date.now()) / 1000));
       }, 1000);
     }
-    return () => { if (lockTimerRef.current) clearInterval(lockTimerRef.current); };
-  }, [isLocked, isPermanentBan]);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [locked, banned]);
 
   useEffect(() => {
     if (!isLoading && user && role) navigate('/admin');
   }, [user, role, isLoading, navigate]);
 
-  const recordAttempt = (success: boolean) => {
-    const data = getSecurityData();
-    const now = Date.now();
-    const recentAttempts = data.attempts.filter(a => now - a.timestamp < ATTEMPT_WINDOW_MS);
-    recentAttempts.push({ timestamp: now, success });
-    const newTotalFails = success ? 0 : data.totalFails + 1;
-    if (newTotalFails >= PERMANENT_BAN_THRESHOLD) {
-      saveSecurityData({ attempts: recentAttempts, lockedUntil: null, totalFails: newTotalFails, permanentBan: true });
-      setIsPermanentBan(true); return;
+  const record = (ok: boolean) => {
+    const d = getSec(); const now = Date.now();
+    const recent = d.attempts.filter(a => now - a.timestamp < WINDOW_MS);
+    recent.push({ timestamp: now, success: ok });
+    const tf = ok ? 0 : d.totalFails + 1;
+    if (tf >= BAN_THRESHOLD) { saveSec({ attempts: recent, lockedUntil: null, totalFails: tf, permanentBan: true }); setBanned(true); return; }
+    const rf = recent.filter(a => !a.success); setFails(rf.length);
+    if (rf.length >= MAX_ATTEMPTS) {
+      const lu = now + LOCKOUT_MS;
+      saveSec({ attempts: recent, lockedUntil: lu, totalFails: tf, permanentBan: false });
+      setLocked(true); setRemaining(Math.ceil(LOCKOUT_MS / 1000)); return;
     }
-    const recentFails = recentAttempts.filter(a => !a.success);
-    setFailedCount(recentFails.length);
-    if (recentFails.length >= MAX_ATTEMPTS) {
-      const lockedUntil = now + LOCKOUT_DURATION_MS;
-      saveSecurityData({ attempts: recentAttempts, lockedUntil, totalFails: newTotalFails, permanentBan: false });
-      setIsLocked(true); setLockRemaining(Math.ceil(LOCKOUT_DURATION_MS / 1000)); return;
-    }
-    saveSecurityData({ attempts: recentAttempts, lockedUntil: data.lockedUntil, totalFails: newTotalFails, permanentBan: false });
+    saveSec({ attempts: recent, lockedUntil: d.lockedUntil, totalFails: tf, permanentBan: false });
   };
 
-  const verifyEmailHasAdminRole = async (email: string): Promise<boolean> => {
+  const gate = async (email: string) => {
     try {
       const { data, error } = await supabase.functions.invoke('admin-gate-check', { body: { email } });
       if (error) return false;
+      if (data?.reason === 'blocked' || data?.reason === 'rate_limited') { setServerBlocked(true); return false; }
       return data?.allowed === true;
     } catch { return false; }
   };
 
-  const onLogin = async (data: LoginFormData) => {
-    if (isLocked || isPermanentBan) { toast.error('Acesso bloqueado.'); return; }
-    setIsSubmitting(true);
+  const onSubmit = async (data: LoginFormData) => {
+    if (locked || banned || serverBlocked) { toast.error('Acesso bloqueado.'); return; }
+    setSubmitting(true);
     try {
-      const hasAccess = await verifyEmailHasAdminRole(data.email);
-      if (!hasAccess) {
-        recordAttempt(false);
-        const remaining = MAX_ATTEMPTS - (failedCount + 1);
-        toast.error(remaining <= 0 ? '🔒 Acesso bloqueado por excesso de tentativas.' : 'Acesso negado. Portal exclusivo para pessoal autorizado.');
-        setIsSubmitting(false); return;
+      const ok = await gate(data.email);
+      if (!ok) {
+        record(false);
+        const r = MAX_ATTEMPTS - (fails + 1);
+        toast.error(r <= 0 ? '🔒 Bloqueado por tentativas excessivas.' : 'Acesso negado.');
+        return;
       }
       const { error } = await signIn(data.email, data.password);
       if (error) {
-        recordAttempt(false);
-        const remaining = MAX_ATTEMPTS - (failedCount + 1);
-        if (isAuthError(error, 'Invalid login credentials')) {
-          toast.error(remaining <= 0 ? '🔒 Conta bloqueada por 15 minutos.' : `Senha incorreta. ${remaining} tentativa${remaining !== 1 ? 's' : ''} restante${remaining !== 1 ? 's' : ''}.`);
-        } else if (isAuthError(error, 'Email not confirmed')) {
-          toast.error('Email não confirmado.');
-        } else { toast.error('Erro de autenticação.'); }
+        record(false);
+        const r = MAX_ATTEMPTS - (fails + 1);
+        if (isAuthError(error, 'Invalid login credentials'))
+          toast.error(r <= 0 ? '🔒 Bloqueado por 15 minutos.' : `Senha incorreta. ${r} tentativa${r !== 1 ? 's' : ''}.`);
+        else if (isAuthError(error, 'Email not confirmed')) toast.error('Email não confirmado.');
+        else toast.error('Erro de autenticação.');
       } else {
-        recordAttempt(true);
-        saveSecurityData({ attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false });
+        record(true);
+        saveSec({ attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false });
         toast.success('✅ Acesso autorizado.');
       }
-    } catch { recordAttempt(false); toast.error('Erro interno.'); }
-    finally { setIsSubmitting(false); }
+    } catch { record(false); toast.error('Erro interno.'); }
+    finally { setSubmitting(false); }
   };
 
-  const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
+  const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
+
+  const brandName = loginSettings.company_name || 'Pincel de Luz';
+  const title = loginSettings.login_title || 'Painel de Controle';
+  const subtitle = loginSettings.login_subtitle || 'Acesse o centro de comando do seu negócio com segurança máxima.';
+  const logoUrl = loginSettings.login_logo || (loginSettings as Record<string, unknown>).header_logo as string | undefined;
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a12]">
-        <Loader2 className="h-10 w-10 animate-spin text-[#e94560]" />
+      <div className="min-h-screen flex items-center justify-center bg-[#1a1408]">
+        <Loader2 className="h-10 w-10 animate-spin text-[#e8a817]" />
       </div>
     );
   }
 
-  if (isPermanentBan) {
+  if (banned || serverBlocked) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a12]">
-        <div className="w-full max-w-md p-8 rounded-3xl border border-red-500/20 bg-red-950/10 backdrop-blur-2xl text-center">
+      <div className="min-h-screen flex items-center justify-center bg-[#1a1408]">
+        <div className="max-w-md p-8 rounded-3xl border border-red-500/20 bg-red-950/10 backdrop-blur-2xl text-center">
           <Skull className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-red-300 mb-2">Acesso Permanentemente Bloqueado</h2>
-          <p className="text-red-400/60 text-sm">Múltiplas tentativas não autorizadas foram detectadas e registradas.</p>
+          <h2 className="text-xl font-bold text-red-300 mb-2">Acesso Bloqueado</h2>
+          <p className="text-red-400/60 text-sm">Tentativas não autorizadas detectadas. Incidente registrado.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-[#0a0a12] via-[#1a0a2e] to-[#0a0a12]">
+    <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-[#1a1408] via-[#2d1f0a] to-[#1a1408]">
       {/* 3D Background */}
       <div className="absolute inset-0 z-0">
-        <Canvas
-          camera={{ position: [0, 0, 6], fov: 50 }}
-          dpr={[1, 1.5]}
-          gl={{ antialias: true, alpha: true }}
-        >
-          <Suspense fallback={null}>
-            <Scene3D />
-          </Suspense>
+        <Canvas camera={{ position: [0, 0, 6], fov: 50 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }}>
+          <Suspense fallback={null}><Scene /></Suspense>
         </Canvas>
       </div>
 
-      {/* Gradient overlays for depth */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#0a0a12]/80 via-transparent to-[#0a0a12]/40" />
-      <div className="absolute inset-0 z-[1] bg-gradient-to-t from-[#0a0a12]/60 via-transparent to-[#0a0a12]/30" />
+      {/* Golden gradient overlays */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#c8951a]/20 via-transparent to-[#c8951a]/10" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[#1a1408]/40 via-transparent to-[#1a1408]/60" />
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col lg:flex-row items-center justify-center px-4 sm:px-8 gap-8 lg:gap-16">
-        
-        {/* Left side - Branding */}
+      <div className="relative z-10 min-h-screen flex flex-col lg:flex-row items-center justify-center px-4 sm:px-8 gap-8 lg:gap-20">
+
+        {/* Left - Branding */}
         <div className="hidden lg:flex flex-col max-w-md">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#e94560] to-[#533483] flex items-center justify-center shadow-xl shadow-[#e94560]/20">
-              <Shield className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white tracking-tight">Pincel de Luz</span>
+          <div className="flex items-center gap-3 mb-8">
+            {logoUrl ? (
+              <img src={logoUrl} alt={brandName} className="h-12 w-auto object-contain" />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#e8a817] to-[#c8951a] flex items-center justify-center shadow-xl shadow-[#e8a817]/30">
+                <div className="w-4 h-6 bg-white rounded-full" />
+              </div>
+            )}
+            <span className="text-2xl font-bold text-white tracking-tight">{brandName}</span>
           </div>
-          <h1 className="text-5xl font-extrabold leading-tight mb-4">
-            <span className="bg-gradient-to-r from-white via-[#e94560] to-[#533483] bg-clip-text text-transparent">
-              Painel de{'\n'}Controle
+          <h1 className="text-5xl font-extrabold leading-tight mb-5">
+            <span className="text-white">
+              {title.split(' ').slice(0, 2).join(' ')}<br />
+              {title.split(' ').slice(2).join(' ')}
             </span>
           </h1>
-          <p className="text-white/40 text-base leading-relaxed max-w-sm">
-            Acesse o centro de comando do seu negócio. Gerencie produtos, pedidos e toda sua operação com segurança máxima.
+          <p className="text-white/50 text-base leading-relaxed max-w-sm">
+            {subtitle}
           </p>
         </div>
 
-        {/* Right side - Glass Login Card */}
-        <div className="w-full max-w-[420px]">
-          {/* Glass Card */}
-          <div className="relative rounded-3xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-2xl shadow-2xl shadow-black/40 overflow-hidden">
-            {/* Glass shine effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] via-transparent to-transparent pointer-events-none" />
-            <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-[#e94560]/10 blur-3xl pointer-events-none" />
+        {/* Right - Glass Login Card */}
+        <div className="w-full max-w-[440px]">
+          <div className="relative rounded-3xl border border-[#e8a817]/15 bg-white/[0.04] backdrop-blur-2xl shadow-2xl shadow-[#e8a817]/10 overflow-hidden">
+            {/* Glass shine */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-transparent pointer-events-none" />
+            <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-[#e8a817]/10 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 -left-16 w-32 h-32 rounded-full bg-[#e8a817]/8 blur-2xl pointer-events-none" />
 
             <div className="relative p-8 sm:p-10">
-              {/* Mobile logo */}
-              <div className="lg:hidden flex items-center gap-2 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e94560] to-[#533483] flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-lg font-bold text-white">Pincel de Luz</span>
+              {/* Mobile branding */}
+              <div className="lg:hidden flex items-center gap-2 mb-6 justify-center">
+                {logoUrl ? (
+                  <img src={logoUrl} alt={brandName} className="h-10 w-auto" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#e8a817] to-[#c8951a] flex items-center justify-center">
+                    <div className="w-3 h-5 bg-white rounded-full" />
+                  </div>
+                )}
+                <span className="text-lg font-bold text-white">{brandName}</span>
               </div>
 
-              <h2 className="text-lg font-semibold tracking-wide text-white/90 uppercase text-center mb-1">
-                {isLocked ? '🔒 Acesso Bloqueado' : 'Acesso Restrito'}
+              <h2 className="text-sm font-semibold tracking-[0.2em] text-[#e8a817] uppercase text-center mb-1">
+                {locked ? '🔒 ACESSO BLOQUEADO' : 'WELCOME BACK'}
               </h2>
-              <p className="text-sm text-white/30 text-center mb-8">
-                {isLocked ? `Tente novamente em ${formatTime(lockRemaining)}` : 'Identifique-se para continuar'}
+              <p className="text-xs text-white/30 tracking-wider uppercase text-center mb-8">
+                {locked ? `Tente em ${fmt(remaining)}` : 'LOG IN TO CONTINUE'}
               </p>
 
-              {/* Warning banner */}
-              {failedCount > 0 && failedCount < MAX_ATTEMPTS && !isLocked && (
-                <div className="mb-6 p-3 rounded-xl bg-amber-500/10 border border-amber-500/15 flex items-start gap-2">
+              {fails > 0 && fails < MAX_ATTEMPTS && !locked && (
+                <div className="mb-5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/12 flex items-start gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />
-                  <p className="text-xs text-amber-300/80">
-                    {MAX_ATTEMPTS - failedCount} tentativa{MAX_ATTEMPTS - failedCount !== 1 ? 's' : ''} restante{MAX_ATTEMPTS - failedCount !== 1 ? 's' : ''} antes do bloqueio.
+                  <p className="text-[11px] text-amber-300/80">
+                    {MAX_ATTEMPTS - fails} tentativa{MAX_ATTEMPTS - fails !== 1 ? 's' : ''} restante{MAX_ATTEMPTS - fails !== 1 ? 's' : ''}.
                   </p>
                 </div>
               )}
 
-              {isLocked ? (
-                <div className="py-10 flex flex-col items-center gap-6">
+              {locked ? (
+                <div className="py-12 flex flex-col items-center gap-6">
                   <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
                     <ShieldAlert className="h-10 w-10 text-red-400" />
                   </div>
-                  <p className="text-white/40 text-sm text-center">Múltiplas tentativas falhas detectadas.</p>
-                  <div className="font-mono text-4xl font-bold text-red-400 tabular-nums">
-                    {formatTime(lockRemaining)}
-                  </div>
+                  <div className="font-mono text-4xl font-bold text-red-400 tabular-nums">{fmt(remaining)}</div>
                 </div>
               ) : (
-                <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-5">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   {/* Email */}
-                  <div>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/25" />
-                      <input
-                        type="email"
-                        {...loginForm.register('email')}
-                        placeholder="seu@email.com"
-                        autoComplete="off"
-                        className="w-full h-13 pl-12 pr-4 rounded-xl bg-white/[0.06] border border-white/[0.08] text-white placeholder:text-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-[#e94560]/40 focus:border-[#e94560]/30 transition-all"
-                      />
-                    </div>
-                    {loginForm.formState.errors.email && (
-                      <p className="text-xs text-red-400 mt-1.5 pl-1">{loginForm.formState.errors.email.message}</p>
-                    )}
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                    <input
+                      type="email" {...form.register('email')}
+                      placeholder="seu@email.com" autoComplete="off"
+                      className="w-full h-[52px] pl-12 pr-4 rounded-xl bg-white text-[#1a1408] placeholder:text-[#1a1408]/40 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#e8a817]/50 transition-all border-0"
+                    />
                   </div>
+                  {form.formState.errors.email && <p className="text-xs text-red-400 pl-1">{form.formState.errors.email.message}</p>}
 
                   {/* Password */}
-                  <div>
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/25" />
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        {...loginForm.register('password')}
-                        placeholder="••••••••"
-                        autoComplete="off"
-                        className="w-full h-13 pl-12 pr-12 rounded-xl bg-white/[0.06] border border-white/[0.08] text-white placeholder:text-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-[#e94560]/40 focus:border-[#e94560]/30 transition-all"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/50 transition-colors text-xs uppercase tracking-wider font-medium"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                    {loginForm.formState.errors.password && (
-                      <p className="text-xs text-red-400 mt-1.5 pl-1">{loginForm.formState.errors.password.message}</p>
-                    )}
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                    <input
+                      type={showPw ? 'text' : 'password'} {...form.register('password')}
+                      placeholder="••••••••" autoComplete="off"
+                      className="w-full h-[52px] pl-12 pr-16 rounded-xl bg-white text-[#1a1408] placeholder:text-[#1a1408]/40 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#e8a817]/50 transition-all border-0"
+                    />
+                    <button type="button" onClick={() => setShowPw(!showPw)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#1a1408]/30 hover:text-[#1a1408]/60 text-[10px] uppercase tracking-widest font-bold transition-colors">
+                      {showPw ? 'HIDE' : 'SHOW'}
+                    </button>
                   </div>
+                  {form.formState.errors.password && <p className="text-xs text-red-400 pl-1">{form.formState.errors.password.message}</p>}
 
                   {/* Submit */}
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full h-13 rounded-xl bg-[#0f0f1a] hover:bg-[#1a1a2e] border border-white/[0.06] text-white font-semibold text-sm tracking-wide flex items-center justify-between px-6 transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? (
-                      <span className="flex items-center gap-2 mx-auto">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Verificando...
-                      </span>
+                  <button type="submit" disabled={submitting}
+                    className="w-full h-[52px] rounded-xl bg-[#0f0f1a] hover:bg-[#1a1a2e] text-white font-semibold text-sm tracking-wide flex items-center justify-between px-6 transition-all duration-300 group disabled:opacity-50 mt-2">
+                    {submitting ? (
+                      <span className="flex items-center gap-2 mx-auto"><Loader2 className="h-4 w-4 animate-spin" />Verificando...</span>
                     ) : (
-                      <>
-                        <span>Acessar Painel</span>
-                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                      </>
+                      <><span>Acessar Painel</span><ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>
                     )}
                   </button>
                 </form>
               )}
 
-              {/* Footer notice */}
-              <p className="text-[10px] text-white/15 text-center mt-8 leading-relaxed">
-                Portal monitorado. Não existe recuperação de senha. Contate o administrador do sistema.
+              <p className="text-[9px] text-white/12 text-center mt-8 tracking-wide">
+                PORTAL MONITORADO • SEM RECUPERAÇÃO DE SENHA • CONTATE O ADMINISTRADOR
               </p>
             </div>
           </div>
