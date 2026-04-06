@@ -235,7 +235,7 @@ const ProductPage = () => {
   };
 
   return (
-    <HelmetProvider>
+    <>
       <div className="min-h-screen flex flex-col bg-background page-enter">
         {/* SEO - #4 JSON-LD + OG tags */}
         <ProductJsonLd
@@ -544,7 +544,9 @@ const ProductPage = () => {
 
         <DynamicFooter />
         <WhatsAppButton />
-        <AIChatWidget />
+        <Suspense fallback={null}>
+          <AIChatWidget />
+        </Suspense>
 
         {/* #1 Sticky Bottom Buy Bar on Mobile */}
         <StickyBuyBar
@@ -557,7 +559,7 @@ const ProductPage = () => {
           onAddToCart={handleAddToCart}
         />
       </div>
-    </HelmetProvider>
+    </>
   );
 };
 
