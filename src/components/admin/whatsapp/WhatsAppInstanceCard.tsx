@@ -195,13 +195,13 @@ const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusCha
             </div>
             <p className="text-white font-medium text-sm">Conectado e ativo</p>
             <div className="flex gap-2 justify-center">
-              <Button variant="outline" size="sm" onClick={handleDisconnect} disabled={!!actionLoading}
-                className="border-yellow-600/50 text-yellow-400 hover:bg-yellow-600/10 text-xs">
+              <Button onClick={handleDisconnect} disabled={!!actionLoading}
+                className="admin-btn admin-btn-edit !min-h-0 !py-1.5 !px-3 text-xs">
                 <WifiOff className="h-3.5 w-3.5 mr-1" /> Desconectar
               </Button>
-              <Button variant="outline" size="sm" onClick={handleDelete} disabled={!!actionLoading}
-                className="border-red-600/50 text-red-400 hover:bg-red-600/10 text-xs">
-                <Trash2 className="h-3.5 w-3.5 mr-1" /> Excluir
+              <Button onClick={handleDelete} disabled={!!actionLoading}
+                className="admin-btn admin-btn-delete !min-h-0 !py-1.5 !px-3 text-xs">
+                <Trash2 className="h-3.5 w-3.5 mr-1" /> Deletar
               </Button>
             </div>
           </div>
@@ -229,8 +229,8 @@ const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusCha
               <Smartphone className="h-8 w-8 text-[hsl(var(--admin-text-muted))]" />
             </div>
             <p className="text-[hsl(var(--admin-text-muted))] text-sm">Não conectado</p>
-            <Button onClick={handleCreateInstance} disabled={!!actionLoading} size="sm"
-              className="bg-green-600 hover:bg-green-700 text-white">
+            <Button onClick={handleCreateInstance} disabled={!!actionLoading}
+              className="admin-btn admin-btn-save">
               {actionLoading === 'create' ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <QrCode className="h-4 w-4 mr-1" />}
               Conectar
             </Button>

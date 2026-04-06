@@ -194,15 +194,15 @@ export function ProductDetailPanel({ product, categories, onEdit, onDelete, onCl
         <div className="flex items-center gap-0.5 shrink-0">
           {editing ? (
             <>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-400 hover:bg-emerald-400/10" onClick={handleSaveInline} disabled={isSaving} title="Salvar">
+              <Button className="admin-btn admin-btn-save admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={handleSaveInline} disabled={isSaving} title="Salvar">
                 {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
               </Button>
               <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:bg-white/5" onClick={() => { setEditing(false); setForm(buildForm(product)); }} title="Cancelar"><X className="h-3.5 w-3.5" /></Button>
             </>
           ) : (
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[hsl(var(--admin-accent-cyan))] hover:bg-[hsl(var(--admin-accent-cyan)/0.1)]" onClick={() => canEdit && setEditing(true)} disabled={!canEdit} title="Editar"><Pencil className="h-3.5 w-3.5" /></Button>
+            <Button className="admin-btn admin-btn-edit admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => canEdit && setEditing(true)} disabled={!canEdit} title="Editar"><Pencil className="h-3.5 w-3.5" /></Button>
           )}
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400/60 hover:text-red-400 hover:bg-red-400/5" onClick={() => onDelete(product)} disabled={!canEdit} title="Excluir"><Trash2 className="h-3.5 w-3.5" /></Button>
+          <Button className="admin-btn admin-btn-delete admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => onDelete(product)} disabled={!canEdit} title="Deletar"><Trash2 className="h-3.5 w-3.5" /></Button>
           {onClose && <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white hover:bg-white/5" onClick={onClose} title="Fechar"><X className="h-4 w-4" /></Button>}
         </div>
       </div>

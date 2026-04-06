@@ -76,7 +76,7 @@ export const SettingsSecuritySection = ({ settings, u, canMutate, profileName, u
 
         <div className="flex items-center gap-4">
           <Button
-            className="h-10 bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.25)]"
+            className="admin-btn admin-btn-save"
             onClick={changePassword}
             disabled={changingPass || !canMutate || !pass.n}
           >

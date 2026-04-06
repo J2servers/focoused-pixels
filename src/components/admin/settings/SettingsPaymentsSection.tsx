@@ -128,7 +128,7 @@ export const SettingsPaymentsSection = ({ payment, up, canMutate, testMP, testEF
                   <p className="text-xs text-[hsl(var(--admin-text-muted))]">{gw.test.isSuccess ? 'Conectado' : 'Não testado'}</p>
                 </div>
               </div>
-              <Button size="sm" variant="outline" className="h-8 text-xs border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-bg))]" onClick={() => runTest(gw.label, gw.test.mutateAsync)} disabled={!canMutate || gw.test.isPending}>
+              <Button className="admin-btn admin-btn-edit !min-h-0 !py-1.5 !px-3 h-8 text-xs" onClick={() => runTest(gw.label, gw.test.mutateAsync)} disabled={!canMutate || gw.test.isPending}>
                 {gw.test.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Testar'}
               </Button>
             </div>
@@ -175,7 +175,7 @@ export const SettingsPaymentsSection = ({ payment, up, canMutate, testMP, testEF
               )}
 
               {test && (
-                <Button size="sm" variant="outline" className="h-9 border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-bg))]" onClick={() => runTest(gw.label, test.mutateAsync)} disabled={!canMutate || test.isPending}>
+                <Button className="admin-btn admin-btn-edit !min-h-0 !py-1.5 !px-3 h-9" onClick={() => runTest(gw.label, test.mutateAsync)} disabled={!canMutate || test.isPending}>
                   {test.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Settings className="h-4 w-4 mr-2" />}
                   Testar conexão
                 </Button>
