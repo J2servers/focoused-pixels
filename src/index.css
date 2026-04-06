@@ -51,6 +51,27 @@
 
     --radius: 0.75rem;
 
+    /* ═══ Premium Design Tokens ═══ */
+    --timing-fast: 150ms;
+    --timing-normal: 250ms;
+    --timing-slow: 400ms;
+    --easing-premium: cubic-bezier(0.22, 1, 0.36, 1);
+    --easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+    --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.08), 0 2px 4px -2px hsl(0 0% 0% / 0.05);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.08), 0 4px 6px -4px hsl(0 0% 0% / 0.04);
+    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.08), 0 8px 10px -6px hsl(0 0% 0% / 0.04);
+    --shadow-glow: 0 0 20px -5px hsl(var(--primary) / 0.25);
+
+    --blur-sm: 4px;
+    --blur-md: 8px;
+    --blur-lg: 16px;
+
+    --gradient-premium: linear-gradient(135deg, hsl(280 70% 43%) 0%, hsl(340 80% 55%) 50%, hsl(210 90% 55%) 100%);
+    --gradient-surface: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
+
     /* Neumorphism Shadow Tokens - Deep Machined */
     --neu-light: 0 0% 100%;
     --neu-dark: 240 20% 75%;
