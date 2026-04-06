@@ -16,7 +16,7 @@ interface ActivityItem {
 
 const tableConfig: Record<string, { icon: typeof ShoppingCart; color: string; label: string }> = {
   orders: { icon: ShoppingCart, color: 'text-purple-400 bg-purple-500/[0.15]', label: 'Pedido' },
-  quotes: { icon: FileText, color: 'text-[hsl(var(--admin-accent-blue))] bg-[hsl(var(--admin-accent-blue)/0.15)]', label: 'Orçamento' },
+  quotes: { icon: FileText, color: 'text-[hsl(210 100% 60%)] bg-[rgb(59 130 246 / 0.15)]', label: 'Orçamento' },
   products: { icon: Package, color: 'text-cyan-400 bg-cyan-500/[0.15]', label: 'Produto' },
   reviews: { icon: Star, color: 'text-orange-400 bg-orange-500/[0.15]', label: 'Avaliação' },
   leads: { icon: UserPlus, color: 'text-emerald-400 bg-emerald-500/[0.15]', label: 'Lead' },
@@ -59,7 +59,7 @@ export function RealActivityFeed() {
         {loading ? (
           <div className="space-y-3">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-12 bg-[hsl(var(--admin-sidebar))] animate-pulse rounded-lg" />
+              <div key={i} className="h-12 bg-white/[0.04] animate-pulse rounded-lg" />
             ))}
           </div>
         ) : activities.length === 0 ? (

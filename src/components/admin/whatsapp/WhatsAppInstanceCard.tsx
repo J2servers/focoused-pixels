@@ -225,7 +225,7 @@ const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusCha
           </div>
         ) : (
           <div className="text-center space-y-3">
-            <div className="w-16 h-16 mx-auto rounded-full bg-[hsl(var(--admin-card-border)/0.3)] flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto rounded-full bg-[rgb(255 255 255 / 0.3)] flex items-center justify-center">
               <Smartphone className="h-8 w-8 text-white/50" />
             </div>
             <p className="text-white/50 text-sm">Não conectado</p>

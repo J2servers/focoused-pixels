@@ -97,7 +97,7 @@ function WorkflowSidebar({
   ];
 
   return (
-    <div className="w-[320px] shrink-0 border-r border-white/[0.06] flex flex-col bg-gradient-to-b from-[hsl(var(--admin-bg))] to-[hsl(var(--admin-bg)/0.95)]">
+    <div className="w-[320px] shrink-0 border-r border-white/[0.06] flex flex-col bg-gradient-to-b from-[rgb(255 255 255 / 0.03)] to-[rgb(255 255 255 / 0.95)]">
       {/* ── KPI Strip ── */}
       <div className="px-4 py-4 border-b border-white/[0.06]">
         <div className="grid grid-cols-3 gap-3">

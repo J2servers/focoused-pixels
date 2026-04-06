@@ -172,7 +172,7 @@ const WhatsAppMessageLog = () => {
           <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
             {filtered.map(msg => (
               <div key={msg.id}
-                className="bg-white/[0.03] rounded-lg p-3 border border-[hsl(var(--admin-card-border)/0.5)] hover:border-white/[0.08] transition-colors">
+                className="bg-white/[0.03] rounded-lg p-3 border border-[rgb(255 255 255 / 0.5)] hover:border-white/[0.08] transition-colors">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">

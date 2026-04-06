@@ -341,7 +341,7 @@ function WorkflowBuilderInner() {
         <div className="flex-1 relative" ref={reactFlowWrapper}>
           {!currentWorkflow ? (
             /* ── Empty State ── */
-            <div className="flex items-center justify-center h-full bg-gradient-to-br from-[hsl(var(--admin-bg))] via-[hsl(var(--admin-bg))] to-violet-950/10">
+            <div className="flex items-center justify-center h-full bg-gradient-to-br from-[rgb(255 255 255 / 0.03)] via-[rgb(255 255 255 / 0.03)] to-violet-950/10">
               {/* Subtle grid pattern */}
               <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
               
@@ -402,13 +402,13 @@ function WorkflowBuilderInner() {
                 <MiniMap
                   nodeStrokeColor="hsl(0 0% 100% / 0.1)"
                   nodeColor="hsl(270 60% 60% / 0.2)"
-                  maskColor="hsl(var(--admin-bg) / 0.85)"
+                  maskColor="rgb(255 255 255 / 0.85)"
                   className="!bg-white/[0.04] !border-white/[0.06] !rounded-xl"
                 />
               )}
 
               {/* ── Top-left: Name & Status ── */}
-              <Panel position="top-left" className="flex items-center gap-2.5 bg-[hsl(var(--admin-card)/0.95)] backdrop-blur-xl border border-white/[0.08] rounded-xl px-4 py-2.5 shadow-2xl shadow-black/20">
+              <Panel position="top-left" className="flex items-center gap-2.5 bg-[rgb(255 255 255 / 0.95)] backdrop-blur-xl border border-white/[0.08] rounded-xl px-4 py-2.5 shadow-2xl shadow-black/20">
                 <div className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
                 <Input
                   value={currentWorkflow.name}
@@ -421,7 +421,7 @@ function WorkflowBuilderInner() {
               </Panel>
 
               {/* ── Top-right: Toolbar ── */}
-              <Panel position="top-right" className="flex items-center gap-1 bg-[hsl(var(--admin-card)/0.95)] backdrop-blur-xl border border-white/[0.08] rounded-xl px-2.5 py-1.5 shadow-2xl shadow-black/20">
+              <Panel position="top-right" className="flex items-center gap-1 bg-[rgb(255 255 255 / 0.95)] backdrop-blur-xl border border-white/[0.08] rounded-xl px-2.5 py-1.5 shadow-2xl shadow-black/20">
                 <ToolbarBtn icon={Undo2} tooltip="Desfazer (Ctrl+Z)" onClick={undo} disabled={undoStack.length === 0} />
                 <ToolbarBtn icon={Redo2} tooltip="Refazer (Ctrl+Y)" onClick={redo} disabled={redoStack.length === 0} />
                 <ToolbarDivider />

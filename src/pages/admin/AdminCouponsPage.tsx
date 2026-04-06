@@ -380,7 +380,7 @@ const AdminCouponsPage = () => {
           <div className="space-y-4">
             {/* Preview Banner */}
             {formData.code && (
-              <div className="p-3 rounded-xl bg-gradient-to-r from-[hsl(var(--admin-accent-purple)/0.1)] to-[hsl(var(--admin-accent-pink)/0.1)] border border-purple-500/20 text-center">
+              <div className="p-3 rounded-xl bg-gradient-to-r from-[rgb(168 85 247 / 0.1)] to-[rgb(236 72 153 / 0.1)] border border-purple-500/20 text-center">
                 <p className="text-[10px] uppercase tracking-wider text-white/50 mb-1">Prévia do cupom</p>
                 <p className="text-lg font-bold font-mono text-white">{formData.code}</p>
                 <p className="text-sm text-purple-400">

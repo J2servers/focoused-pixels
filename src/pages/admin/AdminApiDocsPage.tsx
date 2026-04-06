@@ -188,7 +188,7 @@ function WebhookLogsSection() {
           ) : (
             <div className="max-h-[500px] overflow-y-auto space-y-1.5">
               {logs.map((log) => (
-                <div key={log.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-[hsl(var(--admin-bg)/0.3)] border border-white/[0.08] hover:border-purple-500/20 transition-colors">
+                <div key={log.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-[rgb(255 255 255 / 0.3)] border border-white/[0.08] hover:border-purple-500/20 transition-colors">
                   <div className={`w-2 h-2 rounded-full shrink-0 ${log.status_code === 200 ? 'bg-green-400' : 'bg-red-400'}`} />
                   <span className={`text-xs ${mutedText} w-28 shrink-0`}>{format(new Date(log.created_at), 'dd/MM HH:mm:ss', { locale: ptBR })}</span>
                   <span className="text-xs px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 font-mono">{log.event_type}</span>

@@ -149,7 +149,7 @@ export const SettingsPaymentsSection = ({ payment, up, canMutate, testMP, testEF
                   <span className={cn('inline-flex h-8 items-center rounded-lg px-3 text-xs font-bold uppercase tracking-wider', `bg-[hsl(var(${gw.accentVar})/0.12)] text-[hsl(var(${gw.accentVar}))]`)}>{gw.label}</span>
                   {test && (
                     <span className={cn('inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium',
-                      test.isSuccess ? 'bg-emerald-500/[0.1] text-emerald-400' : 'bg-[hsl(var(--admin-card-border)/0.2)] text-white/30'
+                      test.isSuccess ? 'bg-emerald-500/[0.1] text-emerald-400' : 'bg-[rgb(255 255 255 / 0.2)] text-white/30'
                     )}>
                       {test.isSuccess ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
                       {test.isSuccess ? 'OK' : 'pendente'}

@@ -12,7 +12,7 @@ export function SiteVisitsCard() {
 
   const metrics = [
     { label: 'Hoje', value: stats?.todayViews || 0, icon: Eye, color: 'text-emerald-400' },
-    { label: 'Semana', value: stats?.weekViews || 0, icon: TrendingUp, color: 'text-[hsl(var(--admin-accent-blue))]' },
+    { label: 'Semana', value: stats?.weekViews || 0, icon: TrendingUp, color: 'text-[hsl(210 100% 60%)]' },
     { label: 'Mês', value: stats?.monthViews || 0, icon: Globe, color: 'text-purple-400' },
     { label: 'Visitantes Únicos', value: stats?.uniqueSessions || 0, icon: Users, color: 'text-pink-400' },
   ];
@@ -21,7 +21,7 @@ export function SiteVisitsCard() {
     <Card className="border-white/[0.08] bg-white/[0.04] shadow-lg">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg text-white">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-[hsl(var(--admin-accent-blue))] shadow-lg">
+          <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-[hsl(210 100% 60%)] shadow-lg">
             <Monitor className="h-5 w-5 text-white" />
           </div>
           Visitas do Site
@@ -36,7 +36,7 @@ export function SiteVisitsCard() {
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-20 rounded-xl bg-[hsl(var(--admin-sidebar))]" />
+              <Skeleton key={i} className="h-20 rounded-xl bg-white/[0.04]" />
             ))}
           </div>
         ) : (
@@ -46,7 +46,7 @@ export function SiteVisitsCard() {
               {metrics.map((m) => (
                 <div
                   key={m.label}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[hsl(var(--admin-sidebar))] border border-white/[0.08]"
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.04] border border-white/[0.08]"
                 >
                   <m.icon className={cn("h-5 w-5", m.color)} />
                   <span className="text-2xl font-bold text-white">{m.value.toLocaleString('pt-BR')}</span>
@@ -71,7 +71,7 @@ export function SiteVisitsCard() {
                             <span className="text-sm text-white truncate">{page.page_path === '/' ? 'Página Inicial' : page.page_path}</span>
                             <span className="text-xs font-semibold text-purple-400 ml-2">{page.views}</span>
                           </div>
-                          <div className="h-1.5 rounded-full bg-[hsl(var(--admin-card-border))] overflow-hidden">
+                          <div className="h-1.5 rounded-full bg-[rgb(255 255 255 / 0.08)] overflow-hidden">
                             <div
                               className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
                               style={{ width: `${percentage}%` }}

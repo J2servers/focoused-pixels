@@ -83,7 +83,7 @@ export function EmailTemplateCard({
       <div
         className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer
           ${isSelected
-            ? 'bg-blue-500/8 border-2 border-blue-500/40 shadow-[0_0_20px_-5px_hsl(var(--admin-accent-blue)/0.15)]'
+            ? 'bg-blue-500/8 border-2 border-blue-500/40 shadow-[0_0_20px_-5px_rgb(59 130 246 / 0.15)]'
             : 'bg-white/[0.04] border border-white/[0.08] hover:border-blue-500/20 hover:bg-white/[0.04]/80'
           }`}
         onClick={onEdit}
@@ -120,13 +120,13 @@ export function EmailTemplateCard({
     <Card
       className={`${nodeBase} cursor-pointer
         ${isSelected
-          ? 'border-blue-500/50 bg-blue-500/5 shadow-[0_0_30px_-8px_hsl(var(--admin-accent-blue)/0.2)]'
+          ? 'border-blue-500/50 bg-blue-500/5 shadow-[0_0_30px_-8px_rgb(59 130 246 / 0.2)]'
           : 'border-white/[0.08] bg-white/[0.04] hover:border-blue-500/30 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]'
         }`}
       onClick={onEdit}
     >
       {/* Node connector dot — top */}
-      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-blue-500 border-2 border-[hsl(var(--admin-bg))] z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-blue-500 border-2 border-[rgb(255 255 255 / 0.03)] z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
 
       {/* Header strip */}
       <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-400" />
@@ -196,7 +196,7 @@ export function EmailTemplateCard({
       </CardContent>
 
       {/* Node connector dot — bottom */}
-      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-blue-500 border-2 border-[hsl(var(--admin-bg))] z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-blue-500 border-2 border-[rgb(255 255 255 / 0.03)] z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
     </Card>
   );
 }
@@ -244,7 +244,7 @@ export function WhatsAppTemplateCard({
       <div
         className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer
           ${isSelected
-            ? 'bg-green-500/8 border-2 border-green-500/40 shadow-[0_0_20px_-5px_hsl(var(--admin-accent-green)/0.15)]'
+            ? 'bg-green-500/8 border-2 border-green-500/40 shadow-[0_0_20px_-5px_rgb(16 185 129 / 0.15)]'
             : 'bg-white/[0.04] border border-white/[0.08] hover:border-green-500/20 hover:bg-white/[0.04]/80'
           }`}
         onClick={onEdit}
@@ -281,13 +281,13 @@ export function WhatsAppTemplateCard({
     <Card
       className={`${nodeBase} cursor-pointer
         ${isSelected
-          ? 'border-green-500/50 bg-green-500/5 shadow-[0_0_30px_-8px_hsl(var(--admin-accent-green)/0.2)]'
+          ? 'border-green-500/50 bg-green-500/5 shadow-[0_0_30px_-8px_rgb(16 185 129 / 0.2)]'
           : 'border-white/[0.08] bg-white/[0.04] hover:border-green-500/30 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]'
         }`}
       onClick={onEdit}
     >
       {/* Node connector dot — top */}
-      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-green-500 border-2 border-[hsl(var(--admin-bg))] z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-green-500 border-2 border-[rgb(255 255 255 / 0.03)] z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
 
       {/* Header strip */}
       <div className="h-1 bg-gradient-to-r from-green-500 to-emerald-400" />
@@ -358,7 +358,7 @@ export function WhatsAppTemplateCard({
       </CardContent>
 
       {/* Node connector dot — bottom */}
-      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-green-500 border-2 border-[hsl(var(--admin-bg))] z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-green-500 border-2 border-[rgb(255 255 255 / 0.03)] z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
     </Card>
   );
 }
