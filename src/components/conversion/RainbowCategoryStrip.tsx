@@ -1,10 +1,8 @@
 /**
- * RainbowCategoryStrip - Visibly angled parallelogram cards with neumorphism
- * Uses transform skew on container + counter-skew on content
- * drop-shadow instead of box-shadow to respect skewed shape
+ * RainbowCategoryStrip - Parallelogram cards with neumorphism
+ * CSS-only transitions, no framer-motion
  */
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
 const RAINBOW = [
@@ -36,26 +34,19 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Categorias</h2>
             <p className="text-sm text-muted-foreground mt-1">Escolha sua base e personalize em poucos passos</p>
           </div>
-          <Link to="/categorias">
-            <motion.span whileHover={{ x: 4 }} className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-              Ver todas <ArrowRight className="h-4 w-4" />
-            </motion.span>
+          <Link to="/categorias" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:gap-2.5 transition-all">
+            Ver todas <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
-        {/* Skewed parallelogram grid */}
         <div className="flex gap-3 md:gap-4 px-2 md:px-6 overflow-x-auto md:overflow-visible scrollbar-none snap-x snap-mandatory md:snap-none pb-2">
           {categories.map((cat, i) => {
             const hsl = RAINBOW[i % RAINBOW.length];
             return (
-              <motion.div
+              <div
                 key={cat.id}
-                initial={{ opacity: 0, x: 40 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                whileHover={{ scale: 1.18, y: -14, zIndex: 30 }}
-                viewport={{ once: true }}
-                transition={{ type: 'spring', stiffness: 400, damping: 25, mass: 0.8 }}
-                className="flex-shrink-0 w-[140px] md:w-auto md:flex-1 min-w-0 relative z-10 cursor-pointer snap-start"
+                className="flex-shrink-0 w-[140px] md:w-auto md:flex-1 min-w-0 relative z-10 cursor-pointer snap-start
+                  hover:scale-[1.18] hover:-translate-y-3.5 hover:z-30 transition-all duration-300 ease-out"
                 style={{
                   filter: `
                     drop-shadow(6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)))
@@ -72,7 +63,6 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
                     border: `2px solid hsl(${hsl} / 0.4)`,
                   }}
                 >
-                  {/* Counter-skew wrapper - keeps image & text straight */}
                   <div
                     className="absolute inset-[-20%] flex items-center justify-center"
                     style={{ transform: 'skewX(10deg)' }}
@@ -83,6 +73,7 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
                         alt={cat.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <div className="w-full h-full bg-muted flex items-center justify-center">
@@ -91,10 +82,8 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
                     )}
                   </div>
 
-                  {/* Gradient for readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                  {/* Neon top line */}
                   <div
                     className="absolute top-0 left-0 right-0 h-[3px]"
                     style={{
@@ -103,7 +92,6 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
                     }}
                   />
 
-                  {/* Category name - counter-skewed so text is straight */}
                   <div
                     className="absolute bottom-0 left-0 right-0 p-4"
                     style={{ transform: 'skewX(10deg)' }}
@@ -122,7 +110,6 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
                     </div>
                   </div>
 
-                  {/* Hover glow */}
                   <div
                     className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                     style={{
@@ -130,7 +117,7 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
                     }}
                   />
                 </Link>
-              </motion.div>
+              </div>
             );
           })}
         </div>
