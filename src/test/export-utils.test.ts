@@ -34,7 +34,7 @@ describe('exportToCSV', () => {
     const { exportToCSV } = await import('@/lib/export-utils');
     exportToCSV([{ a: 1 }], 'test', [{ key: 'a', header: 'A' }]);
 
-    const blob = mockCreateObjectURL.mock.calls[0][0] as Blob;
+    const blob = (mockCreateObjectURL.mock.calls as unknown[][])[0][0] as Blob;
     expect(blob).toBeInstanceOf(Blob);
     expect(blob.type).toBe('text/csv;charset=utf-8;');
   });
@@ -54,7 +54,7 @@ describe('exportToJSON', () => {
     const { exportToJSON } = await import('@/lib/export-utils');
     exportToJSON([{ id: 1 }], 'test');
 
-    const blob = mockCreateObjectURL.mock.calls[0][0] as Blob;
+    const blob = (mockCreateObjectURL.mock.calls as unknown[][])[0][0] as Blob;
     expect(blob).toBeInstanceOf(Blob);
     expect(blob.type).toBe('application/json');
   });
