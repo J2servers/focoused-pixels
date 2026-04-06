@@ -634,6 +634,9 @@ const AdminLoginPage = () => {
   const subtitle = loginSettings.login_subtitle || 'Acesse o centro de comando do seu negócio com segurança máxima.';
   const logoUrl = loginSettings.login_logo || loginSettings.header_logo;
   const bgImage = loginSettings.login_bg_image;
+  const logoHeight = loginSettings.login_logo_height || 48;
+  const titleSize = loginSettings.login_title_size || 48;
+  const subtitleSize = loginSettings.login_subtitle_size || 14;
 
   if (isLoading) {
     return (
