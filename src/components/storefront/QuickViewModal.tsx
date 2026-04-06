@@ -53,6 +53,7 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
       image: product.image,
       quantity,
     });
+    analytics.addToCart({ id: product.id, name: product.name, price: product.price });
     toast.success(`${quantity}x ${product.name} adicionado ao carrinho!`);
     onOpenChange(false);
   };
