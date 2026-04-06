@@ -1,0 +1,32 @@
+name: CI Autofix Candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev, fix/*]
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+
+      - name: ESLint auto-fix
+        run: bunx eslint src/ --fix --quiet || true
+
+      - name: Safe autofix
+        run: node tools/fix/safe-autofix.mjs
+
+      - name: Verify build after fixes
+        run: bun run build:dev
+
+      - name: Run tests
+        run: bunx vitest run
+
+      - name: Upload fix report
+        uses: actions/upload-artifact@v4
+        with:
+          name: autofix-report
+          path: tools/reports/
+          retention-days: 7
