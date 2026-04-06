@@ -1155,6 +1155,13 @@
     max-width: 100vw;
   }
 
+  /* Container must not add side margins on mobile */
+  .container {
+    max-width: 100% !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
   /* Reduce neumorphism shadows on mobile */
   .neu-concave,
   .neu-convex,
