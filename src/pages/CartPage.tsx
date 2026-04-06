@@ -275,7 +275,9 @@ const CartPage = () => {
 
       <DynamicFooter />
       <WhatsAppButton />
-      <AIChatWidget />
+      <Suspense fallback={null}>
+        <AIChatWidget />
+      </Suspense>
     </div>
   );
 };
