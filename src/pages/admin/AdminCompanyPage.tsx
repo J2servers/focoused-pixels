@@ -6,7 +6,7 @@ import { AdminSummaryCard } from '@/components/admin/AdminSummaryCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Save, MessageSquare, Settings, FolderOpen, Building2, Palette, Phone, Globe } from 'lucide-react';
-import { useCompanyInfo, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
+import { useCompanyInfoAdmin, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { clamp, sanitizeNumber, normalizeHexColor, hexToHsl } from '@/components/admin/company/CompanyFormUtils';
@@ -23,7 +23,7 @@ const mutedText = "text-[hsl(var(--admin-text-muted))]";
 
 const AdminCompanyPage = () => {
   const { canEdit } = useAuthContext();
-  const { data: companyInfo, isLoading } = useCompanyInfo();
+  const { data: companyInfo, isLoading } = useCompanyInfoAdmin();
   const updateCompany = useUpdateCompanyInfo();
 
   const [formData, setFormData] = useState<Partial<CompanyInfo>>({
