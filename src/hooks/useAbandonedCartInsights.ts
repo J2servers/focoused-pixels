@@ -61,11 +61,25 @@ export function useTriggerAbandonedCartRecovery() {
 
   return useMutation({
     mutationFn: async () => {
-      const { data, error } = await supabase.functions.invoke('trigger-abandoned-cart-recovery', {
-        body: {},
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) throw new Error('Sessão expirada. Faça login novamente.');
+
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/trigger-abandoned-cart-recovery`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({}),
       });
 
-      if (error) throw error;
+      const data = await response.json();
+      if (!response.ok || data?.success === false) {
+        throw new Error(data?.error || 'Falha ao executar recuperação.');
+      }
       if (data?.success === false) {
         throw new Error(data.error || 'Falha ao executar recuperação de carrinhos.');
       }
