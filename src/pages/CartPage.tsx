@@ -69,6 +69,7 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <PageSEO title="Meu Carrinho" description="Revise os itens do seu carrinho de compras Pincel de Luz." path="/carrinho" noindex />
       <TrustBar />
       <DynamicMainHeader />
       <NavigationBar />

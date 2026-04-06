@@ -22,6 +22,7 @@ const SearchPage = () => {
   if (isMobile) {
     return (
       <div className="min-h-screen flex flex-col bg-background pb-16">
+        <PageSEO title={`Busca: ${query}`} description={`Resultados de busca para "${query}" na Pincel de Luz Personalizados.`} path={`/busca?q=${query}`} noindex />
         <MobileHeader />
 
         <main className="flex-1 px-4 py-4">
