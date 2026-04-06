@@ -12,7 +12,7 @@ import {
   Mail, MessageSquare, Plus, Download, Upload, Sparkles,
   Search, ArrowUpDown, LayoutGrid, LayoutList,
   CheckCircle2, AlertTriangle, Activity, Workflow,
-  ChevronDown, ChevronUp, Zap, Filter, Radio,
+  ChevronDown, ChevronUp, Zap, Filter, Radio, Trash2,
 } from 'lucide-react';
 import { useTemplates } from '@/hooks/useTemplates';
 import { SYSTEM_EVENTS } from '@/components/admin/templates/TemplateConstants';
@@ -355,16 +355,16 @@ const AdminEmailTemplatesPage = () => {
                   </Badge>
                   {selectedEmails.size > 0 && (
                     <>
-                      <Button variant="outline" size="sm" className={`h-7 text-xs ${btnOutline}`} onClick={() => handleBulk('email', 'activate')}>Ativar</Button>
-                      <Button variant="outline" size="sm" className={`h-7 text-xs ${btnOutline}`} onClick={() => handleBulk('email', 'deactivate')}>Desativar</Button>
-                      <Button variant="outline" size="sm" className="h-7 text-xs border-red-500/30 text-red-400 hover:bg-red-500/10" onClick={() => handleBulk('email', 'delete')}>Excluir</Button>
+                      <Button className="admin-btn admin-btn-save !min-h-0 !py-1 !px-3 text-xs" onClick={() => handleBulk('email', 'activate')}>Ativar</Button>
+                      <Button className="admin-btn admin-btn-edit !min-h-0 !py-1 !px-3 text-xs" onClick={() => handleBulk('email', 'deactivate')}>Desativar</Button>
+                      <Button className="admin-btn admin-btn-delete !min-h-0 !py-1 !px-3 text-xs" onClick={() => handleBulk('email', 'delete')}><Trash2 className="h-3 w-3 mr-1" />Deletar</Button>
                     </>
                   )}
                   {selectedWhats.size > 0 && (
                     <>
                       <div className="w-px h-4 bg-white/10" />
-                      <Button variant="outline" size="sm" className={`h-7 text-xs ${btnOutline}`} onClick={() => handleBulk('whatsapp', 'activate')}>Ativar WA</Button>
-                      <Button variant="outline" size="sm" className="h-7 text-xs border-red-500/30 text-red-400 hover:bg-red-500/10" onClick={() => handleBulk('whatsapp', 'delete')}>Excluir WA</Button>
+                      <Button className="admin-btn admin-btn-save !min-h-0 !py-1 !px-3 text-xs" onClick={() => handleBulk('whatsapp', 'activate')}>Ativar WA</Button>
+                      <Button className="admin-btn admin-btn-delete !min-h-0 !py-1 !px-3 text-xs" onClick={() => handleBulk('whatsapp', 'delete')}><Trash2 className="h-3 w-3 mr-1" />Deletar WA</Button>
                     </>
                   )}
                 </div>
@@ -402,7 +402,7 @@ const AdminEmailTemplatesPage = () => {
                         </div>
                         <p className="text-white font-semibold mb-1">Nenhum template de e-mail</p>
                         <p className={`text-sm ${mutedText} mb-4`}>Comece instalando os templates sugeridos</p>
-                        <Button onClick={tpl.installSuggestedEmails} className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                        <Button onClick={tpl.installSuggestedEmails} className="admin-btn admin-btn-save">
                           <Sparkles className="h-4 w-4 mr-2" />Instalar templates padrão
                         </Button>
                       </CardContent>
@@ -481,7 +481,7 @@ const AdminEmailTemplatesPage = () => {
                         </div>
                         <p className="text-white font-semibold mb-1">Nenhum template WhatsApp</p>
                         <p className={`text-sm ${mutedText} mb-4`}>Comece instalando os templates sugeridos</p>
-                        <Button onClick={tpl.installSuggestedWhats} className="bg-gradient-to-r from-green-500 to-emerald-500 text-white">
+                        <Button onClick={tpl.installSuggestedWhats} className="admin-btn admin-btn-save">
                           <Sparkles className="h-4 w-4 mr-2" />Instalar templates padrão
                         </Button>
                       </CardContent>

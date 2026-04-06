@@ -159,7 +159,7 @@ const AdminOrdersPage = () => {
       header: '',
       className: 'w-12',
       render: (o) => (
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white" onClick={() => setSelectedOrder(o)}>
+        <Button className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => setSelectedOrder(o)}>
           <Eye className="h-4 w-4" />
         </Button>
       ),

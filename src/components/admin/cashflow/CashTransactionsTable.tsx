@@ -102,7 +102,7 @@ export function CashTransactionsTable({ startDate, endDate }: CashTransactionsTa
             <List className="h-5 w-5 text-primary" />
             Movimentações
           </CardTitle>
-          <Button onClick={handleNewTransaction} size="sm" className="gap-2">
+          <Button onClick={handleNewTransaction} className="admin-btn admin-btn-create gap-2">
             <Plus className="h-4 w-4" />
             Nova Transação
           </Button>

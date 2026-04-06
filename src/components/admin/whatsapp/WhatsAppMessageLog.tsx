@@ -103,8 +103,8 @@ const WhatsAppMessageLog = () => {
             <MessageSquare className="h-5 w-5 text-green-400" />
             Histórico de Mensagens
           </CardTitle>
-          <Button variant="outline" size="sm" onClick={fetchMessages} disabled={loading}
-            className="border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))] hover:text-white">
+          <Button onClick={fetchMessages} disabled={loading}
+            className="admin-btn admin-btn-view !min-h-0 !py-1.5 !px-3">
             <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
             Atualizar
           </Button>

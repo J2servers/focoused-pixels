@@ -113,8 +113,7 @@ const AdminKanbanPage = () => {
             <AdminSummaryCard title="Em Produção" value={inProduction} icon={Wrench} variant="blue" />
             <AdminSummaryCard title="Prontos" value={readyCount} icon={CheckCircle} variant="green" />
           </div>
-          <Button variant="outline" size="sm"
-            className="shrink-0 gap-2 border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-bg))]"
+          <Button className="admin-btn admin-btn-edit !min-h-0 !py-1.5 !px-3 shrink-0 gap-2"
             onClick={() => setShowSettings(true)}>
             <Settings className="h-4 w-4" />Personalizar
           </Button>
@@ -173,9 +172,7 @@ const AdminKanbanPage = () => {
                               </p>
                               {nextStatus && (
                                 <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="h-5 text-[9px] px-1.5 mt-1.5 border-[hsl(var(--admin-accent-purple)/0.3)] text-[hsl(var(--admin-accent-purple))] hover:bg-[hsl(var(--admin-accent-purple)/0.1)]"
+                                  className="admin-btn admin-btn-save !min-h-0 !py-0.5 !px-1.5 h-5 text-[9px]"
                                   onClick={() => handleQuickMove(order, nextStatus)}
                                 >
                                   Avançar →
@@ -205,7 +202,7 @@ const AdminKanbanPage = () => {
                 {editingColumn === col.status ? (
                   <div className="flex-1 flex gap-2">
                     <Input value={editLabel} onChange={e => setEditLabel(e.target.value)} className="h-7 text-sm border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" autoFocus />
-                    <Button size="sm" className="h-7 bg-[hsl(var(--admin-accent-purple))] text-white" onClick={() => renameColumn(col.status)}>OK</Button>
+                    <Button size="sm" className="admin-btn admin-btn-save !min-h-0 !py-0.5 !px-2 h-7" onClick={() => renameColumn(col.status)}>OK</Button>
                   </div>
                 ) : (
                   <span className="flex-1 text-sm text-[hsl(var(--admin-text))]">{col.label}</span>
@@ -217,8 +214,8 @@ const AdminKanbanPage = () => {
             ))}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={resetColumns} className="border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))]">Restaurar Padrão</Button>
-            <Button onClick={() => setShowSettings(false)} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">Fechar</Button>
+            <Button onClick={resetColumns} className="admin-btn admin-btn-edit">Restaurar Padrão</Button>
+            <Button onClick={() => setShowSettings(false)} className="admin-btn admin-btn-save">Fechar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

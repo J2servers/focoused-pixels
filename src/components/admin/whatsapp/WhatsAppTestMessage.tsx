@@ -88,7 +88,7 @@ const WhatsAppTestMessage = ({ instanceStatuses }: WhatsAppTestMessageProps) => 
             className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white resize-none" />
         </div>
         <Button onClick={handleSendTest} disabled={!hasConnected || sending}
-          className="w-full bg-green-600 hover:bg-green-700 text-white">
+          className="admin-btn admin-btn-save w-full">
           {sending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
           Enviar Mensagem
         </Button>

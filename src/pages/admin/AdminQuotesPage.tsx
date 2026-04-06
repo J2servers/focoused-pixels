@@ -129,12 +129,12 @@ const AdminQuotesPage = () => {
       key: 'id', header: '', className: 'w-28',
       render: (q) => (
         <div className="flex justify-end gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white" onClick={() => setSelectedQuote(q)}>
+          <Button className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => setSelectedQuote(q)}>
             <Eye className="h-4 w-4" />
           </Button>
           {q.status === 'approved' && (
-            <Button size="sm" onClick={() => handleConvertToOrder(q.id)} disabled={createOrderFromQuote.isPending}
-              className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white text-xs h-8">
+            <Button onClick={() => handleConvertToOrder(q.id)} disabled={createOrderFromQuote.isPending}
+              className="admin-btn admin-btn-save !min-h-0 !py-1.5 !px-3 text-xs">
               <ArrowRightCircle className="h-3 w-3 mr-1" />Converter
             </Button>
           )}

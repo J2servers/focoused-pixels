@@ -268,8 +268,8 @@ function WorkflowNodeConfig({ selectedNode, currentWorkflow, emailTemplates, wha
           {type !== 'trigger' && (
             <div className="pt-4">
               <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mb-4" />
-              <Button variant="destructive" size="sm" className="w-full h-9 gap-2 text-xs" onClick={onDelete}>
-                <Trash2 className="h-3.5 w-3.5" />Remover nó
+              <Button className="admin-btn admin-btn-delete w-full !min-h-0 h-9 gap-2 text-xs" onClick={onDelete}>
+                <Trash2 className="h-3.5 w-3.5" />Deletar
               </Button>
               <p className="text-[10px] text-white/25 mt-2 text-center">Nós adjacentes serão reconectados automaticamente.</p>
             </div>

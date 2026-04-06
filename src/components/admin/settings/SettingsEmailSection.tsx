@@ -81,8 +81,7 @@ export const SettingsEmailSection = ({ emailSettings, ue, canMutate, handleTestS
 
         <div className={cn('grid md:grid-cols-2', gridGap)}>
           <Button
-            variant="outline"
-            className="h-11 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg)/0.5)] text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-bg))]"
+            className="admin-btn admin-btn-edit h-11"
             onClick={handleTestSmtp}
             disabled={!canMutate || testSmtpPending || updateEmailPending}
           >
@@ -90,8 +89,7 @@ export const SettingsEmailSection = ({ emailSettings, ue, canMutate, handleTestS
             Testar conexão SMTP
           </Button>
           <Button
-            variant="outline"
-            className="h-11 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg)/0.5)] text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-bg))]"
+            className="admin-btn admin-btn-edit h-11"
             onClick={handleSendTest}
             disabled={!canMutate || sendTestPending || updateEmailPending}
           >

@@ -361,10 +361,10 @@ function WorkflowBuilderInner() {
                 </p>
 
                 <div className="flex gap-4 justify-center flex-wrap">
-                  <Button onClick={() => newWorkflow()} size="lg" className="gap-2.5 h-12 px-8 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 shadow-lg shadow-violet-500/20 text-sm font-semibold">
+                  <Button onClick={() => newWorkflow()} className="admin-btn admin-btn-create gap-2.5 h-12 px-8">
                     <Plus className="h-4 w-4" />Novo Workflow
                   </Button>
-                  <Button variant="outline" size="lg" onClick={() => setShowImportDialog(true)} className="gap-2.5 h-12 px-8 rounded-xl border-white/[0.08] hover:bg-white/[0.04] text-sm font-semibold">
+                  <Button onClick={() => setShowImportDialog(true)} className="admin-btn admin-btn-view gap-2.5 h-12 px-8">
                     <Upload className="h-4 w-4" />Importar JSON
                   </Button>
                 </div>
@@ -438,7 +438,7 @@ function WorkflowBuilderInner() {
                   spin={testingWorkflow}
                 />
 
-                <Button size="sm" onClick={handleSave} disabled={saving} className="h-8 gap-2 ml-1.5 text-[11px] font-semibold rounded-lg bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 shadow-lg shadow-violet-500/15 px-4">
+                <Button size="sm" onClick={handleSave} disabled={saving} className="admin-btn admin-btn-save !min-h-0 !py-1.5 !px-4 h-8 gap-2 ml-1.5 text-[11px]">
                   {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
                   Salvar
                 </Button>
@@ -529,7 +529,7 @@ function WorkflowBuilderInner() {
               placeholder='{"name": "...", "trigger_event": "...", "steps": [...]}' rows={8} className="font-mono text-xs border-white/[0.06]" />
             <DialogFooter>
               <Button variant="outline" onClick={() => { setShowImportDialog(false); setImportJson(''); }}>Cancelar</Button>
-              <Button onClick={importWorkflow} disabled={!importJson.trim()} className="bg-gradient-to-r from-violet-600 to-violet-500">Importar</Button>
+              <Button onClick={importWorkflow} disabled={!importJson.trim()} className="admin-btn admin-btn-view">Importar</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

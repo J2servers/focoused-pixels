@@ -88,7 +88,7 @@ export const ToggleBlock = ({ title, description, checked, onChange, icon: Icon 
         <p className="text-xs text-[hsl(var(--admin-text-muted))] leading-relaxed">{description}</p>
       </div>
     </div>
-    <Switch checked={checked} onCheckedChange={onChange} className="shrink-0" />
+    <Switch checked={checked} onCheckedChange={onChange} className="shrink-0 admin-switch-orange" />
   </label>
 );
 

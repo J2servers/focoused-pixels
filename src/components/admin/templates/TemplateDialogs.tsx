@@ -174,7 +174,7 @@ export function EmailEditorDialog({ editEmail, setEditEmail, onSave }: {
 
             {/* Active toggle */}
             <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))]">
-              <Switch checked={editEmail.is_active ?? true} onCheckedChange={v => setEditEmail({ ...editEmail, is_active: v })} />
+              <Switch checked={editEmail.is_active ?? true} onCheckedChange={v => setEditEmail({ ...editEmail, is_active: v })} className="admin-switch-orange" />
               <div>
                 <span className="text-sm font-medium text-white">Template ativo</span>
                 <p className={`text-[11px] ${mutedText}`}>Templates inativos não são usados nas notificações automáticas</p>
@@ -187,7 +187,7 @@ export function EmailEditorDialog({ editEmail, setEditEmail, onSave }: {
           <Button variant="outline" className="border-[hsl(var(--admin-card-border))] text-white hover:bg-white/5" onClick={() => setEditEmail(null)}>
             Cancelar
           </Button>
-          <Button onClick={onSave} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-purple-500/20">
+          <Button onClick={onSave} className="admin-btn admin-btn-save">
             <Save className="h-4 w-4 mr-2" />Salvar Template
           </Button>
         </DialogFooter>
@@ -330,7 +330,7 @@ export function WhatsAppEditorDialog({ editWhats, setEditWhats, onSave }: {
 
             {/* Active toggle */}
             <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))]">
-              <Switch checked={editWhats.is_active ?? true} onCheckedChange={v => setEditWhats({ ...editWhats, is_active: v })} />
+              <Switch checked={editWhats.is_active ?? true} onCheckedChange={v => setEditWhats({ ...editWhats, is_active: v })} className="admin-switch-orange" />
               <div>
                 <span className="text-sm font-medium text-white">Template ativo</span>
                 <p className={`text-[11px] ${mutedText}`}>Templates inativos não são usados nas notificações automáticas</p>
@@ -343,7 +343,7 @@ export function WhatsAppEditorDialog({ editWhats, setEditWhats, onSave }: {
           <Button variant="outline" className="border-[hsl(var(--admin-card-border))] text-white hover:bg-white/5" onClick={() => setEditWhats(null)}>
             Cancelar
           </Button>
-          <Button onClick={onSave} className="bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/20">
+          <Button onClick={onSave} className="admin-btn admin-btn-save">
             <Save className="h-4 w-4 mr-2" />Salvar Template
           </Button>
         </DialogFooter>
@@ -513,10 +513,7 @@ export function TestSendDialog({ testSend, setTestSend, onSend, isSending }: {
           <Button
             onClick={() => onSend(to)}
             disabled={isSending || !to.trim()}
-            className={testSend?.channel === 'email'
-              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-              : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
-            }
+            className="admin-btn admin-btn-save"
           >
             {isSending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
             {isSending ? 'Enviando...' : 'Enviar teste'}

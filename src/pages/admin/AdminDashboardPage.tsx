@@ -488,10 +488,9 @@ const AdminDashboardPage = () => {
     <AdminLayout title="Dashboard">
       <div className="mb-3 flex justify-end">
         <Button
-          variant="outline" size="sm"
           onClick={() => triggerRecovery.mutate()}
           disabled={triggerRecovery.isPending}
-          className="gap-2 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))]"
+          className="admin-btn admin-btn-save gap-2"
         >
           <RefreshCw className={cn("h-4 w-4", triggerRecovery.isPending && "animate-spin")} />
           {triggerRecovery.isPending ? 'Executando recuperação...' : 'Executar recuperação de carrinhos'}
