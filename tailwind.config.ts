@@ -149,6 +149,10 @@ export default {
 			marquee: {
 				'0%': { transform: 'translateX(0)' },
 				'100%': { transform: 'translateX(-50%)' }
+			},
+			'bounce-x': {
+				'0%, 100%': { transform: 'translateX(0)' },
+				'50%': { transform: 'translateX(4px)' }
 			}
   		},
   		animation: {
@@ -157,7 +161,8 @@ export default {
   			'slide-in': 'slide-in 0.3s ease-out',
   			'fade-in': 'fade-in 0.3s ease-out',
 			'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
-			marquee: 'marquee 20s linear infinite'
+			marquee: 'marquee 20s linear infinite',
+			'bounce-x': 'bounce-x 1.5s ease-in-out infinite'
   		}
   	}
   },

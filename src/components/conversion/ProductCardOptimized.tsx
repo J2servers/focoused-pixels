@@ -143,7 +143,9 @@ export function ProductCardOptimized({
                 src={product.image}
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                loading="lazy"
+                loading={index < 4 ? 'eager' : 'lazy'}
+                decoding="async"
+                fetchPriority={index < 4 ? 'high' : 'auto'}
               />
             </div>
 
@@ -241,11 +243,13 @@ export function ProductCardOptimized({
         </div>
       </div>
 
-      <QuickViewModal
-        product={product}
-        open={quickViewOpen}
-        onOpenChange={setQuickViewOpen}
-      />
+      {quickViewOpen && (
+        <QuickViewModal
+          product={product}
+          open={quickViewOpen}
+          onOpenChange={setQuickViewOpen}
+        />
+      )}
     </>
   );
 }

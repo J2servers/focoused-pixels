@@ -65,6 +65,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
               alt={product.name}
               className="w-full h-full object-cover"
               loading="lazy"
+              decoding="async"
             />
             
             {/* Badges */}

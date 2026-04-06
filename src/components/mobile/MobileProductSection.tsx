@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { MobileProductCard } from './MobileProductCard';
 
@@ -34,11 +33,9 @@ export function MobileProductSection({
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(true);
 
-  // Handle scroll to update fade indicators
   const handleScroll = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    
     const { scrollLeft, scrollWidth, clientWidth } = container;
     setShowLeftFade(scrollLeft > 10);
     setShowRightFade(scrollLeft < scrollWidth - clientWidth - 10);
@@ -71,28 +68,21 @@ export function MobileProductSection({
       </div>
       
       <div className="relative">
-        {/* Left fade indicator */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: showLeftFade ? 1 : 0 }}
-          className="absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"
+        {/* Left fade */}
+        <div 
+          className="absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none transition-opacity duration-300"
+          style={{ opacity: showLeftFade ? 1 : 0 }}
         />
         
-        {/* Right fade indicator with animated chevron */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: showRightFade ? 1 : 0 }}
-          className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none flex items-center justify-end pr-1"
+        {/* Right fade with chevron */}
+        <div 
+          className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none flex items-center justify-end pr-1 transition-opacity duration-300"
+          style={{ opacity: showRightFade ? 1 : 0 }}
         >
-          <motion.div
-            animate={{ x: [0, 4, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-          </motion.div>
-        </motion.div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground animate-bounce-x" />
+        </div>
 
-        {/* Horizontal Scroll - smooth snap swipe */}
+        {/* Horizontal Scroll */}
         <div 
           ref={scrollContainerRef}
           className="overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory"
@@ -104,15 +94,12 @@ export function MobileProductSection({
         >
           <div className="flex gap-3 px-4">
             {products.slice(0, 10).map((product, index) => (
-              <motion.div
+              <div
                 key={product.id}
                 className="w-[160px] flex-shrink-0 snap-start"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.03 }}
               >
                 <MobileProductCard product={product} index={index} />
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
