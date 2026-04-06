@@ -395,8 +395,7 @@ serve(async (req) => {
         },
       });
 
-      return new Response(
-        JSON.stringify({
+      const pixResponseBody = JSON.stringify({
           success: true,
           paymentId: data.id,
           status: data.status,
@@ -407,9 +406,16 @@ serve(async (req) => {
           qrCodeBase64: data.point_of_interaction?.transaction_data?.qr_code_base64,
           ticketUrl: data.point_of_interaction?.transaction_data?.ticket_url,
           expirationDate: data.date_of_expiration,
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+        });
+
+      // Cache for idempotency
+      if (orderId) {
+        idempotencyCache.set(`create_pix-${orderId}`, { response: pixResponseBody, timestamp: Date.now() });
+      }
+
+      return new Response(pixResponseBody, {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Create Boleto payment
