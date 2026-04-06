@@ -1,55 +1,166 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Loader2, Mail, Lock, Shield, ShieldAlert, AlertTriangle, Skull } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Eye, EyeOff, Loader2, Mail, Lock, Shield, ShieldAlert, AlertTriangle, Skull, ArrowRight } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { isAuthError } from '@/lib/auth-error';
 import { supabase } from '@/integrations/supabase/client';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Float, MeshTransmissionMaterial, Environment } from '@react-three/drei';
+import * as THREE from 'three';
 
+// ─── Security constants ───
 const MAX_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
-const ATTEMPT_WINDOW_MS = 5 * 60 * 1000; // 5 minute window
-const PERMANENT_BAN_THRESHOLD = 15; // After 15 total fails = permanent ban until clear
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000;
+const ATTEMPT_WINDOW_MS = 5 * 60 * 1000;
+const PERMANENT_BAN_THRESHOLD = 15;
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+  password: z.string().min(6, 'Mínimo 6 caracteres'),
 });
-
 type LoginFormData = z.infer<typeof loginSchema>;
 
-interface LoginAttempt {
-  timestamp: number;
-  success: boolean;
-}
-
-interface SecurityData {
-  attempts: LoginAttempt[];
-  lockedUntil: number | null;
-  totalFails: number;
-  permanentBan: boolean;
-}
+interface LoginAttempt { timestamp: number; success: boolean; }
+interface SecurityData { attempts: LoginAttempt[]; lockedUntil: number | null; totalFails: number; permanentBan: boolean; }
 
 const getSecurityData = (): SecurityData => {
   try {
     const raw = sessionStorage.getItem('_sec_gate');
     if (!raw) return { attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false };
     return JSON.parse(raw);
-  } catch {
-    return { attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false };
-  }
+  } catch { return { attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false }; }
 };
+const saveSecurityData = (data: SecurityData) => sessionStorage.setItem('_sec_gate', JSON.stringify(data));
 
-const saveSecurityData = (data: SecurityData) => {
-  sessionStorage.setItem('_sec_gate', JSON.stringify(data));
-};
+// ─── 3D Scene Components ───
+
+function LaserMachineBody() {
+  const meshRef = useRef<THREE.Mesh>(null);
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.15) * 0.08;
+    }
+  });
+  return (
+    <group position={[0, -0.5, 0]}>
+      {/* Main machine body */}
+      <mesh ref={meshRef} position={[0, 0, 0]}>
+        <boxGeometry args={[3.5, 2, 2.5]} />
+        <meshStandardMaterial color="#1a1a2e" metalness={0.95} roughness={0.15} />
+      </mesh>
+      {/* Machine arm */}
+      <mesh position={[0, 1.3, 0]}>
+        <boxGeometry args={[2.8, 0.3, 0.3]} />
+        <meshStandardMaterial color="#16213e" metalness={0.9} roughness={0.2} />
+      </mesh>
+      {/* Laser head */}
+      <mesh position={[0.8, 1.1, 0]}>
+        <cylinderGeometry args={[0.08, 0.12, 0.5, 16]} />
+        <meshStandardMaterial color="#0f3460" metalness={0.85} roughness={0.1} />
+      </mesh>
+      {/* Laser beam glow */}
+      <mesh position={[0.8, 0.5, 0]}>
+        <cylinderGeometry args={[0.015, 0.015, 1.2, 8]} />
+        <meshBasicMaterial color="#e94560" transparent opacity={0.7} />
+      </mesh>
+      {/* Work bed */}
+      <mesh position={[0, -1.2, 0]}>
+        <boxGeometry args={[3.8, 0.15, 2.8]} />
+        <meshStandardMaterial color="#0a0a1a" metalness={0.8} roughness={0.3} />
+      </mesh>
+      {/* Grid lines on bed */}
+      <gridHelper args={[3.2, 12, '#e94560', '#1a1a3e']} position={[0, -1.1, 0]} />
+    </group>
+  );
+}
+
+function FloatingSphere({ position, scale, color, speed }: { position: [number, number, number]; scale: number; color: string; speed: number }) {
+  const ref = useRef<THREE.Mesh>(null);
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * speed) * 0.3;
+      ref.current.position.x = position[0] + Math.cos(state.clock.elapsedTime * speed * 0.7) * 0.15;
+    }
+  });
+  return (
+    <Float speed={speed} rotationIntensity={0.3} floatIntensity={0.5}>
+      <mesh ref={ref} position={position} scale={scale}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <MeshTransmissionMaterial
+          backside
+          samples={6}
+          thickness={0.4}
+          chromaticAberration={0.15}
+          anisotropy={0.2}
+          distortion={0.3}
+          distortionScale={0.4}
+          temporalDistortion={0.1}
+          color={color}
+          transmission={0.9}
+          roughness={0.05}
+          metalness={0.1}
+        />
+      </mesh>
+    </Float>
+  );
+}
+
+function SparkParticles() {
+  const count = 60;
+  const ref = useRef<THREE.Points>(null);
+  const positions = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 12;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 8;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 6;
+    }
+    return pos;
+  }, []);
+
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = state.clock.elapsedTime * 0.02;
+      ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.01) * 0.05;
+    }
+  });
+
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
+      </bufferGeometry>
+      <pointsMaterial size={0.04} color="#e94560" transparent opacity={0.6} sizeAttenuation />
+    </points>
+  );
+}
+
+function Scene3D() {
+  return (
+    <>
+      <ambientLight intensity={0.15} />
+      <directionalLight position={[5, 5, 5]} intensity={0.4} color="#e94560" />
+      <directionalLight position={[-5, 3, -3]} intensity={0.2} color="#533483" />
+      <pointLight position={[0.8, 0.5, 1]} intensity={2} color="#e94560" distance={4} />
+      <pointLight position={[-2, 2, -1]} intensity={0.8} color="#533483" distance={5} />
+
+      <LaserMachineBody />
+      <FloatingSphere position={[-3, 2, -1]} scale={0.8} color="#e94560" speed={1.2} />
+      <FloatingSphere position={[3.5, -1, -2]} scale={0.5} color="#533483" speed={0.8} />
+      <FloatingSphere position={[-1.5, -2, 1]} scale={0.35} color="#e94560" speed={1.5} />
+      <FloatingSphere position={[2, 3, 0]} scale={1.2} color="#e9456088" speed={0.6} />
+      <SparkParticles />
+
+      <Environment preset="night" />
+    </>
+  );
+}
+
+// ─── Main Component ───
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
@@ -62,368 +173,270 @@ const AdminLoginPage = () => {
   const [failedCount, setFailedCount] = useState(0);
   const lockTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  });
+  const loginForm = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
-  // Check lockout on mount
   useEffect(() => {
     const data = getSecurityData();
-    if (data.permanentBan) {
-      setIsPermanentBan(true);
-      return;
-    }
+    if (data.permanentBan) { setIsPermanentBan(true); return; }
     if (data.lockedUntil && Date.now() < data.lockedUntil) {
       setIsLocked(true);
       setLockRemaining(Math.ceil((data.lockedUntil - Date.now()) / 1000));
     }
-    const recentFails = data.attempts.filter(
-      a => !a.success && Date.now() - a.timestamp < ATTEMPT_WINDOW_MS
-    );
-    setFailedCount(recentFails.length);
+    setFailedCount(data.attempts.filter(a => !a.success && Date.now() - a.timestamp < ATTEMPT_WINDOW_MS).length);
   }, []);
 
-  // Countdown timer for lockout
   useEffect(() => {
     if (isLocked && !isPermanentBan) {
       lockTimerRef.current = setInterval(() => {
         const data = getSecurityData();
         if (!data.lockedUntil || Date.now() >= data.lockedUntil) {
-          setIsLocked(false);
-          setLockRemaining(0);
-          setFailedCount(0);
+          setIsLocked(false); setLockRemaining(0); setFailedCount(0);
           saveSecurityData({ ...data, attempts: [], lockedUntil: null });
           if (lockTimerRef.current) clearInterval(lockTimerRef.current);
-        } else {
-          setLockRemaining(Math.ceil((data.lockedUntil - Date.now()) / 1000));
-        }
+        } else { setLockRemaining(Math.ceil((data.lockedUntil - Date.now()) / 1000)); }
       }, 1000);
     }
-    return () => {
-      if (lockTimerRef.current) clearInterval(lockTimerRef.current);
-    };
+    return () => { if (lockTimerRef.current) clearInterval(lockTimerRef.current); };
   }, [isLocked, isPermanentBan]);
 
   useEffect(() => {
-    if (!isLoading && user && role) {
-      navigate('/admin');
-    }
+    if (!isLoading && user && role) navigate('/admin');
   }, [user, role, isLoading, navigate]);
 
   const recordAttempt = (success: boolean) => {
     const data = getSecurityData();
     const now = Date.now();
-
-    const recentAttempts = data.attempts.filter(
-      a => now - a.timestamp < ATTEMPT_WINDOW_MS
-    );
+    const recentAttempts = data.attempts.filter(a => now - a.timestamp < ATTEMPT_WINDOW_MS);
     recentAttempts.push({ timestamp: now, success });
-
     const newTotalFails = success ? 0 : data.totalFails + 1;
-
-    // Permanent ban check
     if (newTotalFails >= PERMANENT_BAN_THRESHOLD) {
       saveSecurityData({ attempts: recentAttempts, lockedUntil: null, totalFails: newTotalFails, permanentBan: true });
-      setIsPermanentBan(true);
-      return;
+      setIsPermanentBan(true); return;
     }
-
     const recentFails = recentAttempts.filter(a => !a.success);
     setFailedCount(recentFails.length);
-
     if (recentFails.length >= MAX_ATTEMPTS) {
       const lockedUntil = now + LOCKOUT_DURATION_MS;
       saveSecurityData({ attempts: recentAttempts, lockedUntil, totalFails: newTotalFails, permanentBan: false });
-      setIsLocked(true);
-      setLockRemaining(Math.ceil(LOCKOUT_DURATION_MS / 1000));
-      return;
+      setIsLocked(true); setLockRemaining(Math.ceil(LOCKOUT_DURATION_MS / 1000)); return;
     }
-
     saveSecurityData({ attempts: recentAttempts, lockedUntil: data.lockedUntil, totalFails: newTotalFails, permanentBan: false });
   };
 
   const verifyEmailHasAdminRole = async (email: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase.functions.invoke('admin-gate-check', {
-        body: { email },
-      });
+      const { data, error } = await supabase.functions.invoke('admin-gate-check', { body: { email } });
       if (error) return false;
       return data?.allowed === true;
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   };
 
   const onLogin = async (data: LoginFormData) => {
-    if (isLocked || isPermanentBan) {
-      toast.error('Acesso bloqueado.');
-      return;
-    }
-
+    if (isLocked || isPermanentBan) { toast.error('Acesso bloqueado.'); return; }
     setIsSubmitting(true);
     try {
-      // STEP 1: Pre-verify email has admin role BEFORE attempting auth
       const hasAccess = await verifyEmailHasAdminRole(data.email);
-      
       if (!hasAccess) {
         recordAttempt(false);
         const remaining = MAX_ATTEMPTS - (failedCount + 1);
-        
-        // Generic message - never reveal if email exists or not
-        if (remaining <= 0) {
-          toast.error('🔒 Acesso bloqueado por excesso de tentativas.');
-        } else {
-          toast.error('Acesso negado. Este portal é exclusivo para pessoal autorizado.');
-        }
-        setIsSubmitting(false);
-        return;
+        toast.error(remaining <= 0 ? '🔒 Acesso bloqueado por excesso de tentativas.' : 'Acesso negado. Portal exclusivo para pessoal autorizado.');
+        setIsSubmitting(false); return;
       }
-
-      // STEP 2: Only attempt auth if email is verified as admin
       const { error } = await signIn(data.email, data.password);
-
       if (error) {
         recordAttempt(false);
         const remaining = MAX_ATTEMPTS - (failedCount + 1);
-
         if (isAuthError(error, 'Invalid login credentials')) {
-          if (remaining <= 0) {
-            toast.error('🔒 Conta bloqueada por 15 minutos.');
-          } else {
-            toast.error(`Senha incorreta. ${remaining} tentativa${remaining !== 1 ? 's' : ''} restante${remaining !== 1 ? 's' : ''}.`);
-          }
+          toast.error(remaining <= 0 ? '🔒 Conta bloqueada por 15 minutos.' : `Senha incorreta. ${remaining} tentativa${remaining !== 1 ? 's' : ''} restante${remaining !== 1 ? 's' : ''}.`);
         } else if (isAuthError(error, 'Email not confirmed')) {
           toast.error('Email não confirmado.');
-        } else {
-          toast.error('Erro de autenticação.');
-        }
+        } else { toast.error('Erro de autenticação.'); }
       } else {
         recordAttempt(true);
         saveSecurityData({ attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false });
         toast.success('✅ Acesso autorizado.');
       }
-    } catch {
-      recordAttempt(false);
-      toast.error('Erro interno de segurança.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    } catch { recordAttempt(false); toast.error('Erro interno.'); }
+    finally { setIsSubmitting(false); }
   };
 
-  const formatTime = (seconds: number): string => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
+  const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-purple-500/20 animate-ping" />
-          <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shadow-lg">
-            <Loader2 className="h-7 w-7 animate-spin text-white" />
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a12]">
+        <Loader2 className="h-10 w-10 animate-spin text-[#e94560]" />
       </div>
     );
   }
 
-  // PERMANENT BAN SCREEN
   if (isPermanentBan) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
-        <Card className="w-full max-w-md border-red-500/20 bg-red-950/20 shadow-2xl shadow-red-900/20 backdrop-blur-xl">
-          <CardContent className="pt-8 pb-8">
-            <div className="flex flex-col items-center gap-6 text-center">
-              <div className="w-24 h-24 rounded-full bg-red-500/10 border-2 border-red-500/30 flex items-center justify-center">
-                <Skull className="h-12 w-12 text-red-400" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-red-300 mb-2">Acesso Permanentemente Bloqueado</h2>
-                <p className="text-red-400/60 text-sm">
-                  Múltiplas tentativas de acesso não autorizado foram detectadas. 
-                  Este incidente foi registrado e reportado.
-                </p>
-              </div>
-              <div className="w-full p-3 rounded-lg bg-red-500/5 border border-red-500/10">
-                <p className="text-[11px] text-red-400/40 font-mono">
-                  INCIDENT_LOGGED • IP_RECORDED • SESSION_TERMINATED
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a12]">
+        <div className="w-full max-w-md p-8 rounded-3xl border border-red-500/20 bg-red-950/10 backdrop-blur-2xl text-center">
+          <Skull className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-red-300 mb-2">Acesso Permanentemente Bloqueado</h2>
+          <p className="text-red-400/60 text-sm">Múltiplas tentativas não autorizadas foram detectadas e registradas.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex bg-[#0a0a0f]">
-      {/* Left Side - Security Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-[#0d0d15] via-[#111128] to-[#0d0d15]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(139,92,246,0.08),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(59,130,246,0.06),transparent_50%)]" />
-
-        <div className="relative z-10 flex flex-col justify-center px-16">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-emerald-500/20 mb-8">
-            <Shield className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent mb-4">
-            Zona Restrita
-          </h1>
-          <p className="text-lg text-white/40 max-w-md leading-relaxed">
-            Portal blindado com verificação em duas etapas. Apenas pessoal com credenciais válidas e role autorizado pode prosseguir.
-          </p>
-          <div className="mt-12 space-y-4">
-            {[
-              'Verificação de role antes da autenticação',
-              'Bloqueio automático após 5 tentativas',
-              'Ban permanente após 15 tentativas',
-              'Sem recuperação de senha por email',
-              'Emails não cadastrados são rejeitados',
-              'Controle RBAC (Admin/Editor/Suporte)',
-            ].map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 text-white/40">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400" />
-                <span className="text-sm">{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-purple-500/5 to-blue-500/5 blur-3xl" />
-        <div className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full bg-gradient-to-br from-emerald-500/5 to-transparent blur-3xl" />
+    <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-[#0a0a12] via-[#1a0a2e] to-[#0a0a12]">
+      {/* 3D Background */}
+      <div className="absolute inset-0 z-0">
+        <Canvas
+          camera={{ position: [0, 0, 6], fov: 50 }}
+          dpr={[1, 1.5]}
+          gl={{ antialias: true, alpha: true }}
+        >
+          <Suspense fallback={null}>
+            <Scene3D />
+          </Suspense>
+        </Canvas>
       </div>
 
-      {/* Right Side - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <Card className="w-full max-w-md border-white/[0.06] bg-white/[0.03] shadow-2xl shadow-black/40 backdrop-blur-xl">
-          <CardHeader className="text-center space-y-4 pb-2">
-            <div className="lg:hidden mx-auto">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg mx-auto">
-                <Shield className="h-7 w-7 text-white" />
-              </div>
-            </div>
-            <div>
-              <CardTitle className="text-2xl font-bold text-white">
-                {isLocked ? '🔒 Acesso Bloqueado' : 'Acesso Seguro'}
-              </CardTitle>
-              <CardDescription className="mt-2 text-white/40">
-                {isLocked
-                  ? `Tente novamente em ${formatTime(lockRemaining)}`
-                  : 'Identifique-se para continuar'}
-              </CardDescription>
-            </div>
-          </CardHeader>
+      {/* Gradient overlays for depth */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#0a0a12]/80 via-transparent to-[#0a0a12]/40" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-t from-[#0a0a12]/60 via-transparent to-[#0a0a12]/30" />
 
-          <CardContent className="pt-6">
-            {/* Security warning banner */}
-            {failedCount > 0 && failedCount < MAX_ATTEMPTS && !isLocked && (
-              <div className="mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />
-                <p className="text-xs text-amber-300">
-                  {MAX_ATTEMPTS - failedCount} tentativa{MAX_ATTEMPTS - failedCount !== 1 ? 's' : ''} restante{MAX_ATTEMPTS - failedCount !== 1 ? 's' : ''} antes do bloqueio.
-                </p>
-              </div>
-            )}
+      {/* Content */}
+      <div className="relative z-10 min-h-screen flex flex-col lg:flex-row items-center justify-center px-4 sm:px-8 gap-8 lg:gap-16">
+        
+        {/* Left side - Branding */}
+        <div className="hidden lg:flex flex-col max-w-md">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#e94560] to-[#533483] flex items-center justify-center shadow-xl shadow-[#e94560]/20">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-2xl font-bold text-white tracking-tight">Pincel de Luz</span>
+          </div>
+          <h1 className="text-5xl font-extrabold leading-tight mb-4">
+            <span className="bg-gradient-to-r from-white via-[#e94560] to-[#533483] bg-clip-text text-transparent">
+              Painel de{'\n'}Controle
+            </span>
+          </h1>
+          <p className="text-white/40 text-base leading-relaxed max-w-sm">
+            Acesse o centro de comando do seu negócio. Gerencie produtos, pedidos e toda sua operação com segurança máxima.
+          </p>
+        </div>
 
-            {isLocked ? (
-              <div className="space-y-6 py-8">
-                <div className="flex flex-col items-center gap-4">
+        {/* Right side - Glass Login Card */}
+        <div className="w-full max-w-[420px]">
+          {/* Glass Card */}
+          <div className="relative rounded-3xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-2xl shadow-2xl shadow-black/40 overflow-hidden">
+            {/* Glass shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] via-transparent to-transparent pointer-events-none" />
+            <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-[#e94560]/10 blur-3xl pointer-events-none" />
+
+            <div className="relative p-8 sm:p-10">
+              {/* Mobile logo */}
+              <div className="lg:hidden flex items-center gap-2 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e94560] to-[#533483] flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-lg font-bold text-white">Pincel de Luz</span>
+              </div>
+
+              <h2 className="text-lg font-semibold tracking-wide text-white/90 uppercase text-center mb-1">
+                {isLocked ? '🔒 Acesso Bloqueado' : 'Acesso Restrito'}
+              </h2>
+              <p className="text-sm text-white/30 text-center mb-8">
+                {isLocked ? `Tente novamente em ${formatTime(lockRemaining)}` : 'Identifique-se para continuar'}
+              </p>
+
+              {/* Warning banner */}
+              {failedCount > 0 && failedCount < MAX_ATTEMPTS && !isLocked && (
+                <div className="mb-6 p-3 rounded-xl bg-amber-500/10 border border-amber-500/15 flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />
+                  <p className="text-xs text-amber-300/80">
+                    {MAX_ATTEMPTS - failedCount} tentativa{MAX_ATTEMPTS - failedCount !== 1 ? 's' : ''} restante{MAX_ATTEMPTS - failedCount !== 1 ? 's' : ''} antes do bloqueio.
+                  </p>
+                </div>
+              )}
+
+              {isLocked ? (
+                <div className="py-10 flex flex-col items-center gap-6">
                   <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
                     <ShieldAlert className="h-10 w-10 text-red-400" />
                   </div>
-                  <div className="text-center">
-                    <p className="text-white/60 text-sm">
-                      Múltiplas tentativas falhas detectadas.
-                    </p>
-                    <p className="text-white/40 text-xs mt-2">
-                      O acesso será restaurado automaticamente.
-                    </p>
-                  </div>
-                  <div className="font-mono text-3xl font-bold text-red-400 tabular-nums">
+                  <p className="text-white/40 text-sm text-center">Múltiplas tentativas falhas detectadas.</p>
+                  <div className="font-mono text-4xl font-bold text-red-400 tabular-nums">
                     {formatTime(lockRemaining)}
                   </div>
                 </div>
-              </div>
-            ) : (
-              <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
-                <div>
-                  <Label htmlFor="email" className="text-sm font-medium text-white/50">Email</Label>
-                  <div className="relative mt-2">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
-                    <Input
-                      id="email"
-                      type="email"
-                      {...loginForm.register('email')}
-                      placeholder="seu@email.com"
-                      autoComplete="off"
-                      className="pl-10 h-11 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/20 focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:border-emerald-500/40"
-                    />
+              ) : (
+                <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-5">
+                  {/* Email */}
+                  <div>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/25" />
+                      <input
+                        type="email"
+                        {...loginForm.register('email')}
+                        placeholder="seu@email.com"
+                        autoComplete="off"
+                        className="w-full h-13 pl-12 pr-4 rounded-xl bg-white/[0.06] border border-white/[0.08] text-white placeholder:text-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-[#e94560]/40 focus:border-[#e94560]/30 transition-all"
+                      />
+                    </div>
+                    {loginForm.formState.errors.email && (
+                      <p className="text-xs text-red-400 mt-1.5 pl-1">{loginForm.formState.errors.email.message}</p>
+                    )}
                   </div>
-                  {loginForm.formState.errors.email && (
-                    <p className="text-sm text-red-400 mt-1.5">
-                      {loginForm.formState.errors.email.message}
-                    </p>
-                  )}
-                </div>
 
-                <div>
-                  <Label htmlFor="password" className="text-sm font-medium text-white/50">Senha</Label>
-                  <div className="relative mt-2">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      {...loginForm.register('password')}
-                      placeholder="••••••••"
-                      autoComplete="off"
-                      className="pl-10 pr-10 h-11 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/20 focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:border-emerald-500/40"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
+                  {/* Password */}
+                  <div>
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/25" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        {...loginForm.register('password')}
+                        placeholder="••••••••"
+                        autoComplete="off"
+                        className="w-full h-13 pl-12 pr-12 rounded-xl bg-white/[0.06] border border-white/[0.08] text-white placeholder:text-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-[#e94560]/40 focus:border-[#e94560]/30 transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/50 transition-colors text-xs uppercase tracking-wider font-medium"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    {loginForm.formState.errors.password && (
+                      <p className="text-xs text-red-400 mt-1.5 pl-1">{loginForm.formState.errors.password.message}</p>
+                    )}
                   </div>
-                  {loginForm.formState.errors.password && (
-                    <p className="text-sm text-red-400 mt-1.5">
-                      {loginForm.formState.errors.password.message}
-                    </p>
-                  )}
-                </div>
 
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-semibold shadow-lg shadow-emerald-500/20 transition-all duration-300 text-base"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Verificando credenciais...
-                    </>
-                  ) : (
-                    <>
-                      <Shield className="h-4 w-4 mr-2" />
-                      Autenticar
-                    </>
-                  )}
-                </Button>
+                  {/* Submit */}
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full h-13 rounded-xl bg-[#0f0f1a] hover:bg-[#1a1a2e] border border-white/[0.06] text-white font-semibold text-sm tracking-wide flex items-center justify-between px-6 transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2 mx-auto">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Verificando...
+                      </span>
+                    ) : (
+                      <>
+                        <span>Acessar Painel</span>
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
 
-                {/* Security notice - NO password reset link */}
-                <div className="pt-4 border-t border-white/[0.06]">
-                  <p className="text-[11px] text-white/20 text-center leading-relaxed">
-                    Este portal é monitorado e rastreado. Tentativas não autorizadas serão registradas. Não existe recuperação de senha neste portal — contate o administrador do sistema.
-                  </p>
-                </div>
-              </form>
-            )}
-          </CardContent>
-        </Card>
+              {/* Footer notice */}
+              <p className="text-[10px] text-white/15 text-center mt-8 leading-relaxed">
+                Portal monitorado. Não existe recuperação de senha. Contate o administrador do sistema.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
