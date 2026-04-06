@@ -102,7 +102,6 @@ const AdminLoginCustomizePage = () => {
             <ImageUpload
               value={settings.login_logo || ''}
               onChange={(url) => setSettings({ ...settings, login_logo: url })}
-              bucket="admin-uploads"
               folder="login"
             />
           </div>
@@ -119,7 +118,6 @@ const AdminLoginCustomizePage = () => {
             <ImageUpload
               value={settings.login_bg_image || ''}
               onChange={(url) => setSettings({ ...settings, login_bg_image: url })}
-              bucket="admin-uploads"
               folder="login"
             />
           </div>
