@@ -126,7 +126,7 @@ const AdminWhatsAppPage = () => {
 
         {/* ─── Tabs ─── */}
         <Tabs defaultValue="instances" className="space-y-4">
-          <TabsList className={`border ${cardCls}`}>
+          <TabsList className={`admin-tabs-vivid border ${cardCls}`}>
             <TabsTrigger value="instances">🔌 Conexões</TabsTrigger>
             <TabsTrigger value="messages">📨 Mensagens</TabsTrigger>
             <TabsTrigger value="test">🧪 Testar</TabsTrigger>

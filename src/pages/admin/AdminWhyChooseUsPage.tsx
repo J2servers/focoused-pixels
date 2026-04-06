@@ -101,7 +101,7 @@ const AdminWhyChooseUsPage = () => {
         </div>
 
         <Tabs defaultValue="theme" className="space-y-6">
-          <TabsList className="flex flex-wrap gap-1">
+          <TabsList className="admin-tabs-vivid flex flex-wrap gap-1">
             <TabsTrigger value="theme"><Palette className="h-4 w-4 mr-1.5" /> Tema</TabsTrigger>
             <TabsTrigger value="hero"><Type className="h-4 w-4 mr-1.5" /> Hero</TabsTrigger>
             <TabsTrigger value="content"><Sparkles className="h-4 w-4 mr-1.5" /> Conteúdo</TabsTrigger>

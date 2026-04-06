@@ -280,7 +280,7 @@ const AdminEmailTemplatesPage = () => {
 
                 {/* Channel filter */}
                 <Tabs value={channelTab} onValueChange={v => setChannelTab(v as any)}>
-                  <TabsList className="bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))] h-9">
+                  <TabsList className="admin-tabs-vivid bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))] h-9">
                     <TabsTrigger value="all" className="text-xs h-7 data-[state=active]:bg-[hsl(var(--admin-accent-purple)/0.15)] data-[state=active]:text-white">Todos</TabsTrigger>
                     <TabsTrigger value="email" className="text-xs h-7 gap-1 data-[state=active]:bg-blue-500/15 data-[state=active]:text-blue-400">
                       <Mail className="h-3 w-3" />E-mail

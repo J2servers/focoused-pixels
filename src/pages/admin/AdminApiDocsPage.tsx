@@ -342,7 +342,7 @@ export default function AdminApiDocsPage() {
         </div>
 
         <Tabs defaultValue="docs" className="space-y-4">
-          <TabsList className="bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))]">
+          <TabsList className="admin-tabs-vivid bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))]">
             <TabsTrigger value="docs">📄 Documentação</TabsTrigger>
             <TabsTrigger value="keys">🔑 Chaves de API</TabsTrigger>
             <TabsTrigger value="logs">📊 Logs</TabsTrigger>
