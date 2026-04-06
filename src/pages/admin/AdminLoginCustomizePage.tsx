@@ -19,6 +19,7 @@ interface LoginSettings {
   login_logo_height: number;
   login_title_size: number;
   login_subtitle_size: number;
+  login_brand_text: string | null;
 }
 
 const AdminLoginCustomizePage = () => {
@@ -30,6 +31,7 @@ const AdminLoginCustomizePage = () => {
     login_logo_height: 48,
     login_title_size: 48,
     login_subtitle_size: 14,
+    login_brand_text: null,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
