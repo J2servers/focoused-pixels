@@ -1,63 +1,35 @@
+## Análise do Painel Admin — Itens Incompletos
 
+### 1. ❌ Página Fluxo de Caixa ausente
+Existem componentes (`CashFlowSummaryCards`, `CashTransactionDialog`, etc.) e hook `useCashFlow`, mas **NÃO existe uma página nem rota** para Fluxo de Caixa no admin.
 
-# Plan: Send WhatsApp notification after boleto generation
+### 2. ❌ Edição de papel do usuário (AdminUsersPage)
+O hook `useUpdateUserRole` existe mas **NÃO é utilizado** na página. Só é possível criar e deletar — **não editar a função** do usuário.
 
-## What will be done
-After a boleto is successfully generated, the system will automatically send a WhatsApp message to the customer with the boleto barcode and payment link, using the existing WhatsApp Evolution API integration with failover logic.
+### 3. ❌ Produtos sem descrição completa (full_description)
+O formulário de produtos **não tem campo para `full_description`** (apenas `short_description`). O campo existe na tabela.
 
-## Changes
+### 4. ❌ Exportação CSV ausente em várias páginas
+Apenas AdminOrdersPage tem ExportButtons. Faltam em: Produtos, Categorias, Leads, Cupons, Orçamentos, Avaliações.
 
-### 1. Update Edge Function `payment-mercadopago/index.ts`
-After successfully creating the boleto (line ~394), add a call to the `whatsapp-evolution` function to send the boleto details to the customer. This keeps the notification server-side and reliable.
+### 5. ❌ AdminUsersPage sem e-mail visível
+O hook retorna `email: ''` pois não busca da tabela auth. Precisa buscar do profile ou exibir aviso.
 
-- After `console.log("[MercadoPago] Boleto created:", data.id)`, invoke the WhatsApp function with:
-  - Customer phone (new parameter `payerPhone`)
-  - Customer name
-  - Barcode content
-  - Boleto URL
-  - Expiration date
-  - Amount
-- The WhatsApp send is fire-and-forget (non-blocking) so it doesn't delay the boleto response
-- If WhatsApp fails, it logs the error but doesn't fail the payment
+### 6. ❌ Fluxo de Caixa no sidebar
+Não há link para Caixa no sidebar.
 
-### 2. Update `PaymentPage.tsx`
-Pass `payerPhone` to the `create_boleto` call (line ~460). The phone is already available in `paymentState.customerPhone`.
+### 7. ❌ Matérias-primas sem página
+Existe tabela `raw_materials` e `stock_movements` mas sem página de gestão.
 
-Add `payerPhone: paymentState.customerPhone` to the `mutateAsync` call.
+---
 
-### 3. Update Edge Function interface
-Add `payerPhone` to the `PaymentRequest` interface (already exists but need to ensure it's destructured and used in the boleto handler).
+## Plano de Implementação (por prioridade)
 
-## Message template
-```
-🧾 *Boleto Gerado - Pincel de Luz*
-
-Olá, {nome}! Seu boleto foi gerado com sucesso.
-
-💰 *Valor:* R$ {valor}
-📅 *Vencimento:* {data}
-
-📋 *Código de barras:*
-{barcode}
-
-🔗 *Link do boleto:*
-{url}
-
-Qualquer dúvida, estamos à disposição! ✨
-```
-
-## Technical flow
-```text
-PaymentPage (frontend)
-  └─ create_boleto (edge fn)
-       ├─ Mercado Pago API → boleto created
-       ├─ WhatsApp Evolution API → message sent (async, non-blocking)
-       └─ Response to frontend (barcode, url, etc.)
-```
-
-## Files to modify
-| File | Change |
-|------|--------|
-| `supabase/functions/payment-mercadopago/index.ts` | Add WhatsApp notification after boleto creation |
-| `src/pages/PaymentPage.tsx` | Pass `payerPhone` to boleto request |
-
+| # | Tarefa | Impacto |
+|---|--------|---------|
+| 1 | Criar página AdminCashFlowPage + rota + sidebar | Alto |
+| 2 | Adicionar edição de papel no AdminUsersPage | Médio |
+| 3 | Adicionar campo full_description no form de produtos | Médio |
+| 4 | Adicionar ExportButtons nas páginas que faltam | Médio |
+| 5 | Criar página AdminRawMaterialsPage + rota + sidebar | Alto |
+| 6 | Corrigir exibição de email no AdminUsersPage | Baixo |
