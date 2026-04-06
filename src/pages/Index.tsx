@@ -33,6 +33,8 @@ import {
 import { RainbowCategoryStrip } from '@/components/conversion/RainbowCategoryStrip';
 import { PageSEO, WebSiteSchema, LocalBusinessSchema } from '@/components/seo/PageSEO';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
+import { BackToTop } from '@/components/conversion/BackToTop';
+import { SectionDivider } from '@/components/conversion/SectionDivider';
 
 // Lazy load below-fold heavy components
 const SocialProofSection = lazy(() => import('@/components/conversion/SocialProofSection').then(m => ({ default: m.SocialProofSection })));
@@ -187,7 +189,9 @@ const Index = () => {
         )}
 
         <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
+        <SectionDivider />
         <WeeklyUrgencySection />
+        <SectionDivider />
 
         {productsLoading || categoriesLoading ? (
           <section className="py-12">
@@ -223,6 +227,7 @@ const Index = () => {
           <VideoStoriesCarousel />
         </Suspense>
 
+        <SectionDivider />
         <GuaranteesSection />
         <HowItWorksSection />
 
@@ -241,6 +246,7 @@ const Index = () => {
 
       <DynamicFooter />
       <WhatsAppButton />
+      <BackToTop />
       <Suspense fallback={null}>
         <AIChatWidget />
       </Suspense>
