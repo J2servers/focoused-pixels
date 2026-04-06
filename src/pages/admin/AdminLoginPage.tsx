@@ -688,7 +688,7 @@ const AdminLoginPage = () => {
         <div className="hidden lg:flex flex-col max-w-md">
           <div className="flex items-center gap-3 mb-8">
             {logoUrl ? (
-              <img src={logoUrl} alt={brandName} className="h-12 w-auto object-contain" />
+              <img src={logoUrl} alt={brandName} style={{ height: `${logoHeight}px` }} className="w-auto object-contain" />
             ) : (
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#e8a817] to-[#c8951a] flex items-center justify-center shadow-xl shadow-[#e8a817]/30">
                 <div className="w-4 h-6 bg-white rounded-full" />
@@ -696,10 +696,10 @@ const AdminLoginPage = () => {
             )}
             <span className="text-2xl font-bold text-white tracking-tight">{brandName}</span>
           </div>
-          <h1 className="text-5xl font-extrabold leading-tight mb-5">
+          <h1 className="font-extrabold leading-tight mb-5" style={{ fontSize: `${titleSize}px` }}>
             <span className="text-white">{title}</span>
           </h1>
-          <p className="text-white/50 text-base leading-relaxed max-w-sm">{subtitle}</p>
+          <p className="text-white/50 leading-relaxed max-w-sm" style={{ fontSize: `${subtitleSize}px` }}>{subtitle}</p>
         </div>
 
         {/* Right — Glass Login Card */}
