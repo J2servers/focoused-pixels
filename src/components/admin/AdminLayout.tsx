@@ -55,6 +55,10 @@ export const AdminLayout = ({
 
   return (
     <div className="min-h-screen admin-dark bg-[hsl(var(--admin-bg))]">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+        <title>{title} | Admin</title>
+      </Helmet>
       <AdminSidebar onCollapseChange={setSidebarCollapsed} />
       <div className={cn(
         "flex flex-col min-h-screen transition-all duration-300",
