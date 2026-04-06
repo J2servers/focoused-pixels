@@ -310,7 +310,7 @@ export default function TrackingPage() {
                     </p>
                     <Button variant="outline" asChild>
                       <a 
-                        href={whatsappLink} 
+                        href="https://wa.me/" 
                         target="_blank"
                         rel="noopener noreferrer"
                       >
