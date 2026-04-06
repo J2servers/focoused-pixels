@@ -86,8 +86,8 @@ const AdminRawMaterialsPage = () => {
     { key: 'category', header: 'Categoria', render: (m) => m.category ? <AdminStatusBadge label={m.category} variant="info" /> : <span className="text-[hsl(var(--admin-text-muted))]">—</span> },
     { key: 'actions', header: 'Ações', className: 'w-24', render: (m) => (
       <div className="flex gap-1" onClick={e => e.stopPropagation()}>
-        <Button variant="ghost" size="icon" onClick={() => openEdit(m)}><Pencil className="h-4 w-4 text-[hsl(var(--admin-text-muted))]" /></Button>
-        <Button variant="ghost" size="icon" onClick={() => { setSelected(m); setDeleteDialogOpen(true); }}><Trash2 className="h-4 w-4 text-red-400" /></Button>
+        <Button variant="ghost" size="icon" className="admin-btn admin-btn-edit !min-h-0 !p-1 h-8 w-8" onClick={() => openEdit(m)}><Pencil className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="admin-btn admin-btn-delete !min-h-0 !p-1 h-8 w-8" onClick={() => { setSelected(m); setDeleteDialogOpen(true); }}><Trash2 className="h-4 w-4" /></Button>
       </div>
     )},
   ];
@@ -120,7 +120,7 @@ const AdminRawMaterialsPage = () => {
           actions={
             <div className="flex gap-2">
               <ExportButtons data={exportData} columns={EXPORT_COLUMNS} filename="materias-primas" title="Matérias-Primas" />
-              <Button onClick={openCreate} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg">
+              <Button onClick={openCreate} className="admin-btn admin-btn-create">
                 <Plus className="h-4 w-4 mr-2" />Novo Material
               </Button>
             </div>
@@ -187,7 +187,7 @@ const AdminRawMaterialsPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
-            <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
+            <Button onClick={handleSave} disabled={isSaving} className="admin-btn admin-btn-save">
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}{selected ? 'Salvar' : 'Criar'}
             </Button>
           </DialogFooter>
@@ -203,7 +203,7 @@ const AdminRawMaterialsPage = () => {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Excluir</Button>
+            <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
