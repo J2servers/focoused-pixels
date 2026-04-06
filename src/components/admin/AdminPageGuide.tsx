@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp, Lightbulb, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronUp, Lightbulb, Sparkles } from 'lucide-react';
 
 interface GuideStep {
   title: string;
@@ -59,34 +59,39 @@ export function AdminPageGuide({ title, description, steps }: AdminPageGuideProp
       {open && (
         <div className="px-4 pb-4" style={{ borderTop: '1px solid hsl(45 100% 55% / 0.15)' }}>
           <div className="grid gap-3 mt-3 sm:grid-cols-2 lg:grid-cols-3">
-            {steps.map((step, i) => (
-              <div
-                key={i}
-                className="flex gap-3 p-3 rounded-lg transition-colors hover:bg-white/5"
-                style={{
-                  background: i % 2 === 0
-                    ? 'linear-gradient(135deg, hsl(45 100% 55% / 0.06), transparent)'
-                    : 'linear-gradient(135deg, hsl(210 100% 60% / 0.06), transparent)',
-                  border: `1px solid ${i % 2 === 0 ? 'hsl(45 100% 55% / 0.2)' : 'hsl(210 100% 60% / 0.2)'}`,
-                }}
-              >
-                <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5" style={{
-                  background: i % 2 === 0
-                    ? 'hsl(45 100% 55% / 0.15)'
-                    : 'hsl(210 100% 60% / 0.15)',
-                }}>
-                  <Lightbulb className="h-3 w-3" style={{
-                    color: i % 2 === 0 ? 'hsl(45 100% 60%)' : 'hsl(210 100% 70%)',
-                  }} />
+            {steps.map((step, i) => {
+              const isYellow = i % 2 === 0;
+              return (
+                <div
+                  key={i}
+                  className="flex gap-3 p-3 rounded-lg transition-all hover:scale-[1.02]"
+                  style={{
+                    background: isYellow
+                      ? 'hsl(45 100% 50% / 0.15)'
+                      : 'hsl(210 100% 55% / 0.15)',
+                    border: isYellow
+                      ? '1.5px solid hsl(45 100% 55% / 0.4)'
+                      : '1.5px solid hsl(210 100% 60% / 0.4)',
+                  }}
+                >
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5" style={{
+                    background: isYellow
+                      ? 'hsl(45 100% 50% / 0.3)'
+                      : 'hsl(210 100% 55% / 0.3)',
+                  }}>
+                    <Lightbulb className="h-3 w-3" style={{
+                      color: isYellow ? 'hsl(45 100% 60%)' : 'hsl(210 100% 70%)',
+                    }} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold" style={{
+                      color: isYellow ? 'hsl(45 100% 65%)' : 'hsl(210 100% 75%)',
+                    }}>{step.title}</p>
+                    <p className="text-xs text-white/70 mt-0.5 leading-relaxed">{step.description}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold" style={{
-                    color: i % 2 === 0 ? 'hsl(45 100% 70%)' : 'hsl(210 100% 75%)',
-                  }}>{step.title}</p>
-                  <p className="text-xs text-[hsl(var(--admin-text-muted))] mt-0.5 leading-relaxed">{step.description}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
