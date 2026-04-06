@@ -83,16 +83,16 @@ function computeMetrics(all: any, dates: any, taxSettings: any) {
   const failedPaymentOrders = activeOrders.filter((o: { payment_status: string }) => ['failed', 'rejected'].includes(o.payment_status || ''));
   const cancelledOrders = all.orders.filter((o: { order_status: string }) => o.order_status === 'cancelled');
 
-  const ordersToday = filterByDate(activeOrders, todayStart);
-  const ordersWeek = filterByDate(activeOrders, weekStart);
-  const ordersMonth = filterByDate(activeOrders, monthStart);
-  const ordersYear = filterByDate(activeOrders, yearStart);
-  const paidOrdersToday = filterByDate(paidOrders, todayStart);
-  const paidOrdersWeek = filterByDate(paidOrders, weekStart);
-  const paidOrdersMonth = filterByDate(paidOrders, monthStart);
-  const paidOrdersYear = filterByDate(paidOrders, yearStart);
-  const ordersLastMonth = filterByDateRange(activeOrders, lastMonthStart, lastMonthEnd);
-  const paidOrdersLastMonth = filterByDateRange(paidOrders, lastMonthStart, lastMonthEnd);
+  const ordersToday = byDate(activeOrders, todayStart);
+  const ordersWeek = byDate(activeOrders, weekStart);
+  const ordersMonth = byDate(activeOrders, monthStart);
+  const ordersYear = byDate(activeOrders, yearStart);
+  const paidOrdersToday = byDate(paidOrders, todayStart);
+  const paidOrdersWeek = byDate(paidOrders, weekStart);
+  const paidOrdersMonth = byDate(paidOrders, monthStart);
+  const paidOrdersYear = byDate(paidOrders, yearStart);
+  const ordersLastMonth = byDateRange(activeOrders, lastMonthStart, lastMonthEnd);
+  const paidOrdersLastMonth = byDateRange(paidOrders, lastMonthStart, lastMonthEnd);
 
   const vendasHoje = ordersToday.length, vendasSemana = ordersWeek.length, vendasMes = ordersMonth.length;
   const vendasAno = ordersYear.length, vendasMesAnterior = ordersLastMonth.length, vendasTotal = activeOrders.length;
@@ -139,9 +139,9 @@ function computeMetrics(all: any, dates: any, taxSettings: any) {
     : 0;
 
   // LEADS
-  const leadsHoje = filterByDate(all.leads, todayStart).length;
-  const leadsSemana = filterByDate(all.leads, weekStart).length;
-  const leadsMes = filterByDate(all.leads, monthStart).length;
+  const leadsHoje = byDate(all.leads, todayStart).length;
+  const leadsSemana = byDate(all.leads, weekStart).length;
+  const leadsMes = byDate(all.leads, monthStart).length;
   const leadsInscritos = all.leads.filter((l: { is_subscribed: boolean }) => l.is_subscribed).length;
 
   // CLIENTES
@@ -177,8 +177,8 @@ function computeMetrics(all: any, dates: any, taxSettings: any) {
   const orcamentosAprovados = all.quotes.filter((q: { status: string }) => q.status === 'approved').length;
   const orcamentosConvertidos = all.quotes.filter((q: { status: string }) => q.status === 'converted').length;
   const orcamentosRejeitados = all.quotes.filter((q: { status: string }) => q.status === 'rejected').length;
-  const orcamentosHoje = filterByDate(all.quotes, todayStart).length;
-  const orcamentosMes = filterByDate(all.quotes, monthStart).length;
+  const orcamentosHoje = byDate(all.quotes, todayStart).length;
+  const orcamentosMes = byDate(all.quotes, monthStart).length;
 
   // AVALIAÇÕES
   const reviewsPendentes = all.reviews.filter((r: { is_approved: boolean }) => !r.is_approved).length;
@@ -187,8 +187,8 @@ function computeMetrics(all: any, dates: any, taxSettings: any) {
   const reviewsByRating = [5, 4, 3, 2, 1].map(n => all.reviews.filter((r: { rating: number }) => r.rating === n).length);
 
   // TRÁFEGO
-  const visitasHoje = filterByDate(all.pageViews, todayStart).length;
-  const visitasSemana = filterByDate(all.pageViews, weekStart).length;
+  const visitasHoje = byDate(all.pageViews, todayStart).length;
+  const visitasSemana = byDate(all.pageViews, weekStart).length;
   const visitasMes = all.pageViews.length;
   const sessoesUnicas = new Set(all.pageViews.map((p: { session_id: string }) => p.session_id).filter(Boolean)).size;
   const taxaConversao = visitasMes > 0 ? (vendasMes / visitasMes * 100) : 0;
@@ -228,7 +228,7 @@ function computeMetrics(all: any, dates: any, taxSettings: any) {
   // ESTOQUE
   const materiaisEstoqueBaixo = all.rawMaterials.filter((m: { quantity: number; min_quantity: number }) => (m.quantity || 0) <= (m.min_quantity || 0)).length;
   const valorEstoqueMateriais = all.rawMaterials.reduce((s: number, m: { quantity: number; cost_per_unit: number }) => s + ((m.quantity || 0) * (m.cost_per_unit || 0)), 0);
-  const movimentacoesHoje = filterByDate(all.stockMovements, todayStart).length;
+  const movimentacoesHoje = byDate(all.stockMovements, todayStart).length;
 
   // CAIXA
   const entradas = all.cashTx.filter((t: { type: string }) => t.type === 'income');
@@ -406,7 +406,7 @@ function computeMetrics(all: any, dates: any, taxSettings: any) {
     valorEstoqueMateriais, movimentacoesHoje,
     entradasHoje, saidasHoje, saldoDia: entradasHoje - saidasHoje,
     entradasMes, saidasMes, saldoMes: entradasMes - saidasMes,
-    auditoriaHoje: filterByDate(all.auditLogs, todayStart).length,
+    auditoriaHoje: byDate(all.auditLogs, todayStart).length,
     webhooksRecebidos: all.webhookLogs.length,
     webhooksErro: all.webhookLogs.filter((w: { error_message: string }) => w.error_message).length,
     bannersAtivos: all.heroSlides.filter((h: { status: string }) => h.status === 'active').length,
