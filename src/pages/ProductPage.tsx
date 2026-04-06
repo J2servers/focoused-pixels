@@ -47,6 +47,7 @@ import { ProductSectionTabs } from '@/components/product/ProductSectionTabs';
 import { DeliveryEstimate } from '@/components/product/DeliveryEstimate';
 import { NotifyWhenAvailable } from '@/components/product/NotifyWhenAvailable';
 
+const AIChatWidget = lazy(() => import('@/components/chat/AIChatWidget').then(m => ({ default: m.AIChatWidget })));
 
 const ProductPage = () => {
   const { productSlug } = useParams();
