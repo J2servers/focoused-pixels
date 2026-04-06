@@ -2,11 +2,15 @@ import { useState } from 'react';
 import { AdminLayout, DataTable, Column, ImageUpload, MultiImageUpload } from '@/components/admin';
 import { ExportButtons } from '@/components/admin/ExportButtons';
 import { FormFieldInfo } from '@/components/admin/FormFieldInfo';
+import { ProductDetailPanel } from '@/components/admin/ProductDetailPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription
 } from '@/components/ui/dialog';
+import {
+  Sheet, SheetContent,
+} from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -14,6 +18,8 @@ import { Switch } from '@/components/ui/switch';
 import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { Separator } from '@/components/ui/separator';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 import {
   useAdminProducts,
   useAdminCategories,
@@ -38,6 +44,7 @@ const generateSlug = (name: string) =>
 
 const AdminProductsPage = () => {
   const { canEdit } = useAuthContext();
+  const isMobile = useIsMobile();
   const { data: products = [], isLoading } = useAdminProducts();
   const { data: categories = [] } = useAdminCategories();
   const createProduct = useCreateProduct();
@@ -47,6 +54,7 @@ const AdminProductsPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [filterCategoryId, setFilterCategoryId] = useState('all');
 
@@ -119,6 +127,11 @@ const AdminProductsPage = () => {
     if (!selectedProduct) return;
     await deleteProduct.mutateAsync(selectedProduct.id);
     setIsDeleteDialogOpen(false);
+    if (previewProduct?.id === selectedProduct.id) setPreviewProduct(null);
+  };
+
+  const handleRowClick = (product: Product) => {
+    setPreviewProduct(product);
   };
 
   const parentCategories = categories.filter(c => !c.parent_id);
@@ -134,38 +147,38 @@ const AdminProductsPage = () => {
 
   const columns: Column<Product>[] = [
     {
-      key: 'cover_image', header: 'Imagem', className: 'w-16',
+      key: 'cover_image', header: '', className: 'w-12',
       render: (product) => (
-        <div className="w-12 h-12 rounded-lg bg-muted overflow-hidden flex items-center justify-center">
+        <div className="w-10 h-10 rounded-lg bg-muted overflow-hidden flex items-center justify-center">
           {product.cover_image ? (
             <img src={product.cover_image} alt={product.name} className="w-full h-full object-cover"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-          ) : <span className="text-muted-foreground text-xs">Sem</span>}
+          ) : <span className="text-muted-foreground text-[10px]">—</span>}
         </div>
       ),
     },
     { key: 'name', header: 'Nome', sortable: true },
     { key: 'price', header: 'Preço', sortable: true, render: (p) => `R$ ${p.price.toFixed(2)}` },
-    { key: 'stock', header: 'Estoque', sortable: true },
+    { key: 'stock', header: 'Est.', sortable: true, className: 'w-16' },
     {
-      key: 'status', header: 'Status',
+      key: 'status', header: 'Status', className: 'w-20',
       render: (p) => (
-        <Badge variant={p.status === 'active' ? 'default' : 'secondary'}>
-          {p.status === 'active' ? 'Ativo' : p.status === 'inactive' ? 'Inativo' : 'Rascunho'}
+        <Badge variant={p.status === 'active' ? 'default' : 'secondary'} className="text-[10px]">
+          {p.status === 'active' ? 'Ativo' : p.status === 'inactive' ? 'Inativo' : 'Rasc.'}
         </Badge>
       ),
     },
     {
-      key: 'actions', header: 'Ações', className: 'w-24',
+      key: 'actions', header: '', className: 'w-20',
       render: (product) => (
-        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" onClick={() => openEditDialog(product)} disabled={!canEdit()}>
-            <Pencil className="h-4 w-4" />
+        <div className="flex gap-0.5" onClick={(e) => e.stopPropagation()}>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditDialog(product)} disabled={!canEdit()}>
+            <Pencil className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon"
+          <Button variant="ghost" size="icon" className="h-7 w-7"
             onClick={() => { setSelectedProduct(product); setIsDeleteDialogOpen(true); }}
             disabled={!canEdit()}>
-            <Trash2 className="h-4 w-4 text-destructive" />
+            <Trash2 className="h-3.5 w-3.5 text-destructive" />
           </Button>
         </div>
       ),
@@ -174,43 +187,85 @@ const AdminProductsPage = () => {
 
   return (
     <AdminLayout title="Produtos" requireEditor>
-      <DataTable
-        data={filteredProducts}
-        columns={columns}
-        isLoading={isLoading}
-        searchPlaceholder="Buscar produtos..."
-        showAllRows
-        filterContent={
-          <Select value={filterCategoryId} onValueChange={setFilterCategoryId}>
-            <SelectTrigger className="w-full sm:w-56 h-10 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
-              <SelectValue placeholder="Filtrar por categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as categorias</SelectItem>
-              {parentCategories.map(cat => (
-                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-              ))}
-              {subCategories.map(sub => {
-                const parent = categories.find(c => c.id === sub.parent_id);
-                return (
-                  <SelectItem key={sub.id} value={sub.id}>
-                    &nbsp;&nbsp;↳ {sub.name} {parent ? `(${parent.name})` : ''}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-        }
-        actions={
-          <div className="flex items-center gap-2">
-            <ExportButtons data={filteredProducts.map(p => ({ nome: p.name, sku: p.sku || '', preco: p.price, estoque: p.stock ?? 0, status: p.status }))} filename="produtos" title="Produtos" columns={[{key:'nome',header:'Nome'},{key:'sku',header:'SKU'},{key:'preco',header:'Preço'},{key:'estoque',header:'Estoque'},{key:'status',header:'Status'}]} />
-            <Button onClick={openCreateDialog} disabled={!canEdit()} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)] hover:shadow-xl">
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Produto
-            </Button>
+      <div className={cn("flex gap-0 h-[calc(100vh-8rem)]", !isMobile && "flex-row")}>
+        {/* LEFT: Product List */}
+        <div className={cn(
+          "flex flex-col min-h-0 overflow-hidden",
+          previewProduct && !isMobile ? "w-1/2" : "w-full",
+          "transition-all duration-300"
+        )}>
+          <DataTable
+            data={filteredProducts}
+            columns={columns}
+            isLoading={isLoading}
+            searchPlaceholder="Buscar produtos..."
+            showAllRows
+            onRowClick={handleRowClick}
+            filterContent={
+              <Select value={filterCategoryId} onValueChange={setFilterCategoryId}>
+                <SelectTrigger className="w-full sm:w-48 h-9 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white text-xs">
+                  <SelectValue placeholder="Categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  {parentCategories.map(cat => (
+                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                  ))}
+                  {subCategories.map(sub => {
+                    const parent = categories.find(c => c.id === sub.parent_id);
+                    return (
+                      <SelectItem key={sub.id} value={sub.id}>
+                        &nbsp;&nbsp;↳ {sub.name} {parent ? `(${parent.name})` : ''}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            }
+            actions={
+              <div className="flex items-center gap-2">
+                <ExportButtons data={filteredProducts.map(p => ({ nome: p.name, sku: p.sku || '', preco: p.price, estoque: p.stock ?? 0, status: p.status }))} filename="produtos" title="Produtos" columns={[{key:'nome',header:'Nome'},{key:'sku',header:'SKU'},{key:'preco',header:'Preço'},{key:'estoque',header:'Estoque'},{key:'status',header:'Status'}]} />
+                <Button onClick={openCreateDialog} disabled={!canEdit()} size="sm" className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)] hover:shadow-xl">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Novo
+                </Button>
+              </div>
+            }
+          />
+        </div>
+
+        {/* RIGHT: Detail Panel — desktop only */}
+        {!isMobile && previewProduct && (
+          <div className="w-1/2 border-l border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] overflow-hidden animate-in slide-in-from-right-5 duration-300">
+            <ProductDetailPanel
+              product={previewProduct}
+              categories={categories}
+              onEdit={openEditDialog}
+              onDelete={(p) => { setSelectedProduct(p); setIsDeleteDialogOpen(true); }}
+              onClose={() => setPreviewProduct(null)}
+              canEdit={canEdit()}
+            />
           </div>
-        }
-      />
+        )}
+      </div>
+
+      {/* Mobile: Sheet for product detail */}
+      {isMobile && (
+        <Sheet open={!!previewProduct} onOpenChange={(open) => { if (!open) setPreviewProduct(null); }}>
+          <SheetContent side="bottom" className="h-[85vh] p-0 bg-[hsl(var(--admin-card))] border-t border-[hsl(var(--admin-accent-cyan)/0.2)] rounded-t-2xl">
+            {previewProduct && (
+              <ProductDetailPanel
+                product={previewProduct}
+                categories={categories}
+                onEdit={openEditDialog}
+                onDelete={(p) => { setSelectedProduct(p); setIsDeleteDialogOpen(true); }}
+                onClose={() => setPreviewProduct(null)}
+                canEdit={canEdit()}
+              />
+            )}
+          </SheetContent>
+        </Sheet>
+      )}
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
