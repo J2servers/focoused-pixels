@@ -360,6 +360,7 @@ const AdminLoginPage = () => {
     login_logo_height?: number | null;
     login_title_size?: number | null;
     login_subtitle_size?: number | null;
+    login_brand_text?: string | null;
     company_name?: string | null;
     header_logo?: string | null;
   }>({});
@@ -629,7 +630,7 @@ const AdminLoginPage = () => {
 
   const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
-  const brandName = loginSettings.company_name || 'Pincel de Luz';
+  const brandName = loginSettings.login_brand_text || loginSettings.company_name || 'Pincel de Luz';
   const title = loginSettings.login_title || 'Painel de Controle';
   const subtitle = loginSettings.login_subtitle || 'Acesse o centro de comando do seu negócio com segurança máxima.';
   const logoUrl = loginSettings.login_logo || loginSettings.header_logo;

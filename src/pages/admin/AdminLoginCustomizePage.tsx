@@ -19,6 +19,7 @@ interface LoginSettings {
   login_logo_height: number;
   login_title_size: number;
   login_subtitle_size: number;
+  login_brand_text: string | null;
 }
 
 const AdminLoginCustomizePage = () => {
@@ -30,6 +31,7 @@ const AdminLoginCustomizePage = () => {
     login_logo_height: 48,
     login_title_size: 48,
     login_subtitle_size: 14,
+    login_brand_text: null,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -41,7 +43,7 @@ const AdminLoginCustomizePage = () => {
   const loadSettings = async () => {
     const { data } = await supabase
       .from('company_info')
-      .select('login_logo, login_bg_image, login_title, login_subtitle, login_logo_height, login_title_size, login_subtitle_size')
+      .select('login_logo, login_bg_image, login_title, login_subtitle, login_logo_height, login_title_size, login_subtitle_size, login_brand_text')
       .limit(1)
       .single();
     if (data) {
@@ -54,6 +56,7 @@ const AdminLoginCustomizePage = () => {
         login_logo_height: (d.login_logo_height as number) || 48,
         login_title_size: (d.login_title_size as number) || 48,
         login_subtitle_size: (d.login_subtitle_size as number) || 14,
+        login_brand_text: (d.login_brand_text as string) || null,
       });
     }
     setIsLoading(false);
@@ -71,6 +74,7 @@ const AdminLoginCustomizePage = () => {
         login_logo_height: settings.login_logo_height,
         login_title_size: settings.login_title_size,
         login_subtitle_size: settings.login_subtitle_size,
+        login_brand_text: settings.login_brand_text,
       } as Record<string, unknown>)
       .neq('id', '00000000-0000-0000-0000-000000000000');
 
@@ -152,7 +156,23 @@ const AdminLoginCustomizePage = () => {
             )}
           </div>
 
-          {/* BG Image */}
+          {/* Texto ao lado da Logo */}
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl p-6 space-y-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-amber-500 flex items-center justify-center">
+                <Type className="h-4 w-4 text-white" />
+              </div>
+              <h3 className="text-white font-semibold">Texto ao Lado da Logo</h3>
+            </div>
+            <p className="text-white/40 text-xs">Texto que aparece ao lado do logotipo. Deixe vazio para usar o nome da empresa.</p>
+            <Input
+              value={settings.login_brand_text || ''}
+              onChange={(e) => update('login_brand_text', e.target.value || null)}
+              className="border-white/[0.08] bg-white/[0.04] text-white"
+              placeholder="Ex: Minha Empresa"
+            />
+          </div>
+
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl p-6 space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
