@@ -130,8 +130,16 @@ const FAQPage = () => {
     ),
   })).filter(cat => cat.questions.length > 0);
 
+  const allFaqs = faqCategories.flatMap(cat => cat.questions);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <PageSEO
+        title="Perguntas Frequentes"
+        description="Encontre respostas sobre pedidos, pagamentos, produção, personalização, entrega e garantia dos produtos Pincel de Luz."
+        path="/faq"
+      />
+      <FAQSchema faqs={allFaqs} />
       <DynamicTopBar />
       <DynamicMainHeader />
       <NavigationBar />
