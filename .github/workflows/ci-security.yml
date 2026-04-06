@@ -1,0 +1,27 @@
+name: CI Security
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1' # Weekly Monday
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+
+      - name: Scan secrets in frontend
+        run: node tools/audit/scan-env-exposure.mjs
+
+      - name: Scan role fallbacks
+        run: node tools/audit/scan-role-fallbacks.mjs
+
+      - name: Scan RLS policies
+        run: node tools/audit/scan-supabase-policies.mjs
+
+      - name: Dependency audit
+        run: bun x npm-audit-html || npm audit --audit-level=high || true
+        continue-on-error: true
