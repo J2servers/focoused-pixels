@@ -299,6 +299,8 @@ const AdminLoginPage = () => {
   const [remaining, setRemaining] = useState(0);
   const [fails, setFails] = useState(0);
   const [serverBlocked, setServerBlocked] = useState(false);
+  const [intruderInfo, setIntruderInfo] = useState<IntruderInfo | null>(null);
+  const [showIntruderModal, setShowIntruderModal] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const honeypotRef = useRef<HTMLInputElement>(null);
   const mountTime = useRef(Date.now());
