@@ -244,6 +244,8 @@ const AdminProductsPage = () => {
               onDelete={(p) => { setSelectedProduct(p); setIsDeleteDialogOpen(true); }}
               onClose={() => setPreviewProduct(null)}
               canEdit={canEdit()}
+              onSave={async (id, data) => { await updateProduct.mutateAsync({ id, data }); }}
+              isSaving={updateProduct.isPending}
             />
           </div>
         )}
@@ -261,6 +263,8 @@ const AdminProductsPage = () => {
                 onDelete={(p) => { setSelectedProduct(p); setIsDeleteDialogOpen(true); }}
                 onClose={() => setPreviewProduct(null)}
                 canEdit={canEdit()}
+                onSave={async (id, data) => { await updateProduct.mutateAsync({ id, data }); }}
+                isSaving={updateProduct.isPending}
               />
             )}
           </SheetContent>
