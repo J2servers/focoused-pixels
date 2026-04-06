@@ -1,4 +1,4 @@
-﻿import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { TrustBar } from '@/components/conversion';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
@@ -9,6 +9,7 @@ import { useCart } from '@/hooks/useCart';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { storeInfo } from '@/data/store';
 import { CartCrossSell } from '@/components/cart/CartCrossSell';
+import { PageSEO } from '@/components/seo/PageSEO';
 
 const CartPage = () => {
   const { items, removeItem, updateQuantity, total, clearCart, itemCount } = useCart();

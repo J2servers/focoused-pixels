@@ -5,10 +5,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import { storeInfo } from '@/data/store';
 import { Target, Eye, Heart, Award, Users, Lightbulb } from 'lucide-react';
 import logo from '@/assets/logo-pincel-de-luz.png';
+import { PageSEO } from '@/components/seo/PageSEO';
 
 const AboutPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <PageSEO
+        title="Sobre Nós"
+        description="Conheça a Pincel de Luz Personalizados. Especialistas em comunicação visual, letreiros LED, displays QR Code e produtos personalizados desde 2018."
+        path="/sobre"
+      />
       <DynamicTopBar />
       <DynamicMainHeader />
       <NavigationBar />

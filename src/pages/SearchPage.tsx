@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Search } from 'lucide-react';
 import { useSearchProducts } from '@/hooks/useProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { PageSEO } from '@/components/seo/PageSEO';
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
