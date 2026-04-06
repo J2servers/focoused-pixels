@@ -31,6 +31,7 @@ interface TrackingResult {
 }
 
 export default function TrackingPage() {
+  const siteSettings = useSiteSettings();
   const [trackingCode, setTrackingCode] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
   const [loading, setLoading] = useState(false);
@@ -311,7 +312,7 @@ export default function TrackingPage() {
                     </p>
                     <Button variant="outline" asChild>
                       <a 
-                        href="https://wa.me/" 
+                        href={`https://wa.me/${siteSettings.whatsapp?.replace(/\D/g, '') || ''}`} 
                         target="_blank"
                         rel="noopener noreferrer"
                       >
