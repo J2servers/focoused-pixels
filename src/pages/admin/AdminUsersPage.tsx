@@ -7,10 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2, Pencil, Loader2, Shield, Users, UserCheck } from 'lucide-react';
+import { Plus, Trash2, Pencil, Loader2, Shield, Users, UserCheck, KeyRound } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useAdminUsers, useCreateAdminUser, useUpdateUserRole, useDeleteAdminUser, type AdminUser } from '@/hooks/useAdminUsers';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const ROLE_VARIANTS: Record<string, { label: string; variant: 'danger' | 'info' | 'neutral' }> = {
   admin: { label: 'Admin', variant: 'danger' },
@@ -28,9 +30,13 @@ const AdminUsersPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditRoleOpen, setIsEditRoleOpen] = useState(false);
+  const [isResetPwdOpen, setIsResetPwdOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [formData, setFormData] = useState({ email: '', password: '', full_name: '', role: 'support' });
   const [editRole, setEditRole] = useState<string>('support');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [isResettingPwd, setIsResettingPwd] = useState(false);
 
   const isSaving = createUser.isPending || deleteUser.isPending || updateRole.isPending;
 
@@ -53,6 +59,42 @@ const AdminUsersPage = () => {
     setIsEditRoleOpen(false);
   };
 
+  const handleResetPassword = async () => {
+    if (!selectedUser) return;
+    if (newPassword.length < 8) {
+      toast.error('A nova senha deve ter pelo menos 8 caracteres.');
+      return;
+    }
+    if (!/[A-Za-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+      toast.error('A senha deve conter letras e números.');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      toast.error('As senhas não coincidem.');
+      return;
+    }
+
+    setIsResettingPwd(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-reset-password', {
+        body: { target_user_id: selectedUser.id, new_password: newPassword },
+      });
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error);
+      } else {
+        toast.success('Senha redefinida com sucesso!');
+        setIsResetPwdOpen(false);
+        setNewPassword('');
+        setConfirmNewPassword('');
+      }
+    } catch {
+      toast.error('Erro ao redefinir senha.');
+    } finally {
+      setIsResettingPwd(false);
+    }
+  };
+
   const adminCount = users.filter(u => u.role === 'admin').length;
   const editorCount = users.filter(u => u.role === 'editor').length;
 
@@ -73,17 +115,26 @@ const AdminUsersPage = () => {
       render: (u) => <span className="font-mono text-xs text-white/50">{u.id.slice(0, 8)}…</span>,
     },
     {
-      key: 'actions', header: 'Ações', className: 'w-28',
+      key: 'actions', header: 'Ações', className: 'w-40',
       render: (user) => (
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
           <Button variant="ghost" size="icon"
             className="admin-btn admin-btn-edit !min-h-0 !p-1 h-8 w-8"
+            title="Alterar função"
             onClick={() => { setSelectedUser(user); setEditRole(user.role || 'support'); setIsEditRoleOpen(true); }}
             disabled={user.id === currentUser?.id}>
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon"
+            className="!min-h-0 !p-1 h-8 w-8 bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-400 hover:to-amber-400"
+            title="Redefinir senha"
+            onClick={() => { setSelectedUser(user); setNewPassword(''); setConfirmNewPassword(''); setIsResetPwdOpen(true); }}
+            disabled={user.id === currentUser?.id}>
+            <KeyRound className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon"
             className="admin-btn admin-btn-delete !min-h-0 !p-1 h-8 w-8"
+            title="Remover acesso"
             onClick={() => { setSelectedUser(user); setIsDeleteDialogOpen(true); }}
             disabled={user.id === currentUser?.id}>
             <Trash2 className="h-4 w-4" />
@@ -101,9 +152,9 @@ const AdminUsersPage = () => {
           description="Gerencie contas de usuários e permissões de acesso."
           steps={[
             { title: "Criar usuário", description: "Adicione novos usuários com nome, e-mail e nível de permissão." },
-            { title: "Definir role", description: "Atribua papéis: Admin (acesso total), Editor (edição) ou Viewer (somente leitura)." },
-            { title: "Desativar conta", description: "Desative contas sem excluí-las para bloquear o acesso temporariamente." },
-            { title: "Resetar senha", description: "Envie um link de redefinição de senha para o e-mail do usuário." },
+            { title: "Definir role", description: "Atribua papéis: Admin (acesso total), Editor (edição) ou Suporte (somente leitura)." },
+            { title: "Redefinir senha", description: "Apenas admins logados podem redefinir a senha de outros usuários. Não existe recuperação por email." },
+            { title: "Remover acesso", description: "Remova o acesso de um usuário ao painel administrativo." },
           ]}
         />
 
@@ -189,6 +240,56 @@ const AdminUsersPage = () => {
             <Button variant="outline" onClick={() => setIsEditRoleOpen(false)} className="border-white/[0.08] bg-transparent text-white">Cancelar</Button>
             <Button onClick={handleEditRole} disabled={isSaving} className="admin-btn admin-btn-save">
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={isResetPwdOpen} onOpenChange={setIsResetPwdOpen}>
+        <DialogContent className="max-w-md liquid-glass">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <KeyRound className="h-5 w-5 text-orange-400" />Redefinir Senha
+            </DialogTitle>
+            <DialogDescription className="text-white/50">
+              Definir nova senha para "{selectedUser?.profile?.full_name || 'Usuário'}"
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <p className="text-xs text-amber-300">
+                ⚠️ Esta é a ÚNICA forma de redefinir senhas. Não existe recuperação por email. 
+                A nova senha deve ter no mínimo 8 caracteres com letras e números.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-white/50">Nova Senha *</Label>
+              <Input 
+                type="password" 
+                className="border-white/[0.08] bg-white/[0.03] text-white" 
+                value={newPassword} 
+                onChange={(e) => setNewPassword(e.target.value)} 
+                placeholder="Mínimo 8 caracteres"
+                autoComplete="off"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-white/50">Confirmar Nova Senha *</Label>
+              <Input 
+                type="password" 
+                className="border-white/[0.08] bg-white/[0.03] text-white" 
+                value={confirmNewPassword} 
+                onChange={(e) => setConfirmNewPassword(e.target.value)} 
+                placeholder="Repita a senha"
+                autoComplete="off"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsResetPwdOpen(false)} className="border-white/[0.08] bg-transparent text-white">Cancelar</Button>
+            <Button onClick={handleResetPassword} disabled={isResettingPwd} className="admin-btn admin-btn-save">
+              {isResettingPwd && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Redefinir Senha
             </Button>
           </DialogFooter>
         </DialogContent>
