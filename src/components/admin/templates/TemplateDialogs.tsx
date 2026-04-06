@@ -174,7 +174,7 @@ export function EmailEditorDialog({ editEmail, setEditEmail, onSave }: {
 
             {/* Active toggle */}
             <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))]">
-              <Switch checked={editEmail.is_active ?? true} onCheckedChange={v => setEditEmail({ ...editEmail, is_active: v })} />
+              <Switch checked={editEmail.is_active ?? true} onCheckedChange={v => setEditEmail({ ...editEmail, is_active: v })} className="admin-switch-orange" />
               <div>
                 <span className="text-sm font-medium text-white">Template ativo</span>
                 <p className={`text-[11px] ${mutedText}`}>Templates inativos não são usados nas notificações automáticas</p>
@@ -330,7 +330,7 @@ export function WhatsAppEditorDialog({ editWhats, setEditWhats, onSave }: {
 
             {/* Active toggle */}
             <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))]">
-              <Switch checked={editWhats.is_active ?? true} onCheckedChange={v => setEditWhats({ ...editWhats, is_active: v })} />
+              <Switch checked={editWhats.is_active ?? true} onCheckedChange={v => setEditWhats({ ...editWhats, is_active: v })} className="admin-switch-orange" />
               <div>
                 <span className="text-sm font-medium text-white">Template ativo</span>
                 <p className={`text-[11px] ${mutedText}`}>Templates inativos não são usados nas notificações automáticas</p>

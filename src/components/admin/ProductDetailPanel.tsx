@@ -388,7 +388,7 @@ export function ProductDetailPanel({ product, categories, onEdit, onDelete, onCl
                   </div>
                 </div>
                 <div className="flex items-center gap-2 p-2.5 rounded-lg bg-white/[0.03] border border-[hsl(var(--admin-accent-purple)/0.15)]">
-                  <Switch checked={form.is_featured} onCheckedChange={(v) => set('is_featured', v)} />
+                  <Switch checked={form.is_featured} onCheckedChange={(v) => set('is_featured', v)} className="admin-switch-orange" />
                   <span className="text-[11px] text-white/60">Produto em Destaque</span>
                 </div>
               </div>
@@ -412,7 +412,7 @@ export function ProductDetailPanel({ product, categories, onEdit, onDelete, onCl
           <div className="flex gap-2 pt-2 pb-4">
             {editing ? (
               <>
-                <Button size="sm" className="flex-1 h-9 text-xs bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 text-emerald-400 hover:from-emerald-500/30 hover:to-emerald-600/30 border border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.1)]"
+                <Button className="admin-btn admin-btn-save flex-1 !min-h-0 h-9 text-xs"
                   onClick={handleSaveInline} disabled={isSaving}>
                   {isSaving ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Check className="h-3 w-3 mr-1.5" />}
                   Salvar alterações
@@ -424,12 +424,12 @@ export function ProductDetailPanel({ product, categories, onEdit, onDelete, onCl
               </>
             ) : (
               <>
-                <Button size="sm" className="flex-1 h-9 text-xs bg-gradient-to-r from-[hsl(var(--admin-accent-cyan)/0.15)] to-[hsl(var(--admin-accent-purple)/0.15)] text-[hsl(var(--admin-accent-cyan))] hover:from-[hsl(var(--admin-accent-cyan)/0.25)] hover:to-[hsl(var(--admin-accent-purple)/0.25)] border border-[hsl(var(--admin-accent-cyan)/0.25)] shadow-[0_0_12px_hsl(var(--admin-accent-cyan)/0.08)]"
+                <Button className="admin-btn admin-btn-edit flex-1 !min-h-0 h-9 text-xs"
                   onClick={() => setEditing(true)} disabled={!canEdit}>
                   <Pencil className="h-3 w-3 mr-1.5" />Editar
                 </Button>
                 <a href={`/produto/${product.slug}`} target="_blank" rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center h-9 rounded-md border border-[hsl(var(--admin-accent-purple)/0.2)] text-[hsl(var(--admin-accent-purple))] hover:bg-[hsl(var(--admin-accent-purple)/0.08)] text-xs font-medium transition-colors">
+                  className="admin-btn admin-btn-view flex-1 !min-h-0 h-9 text-xs inline-flex items-center justify-center">
                   <Eye className="h-3 w-3 mr-1.5" />Ver na loja
                 </a>
               </>

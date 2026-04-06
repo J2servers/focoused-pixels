@@ -107,7 +107,7 @@ export function EmailTemplateCard({
           {usageCount > 0 && (
             <Badge className={`${statBadge} bg-blue-500/10 text-blue-400`}><Activity className="h-2.5 w-2.5 mr-1" />{usageCount}</Badge>
           )}
-          <Switch checked={t.is_active} onCheckedChange={(v) => { onToggle(v); }} onClick={(e) => e.stopPropagation()} />
+          <Switch checked={t.is_active} onCheckedChange={(v) => { onToggle(v); }} onClick={(e) => e.stopPropagation()} className="admin-switch-orange" />
           <div onClick={(e) => e.stopPropagation()}>
             <ActionBar actions={actions} />
           </div>
@@ -145,7 +145,7 @@ export function EmailTemplateCard({
             </div>
           </div>
           <div onClick={(e) => e.stopPropagation()}>
-            <Switch checked={t.is_active} onCheckedChange={onToggle} />
+            <Switch checked={t.is_active} onCheckedChange={onToggle} className="admin-switch-orange" />
           </div>
         </div>
 
@@ -268,7 +268,7 @@ export function WhatsAppTemplateCard({
           {usageCount > 0 && (
             <Badge className={`${statBadge} bg-green-500/10 text-green-400`}><Activity className="h-2.5 w-2.5 mr-1" />{usageCount}</Badge>
           )}
-          <Switch checked={t.is_active} onCheckedChange={(v) => { onToggle(v); }} onClick={(e) => e.stopPropagation()} />
+          <Switch checked={t.is_active} onCheckedChange={(v) => { onToggle(v); }} onClick={(e) => e.stopPropagation()} className="admin-switch-orange" />
           <div onClick={(e) => e.stopPropagation()}>
             <ActionBar actions={actions} />
           </div>
@@ -306,7 +306,7 @@ export function WhatsAppTemplateCard({
             </div>
           </div>
           <div onClick={(e) => e.stopPropagation()}>
-            <Switch checked={t.is_active} onCheckedChange={onToggle} />
+            <Switch checked={t.is_active} onCheckedChange={onToggle} className="admin-switch-orange" />
           </div>
         </div>
 
