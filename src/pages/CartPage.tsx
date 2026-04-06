@@ -74,7 +74,7 @@ const CartPage = () => {
       <DynamicMainHeader />
       <NavigationBar />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1" role="main">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-8">Meu Carrinho</h1>
 
@@ -146,7 +146,7 @@ const CartPage = () => {
                         </p>
                       )}
                       <p className="text-lg font-bold text-primary mt-2">
-                        R$ {item.price.toFixed(2)}
+                        R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
                       </p>
 
                       <div className="flex items-center justify-between mt-3">
