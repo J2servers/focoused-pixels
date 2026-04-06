@@ -23,8 +23,9 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
 
-    if (!supabaseUrl || !serviceRoleKey) {
+    if (!supabaseUrl || !serviceRoleKey || !anonKey) {
       return new Response(
         JSON.stringify({ success: false, error: "Supabase credentials are not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -32,40 +33,45 @@ serve(async (req) => {
     }
 
     const authHeader = req.headers.get("Authorization");
-    const token = authHeader?.replace("Bearer ", "").trim();
-
-    if (!token) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return new Response(
         JSON.stringify({ success: false, error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    const authClient = createClient(supabaseUrl, anonKey, {
       auth: { persistSession: false },
+      global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: userData, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !userData?.user) {
+    const token = authHeader.replace("Bearer ", "").trim();
+    const { data: claimsData, error: claimsError } = await authClient.auth.getClaims(token);
+    const userId = claimsData?.claims?.sub;
+
+    if (claimsError || !userId) {
       return new Response(
         JSON.stringify({ success: false, error: "Invalid user token" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const { data: isAdmin } = await supabase.rpc("has_admin_access", {
-      _user_id: userData.user.id,
+    const adminClient = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false },
     });
 
-    if (!isAdmin) {
+    const { data: isAdmin, error: adminError } = await adminClient.rpc("has_admin_access", {
+      _user_id: userId,
+    });
+
+    if (adminError || !isAdmin) {
       return new Response(
         JSON.stringify({ success: false, error: "Forbidden" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    // Actual columns: id, session_id, user_email, user_name, user_phone, cart_items, cart_total, last_activity_at, recovered, recovered_at, reminder_sent, reminder_sent_at, coupon_code, created_at
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from("abandoned_cart_sessions")
       .select("id, cart_total, cart_items, recovered, reminder_sent")
       .order("last_activity_at", { ascending: false })
