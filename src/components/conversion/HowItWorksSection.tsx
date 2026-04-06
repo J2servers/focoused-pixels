@@ -31,8 +31,8 @@ export function HowItWorksSection() {
 
         <div className="grid md:grid-cols-3 gap-4 lg:gap-6">
           {STEPS.map((step) => (
-            <article key={step.title} className="rounded-2xl neu-flat p-5 md:p-6">
-              <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+            <article key={step.title} className="rounded-2xl neu-flat p-5 md:p-6 group">
+              <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 guarantee-icon-hover">
                 <step.icon className="h-5 w-5" />
               </div>
               <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
