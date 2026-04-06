@@ -481,7 +481,7 @@ const AdminEmailTemplatesPage = () => {
                         </div>
                         <p className="text-white font-semibold mb-1">Nenhum template WhatsApp</p>
                         <p className={`text-sm ${mutedText} mb-4`}>Comece instalando os templates sugeridos</p>
-                        <Button onClick={tpl.installSuggestedWhats} className="bg-gradient-to-r from-green-500 to-emerald-500 text-white">
+                        <Button onClick={tpl.installSuggestedWhats} className="admin-btn admin-btn-save">
                           <Sparkles className="h-4 w-4 mr-2" />Instalar templates padrão
                         </Button>
                       </CardContent>
