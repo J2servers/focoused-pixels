@@ -698,54 +698,90 @@
     color: transparent;
   }
 
-  /* ═══ Vivid Gradient Admin Buttons ═══ */
-  .admin-btn-purple {
-    background: linear-gradient(135deg, hsl(280 90% 55%), hsl(280 90% 45%));
-    color: white; border: none;
+  /* ═══ Vivid Semantic Admin Buttons ═══ */
+  /* Shared base for all admin buttons */
+  .admin-btn {
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.5rem;
+    min-height: 2.75rem;
+    border-radius: 0.75rem;
+    border: none;
+    box-shadow: none;
+    letter-spacing: 0.02em;
     transition: all 0.2s ease;
+    animation: adminBtnPulse 2.5s ease-in-out infinite;
   }
+  .admin-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .admin-btn:active { transform: translateY(0); filter: brightness(0.95); }
+
+  @keyframes adminBtnPulse {
+    0%, 100% { box-shadow: 0 0 0 0 transparent; }
+    50% { box-shadow: 0 0 12px 2px currentColor; }
+  }
+
+  /* CYAN — Adicionar / Criar */
+  .admin-btn-create {
+    background: hsl(185 100% 40%);
+    color: white;
+  }
+  .admin-btn-create { --tw-shadow-color: hsl(185 100% 40% / 0.4); animation: adminBtnPulseCyan 2.5s ease-in-out infinite; }
+  @keyframes adminBtnPulseCyan { 0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 14px 3px hsl(185 100% 40%/0.35)} }
+
+  /* RED — Deletar / Excluir / Apagar */
+  .admin-btn-delete {
+    background: hsl(0 80% 50%);
+    color: white;
+  }
+  .admin-btn-delete { animation: adminBtnPulseRed 2.5s ease-in-out infinite; }
+  @keyframes adminBtnPulseRed { 0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 14px 3px hsl(0 80% 50%/0.35)} }
+
+  /* YELLOW — Editar / Testar */
+  .admin-btn-edit {
+    background: hsl(45 100% 48%);
+    color: hsl(0 0% 8%);
+  }
+  .admin-btn-edit { animation: adminBtnPulseYellow 2.5s ease-in-out infinite; }
+  @keyframes adminBtnPulseYellow { 0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 14px 3px hsl(45 100% 48%/0.35)} }
+
+  /* PURPLE — Visualizar / Importar / Exibir */
+  .admin-btn-view {
+    background: hsl(280 90% 50%);
+    color: white;
+  }
+  .admin-btn-view { animation: adminBtnPulsePurple 2.5s ease-in-out infinite; }
+  @keyframes adminBtnPulsePurple { 0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 14px 3px hsl(280 90% 50%/0.35)} }
+
+  /* GREEN — Salvar / Enviar / Instalar / Prosseguir */
+  .admin-btn-save {
+    background: hsl(145 80% 38%);
+    color: white;
+  }
+  .admin-btn-save { animation: adminBtnPulseGreen 2.5s ease-in-out infinite; }
+  @keyframes adminBtnPulseGreen { 0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 14px 3px hsl(145 80% 38%/0.35)} }
+
+  /* DEEP ORANGE — Switch toggles */
+  .admin-switch-orange[data-state="checked"] {
+    background: hsl(20 100% 48%) !important;
+  }
+  .admin-switch-orange[data-state="unchecked"] {
+    background: hsl(220 10% 25%) !important;
+  }
+
+  /* Keep old classes for backward compat */
+  .admin-btn-purple { background: linear-gradient(135deg, hsl(280 90% 55%), hsl(280 90% 45%)); color: white; border: none; transition: all 0.2s ease; }
   .admin-btn-purple:hover { filter: brightness(1.15); transform: translateY(-1px); }
-
-  .admin-btn-green {
-    background: linear-gradient(135deg, hsl(160 100% 40%), hsl(145 80% 35%));
-    color: white; border: none;
-    transition: all 0.2s ease;
-  }
+  .admin-btn-green { background: linear-gradient(135deg, hsl(160 100% 40%), hsl(145 80% 35%)); color: white; border: none; transition: all 0.2s ease; }
   .admin-btn-green:hover { filter: brightness(1.15); transform: translateY(-1px); }
-
-  .admin-btn-blue {
-    background: linear-gradient(135deg, hsl(210 100% 55%), hsl(220 90% 45%));
-    color: white; border: none;
-    transition: all 0.2s ease;
-  }
+  .admin-btn-blue { background: linear-gradient(135deg, hsl(210 100% 55%), hsl(220 90% 45%)); color: white; border: none; transition: all 0.2s ease; }
   .admin-btn-blue:hover { filter: brightness(1.15); transform: translateY(-1px); }
-
-  .admin-btn-orange {
-    background: linear-gradient(135deg, hsl(30 100% 50%), hsl(25 90% 45%));
-    color: white; border: none;
-    transition: all 0.2s ease;
-  }
+  .admin-btn-orange { background: linear-gradient(135deg, hsl(30 100% 50%), hsl(25 90% 45%)); color: white; border: none; transition: all 0.2s ease; }
   .admin-btn-orange:hover { filter: brightness(1.15); transform: translateY(-1px); }
-
-  .admin-btn-pink {
-    background: linear-gradient(135deg, hsl(340 100% 60%), hsl(330 90% 50%));
-    color: white; border: none;
-    transition: all 0.2s ease;
-  }
+  .admin-btn-pink { background: linear-gradient(135deg, hsl(340 100% 60%), hsl(330 90% 50%)); color: white; border: none; transition: all 0.2s ease; }
   .admin-btn-pink:hover { filter: brightness(1.15); transform: translateY(-1px); }
-
-  .admin-btn-cyan {
-    background: linear-gradient(135deg, hsl(185 100% 45%), hsl(190 90% 40%));
-    color: white; border: none;
-    transition: all 0.2s ease;
-  }
+  .admin-btn-cyan { background: linear-gradient(135deg, hsl(185 100% 45%), hsl(190 90% 40%)); color: white; border: none; transition: all 0.2s ease; }
   .admin-btn-cyan:hover { filter: brightness(1.15); transform: translateY(-1px); }
-
-  .admin-btn-amber {
-    background: linear-gradient(135deg, hsl(45 100% 50%), hsl(38 90% 45%));
-    color: hsl(0 0% 10%); border: none;
-    transition: all 0.2s ease;
-  }
+  .admin-btn-amber { background: linear-gradient(135deg, hsl(45 100% 50%), hsl(38 90% 45%)); color: hsl(0 0% 10%); border: none; transition: all 0.2s ease; }
   .admin-btn-amber:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
   /* ═══ Vivid Gradient Admin Cards ═══ */

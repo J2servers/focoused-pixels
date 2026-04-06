@@ -357,7 +357,7 @@ const AdminCouponsPage = () => {
           actions={
             <div className="flex items-center gap-2">
               <ExportButtons data={coupons.map(c => ({ codigo: c.code, tipo: c.type, valor: c.value, usos: c.usage_count || 0, ativo: c.is_active ? 'Sim' : 'Não' }))} filename="cupons" title="Cupons" columns={[{key:'codigo',header:'Código'},{key:'tipo',header:'Tipo'},{key:'valor',header:'Valor'},{key:'usos',header:'Usos'},{key:'ativo',header:'Ativo'}]} />
-              <Button onClick={openCreateDialog} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
+              <Button onClick={openCreateDialog} className="admin-btn admin-btn-create">
                 <Plus className="h-4 w-4 mr-2" />Novo Cupom
               </Button>
             </div>
@@ -449,13 +449,13 @@ const AdminCouponsPage = () => {
                 <Label className="text-white text-sm font-medium">Cupom Ativo</Label>
                 <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">Desativado, o cupom não poderá ser utilizado</p>
               </div>
-              <Switch checked={formData.is_active} onCheckedChange={(c) => setFormData({ ...formData, is_active: c })} />
+              <Switch checked={formData.is_active} onCheckedChange={(c) => setFormData({ ...formData, is_active: c })} className="admin-switch-orange" />
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</Button>
-            <Button onClick={handleSubmit} disabled={!formData.code || !formData.value} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
+            <Button onClick={handleSubmit} disabled={!formData.code || !formData.value} className="admin-btn admin-btn-save">
               {editingCoupon ? 'Salvar Alterações' : 'Criar Cupom'}
             </Button>
           </DialogFooter>
@@ -472,7 +472,7 @@ const AdminCouponsPage = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">Excluir</AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete} className="admin-btn admin-btn-delete"><Trash2 className="h-4 w-4 mr-1" />Deletar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

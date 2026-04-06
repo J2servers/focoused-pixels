@@ -132,7 +132,7 @@ const AdminSettingsPage = () => {
             </p>
           </div>
           <Button
-            className="h-10 shrink-0 bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.25)] hover:shadow-xl transition-shadow"
+            className="admin-btn admin-btn-save h-10 shrink-0"
             onClick={saveAll}
             disabled={saving || !canMutate}
           >

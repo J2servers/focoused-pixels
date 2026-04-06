@@ -320,7 +320,7 @@ const AdminQuotesPage = () => {
           <DialogFooter>
             {selectedQuote?.status === 'approved' && (
               <Button onClick={() => handleConvertToOrder(selectedQuote.id)} disabled={createOrderFromQuote.isPending}
-                className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
+                className="admin-btn admin-btn-save">
                 <ArrowRightCircle className="h-4 w-4 mr-2" />Converter em Pedido
               </Button>
             )}

@@ -264,7 +264,7 @@ const AdminKanbanPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setMovingTo(null)} className="border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))]">Cancelar</Button>
-            <Button onClick={handleMoveOrder} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">Confirmar</Button>
+            <Button onClick={handleMoveOrder} className="admin-btn admin-btn-save">Confirmar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

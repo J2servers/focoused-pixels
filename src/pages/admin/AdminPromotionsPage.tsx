@@ -115,9 +115,9 @@ const AdminPromotionsPage = () => {
       key: 'actions', header: 'Ações', className: 'w-24',
       render: (promo) => (
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" onClick={() => openEditDialog(promo)} disabled={!canEdit()}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="icon" onClick={() => { setSelectedPromo(promo); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}>
-            <Trash2 className="h-4 w-4 text-destructive" />
+          <Button variant="ghost" size="icon" className="admin-btn admin-btn-edit !min-h-0 !p-1 h-8 w-8" onClick={() => openEditDialog(promo)} disabled={!canEdit()}><Pencil className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" className="admin-btn admin-btn-delete !min-h-0 !p-1 h-8 w-8" onClick={() => { setSelectedPromo(promo); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}>
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -147,7 +147,7 @@ const AdminPromotionsPage = () => {
         </div>
 
         <DataTable data={promotions} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar promoções..."
-          actions={<Button onClick={openCreateDialog} disabled={!canEdit()}><Plus className="h-4 w-4 mr-2" />Nova Promoção</Button>} />
+          actions={<Button onClick={openCreateDialog} disabled={!canEdit()} className="admin-btn admin-btn-create"><Plus className="h-4 w-4 mr-2" />Nova Promoção</Button>} />
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -183,7 +183,7 @@ const AdminPromotionsPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white">Cancelar</Button>
-            <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-purple-600">{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar</Button>
+            <Button onClick={handleSave} disabled={isSaving} className="admin-btn admin-btn-save">{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -194,7 +194,7 @@ const AdminPromotionsPage = () => {
             <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Tem certeza que deseja excluir "{selectedPromo?.name}"?</DialogDescription></DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white">Cancelar</Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Excluir</Button>
+            <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
