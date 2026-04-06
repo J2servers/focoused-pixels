@@ -15,9 +15,9 @@ import {
 
 /* ─── Shared styles ─── */
 const nodeBase = "group relative rounded-2xl border-2 transition-all duration-200 overflow-hidden";
-const actionBtn = "h-8 w-8 rounded-lg bg-transparent text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-white/10 transition-colors";
+const actionBtn = "h-8 w-8 rounded-lg bg-transparent text-white/50 hover:text-white hover:bg-white/10 transition-colors";
 const actionBtnDanger = "h-8 w-8 rounded-lg bg-transparent text-red-400/60 hover:text-red-400 hover:bg-red-500/10 transition-colors";
-const varBadge = "bg-white/5 text-[hsl(var(--admin-text-muted))] border border-white/10 text-[10px] font-mono";
+const varBadge = "bg-white/5 text-white/50 border border-white/10 text-[10px] font-mono";
 const statBadge = "border-0 text-[10px] font-medium";
 
 /* ─── Helpers ─── */
@@ -25,7 +25,7 @@ function EventLabel({ name }: { name: string }) {
   const ev = SYSTEM_EVENTS.find(e => e.value === name);
   if (!ev) return null;
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[hsl(var(--admin-accent-purple)/0.12)] text-[hsl(var(--admin-accent-purple))] text-[10px] font-semibold">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/[0.12] text-purple-400 text-[10px] font-semibold">
       <Zap className="h-2.5 w-2.5" />{ev.label}
     </span>
   );
@@ -84,7 +84,7 @@ export function EmailTemplateCard({
         className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer
           ${isSelected
             ? 'bg-blue-500/8 border-2 border-blue-500/40 shadow-[0_0_20px_-5px_hsl(var(--admin-accent-blue)/0.15)]'
-            : 'bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))] hover:border-blue-500/20 hover:bg-[hsl(var(--admin-card))]/80'
+            : 'bg-white/[0.04] border border-white/[0.08] hover:border-blue-500/20 hover:bg-white/[0.04]/80'
           }`}
         onClick={onEdit}
       >
@@ -98,7 +98,7 @@ export function EmailTemplateCard({
             {isDefault && <EventLabel name={t.name} />}
             {isNew(t.created_at) && <AdminStatusBadge label="Novo" variant="success" />}
           </div>
-          <p className="text-xs text-[hsl(var(--admin-text-muted))] truncate mt-0.5">{t.subject}</p>
+          <p className="text-xs text-white/50 truncate mt-0.5">{t.subject}</p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
           {linked.length > 0 && (
@@ -121,7 +121,7 @@ export function EmailTemplateCard({
       className={`${nodeBase} cursor-pointer
         ${isSelected
           ? 'border-blue-500/50 bg-blue-500/5 shadow-[0_0_30px_-8px_hsl(var(--admin-accent-blue)/0.2)]'
-          : 'border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] hover:border-blue-500/30 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]'
+          : 'border-white/[0.08] bg-white/[0.04] hover:border-blue-500/30 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]'
         }`}
       onClick={onEdit}
     >
@@ -150,7 +150,7 @@ export function EmailTemplateCard({
         </div>
 
         {/* Subject line */}
-        <p className="text-xs text-[hsl(var(--admin-text-muted))] truncate pl-[52px]">{t.subject}</p>
+        <p className="text-xs text-white/50 truncate pl-[52px]">{t.subject}</p>
 
         {/* Badges row */}
         <div className="flex flex-wrap gap-1.5 pl-[52px]">
@@ -184,14 +184,14 @@ export function EmailTemplateCard({
         )}
 
         {/* Body preview */}
-        <p className="text-[11px] text-[hsl(var(--admin-text-muted))] line-clamp-2 pl-[52px] leading-relaxed">
+        <p className="text-[11px] text-white/50 line-clamp-2 pl-[52px] leading-relaxed">
           {t.body.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 140)}
         </p>
 
         {/* Action bar */}
         <div className="flex items-center justify-between pt-3 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
           <ActionBar actions={actions} />
-          <ArrowRight className="h-3.5 w-3.5 text-[hsl(var(--admin-text-muted))] opacity-0 group-hover:opacity-100 transition-opacity" />
+          <ArrowRight className="h-3.5 w-3.5 text-white/50 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
       </CardContent>
 
@@ -245,7 +245,7 @@ export function WhatsAppTemplateCard({
         className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer
           ${isSelected
             ? 'bg-green-500/8 border-2 border-green-500/40 shadow-[0_0_20px_-5px_hsl(var(--admin-accent-green)/0.15)]'
-            : 'bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))] hover:border-green-500/20 hover:bg-[hsl(var(--admin-card))]/80'
+            : 'bg-white/[0.04] border border-white/[0.08] hover:border-green-500/20 hover:bg-white/[0.04]/80'
           }`}
         onClick={onEdit}
       >
@@ -259,10 +259,10 @@ export function WhatsAppTemplateCard({
             <Badge className={`${statBadge} ${cat.color}`}>{cat.label}</Badge>
             {isDefault && <EventLabel name={t.name} />}
           </div>
-          <p className="text-xs text-[hsl(var(--admin-text-muted))] truncate mt-0.5">{t.content.slice(0, 80)}</p>
+          <p className="text-xs text-white/50 truncate mt-0.5">{t.content.slice(0, 80)}</p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <Badge className={`${statBadge} ${segInfo.isLong ? 'bg-red-500/10 text-red-400' : 'bg-white/5 text-[hsl(var(--admin-text-muted))]'}`}>
+          <Badge className={`${statBadge} ${segInfo.isLong ? 'bg-red-500/10 text-red-400' : 'bg-white/5 text-white/50'}`}>
             <Hash className="h-2.5 w-2.5 mr-1" />{segInfo.length}c
           </Badge>
           {usageCount > 0 && (
@@ -282,7 +282,7 @@ export function WhatsAppTemplateCard({
       className={`${nodeBase} cursor-pointer
         ${isSelected
           ? 'border-green-500/50 bg-green-500/5 shadow-[0_0_30px_-8px_hsl(var(--admin-accent-green)/0.2)]'
-          : 'border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] hover:border-green-500/30 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]'
+          : 'border-white/[0.08] bg-white/[0.04] hover:border-green-500/30 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]'
         }`}
       onClick={onEdit}
     >
@@ -325,7 +325,7 @@ export function WhatsAppTemplateCard({
               <Activity className="h-2.5 w-2.5 mr-1" />{usageCount} envio{usageCount > 1 ? 's' : ''}
             </Badge>
           )}
-          <Badge className={`${statBadge} ${segInfo.isLong ? 'bg-red-500/10 text-red-400' : 'bg-white/5 text-[hsl(var(--admin-text-muted))]'}`}>
+          <Badge className={`${statBadge} ${segInfo.isLong ? 'bg-red-500/10 text-red-400' : 'bg-white/5 text-white/50'}`}>
             <Hash className="h-2.5 w-2.5 mr-1" />{segInfo.length}c • {segInfo.segments} seg
           </Badge>
           {unknownVars.length > 0 && (
@@ -346,14 +346,14 @@ export function WhatsAppTemplateCard({
         )}
 
         {/* Content preview */}
-        <p className="text-[11px] text-[hsl(var(--admin-text-muted))] line-clamp-3 pl-[52px] whitespace-pre-wrap leading-relaxed">
+        <p className="text-[11px] text-white/50 line-clamp-3 pl-[52px] whitespace-pre-wrap leading-relaxed">
           {t.content.slice(0, 160)}
         </p>
 
         {/* Action bar */}
         <div className="flex items-center justify-between pt-3 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
           <ActionBar actions={actions} />
-          <ArrowRight className="h-3.5 w-3.5 text-[hsl(var(--admin-text-muted))] opacity-0 group-hover:opacity-100 transition-opacity" />
+          <ArrowRight className="h-3.5 w-3.5 text-white/50 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
       </CardContent>
 

@@ -123,7 +123,7 @@ const AdminKanbanPage = () => {
         <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${visibleColumns.length}, 1fr)` }}>
           {visibleColumns.map(({ status, icon: Icon, color, borderColor, label }) => (
             <Card key={status} className={cn(
-              'flex flex-col border-white/[0.08] bg-[hsl(var(--admin-card))] border-t-4',
+              'flex flex-col border-white/[0.08] bg-white/[0.04] border-t-4',
               borderColor
             )}>
               <CardHeader className="pb-2 px-3">

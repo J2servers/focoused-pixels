@@ -90,8 +90,8 @@ const AdminLoginPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white/[0.03]">
         <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-purple)/0.3)] animate-ping" />
-          <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-pink)/0.2)] animate-pulse delay-75" />
+          <div className="absolute inset-0 rounded-full bg-purple-500/[0.3] animate-ping" />
+          <div className="absolute inset-0 rounded-full bg-pink-500/[0.2] animate-pulse delay-75" />
           <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]">
             <Loader2 className="h-7 w-7 animate-spin text-white" />
           </div>
@@ -137,12 +137,12 @@ const AdminLoginPage = () => {
         {/* Decorative elements */}
         <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-purple)/0.1)] to-[hsl(var(--admin-accent-pink)/0.1)] blur-3xl" />
         <div className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-blue)/0.1)] to-transparent blur-3xl" />
-        <div className="absolute top-1/2 right-20 w-32 h-32 rounded-full bg-[hsl(var(--admin-accent-cyan)/0.1)] blur-2xl animate-pulse" />
+        <div className="absolute top-1/2 right-20 w-32 h-32 rounded-full bg-cyan-500/[0.1] blur-2xl animate-pulse" />
       </div>
 
       {/* Right Side - Form */}
       <div className="flex-1 flex items-center justify-center bg-white/[0.03] p-6">
-        <Card className="w-full max-w-md border-white/[0.08] bg-[hsl(var(--admin-card))] shadow-2xl shadow-black/20">
+        <Card className="w-full max-w-md border-white/[0.08] bg-white/[0.04] shadow-2xl shadow-black/20">
           <CardHeader className="text-center space-y-4 pb-2">
             <div className="lg:hidden mx-auto">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] mx-auto">
@@ -183,7 +183,7 @@ const AdminLoginPage = () => {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-purple))] hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-purple-500 via-[hsl(var(--admin-accent-pink))] to-purple-500 hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -251,7 +251,7 @@ const AdminLoginPage = () => {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-purple))] hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-purple-500 via-[hsl(var(--admin-accent-pink))] to-purple-500 hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />

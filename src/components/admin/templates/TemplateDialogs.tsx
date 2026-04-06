@@ -20,12 +20,12 @@ import {
 } from './TemplateConstants';
 
 /* ─── Shared styles ─── */
-const dlgCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white sm:max-w-4xl";
-const dlgClsSm = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white sm:max-w-lg";
-const inpCls = "bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus:border-[hsl(var(--admin-accent-purple))] focus:ring-1 focus:ring-[hsl(var(--admin-accent-purple)/0.3)]";
-const mutedText = "text-[hsl(var(--admin-text-muted))]";
-const labelCls = "text-xs font-semibold uppercase tracking-wider text-[hsl(var(--admin-text-muted))] mb-1.5 block";
-const varBtn = "text-[10px] h-6 px-2 border-white/10 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-white/5 font-mono transition-colors";
+const dlgCls = "bg-white/[0.04] border-white/[0.08] text-white sm:max-w-4xl";
+const dlgClsSm = "bg-white/[0.04] border-white/[0.08] text-white sm:max-w-lg";
+const inpCls = "bg-white/[0.03] border-white/[0.08] text-white placeholder:text-white/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/[0.3]";
+const mutedText = "text-white/50";
+const labelCls = "text-xs font-semibold uppercase tracking-wider text-white/50 mb-1.5 block";
+const varBtn = "text-[10px] h-6 px-2 border-white/10 text-white/50 hover:text-white hover:bg-white/5 font-mono transition-colors";
 
 /* ─── Variable Inserter ─── */
 function VariableInserter({ onInsert }: { onInsert: (key: string) => void }) {
@@ -116,8 +116,8 @@ export function EmailEditorDialog({ editEmail, setEditEmail, onSave }: {
 
             {/* Event link */}
             {editEmail.name && isEventDefault(editEmail.name) && (
-              <div className="flex items-center gap-2 text-xs p-3 rounded-xl bg-[hsl(var(--admin-accent-purple)/0.08)] border border-[hsl(var(--admin-accent-purple)/0.2)]">
-                <Zap className="h-3.5 w-3.5 text-[hsl(var(--admin-accent-purple))]" />
+              <div className="flex items-center gap-2 text-xs p-3 rounded-xl bg-purple-500/[0.08] border border-purple-500/[0.2]">
+                <Zap className="h-3.5 w-3.5 text-purple-400" />
                 <span className="text-white">Vinculado ao evento <strong>"{SYSTEM_EVENTS.find(ev => ev.value === editEmail.name)?.label}"</strong></span>
               </div>
             )}
@@ -125,11 +125,11 @@ export function EmailEditorDialog({ editEmail, setEditEmail, onSave }: {
             {/* Editor with tabs */}
             <Tabs value={editorTab} onValueChange={v => setEditorTab(v as any)}>
               <div className="flex items-center justify-between">
-                <TabsList className="bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))]">
-                  <TabsTrigger value="code" className="text-xs gap-1.5 data-[state=active]:bg-[hsl(var(--admin-accent-purple)/0.15)] data-[state=active]:text-white">
+                <TabsList className="bg-white/[0.03] border border-white/[0.08]">
+                  <TabsTrigger value="code" className="text-xs gap-1.5 data-[state=active]:bg-purple-500/[0.15] data-[state=active]:text-white">
                     <Code2 className="h-3 w-3" />Código HTML
                   </TabsTrigger>
-                  <TabsTrigger value="preview" className="text-xs gap-1.5 data-[state=active]:bg-[hsl(var(--admin-accent-purple)/0.15)] data-[state=active]:text-white">
+                  <TabsTrigger value="preview" className="text-xs gap-1.5 data-[state=active]:bg-purple-500/[0.15] data-[state=active]:text-white">
                     <EyeIcon className="h-3 w-3" />Preview
                   </TabsTrigger>
                 </TabsList>
@@ -157,7 +157,7 @@ export function EmailEditorDialog({ editEmail, setEditEmail, onSave }: {
               </TabsContent>
 
               <TabsContent value="preview" className="mt-3">
-                <div className={`mx-auto border border-[hsl(var(--admin-card-border))] rounded-xl bg-white text-black overflow-hidden transition-all ${previewDevice === 'mobile' ? 'max-w-[375px]' : 'max-w-full'}`}>
+                <div className={`mx-auto border border-white/[0.08] rounded-xl bg-white text-black overflow-hidden transition-all ${previewDevice === 'mobile' ? 'max-w-[375px]' : 'max-w-full'}`}>
                   <div className="bg-gray-100 px-4 py-2 text-xs text-gray-500 border-b">
                     <strong>Assunto:</strong> {replaceVariables(editEmail.subject || '')}
                   </div>
@@ -173,7 +173,7 @@ export function EmailEditorDialog({ editEmail, setEditEmail, onSave }: {
             <VariableInserter onInsert={insertVar} />
 
             {/* Active toggle */}
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))]">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08]">
               <Switch checked={editEmail.is_active ?? true} onCheckedChange={v => setEditEmail({ ...editEmail, is_active: v })} className="admin-switch-orange" />
               <div>
                 <span className="text-sm font-medium text-white">Template ativo</span>
@@ -184,7 +184,7 @@ export function EmailEditorDialog({ editEmail, setEditEmail, onSave }: {
         )}
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" className="border-[hsl(var(--admin-card-border))] text-white hover:bg-white/5" onClick={() => setEditEmail(null)}>
+          <Button variant="outline" className="border-white/[0.08] text-white hover:bg-white/5" onClick={() => setEditEmail(null)}>
             Cancelar
           </Button>
           <Button onClick={onSave} className="admin-btn admin-btn-save">
@@ -271,8 +271,8 @@ export function WhatsAppEditorDialog({ editWhats, setEditWhats, onSave }: {
 
             {/* Event link */}
             {editWhats.name && isEventDefault(editWhats.name) && (
-              <div className="flex items-center gap-2 text-xs p-3 rounded-xl bg-[hsl(var(--admin-accent-purple)/0.08)] border border-[hsl(var(--admin-accent-purple)/0.2)]">
-                <Zap className="h-3.5 w-3.5 text-[hsl(var(--admin-accent-purple))]" />
+              <div className="flex items-center gap-2 text-xs p-3 rounded-xl bg-purple-500/[0.08] border border-purple-500/[0.2]">
+                <Zap className="h-3.5 w-3.5 text-purple-400" />
                 <span className="text-white">Vinculado ao evento <strong>"{SYSTEM_EVENTS.find(ev => ev.value === editWhats.name)?.label}"</strong></span>
               </div>
             )}
@@ -329,7 +329,7 @@ export function WhatsAppEditorDialog({ editWhats, setEditWhats, onSave }: {
             )}
 
             {/* Active toggle */}
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))]">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08]">
               <Switch checked={editWhats.is_active ?? true} onCheckedChange={v => setEditWhats({ ...editWhats, is_active: v })} className="admin-switch-orange" />
               <div>
                 <span className="text-sm font-medium text-white">Template ativo</span>
@@ -340,7 +340,7 @@ export function WhatsAppEditorDialog({ editWhats, setEditWhats, onSave }: {
         )}
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" className="border-[hsl(var(--admin-card-border))] text-white hover:bg-white/5" onClick={() => setEditWhats(null)}>
+          <Button variant="outline" className="border-white/[0.08] text-white hover:bg-white/5" onClick={() => setEditWhats(null)}>
             Cancelar
           </Button>
           <Button onClick={onSave} className="admin-btn admin-btn-save">
@@ -366,7 +366,7 @@ export function PreviewDialog({ preview, setPreview }: {
       <DialogContent className={`${dlgCls} max-h-[90vh]`}>
         <DialogHeader>
           <DialogTitle className="text-white flex items-center gap-3">
-            <Eye className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
+            <Eye className="h-5 w-5 text-purple-400" />
             Preview: {preview?.title}
           </DialogTitle>
           {preview?.channel === 'email' && (
@@ -383,11 +383,11 @@ export function PreviewDialog({ preview, setPreview }: {
 
         {preview && (preview.channel === 'email' ? (
           <div className="space-y-3">
-            <div className="bg-[hsl(var(--admin-bg))] p-3 rounded-xl text-sm">
+            <div className="bg-white/[0.03] p-3 rounded-xl text-sm">
               <span className={mutedText}>Assunto: </span>
               <span className="text-white font-medium">{replaceVariables(preview.subject || '')}</span>
             </div>
-            <div className={`mx-auto border border-[hsl(var(--admin-card-border))] rounded-xl bg-white text-black overflow-hidden transition-all ${device === 'mobile' ? 'max-w-[375px]' : 'max-w-full'}`}>
+            <div className={`mx-auto border border-white/[0.08] rounded-xl bg-white text-black overflow-hidden transition-all ${device === 'mobile' ? 'max-w-[375px]' : 'max-w-full'}`}>
               <div className="p-4 max-h-[500px] overflow-y-auto prose prose-sm" dangerouslySetInnerHTML={{ __html: sanitizePreviewHtml(replaceVariables(preview.content)) }} />
             </div>
           </div>
@@ -416,7 +416,7 @@ export function PreviewDialog({ preview, setPreview }: {
         ))}
 
         <DialogFooter>
-          <Button variant="outline" className="border-[hsl(var(--admin-card-border))] text-white hover:bg-white/5" onClick={() => setPreview(null)}>
+          <Button variant="outline" className="border-white/[0.08] text-white hover:bg-white/5" onClick={() => setPreview(null)}>
             Fechar
           </Button>
         </DialogFooter>
@@ -435,7 +435,7 @@ export function DeleteTemplateDialog({ deleteTarget, setDeleteTarget, onConfirm 
 }) {
   return (
     <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
-      <AlertDialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
+      <AlertDialogContent className="bg-white/[0.04] border-white/[0.08] text-white">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-white flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-400" />
@@ -452,7 +452,7 @@ export function DeleteTemplateDialog({ deleteTarget, setDeleteTarget, onConfirm 
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="border-[hsl(var(--admin-card-border))] text-white hover:bg-white/5">Cancelar</AlertDialogCancel>
+          <AlertDialogCancel className="border-white/[0.08] text-white hover:bg-white/5">Cancelar</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm} className="bg-red-500 text-white hover:bg-red-600">Excluir permanentemente</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -507,7 +507,7 @@ export function TestSendDialog({ testSend, setTestSend, onSend, isSending }: {
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" className="border-[hsl(var(--admin-card-border))] text-white hover:bg-white/5" onClick={() => { setTestSend(null); setTo(''); }}>
+          <Button variant="outline" className="border-white/[0.08] text-white hover:bg-white/5" onClick={() => { setTestSend(null); setTo(''); }}>
             Cancelar
           </Button>
           <Button

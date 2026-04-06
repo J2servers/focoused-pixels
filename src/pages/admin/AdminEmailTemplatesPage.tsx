@@ -172,7 +172,7 @@ const AdminEmailTemplatesPage = () => {
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex-1 flex items-center justify-center gap-3 px-6 py-4 transition-all border-b-2
                     ${isActive
-                      ? 'border-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.06)] text-white'
+                      ? 'border-[hsl(var(--admin-accent-purple))] bg-purple-500/[0.06] text-white'
                       : 'border-transparent text-white/50 hover:bg-white/3 hover:text-white'
                     }`}
                 >

@@ -50,21 +50,21 @@ const WhatsAppTestMessage = ({ instanceStatuses }: WhatsAppTestMessageProps) => 
   };
 
   return (
-    <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+    <Card className="bg-white/[0.04] border-white/[0.08]">
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <Send className="h-5 w-5 text-blue-400" />
           Enviar Mensagem de Teste
         </CardTitle>
-        <CardDescription className="text-[hsl(var(--admin-text-muted))]">
+        <CardDescription className="text-white/50">
           Teste o envio com failover automático ou escolha a instância
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <label className="text-sm text-[hsl(var(--admin-text-muted))] mb-1.5 block">Enviar via</label>
+          <label className="text-sm text-white/50 mb-1.5 block">Enviar via</label>
           <Select value={sendMode} onValueChange={setSendMode}>
-            <SelectTrigger className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white">
+            <SelectTrigger className="bg-white/[0.03] border-white/[0.08] text-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -75,17 +75,17 @@ const WhatsAppTestMessage = ({ instanceStatuses }: WhatsAppTestMessageProps) => 
           </Select>
         </div>
         <div>
-          <label className="text-sm text-[hsl(var(--admin-text-muted))] mb-1.5 block">Número (com DDD)</label>
+          <label className="text-sm text-white/50 mb-1.5 block">Número (com DDD)</label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
             <Input placeholder="11999999999" value={testPhone} onChange={e => setTestPhone(e.target.value)}
-              className="pl-10 bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white" />
+              className="pl-10 bg-white/[0.03] border-white/[0.08] text-white" />
           </div>
         </div>
         <div>
-          <label className="text-sm text-[hsl(var(--admin-text-muted))] mb-1.5 block">Mensagem</label>
+          <label className="text-sm text-white/50 mb-1.5 block">Mensagem</label>
           <Textarea value={testMessage} onChange={e => setTestMessage(e.target.value)} rows={3}
-            className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white resize-none" />
+            className="bg-white/[0.03] border-white/[0.08] text-white resize-none" />
         </div>
         <Button onClick={handleSendTest} disabled={!hasConnected || sending}
           className="admin-btn admin-btn-save w-full">
