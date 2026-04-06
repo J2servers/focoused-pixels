@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { useCategories } from '@/hooks/useProducts';
@@ -40,19 +39,17 @@ export function MobileCategoryGrid() {
 
       <div className="relative">
         {/* Left fade */}
-        <motion.div
-          animate={{ opacity: showLeft ? 1 : 0 }}
-          className="absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"
+        <div
+          className="absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none transition-opacity duration-300"
+          style={{ opacity: showLeft ? 1 : 0 }}
         />
         {/* Right fade */}
-        <motion.div
-          animate={{ opacity: showRight ? 1 : 0 }}
-          className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none flex items-center justify-end pr-1"
+        <div
+          className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none flex items-center justify-end pr-1 transition-opacity duration-300"
+          style={{ opacity: showRight ? 1 : 0 }}
         >
-          <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-          </motion.div>
-        </motion.div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground animate-bounce-x" />
+        </div>
 
         <div
           ref={scrollRef}
@@ -60,14 +57,8 @@ export function MobileCategoryGrid() {
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
         >
           <div className="flex gap-3 px-4">
-            {parents.map((cat, i) => (
-              <motion.div
-                key={cat.id}
-                className="w-[120px] flex-shrink-0"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.04 }}
-              >
+            {parents.map((cat) => (
+              <div key={cat.id} className="w-[120px] flex-shrink-0">
                 <Link
                   to={`/categoria/${cat.slug}`}
                   className="block group h-full active:scale-[0.98] transition-all duration-200"
@@ -100,6 +91,7 @@ export function MobileCategoryGrid() {
                           alt={cat.name}
                           className="w-full h-full object-cover"
                           loading="lazy"
+                          decoding="async"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -127,7 +119,7 @@ export function MobileCategoryGrid() {
                     />
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

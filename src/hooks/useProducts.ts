@@ -101,6 +101,8 @@ export function useProducts() {
       if (error) throw error;
       return (data || []).map(mapDbProduct);
     },
+    staleTime: 5 * 60 * 1000, // 5 min
+    gcTime: 10 * 60 * 1000,
   });
 }
 
@@ -243,6 +245,8 @@ export function useCategories() {
       if (error) throw error;
       return data as DbCategory[];
     },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 
@@ -293,5 +297,7 @@ export function useHeroSlides() {
       if (error) throw error;
       return data || [];
     },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
