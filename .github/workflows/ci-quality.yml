@@ -1,0 +1,32 @@
+name: CI Quality
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run lint
+
+      - name: TypeScript Check
+        run: bunx tsc --noEmit
+
+      - name: Unit Tests
+        run: bunx vitest run
+
+      - name: Scan unsafe types
+        run: node tools/audit/scan-any-usage.mjs
+
+      - name: Scan file sizes
+        run: node tools/audit/scan-file-sizes.mjs
+
+      - name: Scan role fallbacks
+        run: node tools/audit/scan-role-fallbacks.mjs

@@ -1,0 +1,16 @@
+name: CI Architecture
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  architecture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan file sizes
+        run: node tools/audit/scan-file-sizes.mjs
+
+      - name: Scan architecture
+        run: node tools/audit/scan-architecture.mjs
