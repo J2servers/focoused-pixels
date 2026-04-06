@@ -230,7 +230,7 @@ const AdminQuotesPage = () => {
 
         <DataTable data={filteredQuotes} columns={columns} isLoading={isLoading} emptyMessage="Nenhum orçamento encontrado"
           actions={
-            <ExportButtons data={filteredQuotes.map(q => ({ cliente: q.customer_name, email: q.customer_email, telefone: q.customer_phone, quantidade: q.quantity, status: q.status || 'pending', data: q.created_at }))} filename="orcamentos" columns={[{key:'cliente',header:'Cliente'},{key:'email',header:'Email'},{key:'telefone',header:'Telefone'},{key:'quantidade',header:'Qtd'},{key:'status',header:'Status'},{key:'data',header:'Data'}]} />
+            <ExportButtons data={filteredQuotes.map(q => ({ cliente: q.customer_name, email: q.customer_email, telefone: q.customer_phone, quantidade: q.quantity, status: q.status || 'pending', data: q.created_at }))} filename="orcamentos" title="Orçamentos" columns={[{key:'cliente',header:'Cliente'},{key:'email',header:'Email'},{key:'telefone',header:'Telefone'},{key:'quantidade',header:'Qtd'},{key:'status',header:'Status'},{key:'data',header:'Data'}]} />
           }
         />
       </div>

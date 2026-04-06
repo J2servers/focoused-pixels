@@ -78,7 +78,7 @@ const AdminReviewsPage = () => {
 
         <DataTable data={reviews} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar avaliações..."
           actions={
-            <ExportButtons data={reviews.map(r => ({ cliente: r.customer_name, produto: r.product_slug, nota: r.rating, comentario: r.comment, aprovada: r.is_approved ? 'Sim' : 'Não', data: r.created_at }))} filename="avaliacoes" columns={[{key:'cliente',header:'Cliente'},{key:'produto',header:'Produto'},{key:'nota',header:'Nota'},{key:'comentario',header:'Comentário'},{key:'aprovada',header:'Aprovada'},{key:'data',header:'Data'}]} />
+            <ExportButtons data={reviews.map(r => ({ cliente: r.customer_name, produto: r.product_slug, nota: r.rating, comentario: r.comment, aprovada: r.is_approved ? 'Sim' : 'Não', data: r.created_at }))} filename="avaliacoes" title="Avaliações" columns={[{key:'cliente',header:'Cliente'},{key:'produto',header:'Produto'},{key:'nota',header:'Nota'},{key:'comentario',header:'Comentário'},{key:'aprovada',header:'Aprovada'},{key:'data',header:'Data'}]} />
           }
         />
       </div>

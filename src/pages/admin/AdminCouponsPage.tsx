@@ -343,7 +343,7 @@ const AdminCouponsPage = () => {
           emptyMessage="Nenhum cupom cadastrado"
           actions={
             <div className="flex items-center gap-2">
-              <ExportButtons data={coupons.map(c => ({ codigo: c.code, tipo: c.type, valor: c.value, usos: c.usage_count || 0, ativo: c.is_active ? 'Sim' : 'Não' }))} filename="cupons" columns={[{key:'codigo',header:'Código'},{key:'tipo',header:'Tipo'},{key:'valor',header:'Valor'},{key:'usos',header:'Usos'},{key:'ativo',header:'Ativo'}]} />
+              <ExportButtons data={coupons.map(c => ({ codigo: c.code, tipo: c.type, valor: c.value, usos: c.usage_count || 0, ativo: c.is_active ? 'Sim' : 'Não' }))} filename="cupons" title="Cupons" columns={[{key:'codigo',header:'Código'},{key:'tipo',header:'Tipo'},{key:'valor',header:'Valor'},{key:'usos',header:'Usos'},{key:'ativo',header:'Ativo'}]} />
               <Button onClick={openCreateDialog} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
                 <Plus className="h-4 w-4 mr-2" />Novo Cupom
               </Button>

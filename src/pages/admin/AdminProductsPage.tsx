@@ -203,7 +203,7 @@ const AdminProductsPage = () => {
         }
         actions={
           <div className="flex items-center gap-2">
-            <ExportButtons data={filteredProducts.map(p => ({ nome: p.name, sku: p.sku || '', preco: p.price, estoque: p.stock ?? 0, status: p.status }))} filename="produtos" columns={[{key:'nome',header:'Nome'},{key:'sku',header:'SKU'},{key:'preco',header:'Preço'},{key:'estoque',header:'Estoque'},{key:'status',header:'Status'}]} />
+            <ExportButtons data={filteredProducts.map(p => ({ nome: p.name, sku: p.sku || '', preco: p.price, estoque: p.stock ?? 0, status: p.status }))} filename="produtos" title="Produtos" columns={[{key:'nome',header:'Nome'},{key:'sku',header:'SKU'},{key:'preco',header:'Preço'},{key:'estoque',header:'Estoque'},{key:'status',header:'Status'}]} />
             <Button onClick={openCreateDialog} disabled={!canEdit()} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)] hover:shadow-xl">
               <Plus className="h-4 w-4 mr-2" />
               Novo Produto
