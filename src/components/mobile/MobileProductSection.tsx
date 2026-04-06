@@ -79,7 +79,7 @@ export function MobileProductSection({
           className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none flex items-center justify-end pr-1 transition-opacity duration-300"
           style={{ opacity: showRightFade ? 1 : 0 }}
         >
-          <ChevronRight className="h-5 w-5 text-muted-foreground animate-[bounce-x_1.5s_ease-in-out_infinite]" />
+          <ChevronRight className="h-5 w-5 text-muted-foreground animate-bounce-x" />
         </div>
 
         {/* Horizontal Scroll */}
