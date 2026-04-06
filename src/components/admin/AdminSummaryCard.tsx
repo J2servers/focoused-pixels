@@ -1,4 +1,3 @@
-import { Card, CardContent } from '@/components/ui/card';
 import { type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -11,57 +10,38 @@ interface AdminSummaryCardProps {
   trend?: { value: number; label?: string };
 }
 
-const variantMap = {
-  purple: {
-    bg: 'bg-gradient-to-br from-[hsl(280,80%,50%)] to-[hsl(300,70%,40%)]',
-    trendColor: 'text-violet-200',
-  },
-  green: {
-    bg: 'bg-gradient-to-br from-[hsl(160,100%,38%)] to-[hsl(145,80%,30%)]',
-    trendColor: 'text-emerald-200',
-  },
-  blue: {
-    bg: 'bg-gradient-to-br from-[hsl(210,100%,55%)] to-[hsl(220,90%,42%)]',
-    trendColor: 'text-blue-200',
-  },
-  orange: {
-    bg: 'bg-gradient-to-br from-[hsl(30,100%,50%)] to-[hsl(20,90%,42%)]',
-    trendColor: 'text-orange-200',
-  },
-  pink: {
-    bg: 'bg-gradient-to-br from-[hsl(340,100%,58%)] to-[hsl(330,80%,45%)]',
-    trendColor: 'text-pink-200',
-  },
-  cyan: {
-    bg: 'bg-gradient-to-br from-[hsl(185,100%,45%)] to-[hsl(195,90%,35%)]',
-    trendColor: 'text-cyan-200',
-  },
+const variantStyles = {
+  purple: { gradient: 'linear-gradient(135deg, hsl(280 80% 50% / 0.25), hsl(300 70% 40% / 0.15))', border: 'hsl(280 90% 60% / 0.25)', iconBg: 'hsl(280 80% 55% / 0.2)', trendUp: 'text-violet-300' },
+  green:  { gradient: 'linear-gradient(135deg, hsl(160 100% 38% / 0.25), hsl(145 80% 30% / 0.15))', border: 'hsl(160 100% 45% / 0.25)', iconBg: 'hsl(160 100% 40% / 0.2)', trendUp: 'text-emerald-300' },
+  blue:   { gradient: 'linear-gradient(135deg, hsl(210 100% 55% / 0.25), hsl(220 90% 42% / 0.15))', border: 'hsl(210 100% 60% / 0.25)', iconBg: 'hsl(210 100% 55% / 0.2)', trendUp: 'text-blue-300' },
+  orange: { gradient: 'linear-gradient(135deg, hsl(30 100% 50% / 0.25), hsl(20 90% 42% / 0.15))', border: 'hsl(30 100% 55% / 0.25)', iconBg: 'hsl(30 100% 50% / 0.2)', trendUp: 'text-orange-300' },
+  pink:   { gradient: 'linear-gradient(135deg, hsl(340 100% 58% / 0.25), hsl(330 80% 45% / 0.15))', border: 'hsl(340 100% 65% / 0.25)', iconBg: 'hsl(340 100% 58% / 0.2)', trendUp: 'text-pink-300' },
+  cyan:   { gradient: 'linear-gradient(135deg, hsl(185 100% 45% / 0.25), hsl(195 90% 35% / 0.15))', border: 'hsl(185 100% 50% / 0.25)', iconBg: 'hsl(185 100% 45% / 0.2)', trendUp: 'text-cyan-300' },
 };
 
 export const AdminSummaryCard = ({ title, value, icon: Icon, variant = 'purple', subtitle, trend }: AdminSummaryCardProps) => {
-  const v = variantMap[variant];
+  const v = variantStyles[variant];
   return (
-    <Card className={cn(
-      'border-0 shadow-lg motion-fade-up group overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl',
-      v.bg
-    )}>
-      <CardContent className="flex items-center gap-4 p-6 relative">
-        <div className="p-3 rounded-xl bg-white/15 backdrop-blur-sm shadow-lg transition-transform duration-300 group-hover:scale-110">
+    <div className="rounded-xl p-5 motion-fade-up group overflow-hidden transition-all duration-300 hover:-translate-y-1 backdrop-blur-lg"
+      style={{ background: v.gradient, border: `1px solid ${v.border}`, boxShadow: `0 8px 32px hsl(0 0% 0% / 0.2)` }}>
+      <div className="flex items-center gap-4 relative">
+        <div className="p-3 rounded-xl transition-transform duration-300 group-hover:scale-110"
+          style={{ background: v.iconBg, backdropFilter: 'blur(8px)' }}>
           <Icon className="h-6 w-6 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-white/75 truncate">{title}</p>
+          <p className="text-sm text-white/60 truncate">{title}</p>
           <div className="flex items-baseline gap-2">
             <p className="text-2xl font-bold text-white tabular-nums">{value}</p>
             {trend && (
-              <span className={cn('text-xs font-medium', trend.value >= 0 ? 'text-white/90' : 'text-red-200')}>
+              <span className={cn('text-xs font-medium', trend.value >= 0 ? v.trendUp : 'text-red-300')}>
                 {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}%
               </span>
             )}
           </div>
-          {subtitle && <p className="text-xs text-white/60 truncate">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-white/40 truncate">{subtitle}</p>}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

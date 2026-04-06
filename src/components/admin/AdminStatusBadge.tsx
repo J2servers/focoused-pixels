@@ -10,14 +10,14 @@ interface AdminStatusBadgeProps {
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  success: 'bg-[hsl(var(--admin-accent-green))] text-white hover:bg-[hsl(var(--admin-accent-green))]',
-  warning: 'bg-amber-500 text-white hover:bg-amber-500',
-  danger: 'bg-red-500 text-white hover:bg-red-500',
-  info: 'bg-[hsl(var(--admin-accent-blue))] text-white hover:bg-[hsl(var(--admin-accent-blue))]',
-  neutral: 'bg-gray-500 text-white hover:bg-gray-500',
-  purple: 'bg-[hsl(var(--admin-accent-purple))] text-white hover:bg-[hsl(var(--admin-accent-purple))]',
+  success: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/25 hover:bg-emerald-500/25',
+  warning: 'bg-amber-500/20 text-amber-300 border border-amber-500/25 hover:bg-amber-500/25',
+  danger: 'bg-red-500/20 text-red-300 border border-red-500/25 hover:bg-red-500/25',
+  info: 'bg-blue-500/20 text-blue-300 border border-blue-500/25 hover:bg-blue-500/25',
+  neutral: 'bg-white/10 text-white/50 border border-white/10 hover:bg-white/15',
+  purple: 'bg-violet-500/20 text-violet-300 border border-violet-500/25 hover:bg-violet-500/25',
 };
 
 export const AdminStatusBadge = ({ label, variant = 'neutral', className }: AdminStatusBadgeProps) => (
-  <Badge className={cn(variantStyles[variant], className)}>{label}</Badge>
+  <Badge className={cn('backdrop-blur-sm', variantStyles[variant], className)}>{label}</Badge>
 );

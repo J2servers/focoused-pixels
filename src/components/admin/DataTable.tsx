@@ -1,26 +1,13 @@
 import { useState, ReactNode } from 'react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card } from '@/components/ui/card';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  ChevronsLeft, 
-  ChevronsRight,
-  Search,
-  Loader2,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown
+import {
+  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
+  Search, Loader2, ArrowUpDown, ArrowUp, ArrowDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -51,91 +38,45 @@ interface DataTableProps<T> {
 }
 
 export function DataTable<T>({
-  data,
-  columns,
-  isLoading = false,
-  searchable = true,
-  searchPlaceholder = 'Buscar...',
-  selectable = false,
-  selectedItems = [],
-  onSelectionChange,
-  getItemId = (item: any) => item.id,
-  onRowClick,
+  data, columns, isLoading = false, searchable = true,
+  searchPlaceholder = 'Buscar...', selectable = false,
+  selectedItems = [], onSelectionChange,
+  getItemId = (item: any) => item.id, onRowClick,
   emptyMessage = 'Nenhum registro encontrado',
-  actions,
-  filterContent,
-  pageSize = 10,
-  showAllRows = false,
+  actions, filterContent, pageSize = 10, showAllRows = false,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  // Filter data
   const filteredData = search
-    ? data.filter(item =>
-        Object.values(item as any).some(value =>
-          String(value).toLowerCase().includes(search.toLowerCase())
-        )
-      )
+    ? data.filter(item => Object.values(item as any).some(value => String(value).toLowerCase().includes(search.toLowerCase())))
     : data;
 
-  // Sort data
   const sortedData = sortColumn
     ? [...filteredData].sort((a, b) => {
-        const aVal = (a as any)[sortColumn];
-        const bVal = (b as any)[sortColumn];
-        const comparison = String(aVal).localeCompare(String(bVal));
+        const comparison = String((a as any)[sortColumn]).localeCompare(String((b as any)[sortColumn]));
         return sortDirection === 'asc' ? comparison : -comparison;
       })
     : filteredData;
 
-  // Paginate
   const effectivePageSize = showAllRows ? sortedData.length || 1 : pageSize;
   const totalPages = Math.ceil(sortedData.length / effectivePageSize);
-  const paginatedData = showAllRows
-    ? sortedData
-    : sortedData.slice(
-        (currentPage - 1) * effectivePageSize,
-        currentPage * effectivePageSize
-      );
+  const paginatedData = showAllRows ? sortedData : sortedData.slice((currentPage - 1) * effectivePageSize, currentPage * effectivePageSize);
 
   const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      setSortDirection('asc');
-    }
+    if (sortColumn === column) setSortDirection(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortColumn(column); setSortDirection('asc'); }
   };
 
-  const handleSelectAll = (checked: boolean) => {
-    if (onSelectionChange) {
-      onSelectionChange(checked ? paginatedData.map(getItemId) : []);
-    }
-  };
-
-  const handleSelectItem = (id: string, checked: boolean) => {
-    if (onSelectionChange) {
-      if (checked) {
-        onSelectionChange([...selectedItems, id]);
-      } else {
-        onSelectionChange(selectedItems.filter(i => i !== id));
-      }
-    }
-  };
-
-  const allSelected = paginatedData.length > 0 && 
-    paginatedData.every(item => selectedItems.includes(getItemId(item)));
+  const handleSelectAll = (checked: boolean) => onSelectionChange?.(checked ? paginatedData.map(getItemId) : []);
+  const handleSelectItem = (id: string, checked: boolean) => onSelectionChange?.(checked ? [...selectedItems, id] : selectedItems.filter(i => i !== id));
+  const allSelected = paginatedData.length > 0 && paginatedData.every(item => selectedItems.includes(getItemId(item)));
 
   const getSortIcon = (column: string) => {
-    if (sortColumn !== column) {
-      return <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground/50" />;
-    }
-    return sortDirection === 'asc' 
-      ? <ArrowUp className="h-3.5 w-3.5 text-primary" />
-      : <ArrowDown className="h-3.5 w-3.5 text-primary" />;
+    if (sortColumn !== column) return <ArrowUpDown className="h-3.5 w-3.5 text-white/20" />;
+    return sortDirection === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-violet-400" /> : <ArrowDown className="h-3.5 w-3.5 text-violet-400" />;
   };
 
   return (
@@ -145,17 +86,10 @@ export function DataTable<T>({
         <div className="flex flex-col sm:flex-row gap-3 flex-1">
           {searchable && (
             <div className="relative w-full sm:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
-              <Input
-                type="search"
-                placeholder={searchPlaceholder}
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="pl-10 h-10 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-1 focus-visible:ring-[hsl(var(--admin-accent-purple))]"
-              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+              <Input type="search" placeholder={searchPlaceholder} value={search}
+                onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+                className="pl-10 h-10 liquid-input" />
             </div>
           )}
           {filterContent}
@@ -164,29 +98,24 @@ export function DataTable<T>({
       </div>
 
       {/* Table */}
-      <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg overflow-hidden">
+      <div className="liquid-glass rounded-xl overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-[hsl(var(--admin-sidebar))] hover:bg-[hsl(var(--admin-sidebar))] border-b border-[hsl(var(--admin-card-border))]">
+            <TableRow className="border-b border-white/[0.06] hover:bg-transparent"
+              style={{ background: 'hsl(250 30% 8% / 0.6)' }}>
               {selectable && (
                 <TableHead className="w-12">
-                  <Checkbox
-                    checked={allSelected}
-                    onCheckedChange={handleSelectAll}
-                    className="border-[hsl(var(--admin-text-muted))]"
-                  />
+                  <Checkbox checked={allSelected} onCheckedChange={handleSelectAll} className="border-white/20" />
                 </TableHead>
               )}
               {columns.map(column => (
-                <TableHead
-                  key={column.key}
+                <TableHead key={column.key}
                   className={cn(
-                    "text-xs font-semibold uppercase tracking-wider text-[hsl(var(--admin-text-muted))]",
-                    column.sortable && 'cursor-pointer hover:text-white transition-colors select-none',
-                    column.className
+                    'text-xs font-semibold uppercase tracking-wider text-white/40',
+                    column.sortable && 'cursor-pointer hover:text-white/70 transition-colors select-none',
+                    column.className,
                   )}
-                  onClick={() => column.sortable && handleSort(column.key)}
-                >
+                  onClick={() => column.sortable && handleSort(column.key)}>
                   <div className="flex items-center gap-1.5">
                     {column.header}
                     {column.sortable && getSortIcon(column.key)}
@@ -198,32 +127,27 @@ export function DataTable<T>({
           <TableBody>
             {isLoading ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell 
-                  colSpan={columns.length + (selectable ? 1 : 0)} 
-                  className="h-40"
-                >
+                <TableCell colSpan={columns.length + (selectable ? 1 : 0)} className="h-40">
                   <div className="flex flex-col items-center justify-center gap-3">
                     <div className="relative">
-                      <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-purple)/0.3)] animate-ping" />
-                      <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]">
+                      <div className="absolute inset-0 rounded-full blur-lg opacity-30"
+                        style={{ background: 'linear-gradient(135deg, hsl(280 80% 55%), hsl(210 100% 55%))' }} />
+                      <div className="relative w-10 h-10 rounded-xl liquid-glass flex items-center justify-center">
                         <Loader2 className="h-5 w-5 animate-spin text-white" />
                       </div>
                     </div>
-                    <p className="text-sm text-[hsl(var(--admin-text-muted))]">Carregando dados...</p>
+                    <p className="text-sm text-white/35">Carregando dados...</p>
                   </div>
                 </TableCell>
               </TableRow>
             ) : paginatedData.length === 0 ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell 
-                  colSpan={columns.length + (selectable ? 1 : 0)} 
-                  className="h-40"
-                >
+                <TableCell colSpan={columns.length + (selectable ? 1 : 0)} className="h-40">
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="w-12 h-12 rounded-full bg-[hsl(var(--admin-sidebar))] flex items-center justify-center">
-                      <Search className="h-5 w-5 text-[hsl(var(--admin-text-muted))]" />
+                    <div className="w-12 h-12 rounded-xl liquid-glass-lighter flex items-center justify-center">
+                      <Search className="h-5 w-5 text-white/25" />
                     </div>
-                    <p className="text-sm text-[hsl(var(--admin-text-muted))]">{emptyMessage}</p>
+                    <p className="text-sm text-white/35">{emptyMessage}</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -231,34 +155,22 @@ export function DataTable<T>({
               paginatedData.map((item) => {
                 const id = getItemId(item);
                 const isSelected = selectedItems.includes(id);
-
                 return (
-                  <TableRow
-                    key={id}
+                  <TableRow key={id}
                     className={cn(
-                      "border-b border-[hsl(var(--admin-card-border)/0.5)] transition-colors",
+                      'border-b border-white/[0.04] transition-colors',
                       onRowClick && 'cursor-pointer',
-                      isSelected && 'bg-[hsl(var(--admin-accent-purple)/0.1)]',
-                      !isSelected && 'hover:bg-[hsl(var(--admin-sidebar-hover))]'
+                      isSelected ? 'bg-violet-500/[0.08]' : 'hover:bg-white/[0.03]',
                     )}
-                    onClick={() => onRowClick?.(item)}
-                  >
+                    onClick={() => onRowClick?.(item)}>
                     {selectable && (
                       <TableCell onClick={(e) => e.stopPropagation()}>
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={(checked) => 
-                            handleSelectItem(id, checked as boolean)
-                          }
-                          className="border-[hsl(var(--admin-text-muted))]"
-                        />
+                        <Checkbox checked={isSelected} onCheckedChange={(c) => handleSelectItem(id, c as boolean)} className="border-white/20" />
                       </TableCell>
                     )}
                     {columns.map(column => (
-                      <TableCell key={column.key} className={cn("py-3.5 text-white", column.className)}>
-                        {column.render
-                          ? column.render(item)
-                          : (item as any)[column.key]}
+                      <TableCell key={column.key} className={cn('py-3.5 text-white/90', column.className)}>
+                        {column.render ? column.render(item) : (item as any)[column.key]}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -267,84 +179,46 @@ export function DataTable<T>({
             )}
           </TableBody>
         </Table>
-      </Card>
+      </div>
 
       {/* Pagination */}
       {!showAllRows && totalPages > 1 && (
         <div className="flex items-center justify-between pt-2">
-          <p className="text-sm text-[hsl(var(--admin-text-muted))]">
-            <span className="font-medium text-white">{((currentPage - 1) * effectivePageSize) + 1}-{Math.min(currentPage * effectivePageSize, sortedData.length)}</span>
+          <p className="text-sm text-white/35">
+            <span className="font-medium text-white/80">{((currentPage - 1) * effectivePageSize) + 1}-{Math.min(currentPage * effectivePageSize, sortedData.length)}</span>
             {' '}de{' '}
-            <span className="font-medium text-white">{sortedData.length}</span> registros
+            <span className="font-medium text-white/80">{sortedData.length}</span> registros
           </p>
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-              className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
-            >
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
+            <Button variant="ghost" size="icon" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}
+              className="h-8 w-8 text-white/30 hover:text-white hover:bg-white/[0.06]"><ChevronsLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}
+              className="h-8 w-8 text-white/30 hover:text-white hover:bg-white/[0.06]"><ChevronLeft className="h-4 w-4" /></Button>
             <div className="flex items-center gap-1 px-2">
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 let pageNum: number;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-                
+                if (totalPages <= 5) pageNum = i + 1;
+                else if (currentPage <= 3) pageNum = i + 1;
+                else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                else pageNum = currentPage - 2 + i;
                 return (
-                  <Button
-                    key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "ghost"}
-                    size="icon"
+                  <Button key={pageNum} variant={currentPage === pageNum ? 'default' : 'ghost'} size="icon"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={cn(
-                      "h-8 w-8 text-sm",
-                      currentPage === pageNum 
-                        ? "bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]" 
-                        : "text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
+                    className={cn('h-8 w-8 text-sm',
+                      currentPage === pageNum
+                        ? 'text-white shadow-lg'
+                        : 'text-white/30 hover:text-white hover:bg-white/[0.06]',
                     )}
-                  >
+                    style={currentPage === pageNum ? { background: 'linear-gradient(135deg, hsl(280 80% 50% / 0.8), hsl(210 90% 50% / 0.8))', boxShadow: '0 4px 16px hsl(280 80% 50% / 0.3)' } : undefined}>
                     {pageNum}
                   </Button>
                 );
               })}
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-              className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
+            <Button variant="ghost" size="icon" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}
+              className="h-8 w-8 text-white/30 hover:text-white hover:bg-white/[0.06]"><ChevronRight className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}
+              className="h-8 w-8 text-white/30 hover:text-white hover:bg-white/[0.06]"><ChevronsRight className="h-4 w-4" /></Button>
           </div>
         </div>
       )}
