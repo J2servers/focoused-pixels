@@ -7,6 +7,7 @@ export interface Product {
   name: string;
   slug: string;
   short_description: string | null;
+  full_description: string | null;
   price: number;
   promotional_price: number | null;
   stock: number;
@@ -31,6 +32,7 @@ export interface ProductFormData {
   name: string;
   slug: string;
   short_description: string | null;
+  full_description?: string | null;
   price: number;
   promotional_price: number | null;
   stock: number;

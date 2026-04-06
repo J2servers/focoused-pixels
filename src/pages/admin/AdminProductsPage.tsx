@@ -24,7 +24,7 @@ import {
 } from '@/hooks/useAdminProducts';
 
 const INITIAL_FORM = {
-  name: '', slug: '', short_description: '', price: '', promotional_price: '',
+  name: '', slug: '', short_description: '', full_description: '', price: '', promotional_price: '',
   stock: '0', sku: '', status: 'draft', category_id: '', is_featured: false,
   cover_image: '' as string | null, gallery_images: [] as string[],
   cost_material: '', cost_labor: '', cost_shipping: '',
@@ -62,6 +62,7 @@ const AdminProductsPage = () => {
     setFormData({
       name: product.name, slug: product.slug,
       short_description: product.short_description || '',
+      full_description: product.full_description || '',
       price: product.price.toString(),
       promotional_price: product.promotional_price?.toString() || '',
       stock: product.stock.toString(), sku: product.sku || '',
@@ -87,6 +88,7 @@ const AdminProductsPage = () => {
     const data: ProductFormData = {
       name: formData.name, slug,
       short_description: formData.short_description || null,
+      full_description: formData.full_description || null,
       price: parseFloat(formData.price),
       promotional_price: formData.promotional_price ? parseFloat(formData.promotional_price) : null,
       stock: parseInt(formData.stock) || 0, sku: formData.sku || null,
@@ -231,7 +233,11 @@ const AdminProductsPage = () => {
             </div>
             <div className="space-y-2">
               <FormFieldInfo label="Descrição Curta" description="Resumo em 1-2 frases" showsIn="Card e busca" />
-              <Textarea value={formData.short_description} onChange={(e) => setFormData({ ...formData, short_description: e.target.value })} rows={3} />
+              <Textarea value={formData.short_description} onChange={(e) => setFormData({ ...formData, short_description: e.target.value })} rows={2} />
+            </div>
+            <div className="space-y-2">
+              <FormFieldInfo label="Descrição Completa" description="Texto detalhado do produto" showsIn="Página do produto" />
+              <Textarea value={formData.full_description || ''} onChange={(e) => setFormData({ ...formData, full_description: e.target.value })} rows={5} placeholder="Descreva o produto em detalhes..." />
             </div>
 
             <Separator />

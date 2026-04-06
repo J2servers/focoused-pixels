@@ -64,6 +64,8 @@ const AdminTemplatesPage = lazy(() => import("./pages/admin/AdminEmailTemplatesP
 const AdminMediaPage = lazy(() => import("./pages/admin/AdminMediaPage"));
 const AdminWhyChooseUsPage = lazy(() => import("./pages/admin/AdminWhyChooseUsPage"));
 const AdminWorkflowsPage = lazy(() => import("./pages/admin/AdminWorkflowsPage"));
+const AdminCashFlowPage = lazy(() => import("./pages/admin/AdminCashFlowPage"));
+const AdminRawMaterialsPage = lazy(() => import("./pages/admin/AdminRawMaterialsPage"));
 
 const queryClient = new QueryClient();
 
@@ -144,6 +146,8 @@ const App = () => (
                 <Route path="/admin/midia" element={<AdminMediaPage />} />
                 <Route path="/admin/pagina-por-que-escolher" element={<AdminWhyChooseUsPage />} />
                 <Route path="/admin/workflows" element={<AdminWorkflowsPage />} />
+                <Route path="/admin/caixa" element={<AdminCashFlowPage />} />
+                <Route path="/admin/materiais" element={<AdminRawMaterialsPage />} />
                 
                 <Route path="/teste" element={<TestePage />} />
                 <Route path="/teste2" element={<Teste2Page />} />

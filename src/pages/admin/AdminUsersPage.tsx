@@ -7,9 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2, Loader2, Shield, Users, UserCheck } from 'lucide-react';
+import { Plus, Trash2, Pencil, Loader2, Shield, Users, UserCheck } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { useAdminUsers, useCreateAdminUser, useDeleteAdminUser, type AdminUser } from '@/hooks/useAdminUsers';
+import { useAdminUsers, useCreateAdminUser, useUpdateUserRole, useDeleteAdminUser, type AdminUser } from '@/hooks/useAdminUsers';
 
 const ROLE_VARIANTS: Record<string, { label: string; variant: 'danger' | 'info' | 'neutral' }> = {
   admin: { label: 'Admin', variant: 'danger' },
@@ -21,14 +21,17 @@ const AdminUsersPage = () => {
   const { user: currentUser } = useAuthContext();
   const { data: users = [], isLoading } = useAdminUsers();
   const createUser = useCreateAdminUser();
+  const updateRole = useUpdateUserRole();
   const deleteUser = useDeleteAdminUser();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditRoleOpen, setIsEditRoleOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [formData, setFormData] = useState({ email: '', password: '', full_name: '', role: 'support' });
+  const [editRole, setEditRole] = useState<string>('support');
 
-  const isSaving = createUser.isPending || deleteUser.isPending;
+  const isSaving = createUser.isPending || deleteUser.isPending || updateRole.isPending;
 
   const handleAddUser = async () => {
     if (!formData.email || !formData.password || !formData.full_name) return;
@@ -41,6 +44,12 @@ const AdminUsersPage = () => {
     if (!selectedUser) return;
     await deleteUser.mutateAsync(selectedUser.id);
     setIsDeleteDialogOpen(false);
+  };
+
+  const handleEditRole = async () => {
+    if (!selectedUser) return;
+    await updateRole.mutateAsync({ userId: selectedUser.id, role: editRole as 'admin' | 'editor' | 'support' });
+    setIsEditRoleOpen(false);
   };
 
   const adminCount = users.filter(u => u.role === 'admin').length;
@@ -63,9 +72,15 @@ const AdminUsersPage = () => {
       render: (u) => <span className="font-mono text-xs text-[hsl(var(--admin-text-muted))]">{u.id.slice(0, 8)}…</span>,
     },
     {
-      key: 'actions', header: 'Ações', className: 'w-24',
+      key: 'actions', header: 'Ações', className: 'w-28',
       render: (user) => (
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+          <Button variant="ghost" size="icon"
+            className="text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))]"
+            onClick={() => { setSelectedUser(user); setEditRole(user.role || 'support'); setIsEditRoleOpen(true); }}
+            disabled={user.id === currentUser?.id}>
+            <Pencil className="h-4 w-4" />
+          </Button>
           <Button variant="ghost" size="icon"
             className="text-red-400 hover:text-red-300"
             onClick={() => { setSelectedUser(user); setIsDeleteDialogOpen(true); }}
@@ -103,6 +118,7 @@ const AdminUsersPage = () => {
             <DialogTitle className="flex items-center gap-2 text-[hsl(var(--admin-text))]">
               <Shield className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />Novo Usuário Admin
             </DialogTitle>
+            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Preencha os dados para criar acesso ao painel</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
@@ -133,6 +149,34 @@ const AdminUsersPage = () => {
             <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
             <Button onClick={handleAddUser} disabled={isSaving} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Criar Usuário
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Role Dialog */}
+      <Dialog open={isEditRoleOpen} onOpenChange={setIsEditRoleOpen}>
+        <DialogContent className="max-w-sm bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+          <DialogHeader>
+            <DialogTitle className="text-[hsl(var(--admin-text))]">Alterar função</DialogTitle>
+            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">
+              Alterar função de "{selectedUser?.profile?.full_name || 'Usuário'}"
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Select value={editRole} onValueChange={setEditRole}>
+              <SelectTrigger className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">Admin (acesso total)</SelectItem>
+                <SelectItem value="editor">Editor (gerencia conteúdo)</SelectItem>
+                <SelectItem value="support">Suporte (somente leitura)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditRoleOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
+            <Button onClick={handleEditRole} disabled={isSaving} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
+              {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar
             </Button>
           </DialogFooter>
         </DialogContent>
