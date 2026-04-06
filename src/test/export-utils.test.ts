@@ -32,10 +32,11 @@ describe('exportToCSV', () => {
     exportToCSV(data, 'test', columns);
 
     expect(mockCreateObjectURL).toHaveBeenCalledTimes(1);
-    const blobArg = mockCreateObjectURL.mock.calls[0]?.[0] as Blob | undefined;
+    const calls = mockCreateObjectURL.mock.calls as unknown as Array<[Blob]>;
+    const blobArg = calls[0][0];
     expect(blobArg).toBeInstanceOf(Blob);
 
-    const text = await blobArg!.text();
+    const text = await blobArg.text();
     expect(text).toContain('\uFEFF');
     expect(text).toContain('Nome,Preço');
     expect(text).toContain('"Display, especial"');
@@ -54,8 +55,8 @@ describe('exportToCSV', () => {
     ];
 
     exportToCSV(data, 'test', columns);
-    const blobArg = mockCreateObjectURL.mock.calls[0]?.[0] as Blob | undefined;
-    const text = await blobArg!.text();
+    const calls = mockCreateObjectURL.mock.calls as unknown as Array<[Blob]>;
+    const text = await calls[0][0].text();
     expect(text).toContain(',');
   });
 });
@@ -75,8 +76,8 @@ describe('exportToJSON', () => {
     const data = [{ id: 1, name: 'Test' }];
     exportToJSON(data, 'test');
 
-    const blobArg = mockCreateObjectURL.mock.calls[0]?.[0] as Blob | undefined;
-    const text = await blobArg!.text();
+    const calls = mockCreateObjectURL.mock.calls as unknown as Array<[Blob]>;
+    const text = await calls[0][0].text();
     const parsed = JSON.parse(text);
     expect(parsed).toEqual(data);
   });
