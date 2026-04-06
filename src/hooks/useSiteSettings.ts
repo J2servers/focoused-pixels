@@ -161,13 +161,39 @@ export function useSiteSettings() {
     whatsappMessageTemplate: settings?.whatsapp_message_template || 'Olá! Gostaria de saber mais sobre os produtos.',
     whatsapp: settings?.whatsapp || '',
     email: settings?.email || '',
+    phone: settings?.phone || '',
     freeShippingMinimum: settings?.free_shipping_minimum || 159,
+    freeShippingMessage: settings?.free_shipping_message || '',
     
     // Store info
     companyName: settings?.company_name || 'Pincel de Luz Personalizados',
     warranty: settings?.warranty || '3 meses',
     productionTime: settings?.production_time || '4 a 10 dias úteis',
     installments: settings?.installments || 12,
+    cnpj: settings?.cnpj || '',
+    address: settings?.address || '',
+    businessHours: settings?.business_hours || '',
+    copyrightText: settings?.copyright_text || '',
+
+    // Social
+    socialInstagram: settings?.social_instagram || '',
+    socialFacebook: settings?.social_facebook || '',
+    socialTiktok: settings?.social_tiktok || '',
+    socialYoutube: settings?.social_youtube || '',
+    socialLinkedin: settings?.social_linkedin || '',
+    socialPinterest: settings?.social_pinterest || '',
+
+    // Logos
+    headerLogo: settings?.header_logo || '',
+    footerLogo: settings?.footer_logo || '',
+    headerLogoHeight: settings?.header_logo_height || 64,
+    footerLogoHeight: settings?.footer_logo_height || 48,
+    headerLogoMobileHeight: settings?.header_logo_mobile_height || 36,
+
+    // Policies
+    privacyPolicy: settings?.privacy_policy || '',
+    termsOfService: settings?.terms_of_service || '',
+    returnsPolicy: settings?.returns_policy || '',
   };
 
   // Helper to calculate quantity discount
