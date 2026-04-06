@@ -13,34 +13,28 @@ interface AdminSummaryCardProps {
 
 const variantMap = {
   purple: {
-    gradient: 'from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))]',
-    stat: 'admin-stat-purple',
-    trendColor: 'text-violet-400',
+    bg: 'bg-gradient-to-br from-[hsl(280,80%,50%)] to-[hsl(300,70%,40%)]',
+    trendColor: 'text-violet-200',
   },
   green: {
-    gradient: 'from-[hsl(var(--admin-accent-green))] to-emerald-600',
-    stat: 'admin-stat-green',
-    trendColor: 'text-emerald-400',
+    bg: 'bg-gradient-to-br from-[hsl(160,100%,38%)] to-[hsl(145,80%,30%)]',
+    trendColor: 'text-emerald-200',
   },
   blue: {
-    gradient: 'from-[hsl(var(--admin-accent-blue))] to-[hsl(var(--admin-accent-cyan))]',
-    stat: 'admin-stat-blue',
-    trendColor: 'text-blue-400',
+    bg: 'bg-gradient-to-br from-[hsl(210,100%,55%)] to-[hsl(220,90%,42%)]',
+    trendColor: 'text-blue-200',
   },
   orange: {
-    gradient: 'from-[hsl(var(--admin-accent-orange))] to-red-500',
-    stat: 'admin-stat-orange',
-    trendColor: 'text-orange-400',
+    bg: 'bg-gradient-to-br from-[hsl(30,100%,50%)] to-[hsl(20,90%,42%)]',
+    trendColor: 'text-orange-200',
   },
   pink: {
-    gradient: 'from-[hsl(var(--admin-accent-pink))] to-rose-600',
-    stat: 'admin-stat-pink',
-    trendColor: 'text-pink-400',
+    bg: 'bg-gradient-to-br from-[hsl(340,100%,58%)] to-[hsl(330,80%,45%)]',
+    trendColor: 'text-pink-200',
   },
   cyan: {
-    gradient: 'from-[hsl(var(--admin-accent-cyan))] to-[hsl(var(--admin-accent-blue))]',
-    stat: 'admin-stat-blue',
-    trendColor: 'text-cyan-400',
+    bg: 'bg-gradient-to-br from-[hsl(185,100%,45%)] to-[hsl(195,90%,35%)]',
+    trendColor: 'text-cyan-200',
   },
 };
 
@@ -48,27 +42,24 @@ export const AdminSummaryCard = ({ title, value, icon: Icon, variant = 'purple',
   const v = variantMap[variant];
   return (
     <Card className={cn(
-      'border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg admin-stat-card admin-card-hover motion-fade-up group',
-      v.stat
+      'border-0 shadow-lg motion-fade-up group overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl',
+      v.bg
     )}>
-      <CardContent className="flex items-center gap-4 p-6">
-        <div className={cn(
-          'p-3 rounded-xl bg-gradient-to-br shadow-lg transition-transform duration-300 group-hover:scale-110',
-          v.gradient
-        )}>
+      <CardContent className="flex items-center gap-4 p-6 relative">
+        <div className="p-3 rounded-xl bg-white/15 backdrop-blur-sm shadow-lg transition-transform duration-300 group-hover:scale-110">
           <Icon className="h-6 w-6 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-[hsl(var(--admin-text-muted))] truncate">{title}</p>
+          <p className="text-sm text-white/75 truncate">{title}</p>
           <div className="flex items-baseline gap-2">
             <p className="text-2xl font-bold text-white tabular-nums">{value}</p>
             {trend && (
-              <span className={cn('text-xs font-medium', trend.value >= 0 ? 'text-emerald-400' : 'text-red-400')}>
+              <span className={cn('text-xs font-medium', trend.value >= 0 ? 'text-white/90' : 'text-red-200')}>
                 {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}%
               </span>
             )}
           </div>
-          {subtitle && <p className="text-xs text-[hsl(var(--admin-text-muted))] truncate">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-white/60 truncate">{subtitle}</p>}
         </div>
       </CardContent>
     </Card>

@@ -208,7 +208,7 @@ const AdminOrdersPage = () => {
         </div>
 
         <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'paid' | 'awaiting')} className="space-y-4">
-          <TabsList className="grid w-full max-w-md grid-cols-2 bg-[hsl(var(--admin-sidebar))] border border-[hsl(var(--admin-card-border))]">
+          <TabsList className="admin-tabs-vivid grid w-full max-w-md grid-cols-2 bg-[hsl(var(--admin-sidebar))] border border-[hsl(var(--admin-card-border))]">
             <TabsTrigger value="paid">Vendas Feitas</TabsTrigger>
             <TabsTrigger value="awaiting">Aguardando Pagamento</TabsTrigger>
           </TabsList>

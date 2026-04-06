@@ -283,7 +283,7 @@ const AdminCategoriesPage = () => {
         )}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
             <div className="px-3 pt-3 flex items-center justify-between">
-              <TabsList className="bg-[hsl(var(--admin-sidebar))]">
+              <TabsList className="admin-tabs-vivid bg-[hsl(var(--admin-sidebar))]">
                 <TabsTrigger value="parents" className="text-xs gap-1 data-[state=active]:bg-[hsl(var(--admin-accent-purple)/0.2)] data-[state=active]:text-[hsl(var(--admin-accent-purple))]">
                   <FolderOpen className="h-3 w-3" />Principais ({parentCategories.length})
                 </TabsTrigger>
