@@ -12,7 +12,7 @@ import {
   Mail, MessageSquare, Plus, Download, Upload, Sparkles,
   Search, ArrowUpDown, LayoutGrid, LayoutList,
   CheckCircle2, AlertTriangle, Activity, Workflow,
-  ChevronDown, ChevronUp, Zap, Filter, Radio,
+  ChevronDown, ChevronUp, Zap, Filter, Radio, Trash2,
 } from 'lucide-react';
 import { useTemplates } from '@/hooks/useTemplates';
 import { SYSTEM_EVENTS } from '@/components/admin/templates/TemplateConstants';
