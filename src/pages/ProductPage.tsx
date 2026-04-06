@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
-import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +47,7 @@ import { ProductSectionTabs } from '@/components/product/ProductSectionTabs';
 import { DeliveryEstimate } from '@/components/product/DeliveryEstimate';
 import { NotifyWhenAvailable } from '@/components/product/NotifyWhenAvailable';
 
+const AIChatWidget = lazy(() => import('@/components/chat/AIChatWidget').then(m => ({ default: m.AIChatWidget })));
 
 const ProductPage = () => {
   const { productSlug } = useParams();
@@ -237,7 +236,7 @@ const ProductPage = () => {
   };
 
   return (
-    <HelmetProvider>
+    <>
       <div className="min-h-screen flex flex-col bg-background page-enter">
         {/* SEO - #4 JSON-LD + OG tags */}
         <ProductJsonLd
@@ -546,7 +545,9 @@ const ProductPage = () => {
 
         <DynamicFooter />
         <WhatsAppButton />
-        <AIChatWidget />
+        <Suspense fallback={null}>
+          <AIChatWidget />
+        </Suspense>
 
         {/* #1 Sticky Bottom Buy Bar on Mobile */}
         <StickyBuyBar
@@ -559,7 +560,7 @@ const ProductPage = () => {
           onAddToCart={handleAddToCart}
         />
       </div>
-    </HelmetProvider>
+    </>
   );
 };
 

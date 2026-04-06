@@ -8,6 +8,9 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import {
+  MetricCard as M, HeroKPI, SectionLabel as Sec, ChartCard, PieCard, CustomTooltip, PIE_COLORS,
+} from '@/components/admin/dashboard';
+import {
   LineChart, Line, PieChart, Pie, Cell, ResponsiveContainer,
   XAxis, YAxis, Tooltip, CartesianGrid, Legend, AreaChart, Area,
   BarChart, Bar,
@@ -21,193 +24,40 @@ import {
   PieChart as PieChartIcon, Award, RefreshCw, ShoppingBag, Repeat, XCircle
 } from 'lucide-react';
 
-// ===== METRIC CARD =====
-function M({ label, value, icon: Icon, color, href, format = 'number', trend }: {
-  label: string; value: number | string; icon: React.ElementType; color: string;
-  href?: string; format?: 'number' | 'currency' | 'percent' | 'text' | 'days'; trend?: number | null;
-}) {
-  const fmt = typeof value === 'string' ? value :
-    format === 'currency' ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` :
-    format === 'percent' ? `${value.toFixed(1)}%` :
-    format === 'days' ? `${value.toFixed(1)}d` :
-    value.toLocaleString('pt-BR');
-
-  const inner = (
-    <div className={cn(
-      "flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] transition-all h-full",
-      href && "hover:border-[hsl(var(--admin-accent-purple)/0.4)] cursor-pointer"
-    )}>
-      <div className={cn("p-1.5 rounded-lg shrink-0", color)}>
-        <Icon className="h-3.5 w-3.5 text-white" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-xs font-bold text-white truncate leading-tight">{fmt}</p>
-        <p className="text-[10px] text-[hsl(var(--admin-text-muted))] truncate leading-tight">{label}</p>
-      </div>
-      {trend !== undefined && trend !== null && (
-        <span className={cn("text-[10px] font-bold shrink-0", trend >= 0 ? "text-emerald-400" : "text-red-400")}>
-          {trend >= 0 ? '↑' : '↓'}{Math.abs(trend).toFixed(0)}%
-        </span>
-      )}
-    </div>
-  );
-  if (href) return <Link to={href} className="h-full">{inner}</Link>;
-  return inner;
-}
-
-// ===== HERO KPI =====
-function HeroKPI({ label, value, icon: Icon, color, format = 'currency', subtitle, trend }: {
-  label: string; value: number; icon: React.ElementType; color: string;
-  format?: 'currency' | 'number'; subtitle?: string; trend?: number;
-}) {
-  const fmt = format === 'currency'
-    ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-    : value.toLocaleString('pt-BR');
-  return (
-    <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-xl overflow-hidden h-full">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-1">
-          <div className={cn("p-2.5 rounded-xl shadow-lg", color)}>
-            <Icon className="h-5 w-5 text-white" />
-          </div>
-          {trend !== undefined && (
-            <span className={cn(
-              "flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-full",
-              trend >= 0 ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
-            )}>
-              {trend >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-              {Math.abs(trend).toFixed(0)}%
-            </span>
-          )}
-        </div>
-        <p className="text-2xl font-bold text-white leading-tight mt-2">{fmt}</p>
-        <p className="text-xs text-[hsl(var(--admin-text-muted))]">{label}</p>
-        {subtitle && <p className="text-[10px] text-[hsl(var(--admin-text-muted)/0.6)]">{subtitle}</p>}
-      </CardContent>
-    </Card>
-  );
-}
-
-// ===== SECTION LABEL =====
-function Sec({ children, icon: Icon, color }: { children: string; icon: React.ElementType; color: string }) {
-  return (
-    <div className="flex items-center gap-2 col-span-full py-1">
-      <div className={cn("p-1.5 rounded-lg", color)}><Icon className="h-3.5 w-3.5 text-white" /></div>
-      <h2 className="text-xs font-bold text-white tracking-wide">{children}</h2>
-    </div>
-  );
-}
-
-const PIE_COLORS = ['hsl(170,70%,45%)', 'hsl(210,80%,55%)', 'hsl(220,15%,50%)', 'hsl(45,93%,47%)', 'hsl(270,70%,55%)', 'hsl(145,63%,42%)', 'hsl(0,72%,51%)'];
-
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))] rounded-lg px-3 py-2 shadow-xl">
-      <p className="text-xs text-[hsl(var(--admin-text-muted))] mb-1">{label}</p>
-      {payload.map((p: any, i: number) => (
-        <p key={i} className="text-xs font-semibold" style={{ color: p.color }}>
-          {p.name}: {typeof p.value === 'number' ? p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : p.value}
-        </p>
-      ))}
-    </div>
-  );
-};
-
 // ===== MOBILE DASHBOARD =====
 function MobileDashboard({ m, abandoned }: { m: any; abandoned: any }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
-        <HeroKPI label="Receita Hoje" value={m.receitaHoje} icon={DollarSign} color="bg-gradient-to-br from-emerald-500 to-emerald-600" subtitle={`${m.vendasHoje} vendas`} />
-        <HeroKPI label="Receita Mês" value={m.receitaMes} icon={TrendingUp} color="bg-gradient-to-br from-blue-500 to-blue-600" trend={m.crescimentoReceita} />
-        <HeroKPI label="Ticket Médio" value={m.ticketMedio} icon={Target} color="bg-gradient-to-br from-purple-500 to-purple-600" />
-        <HeroKPI label="Vendas Pendentes" value={m.vendasPendentes} icon={Clock} color="bg-gradient-to-br from-amber-500 to-amber-600" format="number" />
+        <HeroKPI label="Receita Hoje" value={m.receitaHoje as number} icon={DollarSign} color="bg-gradient-to-br from-emerald-500 to-emerald-600" subtitle={`${m.vendasHoje} vendas`} />
+        <HeroKPI label="Receita Mês" value={m.receitaMes as number} icon={TrendingUp} color="bg-gradient-to-br from-blue-500 to-blue-600" trend={m.crescimentoReceita as number} />
+        <HeroKPI label="Ticket Médio" value={m.ticketMedio as number} icon={Target} color="bg-gradient-to-br from-purple-500 to-purple-600" />
+        <HeroKPI label="Vendas Pendentes" value={m.vendasPendentes as number} icon={Clock} color="bg-gradient-to-br from-amber-500 to-amber-600" format="number" />
       </div>
-      <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))]">
-        <CardHeader className="pb-1 pt-3 px-3"><CardTitle className="text-xs text-[hsl(var(--admin-text-muted))]">Receita 7 dias</CardTitle></CardHeader>
-        <CardContent className="p-2 h-36">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={m.vendasPorDia || []}>
-              <defs><linearGradient id="mRecGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(270,70%,55%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(270,70%,55%)" stopOpacity={0} /></linearGradient></defs>
-              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="receita" stroke="hsl(270,70%,55%)" fill="url(#mRecGrad)" strokeWidth={2} name="Receita" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-      <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))]">
-        <CardHeader className="pb-1 pt-3 px-3"><CardTitle className="text-xs text-[hsl(var(--admin-text-muted))]">Recebido x aguardando</CardTitle></CardHeader>
-        <CardContent className="p-2 h-36">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={m.receitaComparativa7d || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
-              <Bar dataKey="recebido" fill="hsl(145,63%,42%)" radius={[3, 3, 0, 0]} name="Recebido" />
-              <Bar dataKey="aguardando" fill="hsl(45,93%,47%)" radius={[3, 3, 0, 0]} name="Aguardando" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <ChartCard title="Receita 7 dias" height="h-36">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={(m.vendasPorDia as unknown[]) || []}>
+            <defs><linearGradient id="mRecGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(270,70%,55%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(270,70%,55%)" stopOpacity={0} /></linearGradient></defs>
+            <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+            <Tooltip content={<CustomTooltip />} />
+            <Area type="monotone" dataKey="receita" stroke="hsl(270,70%,55%)" fill="url(#mRecGrad)" strokeWidth={2} name="Receita" />
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartCard>
       <div className="grid grid-cols-2 gap-2">
-        <M label="Receita Real" value={m.receitaTotal} icon={DollarSign} color="bg-emerald-700" format="currency" />
-        <M label="A Receber" value={m.receitaPendente} icon={Clock} color="bg-amber-600" format="currency" />
-        <M label="Saldo do Dia" value={m.saldoDia} icon={Wallet} color={m.saldoDia >= 0 ? "bg-emerald-600" : "bg-red-600"} format="currency" />
-        <M label="Visitas Hoje" value={m.visitasHoje} icon={Eye} color="bg-cyan-600" />
-        <M label="Leads Hoje" value={m.leadsHoje} icon={UserPlus} color="bg-pink-600" />
-        <M label="Produtos Ativos" value={m.produtosAtivos} icon={Package} color="bg-orange-600" href="/admin/produtos" />
-        <M label="Estoque Baixo" value={m.produtosEstoqueBaixo} icon={AlertTriangle} color="bg-yellow-600" />
-        <M label="Orçamentos Pend." value={m.orcamentosPendentes} icon={FileText} color="bg-violet-600" href="/admin/orcamentos" />
-        <M label="Sessoes Aband." value={abandoned.sessionsAbandoned} icon={ShoppingBag} color="bg-rose-600" />
-        <M label="Top Abandono" value={abandoned.topProductName} icon={ShoppingBag} color="bg-rose-700" format="text" />
+        <M label="Receita Real" value={m.receitaTotal as number} icon={DollarSign} color="bg-emerald-700" format="currency" />
+        <M label="A Receber" value={m.receitaPendente as number} icon={Clock} color="bg-amber-600" format="currency" />
+        <M label="Visitas Hoje" value={m.visitasHoje as number} icon={Eye} color="bg-cyan-600" />
+        <M label="Leads Hoje" value={m.leadsHoje as number} icon={UserPlus} color="bg-pink-600" />
+        <M label="Produtos Ativos" value={m.produtosAtivos as number} icon={Package} color="bg-orange-600" href="/admin/produtos" />
+        <M label="Estoque Baixo" value={m.produtosEstoqueBaixo as number} icon={AlertTriangle} color="bg-yellow-600" />
+        <M label="Sessoes Aband." value={abandoned.sessionsAbandoned as number} icon={ShoppingBag} color="bg-rose-600" />
+        <M label="Top Abandono" value={abandoned.topProductName as string} icon={ShoppingBag} color="bg-rose-700" format="text" />
       </div>
     </div>
   );
 }
 
-// ===== CHART CARD helper =====
-function ChartCard({ title, children, className, height = 'h-40' }: { title: string; children: React.ReactNode; className?: string; height?: string }) {
-  return (
-    <Card className={cn("border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg", className)}>
-      <CardHeader className="pb-0 pt-3 px-4">
-        <CardTitle className="text-xs text-[hsl(var(--admin-text-muted))]">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className={cn("p-2", height)}>
-        {children}
-      </CardContent>
-    </Card>
-  );
-}
-
-// ===== PIE CARD helper =====
-function PieCard({ title, data, children }: { title: string; data: any[]; children?: React.ReactNode }) {
-  return (
-    <Card className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-      <CardContent className="p-3 flex items-center h-full min-h-[100px]">
-        <div className="w-16 h-16 shrink-0">
-          {data.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart><Pie data={data} cx="50%" cy="50%" innerRadius="40%" outerRadius="75%" paddingAngle={3} dataKey="value">{data.map((_: any, i: number) => <Cell key={i} fill={PIE_COLORS[i] || data[i]?.fill} />)}</Pie></PieChart>
-            </ResponsiveContainer>
-          ) : null}
-        </div>
-        <div className="flex-1 min-w-0 pl-2">
-          <p className="text-[10px] font-bold text-[hsl(var(--admin-text-muted))] mb-1">{title}</p>
-          {data.map((p: any, i: number) => (
-            <div key={p.name} className="flex items-center gap-1 mb-0.5">
-              <div className="w-2 h-2 rounded-full shrink-0" style={{ background: PIE_COLORS[i] || p.fill }} />
-              <span className="text-[10px] text-white truncate">{p.name}: {p.value}</span>
-            </div>
-          ))}
-          {children}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 // ===== DESKTOP DASHBOARD =====
 function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
