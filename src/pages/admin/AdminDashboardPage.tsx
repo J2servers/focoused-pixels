@@ -1,12 +1,9 @@
 import { AdminLayout } from '@/components/admin';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
 import { useAbandonedCartInsights, useTriggerAbandonedCartRecovery } from '@/hooks/useAbandonedCartInsights';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
 import {
   MetricCard as M, HeroKPI, SectionLabel as Sec, ChartCard, PieCard, CustomTooltip, PIE_COLORS,
 } from '@/components/admin/dashboard';
@@ -25,7 +22,7 @@ import {
 } from 'lucide-react';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
-// ===== MOBILE DASHBOARD =====
+/* ═══ MOBILE ═══ */
 function MobileDashboard({ m, abandoned }: { m: any; abandoned: any }) {
   return (
     <div className="space-y-4">
@@ -39,7 +36,7 @@ function MobileDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={(m.vendasPorDia as unknown[]) || []}>
             <defs><linearGradient id="mRecGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(270,70%,55%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(270,70%,55%)" stopOpacity={0} /></linearGradient></defs>
-            <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+            <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Area type="monotone" dataKey="receita" stroke="hsl(270,70%,55%)" fill="url(#mRecGrad)" strokeWidth={2} name="Receita" />
           </AreaChart>
@@ -60,7 +57,7 @@ function MobileDashboard({ m, abandoned }: { m: any; abandoned: any }) {
 }
 
 
-// ===== DESKTOP DASHBOARD =====
+/* ═══ DESKTOP ═══ */
 function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
   const funnelData = m.funnelData || [];
   const conversaoPorDia = m.conversaoPorDia || [];
@@ -88,23 +85,19 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
       <div className="col-span-3"><HeroKPI label="Ticket Médio" value={m.ticketMedio} icon={Target} color="bg-gradient-to-br from-purple-500 to-purple-600" subtitle={`Hoje: R$ ${m.ticketMedioHoje.toFixed(2)}`} /></div>
       <div className="col-span-3"><HeroKPI label="Receita Líquida 12m" value={m.receitaLiquida} icon={TrendingUp} color="bg-gradient-to-br from-teal-500 to-teal-600" subtitle={`Margem: ${m.margemLiquida.toFixed(1)}%`} /></div>
 
-      {/* ROW 2: Financial overview cards */}
-      <Card className="col-span-4 border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-lg">
-        <CardHeader className="pb-1 pt-3 px-4">
-          <CardTitle className="text-xs text-white">Leitura financeira rápida</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 p-4">
-          <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">
-            Receita considera apenas pedidos com pagamento confirmado. Pedidos aguardando boleto, PIX pendente ou pagamentos falhados ficam fora do faturamento.
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            <M label="Receita Real" value={m.receitaTotal} icon={DollarSign} color="bg-emerald-600" format="currency" />
-            <M label="A Receber" value={m.receitaPendente} icon={Clock} color="bg-amber-600" format="currency" />
-            <M label="Falhou" value={m.receitaFalhada} icon={AlertTriangle} color="bg-red-600" format="currency" />
-            <M label="Pagos" value={m.pagamentosPagos} icon={CheckCircle} color="bg-blue-600" />
-          </div>
-        </CardContent>
-      </Card>
+      {/* ROW 2: Financial overview */}
+      <div className="col-span-4 liquid-glass rounded-2xl shadow-lg p-4 space-y-3">
+        <p className="text-xs font-semibold text-white">Leitura financeira rápida</p>
+        <p className="text-[10px] text-white/40">
+          Receita considera apenas pedidos com pagamento confirmado.
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          <M label="Receita Real" value={m.receitaTotal} icon={DollarSign} color="bg-emerald-600" format="currency" />
+          <M label="A Receber" value={m.receitaPendente} icon={Clock} color="bg-amber-600" format="currency" />
+          <M label="Falhou" value={m.receitaFalhada} icon={AlertTriangle} color="bg-red-600" format="currency" />
+          <M label="Pagos" value={m.pagamentosPagos} icon={CheckCircle} color="bg-blue-600" />
+        </div>
+      </div>
 
       <ChartCard title="Status financeiro do mês" className="col-span-4" height="h-40">
         {receitaStatusResumoMes.length > 0 ? (
@@ -118,16 +111,16 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
             </PieChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-8">Sem movimentação financeira no período</p>
+          <p className="text-[10px] text-white/40 text-center pt-8">Sem movimentação financeira</p>
         )}
       </ChartCard>
 
       <ChartCard title="Recebido x aguardando (7 dias)" className="col-span-4" height="h-40">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={receitaComparativa7d}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} width={35} />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 10 }} />
             <Bar dataKey="recebido" fill="hsl(145,63%,42%)" radius={[3, 3, 0, 0]} name="Recebido" />
@@ -147,13 +140,13 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
               const convRate = nextStage && stage.value > 0 ? (nextStage.value / stage.value * 100) : null;
               return (
                 <div key={stage.stage} className="flex items-center gap-2">
-                  <span className="text-[10px] text-[hsl(var(--admin-text-muted))] w-16 text-right shrink-0">{stage.stage}</span>
-                  <div className="flex-1 h-5 bg-[hsl(var(--admin-sidebar))] rounded-md overflow-hidden relative">
+                  <span className="text-[10px] text-white/50 w-16 text-right shrink-0">{stage.stage}</span>
+                  <div className="flex-1 h-5 bg-white/[0.06] rounded-md overflow-hidden relative">
                     <div className="h-full rounded-md transition-all duration-500" style={{ width: `${Math.max(pct, 3)}%`, background: stage.color }} />
                     <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white">{stage.value.toLocaleString('pt-BR')}</span>
                   </div>
                   {convRate !== null && (
-                    <span className="text-[9px] text-[hsl(var(--admin-text-muted))] w-10 shrink-0">→{convRate.toFixed(0)}%</span>
+                    <span className="text-[9px] text-white/40 w-10 shrink-0">→{convRate.toFixed(0)}%</span>
                   )}
                 </div>
               );
@@ -165,10 +158,10 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
       <ChartCard title="Conversão Diária (7 dias)" className="col-span-4" height="h-44">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={conversaoPorDia}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
-            <YAxis yAxisId="left" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={30} />
-            <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={30} tickFormatter={(v: number) => `${v.toFixed(0)}%`} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} />
+            <YAxis yAxisId="left" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} width={30} />
+            <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} width={30} tickFormatter={(v: number) => `${v.toFixed(0)}%`} />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 10 }} />
             <Bar yAxisId="left" dataKey="visitas" fill="hsl(210,80%,55%)" radius={[3,3,0,0]} name="Visitas" opacity={0.6} />
@@ -183,8 +176,8 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={ticketPorMes}>
               <defs><linearGradient id="ticketGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(145,63%,42%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(145,63%,42%)" stopOpacity={0} /></linearGradient></defs>
-              <XAxis dataKey="mes" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} tickFormatter={(v: number) => `R$${v.toFixed(0)}`} />
+              <XAxis dataKey="mes" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} width={35} tickFormatter={(v: number) => `R$${v.toFixed(0)}`} />
               <Tooltip content={<CustomTooltip />} />
               <Area type="monotone" dataKey="ticket" stroke="hsl(145,63%,42%)" fill="url(#ticketGrad)" strokeWidth={2} name="Ticket Médio (R$)" />
             </AreaChart>
@@ -208,9 +201,9 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
       <ChartCard title="Receita vs Custos (6 meses)" className="col-span-5" height="h-44">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={receitaPorMes}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-            <XAxis dataKey="mes" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickFormatter={(v: number) => `${(v/1000).toFixed(0)}k`} width={35} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+            <XAxis dataKey="mes" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} tickFormatter={(v: number) => `${(v/1000).toFixed(0)}k`} width={35} />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 10 }} />
             <Line type="monotone" dataKey="receita" stroke="hsl(145,63%,42%)" strokeWidth={2.5} dot={{ r: 3 }} name="Receita" />
@@ -223,9 +216,9 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={vendasPorDia}>
             <defs><linearGradient id="recGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(270,70%,55%)" stopOpacity={0.3} /><stop offset="100%" stopColor="hsl(270,70%,55%)" stopOpacity={0} /></linearGradient></defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,10%,20%)" />
-            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: 'hsl(220,10%,50%)' }} axisLine={false} width={35} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+            <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} width={35} />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 10 }} />
             <Area type="monotone" dataKey="receita" stroke="hsl(270,70%,55%)" fill="url(#recGrad)" strokeWidth={2.5} name="Receita recebida" />
@@ -285,7 +278,7 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart><Pie data={productionDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{productionDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
             </ResponsiveContainer>
-          ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+          ) : <p className="text-[10px] text-white/40 text-center pt-4">Sem dados</p>}
         </ChartCard>
         <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Aguardando" value={m.prodPending} icon={Clock} color="bg-gray-600" href="/admin/kanban" />
@@ -301,7 +294,7 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={leadsPorDia}>
               <defs><linearGradient id="leadsGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(330,70%,55%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(330,70%,55%)" stopOpacity={0} /></linearGradient></defs>
-              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Area type="monotone" dataKey="leads" stroke="hsl(330,70%,55%)" fill="url(#leadsGrad)" strokeWidth={2} name="Leads" />
             </AreaChart>
@@ -320,7 +313,7 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         <ChartCard title="" className="mt-1" height="h-24">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={visitasPorDia}>
-              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="visitas" fill="hsl(190,70%,50%)" radius={[3,3,0,0]} name="Visitas" />
             </BarChart>
@@ -341,7 +334,7 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart><Pie data={productsDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{productsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
             </ResponsiveContainer>
-          ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+          ) : <p className="text-[10px] text-white/40 text-center pt-4">Sem dados</p>}
         </ChartCard>
         <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Total" value={m.totalProdutos} icon={Package} color="bg-orange-600" href="/admin/produtos" />
@@ -359,7 +352,7 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart><Pie data={quotesDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{quotesDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
             </ResponsiveContainer>
-          ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+          ) : <p className="text-[10px] text-white/40 text-center pt-4">Sem dados</p>}
         </ChartCard>
         <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Total" value={m.totalOrcamentos} icon={FileText} color="bg-violet-600" href="/admin/orcamentos" />
@@ -375,12 +368,12 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
           {reviewsDistribution.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={reviewsDistribution}>
-                <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="value" name="Avaliações" radius={[3,3,0,0]}>{reviewsDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Bar>
               </BarChart>
             </ResponsiveContainer>
-          ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+          ) : <p className="text-[10px] text-white/40 text-center pt-4">Sem dados</p>}
         </ChartCard>
         <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Total" value={m.totalReviews} icon={Star} color="bg-amber-600" href="/admin/avaliacoes" />
@@ -397,7 +390,7 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart><Pie data={whatsappDistribution} cx="50%" cy="50%" innerRadius="35%" outerRadius="70%" paddingAngle={3} dataKey="value">{whatsappDistribution.map((e: any, i: number) => <Cell key={i} fill={e.fill} />)}</Pie><Tooltip content={<CustomTooltip />} /></PieChart>
             </ResponsiveContainer>
-          ) : <p className="text-[10px] text-[hsl(var(--admin-text-muted))] text-center pt-4">Sem dados</p>}
+          ) : <p className="text-[10px] text-white/40 text-center pt-4">Sem dados</p>}
         </ChartCard>
         <div className="grid grid-cols-2 gap-2 mt-2">
           <M label="Enviadas" value={m.whatsappEnviadas} icon={MessageSquare} color="bg-green-600" href="/admin/whatsapp" />
@@ -412,7 +405,7 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
         <ChartCard title="" className="mt-1" height="h-24">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={caixaPorDia}>
-              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(220,10%,50%)' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.5)' }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="entradas" fill="hsl(145,63%,42%)" radius={[3,3,0,0]} name="Entradas" />
               <Bar dataKey="saidas" fill="hsl(0,72%,51%)" radius={[3,3,0,0]} name="Saídas" />
@@ -446,7 +439,7 @@ function DesktopDashboard({ m, abandoned }: { m: any; abandoned: any }) {
   );
 }
 
-// ===== MAIN PAGE =====
+/* ═══ MAIN ═══ */
 const AdminDashboardPage = () => {
   const { data: m, isLoading } = useDashboardMetrics();
   const { data: abandonedInsights } = useAbandonedCartInsights();
@@ -460,27 +453,26 @@ const AdminDashboardPage = () => {
   if (isLoading || !m) {
     return (
       <AdminLayout title="Dashboard">
-      <div className="space-y-5">
-        <AdminPageGuide
-          title="📊 Guia do Dashboard"
-          description="Visão geral de vendas, pedidos, leads e métricas do negócio em tempo real."
-          steps={[
-            { title: "Resumo financeiro", description: "Veja receita total, ticket médio e comparação com período anterior nos cards do topo." },
-            { title: "Gráficos de vendas", description: "Analise tendências de faturamento por dia, semana ou mês nos gráficos interativos." },
-            { title: "Alertas de estoque", description: "Produtos com estoque baixo aparecem em destaque para reposição imediata." },
-            { title: "Atividade recente", description: "Acompanhe pedidos, cadastros e ações recentes no feed de atividades." },
-            { title: "Ranking de produtos", description: "Identifique os produtos mais vendidos e com melhor margem de lucro." },
-            { title: "Visitas ao site", description: "Monitore o tráfego de visitantes e páginas mais acessadas." },
-          ]}
-        />
-
-        <div className="grid grid-cols-4 gap-3">
-          {Array.from({ length: 16 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-xl bg-[hsl(var(--admin-sidebar))]" />
-          ))}
+        <div className="space-y-5">
+          <AdminPageGuide
+            title="📊 Guia do Dashboard"
+            description="Visão geral de vendas, pedidos, leads e métricas do negócio em tempo real."
+            steps={[
+              { title: "Resumo financeiro", description: "Veja receita total, ticket médio e comparação com período anterior nos cards do topo." },
+              { title: "Gráficos de vendas", description: "Analise tendências de faturamento por dia, semana ou mês nos gráficos interativos." },
+              { title: "Alertas de estoque", description: "Produtos com estoque baixo aparecem em destaque para reposição imediata." },
+              { title: "Atividade recente", description: "Acompanhe pedidos, cadastros e ações recentes no feed de atividades." },
+              { title: "Ranking de produtos", description: "Identifique os produtos mais vendidos e com melhor margem de lucro." },
+              { title: "Visitas ao site", description: "Monitore o tráfego de visitantes e páginas mais acessadas." },
+            ]}
+          />
+          <div className="grid grid-cols-4 gap-3">
+            {Array.from({ length: 16 }).map((_, i) => (
+              <div key={i} className="h-20 rounded-xl liquid-glass animate-pulse" />
+            ))}
+          </div>
         </div>
-      </div>
-    </AdminLayout>
+      </AdminLayout>
     );
   }
 

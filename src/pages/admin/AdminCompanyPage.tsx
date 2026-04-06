@@ -4,7 +4,6 @@ import { VideoStoriesManager } from '@/components/admin/VideoStoriesManager';
 import { AdminLayout } from '@/components/admin';
 import { AdminSummaryCard } from '@/components/admin/AdminSummaryCard';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Save, MessageSquare, Settings, FolderOpen, Building2, Palette, Phone, Globe } from 'lucide-react';
 import { useCompanyInfoAdmin, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
 import { toast } from 'sonner';
@@ -18,9 +17,6 @@ import {
   CompanyPoliciesSection,
 } from '@/components/admin/company/CompanySections';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
-
-const cardCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]";
-const mutedText = "text-[hsl(var(--admin-text-muted))]";
 
 const AdminCompanyPage = () => {
   const { canEdit } = useAuthContext();
@@ -131,7 +127,7 @@ const AdminCompanyPage = () => {
   if (isLoading) {
     return (
       <AdminLayout title="Empresa e Branding">
-        <div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin text-[hsl(var(--admin-text-muted))]" /></div>
+        <div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin text-purple-400" /></div>
       </AdminLayout>
     );
   }
@@ -152,16 +148,16 @@ const AdminCompanyPage = () => {
           ]}
         />
 
-        {/* ─── Header ─── */}
+        {/* Header */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2 text-white">
-              <div className="w-9 h-9 rounded-xl bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />
+              <div className="w-9 h-9 rounded-xl bg-purple-500/15 flex items-center justify-center">
+                <Building2 className="h-5 w-5 text-purple-400" />
               </div>
               Empresa e Branding
             </h1>
-            <p className={`${mutedText} mt-1 text-sm`}>Logos, cores, contatos, políticas e ajustes de credibilidade da loja</p>
+            <p className="text-white/50 mt-1 text-sm">Logos, cores, contatos, políticas e ajustes de credibilidade da loja</p>
           </div>
           <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} className="admin-btn admin-btn-save" size="lg">
             {updateCompany.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
@@ -169,7 +165,7 @@ const AdminCompanyPage = () => {
           </Button>
         </div>
 
-        {/* ─── Summary Cards ─── */}
+        {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <AdminSummaryCard title="Completude" value={`${completionScore}/10`} icon={Building2} variant={completionScore >= 8 ? 'green' : 'orange'} />
           <AdminSummaryCard title="Cor Primária" value={previewColors.primary} icon={Palette} variant="purple" />
@@ -177,29 +173,25 @@ const AdminCompanyPage = () => {
           <AdminSummaryCard title="Redes Sociais" value={[formData.social_instagram, formData.social_facebook, formData.social_tiktok, formData.social_youtube].filter(Boolean).length.toString()} icon={Globe} variant="blue" />
         </div>
 
-        {/* ─── Quick Links ─── */}
+        {/* Quick Links */}
         <div className="grid gap-3 md:grid-cols-3">
           {[
             { title: 'Templates', desc: 'E-mail e WhatsApp.', icon: MessageSquare, to: '/admin/templates' },
             { title: 'Configurações', desc: 'Checkout, pagamentos, alertas.', icon: Settings, to: '/admin/configuracoes' },
             { title: 'Mídia', desc: 'Biblioteca de arquivos.', icon: FolderOpen, to: '/admin/midia' },
           ].map(({ title, desc, icon: Icon, to }) => (
-            <Card key={to} className={`${cardCls} hover:border-[hsl(var(--admin-accent-purple)/0.3)] transition-colors`}>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2 text-white">
-                  <div className="w-7 h-7 rounded-lg bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center"><Icon className="h-3.5 w-3.5 text-[hsl(var(--admin-accent-purple))]" /></div>
-                  {title}
-                </CardTitle>
-                <CardDescription className={mutedText}>{desc}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" asChild className="w-full border-[hsl(var(--admin-card-border))] text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"><Link to={to}>Abrir {title.toLowerCase()}</Link></Button>
-              </CardContent>
-            </Card>
+            <div key={to} className="liquid-glass rounded-2xl p-4 hover:bg-white/[0.06] transition-colors">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-lg bg-purple-500/15 flex items-center justify-center"><Icon className="h-3.5 w-3.5 text-purple-400" /></div>
+                <span className="text-sm font-semibold text-white">{title}</span>
+              </div>
+              <p className="text-xs text-white/50 mb-3">{desc}</p>
+              <Button variant="outline" asChild className="w-full border-white/10 text-white hover:bg-white/[0.06]"><Link to={to}>Abrir {title.toLowerCase()}</Link></Button>
+            </div>
           ))}
         </div>
 
-        {/* ─── Form Sections ─── */}
+        {/* Form Sections */}
         <CompanyIdentitySection formData={formData} setFormData={setFormData} previewColors={previewColors} />
         <CompanyConversionSection formData={formData} setFormData={setFormData} freeShippingPreview={freeShippingPreview} />
         <CompanyDataSection formData={formData} setFormData={setFormData} />
@@ -207,7 +199,7 @@ const AdminCompanyPage = () => {
         <CompanyPoliciesSection formData={formData} setFormData={setFormData} />
         <VideoStoriesManager />
 
-        {/* ─── Bottom Save ─── */}
+        {/* Bottom Save */}
         <div className="flex justify-end">
           <Button onClick={handleSave} disabled={updateCompany.isPending || !canEdit()} className="admin-btn admin-btn-save" size="lg">
             {updateCompany.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}

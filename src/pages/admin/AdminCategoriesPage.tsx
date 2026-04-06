@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Plus, Trash2, Loader2, Save, X, ImageIcon, FolderOpen, Folder, Layers, Eye, Hash, Link2,
+  Plus, Trash2, Loader2, Save, X, ImageIcon, FolderOpen, Folder, Layers,
 } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -26,34 +26,23 @@ import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 const generateSlug = (name: string) =>
   name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-/* ═══ Vivid helpers ═══ */
-const SECTION_COLORS = {
-  cyan: { border: 'border-[hsl(var(--admin-accent-cyan)/0.2)]', headerBg: 'bg-[hsl(var(--admin-accent-cyan)/0.06)]', text: 'text-[hsl(var(--admin-accent-cyan))]', glow: 'shadow-[0_0_10px_hsl(var(--admin-accent-cyan)/0.08)]' },
-  purple: { border: 'border-[hsl(var(--admin-accent-purple)/0.2)]', headerBg: 'bg-[hsl(var(--admin-accent-purple)/0.06)]', text: 'text-[hsl(var(--admin-accent-purple))]', glow: 'shadow-[0_0_10px_hsl(var(--admin-accent-purple)/0.08)]' },
-  pink: { border: 'border-[hsl(var(--admin-accent-pink)/0.2)]', headerBg: 'bg-[hsl(var(--admin-accent-pink)/0.06)]', text: 'text-[hsl(var(--admin-accent-pink))]', glow: 'shadow-[0_0_10px_hsl(var(--admin-accent-pink)/0.08)]' },
-};
-
-function VSection({ icon: Icon, title, color = 'cyan', children }: { icon: React.ComponentType<{ className?: string }>; title: string; color?: keyof typeof SECTION_COLORS; children: React.ReactNode }) {
-  const c = SECTION_COLORS[color];
+/* ═══ Liquid helpers ═══ */
+function LiquidSection({ icon: Icon, title, accent = 'cyan', children }: { icon: React.ComponentType<{ className?: string }>; title: string; accent?: string; children: React.ReactNode }) {
+  const colors: Record<string, string> = {
+    cyan: 'border-cyan-500/20 bg-cyan-500/[0.04]',
+    purple: 'border-purple-500/20 bg-purple-500/[0.04]',
+    pink: 'border-pink-500/20 bg-pink-500/[0.04]',
+  };
+  const textColors: Record<string, string> = {
+    cyan: 'text-cyan-400', purple: 'text-purple-400', pink: 'text-pink-400',
+  };
   return (
-    <div className={`rounded-xl border ${c.border} ${c.glow} overflow-hidden`}>
-      <div className={`flex items-center gap-2 px-3 py-2 ${c.headerBg} border-b ${c.border}`}>
-        <Icon className={`h-3.5 w-3.5 ${c.text}`} />
-        <span className={`text-[11px] font-bold uppercase tracking-[0.1em] ${c.text}`}>{title}</span>
+    <div className={`rounded-xl border ${colors[accent] || colors.cyan} overflow-hidden`}>
+      <div className={`flex items-center gap-2 px-3 py-2 border-b ${colors[accent] || colors.cyan}`}>
+        <Icon className={`h-3.5 w-3.5 ${textColors[accent] || textColors.cyan}`} />
+        <span className={`text-[11px] font-bold uppercase tracking-[0.1em] ${textColors[accent] || textColors.cyan}`}>{title}</span>
       </div>
       <div className="p-3">{children}</div>
-    </div>
-  );
-}
-
-function Field({ label, value, onChange, type = 'text', placeholder }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string;
-}) {
-  return (
-    <div className="space-y-1">
-      <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">{label}</label>
-      <Input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
-        className="h-8 text-xs bg-white/[0.04] border-white/[0.08] text-white/90 focus:border-[hsl(var(--admin-accent-cyan)/0.5)]" />
     </div>
   );
 }
@@ -68,7 +57,7 @@ function buildForm(cat?: Category) {
   };
 }
 
-/* ═══ DETAIL PANEL — 3/5, split 2/3 fields + 1/3 image ═══ */
+/* ═══ DETAIL PANEL ═══ */
 function CategoryPanel({ category, parentCategories, canEdit, onSave, isSaving, onDelete, onClose, isNew, childCount }: {
   category: Category | null; parentCategories: Category[]; canEdit: boolean;
   onSave: (data: CategoryFormData, id?: string) => Promise<void>;
@@ -100,17 +89,16 @@ function CategoryPanel({ category, parentCategories, canEdit, onSave, isSaving, 
   };
 
   return (
-    <div className="h-full flex flex-col bg-[hsl(var(--admin-bg))]">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-[hsl(var(--admin-accent-purple)/0.2)] bg-[hsl(var(--admin-card))]"
-        style={{ boxShadow: '0 4px 20px hsl(var(--admin-accent-purple) / 0.06)' }}>
+      <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-white/[0.08] liquid-glass">
         <div className="flex items-center gap-2 min-w-0">
-          {isChild ? <Folder className="h-4 w-4 text-[hsl(var(--admin-accent-cyan))] shrink-0" /> : <FolderOpen className="h-4 w-4 text-[hsl(var(--admin-accent-purple))] shrink-0" />}
+          {isChild ? <Folder className="h-4 w-4 text-cyan-400 shrink-0" /> : <FolderOpen className="h-4 w-4 text-purple-400 shrink-0" />}
           <h3 className="text-sm font-bold text-white truncate">
             {isNew ? (isChild ? '✨ Nova Subcategoria' : '✨ Nova Categoria') : category?.name || 'Categoria'}
           </h3>
           {childCount !== undefined && childCount > 0 && (
-            <Badge variant="outline" className="border-[hsl(var(--admin-accent-cyan)/0.3)] text-[hsl(var(--admin-accent-cyan))] text-[9px] shrink-0">{childCount} sub</Badge>
+            <Badge variant="outline" className="border-cyan-500/30 text-cyan-400 text-[9px] shrink-0">{childCount} sub</Badge>
           )}
         </div>
         <div className="flex items-center gap-1">
@@ -130,27 +118,31 @@ function CategoryPanel({ category, parentCategories, canEdit, onSave, isSaving, 
       {/* Body: 2/3 fields + 1/3 image */}
       <ScrollArea className="flex-1">
         <div className="flex h-full">
-          {/* LEFT 2/3 */}
           <div className="w-2/3 p-4 space-y-3 border-r border-white/[0.04]">
-            <VSection icon={Layers} title="Informações" color="cyan">
+            <LiquidSection icon={Layers} title="Informações" accent="cyan">
               <div className="space-y-2">
-                <Field label="Nome *" value={form.name} onChange={(v) => set('name', v)} placeholder="Nome da categoria" />
-                <Field label="Slug (URL)" value={form.slug} onChange={(v) => set('slug', v)} placeholder="auto-gerado" />
-                <div>
-                  <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium mb-1 block">Descrição</label>
-                  <Textarea value={form.description} onChange={(e) => set('description', e.target.value)}
-                    className="text-xs bg-white/[0.04] border-white/[0.08] text-white/90 min-h-[60px]" rows={3} />
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Nome *</label>
+                  <Input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Nome da categoria" className="h-8 text-xs liquid-input" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Slug (URL)</label>
+                  <Input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="auto-gerado" className="h-8 text-xs liquid-input" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Descrição</label>
+                  <Textarea value={form.description} onChange={(e) => set('description', e.target.value)} className="text-xs liquid-input min-h-[60px]" rows={3} />
                 </div>
               </div>
-            </VSection>
+            </LiquidSection>
 
-            <VSection icon={Layers} title="Organização" color="purple">
+            <LiquidSection icon={Layers} title="Organização" accent="purple">
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
                     <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Categoria Pai</label>
                     <Select value={form.parent_id || '__none__'} onValueChange={(v) => set('parent_id', v === '__none__' ? '' : v)}>
-                      <SelectTrigger className="h-8 text-xs bg-white/[0.04] border-white/[0.08] text-white/90"><SelectValue placeholder="Nenhuma (principal)" /></SelectTrigger>
+                      <SelectTrigger className="h-8 text-xs liquid-input"><SelectValue placeholder="Nenhuma (principal)" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="__none__">Nenhuma (principal)</SelectItem>
                         {parentCategories.filter(c => c.id !== category?.id).map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
@@ -160,7 +152,7 @@ function CategoryPanel({ category, parentCategories, canEdit, onSave, isSaving, 
                   <div className="space-y-1">
                     <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Status</label>
                     <Select value={form.status} onValueChange={(v) => set('status', v)}>
-                      <SelectTrigger className="h-8 text-xs bg-white/[0.04] border-white/[0.08] text-white/90"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-8 text-xs liquid-input"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="active">✅ Ativa</SelectItem>
                         <SelectItem value="inactive">⏸️ Inativa</SelectItem>
@@ -168,16 +160,18 @@ function CategoryPanel({ category, parentCategories, canEdit, onSave, isSaving, 
                     </Select>
                   </div>
                 </div>
-                <Field label="Ordem de exibição" value={form.display_order} onChange={(v) => set('display_order', v)} type="number" />
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Ordem de exibição</label>
+                  <Input type="number" value={form.display_order} onChange={(e) => set('display_order', e.target.value)} className="h-8 text-xs liquid-input" />
+                </div>
               </div>
-            </VSection>
+            </LiquidSection>
           </div>
 
-          {/* RIGHT 1/3 */}
           <div className="w-1/3 p-4">
-            <VSection icon={ImageIcon} title="Imagem" color="pink">
+            <LiquidSection icon={ImageIcon} title="Imagem" accent="pink">
               <ImageUpload value={form.image_url} onChange={(url) => set('image_url', url)} folder="categories" aspectRatio="aspect-square" />
-            </VSection>
+            </LiquidSection>
           </div>
         </div>
       </ScrollArea>
@@ -196,7 +190,6 @@ const AdminCategoriesPage = () => {
 
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [createAsChild, setCreateAsChild] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
   const [activeTab, setActiveTab] = useState('parents');
@@ -222,7 +215,7 @@ const AdminCategoriesPage = () => {
   };
 
   const imgCol = (cat: Category) => (
-    <div className="w-9 h-9 rounded-lg bg-[hsl(var(--admin-sidebar))] overflow-hidden flex items-center justify-center border border-white/[0.06]">
+    <div className="w-9 h-9 rounded-lg liquid-glass overflow-hidden flex items-center justify-center">
       {cat.image_url ? <img src={cat.image_url} alt="" className="w-full h-full object-cover" /> : <ImageIcon className="h-3.5 w-3.5 text-white/15" />}
     </div>
   );
@@ -230,7 +223,7 @@ const AdminCategoriesPage = () => {
   const parentColumns: Column<Category>[] = [
     { key: 'image_url', header: '', className: 'w-10', render: imgCol },
     { key: 'name', header: 'Nome', sortable: true },
-    { key: 'children_count', header: 'Sub', className: 'w-12', render: (c) => <Badge variant="outline" className="text-[9px] border-[hsl(var(--admin-accent-cyan)/0.3)] text-[hsl(var(--admin-accent-cyan))]">{childCategories.filter(ch => ch.parent_id === c.id).length}</Badge> },
+    { key: 'children_count', header: 'Sub', className: 'w-12', render: (c) => <Badge variant="outline" className="text-[9px] border-cyan-500/30 text-cyan-400">{childCategories.filter(ch => ch.parent_id === c.id).length}</Badge> },
     { key: 'display_order', header: 'Ord.', sortable: true, className: 'w-12' },
     { key: 'status', header: '', className: 'w-14', render: (c) => <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className="text-[9px] px-1.5">{c.status === 'active' ? '✅' : '⏸️'}</Badge> },
   ];
@@ -275,25 +268,23 @@ const AdminCategoriesPage = () => {
         />
 
       <div className={cn("flex h-[calc(100vh-8rem)]", !isMobile && "flex-row")}>
-
-        {/* LEFT: List — 2/5 */}
         <div className={cn(
           "flex flex-col min-h-0 overflow-hidden transition-all duration-300",
           panelOpen && !isMobile ? "w-2/5" : "w-full",
         )}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
             <div className="px-3 pt-3 flex items-center justify-between">
-              <TabsList className="admin-tabs-vivid bg-[hsl(var(--admin-sidebar))]">
-                <TabsTrigger value="parents" className="text-xs gap-1 data-[state=active]:bg-[hsl(var(--admin-accent-purple)/0.2)] data-[state=active]:text-[hsl(var(--admin-accent-purple))]">
+              <TabsList className="liquid-glass">
+                <TabsTrigger value="parents" className="text-xs gap-1 data-[state=active]:bg-white/[0.1] data-[state=active]:text-white">
                   <FolderOpen className="h-3 w-3" />Principais ({parentCategories.length})
                 </TabsTrigger>
-                <TabsTrigger value="children" className="text-xs gap-1 data-[state=active]:bg-[hsl(var(--admin-accent-cyan)/0.2)] data-[state=active]:text-[hsl(var(--admin-accent-cyan))]">
+                <TabsTrigger value="children" className="text-xs gap-1 data-[state=active]:bg-white/[0.1] data-[state=active]:text-white">
                   <Folder className="h-3 w-3" />Sub ({childCategories.length})
                 </TabsTrigger>
               </TabsList>
               <div className="flex gap-2">
                 <ExportButtons data={categories.map(c => ({ nome: c.name, slug: c.slug, status: c.status, ordem: c.display_order }))} filename="categorias" title="Categorias" columns={[{ key: 'nome', header: 'Nome' }, { key: 'slug', header: 'Slug' }, { key: 'status', header: 'Status' }, { key: 'ordem', header: 'Ordem' }]} />
-                <Button onClick={() => { setSelectedCategory(null); setCreateAsChild(activeTab === 'children'); setIsCreating(true); }} disabled={!canEdit()} className="admin-btn admin-btn-create">
+                <Button onClick={() => { setSelectedCategory(null); setIsCreating(true); }} disabled={!canEdit()} className="admin-btn admin-btn-create">
                   <Plus className="h-4 w-4 mr-1" />Nova Categoria
                 </Button>
               </div>
@@ -309,32 +300,29 @@ const AdminCategoriesPage = () => {
           </Tabs>
         </div>
 
-        {/* RIGHT: Detail Panel — 3/5 (desktop) */}
         {!isMobile && panelOpen && (
-          <div className="w-3/5 border-l border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] overflow-hidden animate-in slide-in-from-right-5 duration-300">
+          <div className="w-3/5 border-l border-white/[0.06] liquid-glass overflow-hidden animate-in slide-in-from-right-5 duration-300">
             {panelContent}
           </div>
         )}
       </div>
 
-      {/* Mobile Sheet */}
       {isMobile && (
         <Sheet open={panelOpen} onOpenChange={(open) => { if (!open) { setSelectedCategory(null); setIsCreating(false); } }}>
-          <SheetContent side="bottom" className="h-[90vh] p-0 bg-[hsl(var(--admin-card))] border-t border-[hsl(var(--admin-accent-cyan)/0.2)] rounded-t-2xl">
+          <SheetContent side="bottom" className="h-[90vh] p-0 liquid-glass border-t border-cyan-500/20 rounded-t-2xl">
             {panelContent}
           </SheetContent>
         </Sheet>
       )}
 
-      {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <DialogContent className="liquid-glass border-white/[0.1]">
           <DialogHeader>
             <DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
-            <DialogDescription>Excluir "{deleteTarget?.name}"? Esta ação não pode ser desfeita.</DialogDescription>
+            <DialogDescription>Tem certeza que deseja excluir "{deleteTarget?.name}"?</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-white/10 text-white">Cancelar</Button>
             <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={deleteCat.isPending}>
               {deleteCat.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar
             </Button>

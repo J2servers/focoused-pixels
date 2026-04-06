@@ -20,7 +20,7 @@ import {
   type Order,
 } from '@/hooks/useOrders';
 import { ExportButtons } from '@/components/admin/ExportButtons';
-import { Search, Eye, Package, Truck, Clock, CheckCircle, DollarSign, AlertTriangle } from 'lucide-react';
+import { Eye, Clock, CheckCircle, DollarSign, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
@@ -52,7 +52,6 @@ const EXPORT_COLUMNS = [
 ];
 
 const fmtCurrency = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`;
-
 const isCompletedSale = (o: Order) => o.payment_status === 'paid' && o.order_status !== 'cancelled';
 const isAwaitingPayment = (o: Order) => o.payment_status === 'pending' && o.order_status !== 'cancelled';
 const sumOrders = (list: Order[]) => list.reduce((s, o) => s + (o.total || 0), 0);
@@ -98,66 +97,49 @@ const AdminOrdersPage = () => {
 
   const columns: Column<Order>[] = [
     {
-      key: 'order_number',
-      header: 'Pedido',
-      sortable: true,
-      render: (o) => <span className="font-mono font-semibold text-[hsl(var(--admin-accent-purple))]">{o.order_number}</span>,
+      key: 'order_number', header: 'Pedido', sortable: true,
+      render: (o) => <span className="font-mono font-semibold text-purple-400">{o.order_number}</span>,
     },
     {
-      key: 'customer_name',
-      header: 'Cliente',
-      sortable: true,
+      key: 'customer_name', header: 'Cliente', sortable: true,
       render: (o) => (
         <div>
           <p className="font-medium text-white">{o.customer_name}</p>
-          <p className="text-xs text-[hsl(var(--admin-text-muted))]">{o.customer_email}</p>
+          <p className="text-xs text-white/40">{o.customer_email}</p>
         </div>
       ),
     },
     {
-      key: 'total',
-      header: 'Total',
-      sortable: true,
+      key: 'total', header: 'Total', sortable: true,
       render: (o) => <span className="font-semibold text-white">{fmtCurrency(o.total)}</span>,
     },
     {
-      key: 'order_status',
-      header: 'Status',
+      key: 'order_status', header: 'Status',
       render: (o) => {
         const cfg = ORDER_STATUS_CONFIG[o.order_status] || ORDER_STATUS_CONFIG.pending;
         return <Badge className={`${cfg.color} text-white`}>{cfg.label}</Badge>;
       },
     },
     {
-      key: 'payment_status',
-      header: 'Pagamento',
+      key: 'payment_status', header: 'Pagamento',
       render: (o) => {
         const cfg = PAYMENT_STATUS_CONFIG[o.payment_status] || PAYMENT_STATUS_CONFIG.pending;
         return <Badge className={`${cfg.color} text-white`}>{cfg.label}</Badge>;
       },
     },
     {
-      key: 'production_status',
-      header: 'Produção',
+      key: 'production_status', header: 'Produção',
       render: (o) => {
         const ps = o.production_status as ProductionStatus;
         return <Badge className={`${PRODUCTION_STATUS_COLORS[ps]} text-white`}>{PRODUCTION_STATUS_LABELS[ps]}</Badge>;
       },
     },
     {
-      key: 'created_at',
-      header: 'Data',
-      sortable: true,
-      render: (o) => (
-        <span className="text-sm text-[hsl(var(--admin-text-muted))]">
-          {format(new Date(o.created_at), 'dd/MM/yy HH:mm', { locale: ptBR })}
-        </span>
-      ),
+      key: 'created_at', header: 'Data', sortable: true,
+      render: (o) => <span className="text-sm text-white/50">{format(new Date(o.created_at), 'dd/MM/yy HH:mm', { locale: ptBR })}</span>,
     },
     {
-      key: 'actions',
-      header: '',
-      className: 'w-12',
+      key: 'actions', header: '', className: 'w-12',
       render: (o) => (
         <Button className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => setSelectedOrder(o)}>
           <Eye className="h-4 w-4" />
@@ -169,7 +151,7 @@ const AdminOrdersPage = () => {
   const filterContent = (
     <div className="flex gap-2 flex-wrap">
       <Select value={statusFilter} onValueChange={setStatusFilter}>
-        <SelectTrigger className="w-[180px] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
+        <SelectTrigger className="w-[180px] liquid-input text-white">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
@@ -179,8 +161,8 @@ const AdminOrdersPage = () => {
           ))}
         </SelectContent>
       </Select>
-      <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-[150px] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white" />
-      <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-[150px] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white" />
+      <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-[150px] liquid-input text-white" />
+      <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-[150px] liquid-input text-white" />
     </div>
   );
 
@@ -208,9 +190,9 @@ const AdminOrdersPage = () => {
         </div>
 
         <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'paid' | 'awaiting')} className="space-y-4">
-          <TabsList className="admin-tabs-vivid grid w-full max-w-md grid-cols-2 bg-[hsl(var(--admin-sidebar))] border border-[hsl(var(--admin-card-border))]">
-            <TabsTrigger value="paid">Vendas Feitas</TabsTrigger>
-            <TabsTrigger value="awaiting">Aguardando Pagamento</TabsTrigger>
+          <TabsList className="grid w-full max-w-md grid-cols-2 liquid-glass">
+            <TabsTrigger value="paid" className="data-[state=active]:bg-white/[0.1] data-[state=active]:text-white">Vendas Feitas</TabsTrigger>
+            <TabsTrigger value="awaiting" className="data-[state=active]:bg-white/[0.1] data-[state=active]:text-white">Aguardando Pagamento</TabsTrigger>
           </TabsList>
 
           <TabsContent value={viewMode} className="mt-0">
@@ -236,7 +218,7 @@ const AdminOrdersPage = () => {
 
       {/* Order Detail Dialog */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
+        <DialogContent className="max-w-2xl max-h-[90vh] liquid-glass border-white/[0.1] text-white">
           <DialogHeader>
             <DialogTitle className="text-white">Venda {selectedOrder?.order_number}</DialogTitle>
           </DialogHeader>
@@ -246,7 +228,7 @@ const AdminOrdersPage = () => {
               <div className="space-y-6 p-1">
                 <div>
                   <h4 className="font-semibold mb-2 text-white">Cliente</h4>
-                  <div className="bg-[hsl(var(--admin-bg))] rounded-lg p-4 space-y-1 text-[hsl(var(--admin-text-muted))]">
+                  <div className="liquid-glass-lighter rounded-lg p-4 space-y-1 text-white/70">
                     <p><strong className="text-white">Nome:</strong> {selectedOrder.customer_name}</p>
                     <p><strong className="text-white">Email:</strong> {selectedOrder.customer_email}</p>
                     <p><strong className="text-white">Telefone:</strong> {selectedOrder.customer_phone}</p>
@@ -256,18 +238,16 @@ const AdminOrdersPage = () => {
                   </div>
                 </div>
 
-                <Separator className="bg-[hsl(var(--admin-card-border))]" />
+                <Separator className="bg-white/[0.08]" />
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium block mb-2 text-[hsl(var(--admin-text-muted))]">Status da venda</label>
+                    <label className="text-sm font-medium block mb-2 text-white/60">Status da venda</label>
                     <Select
                       value={selectedOrder.order_status}
                       onValueChange={(v) => updateOrder.mutateAsync({ id: selectedOrder.id, order_status: v })}
                     >
-                      <SelectTrigger className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white">
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger className="liquid-input text-white"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {Object.entries(ORDER_STATUS_CONFIG).map(([key, { label }]) => (
                           <SelectItem key={key} value={key}>{label}</SelectItem>
@@ -276,14 +256,12 @@ const AdminOrdersPage = () => {
                     </Select>
                   </div>
                   <div>
-                    <label className="text-sm font-medium block mb-2 text-[hsl(var(--admin-text-muted))]">Status de produção</label>
+                    <label className="text-sm font-medium block mb-2 text-white/60">Status de produção</label>
                     <Select
                       value={selectedOrder.production_status}
                       onValueChange={(v) => updateProductionStatus.mutateAsync({ id: selectedOrder.id, status: v as ProductionStatus })}
                     >
-                      <SelectTrigger className="bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white">
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger className="liquid-input text-white"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {Object.entries(PRODUCTION_STATUS_LABELS).map(([key, label]) => (
                           <SelectItem key={key} value={key}>{label}</SelectItem>
@@ -293,11 +271,11 @@ const AdminOrdersPage = () => {
                   </div>
                 </div>
 
-                <Separator className="bg-[hsl(var(--admin-card-border))]" />
+                <Separator className="bg-white/[0.08]" />
 
                 <div>
                   <h4 className="font-semibold mb-2 text-white">Resumo</h4>
-                  <div className="bg-[hsl(var(--admin-bg))] rounded-lg p-4 space-y-2 text-[hsl(var(--admin-text-muted))]">
+                  <div className="liquid-glass-lighter rounded-lg p-4 space-y-2 text-white/70">
                     <div className="flex justify-between"><span>Subtotal:</span><span>{fmtCurrency(selectedOrder.subtotal)}</span></div>
                     {selectedOrder.shipping_cost != null && selectedOrder.shipping_cost > 0 && (
                       <div className="flex justify-between"><span>Frete:</span><span>{fmtCurrency(selectedOrder.shipping_cost)}</span></div>
@@ -305,17 +283,17 @@ const AdminOrdersPage = () => {
                     {selectedOrder.discount != null && selectedOrder.discount > 0 && (
                       <div className="flex justify-between text-green-400"><span>Desconto:</span><span>- {fmtCurrency(selectedOrder.discount)}</span></div>
                     )}
-                    <Separator className="bg-[hsl(var(--admin-card-border))]" />
+                    <Separator className="bg-white/[0.08]" />
                     <div className="flex justify-between font-bold text-lg text-white"><span>Total:</span><span>{fmtCurrency(selectedOrder.total)}</span></div>
                   </div>
                 </div>
 
                 {selectedOrder.tracking_code && (
                   <>
-                    <Separator className="bg-[hsl(var(--admin-card-border))]" />
+                    <Separator className="bg-white/[0.08]" />
                     <div>
                       <h4 className="font-semibold mb-2 text-white">Rastreio</h4>
-                      <div className="bg-[hsl(var(--admin-bg))] rounded-lg p-4 text-[hsl(var(--admin-text-muted))]">
+                      <div className="liquid-glass-lighter rounded-lg p-4 text-white/70">
                         <p><strong className="text-white">Código:</strong> {selectedOrder.tracking_code}</p>
                         <p><strong className="text-white">Transportadora:</strong> {selectedOrder.shipping_company || 'Correios'}</p>
                       </div>
@@ -325,10 +303,10 @@ const AdminOrdersPage = () => {
 
                 {selectedOrder.notes && (
                   <>
-                    <Separator className="bg-[hsl(var(--admin-card-border))]" />
+                    <Separator className="bg-white/[0.08]" />
                     <div>
                       <h4 className="font-semibold mb-2 text-white">Observações</h4>
-                      <p className="text-[hsl(var(--admin-text-muted))]">{selectedOrder.notes}</p>
+                      <p className="text-white/60">{selectedOrder.notes}</p>
                     </div>
                   </>
                 )}

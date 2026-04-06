@@ -19,15 +19,14 @@ import { SettingsAISection } from '@/components/admin/settings/SettingsAISection
 import { type SettingsTab } from '@/components/admin/settings/SettingsShared';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
-/* ─── Tab Config ─── */
-interface TabMeta { label: string; icon: LucideIcon; accentVar: string; }
+interface TabMeta { label: string; icon: LucideIcon; }
 const TABS: Record<SettingsTab, TabMeta> = {
-  geral:       { label: 'Geral',       icon: Store,       accentVar: '--admin-accent-blue' },
-  pagamentos:  { label: 'Pagamentos',  icon: CreditCard,  accentVar: '--admin-accent-green' },
-  email:       { label: 'Email',       icon: Mail,        accentVar: '--admin-accent-orange' },
-  seguranca:   { label: 'Segurança',   icon: ShieldCheck, accentVar: '--admin-accent-pink' },
-  operacoes:   { label: 'Operações',   icon: Settings2,   accentVar: '--admin-accent-purple' },
-  ia:          { label: 'IA',          icon: Bot,         accentVar: '--admin-accent-purple' },
+  geral:       { label: 'Geral',       icon: Store },
+  pagamentos:  { label: 'Pagamentos',  icon: CreditCard },
+  email:       { label: 'Email',       icon: Mail },
+  seguranca:   { label: 'Segurança',   icon: ShieldCheck },
+  operacoes:   { label: 'Operações',   icon: Settings2 },
+  ia:          { label: 'IA',          icon: Bot },
 };
 const TAB_ORDER: SettingsTab[] = ['geral', 'pagamentos', 'email', 'seguranca', 'operacoes', 'ia'];
 
@@ -101,7 +100,7 @@ const AdminSettingsPage = () => {
     return (
       <AdminLayout title="Configurações">
         <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-[hsl(var(--admin-accent-purple))]" />
+          <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
         </div>
       </AdminLayout>
     );
@@ -123,26 +122,20 @@ const AdminSettingsPage = () => {
           ]}
         />
 
-        {/* ── Header Bar ── */}
+        {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[hsl(var(--admin-text))]">Configurações</h2>
-            <p className="text-sm text-[hsl(var(--admin-text-muted))]">
-              Gerencie loja, pagamentos, email, segurança e operações.
-            </p>
+            <h2 className="text-xl font-bold text-white">Configurações</h2>
+            <p className="text-sm text-white/50">Gerencie loja, pagamentos, email, segurança e operações.</p>
           </div>
-          <Button
-            className="admin-btn admin-btn-save h-10 shrink-0"
-            onClick={saveAll}
-            disabled={saving || !canMutate}
-          >
+          <Button className="admin-btn admin-btn-save h-10 shrink-0" onClick={saveAll} disabled={saving || !canMutate}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
             Salvar tudo
           </Button>
         </div>
 
-        {/* ── Tabs ── */}
-        <div className="flex gap-1 overflow-x-auto rounded-xl border border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] p-1">
+        {/* Tabs */}
+        <div className="flex gap-1 overflow-x-auto rounded-xl liquid-glass p-1">
           {TAB_ORDER.map(t => {
             const meta = TABS[t];
             const Icon = meta.icon;
@@ -155,8 +148,8 @@ const AdminSettingsPage = () => {
                 className={cn(
                   'flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200',
                   active
-                    ? 'bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-md shadow-[hsl(var(--admin-accent-purple)/0.3)]'
-                    : 'text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-bg)/0.5)]'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/30'
+                    : 'text-white/50 hover:text-white hover:bg-white/[0.06]'
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -166,7 +159,7 @@ const AdminSettingsPage = () => {
           })}
         </div>
 
-        {/* ── Content ── */}
+        {/* Content */}
         <div className="min-w-0">
           {tab === 'geral' && <SettingsGeneralSection settings={settings} u={u} />}
           {tab === 'pagamentos' && <SettingsPaymentsSection payment={payment} up={up} canMutate={canMutate} testMP={testMP} testEFI={testEFI} testStripe={testStripe} runTest={runTest} />}
