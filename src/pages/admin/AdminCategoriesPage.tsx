@@ -140,6 +140,9 @@ const AdminCategoriesPage = () => {
   return (
     <AdminLayout title="Categorias" requireEditor>
       <div className="space-y-6">
+        <div className="flex justify-end">
+          <ExportButtons data={[...parentCategories, ...childCategories].map(c => ({ nome: c.name, slug: c.slug, status: c.status || 'active', ordem: c.display_order ?? 0 }))} filename="categorias" columns={[{key:'nome',header:'Nome'},{key:'slug',header:'Slug'},{key:'status',header:'Status'},{key:'ordem',header:'Ordem'}]} />
+        </div>
         <Collapsible open={parentSectionOpen} onOpenChange={setParentSectionOpen}>
           <div className="bg-[hsl(var(--admin-card))] border border-[hsl(var(--admin-card-border))] rounded-xl overflow-hidden">
             <CollapsibleTrigger asChild>
