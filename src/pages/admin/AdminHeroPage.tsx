@@ -95,9 +95,9 @@ const AdminHeroPage = () => {
       key: 'actions', header: 'Ações', className: 'w-32',
       render: (slide) => (
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" className="text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))]" onClick={() => { setSelectedSlide(slide); setIsPreviewOpen(true); }}><Eye className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="icon" className="text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text))]" onClick={() => openEditDialog(slide)} disabled={!canEdit()}><Pencil className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300" onClick={() => { setSelectedSlide(slide); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}><Trash2 className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" className="admin-btn admin-btn-view !min-h-0 !p-1 h-8 w-8" onClick={() => { setSelectedSlide(slide); setIsPreviewOpen(true); }}><Eye className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" className="admin-btn admin-btn-edit !min-h-0 !p-1 h-8 w-8" onClick={() => openEditDialog(slide)} disabled={!canEdit()}><Pencil className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" className="admin-btn admin-btn-delete !min-h-0 !p-1 h-8 w-8" onClick={() => { setSelectedSlide(slide); setIsDeleteDialogOpen(true); }} disabled={!canEdit()}><Trash2 className="h-4 w-4" /></Button>
         </div>
       ),
     },
@@ -128,7 +128,7 @@ const AdminHeroPage = () => {
         <DataTable data={slides} columns={columns} isLoading={isLoading} searchPlaceholder="Buscar slides..."
           actions={
             <Button onClick={openCreateDialog} disabled={!canEdit()}
-              className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white shadow-lg">
+              className="admin-btn admin-btn-create">
               <Plus className="h-4 w-4 mr-2" />Novo Slide
             </Button>
           } />
@@ -163,7 +163,7 @@ const AdminHeroPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</Button>
-            <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white">
+            <Button onClick={handleSave} disabled={isSaving} className="admin-btn admin-btn-save">
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar
             </Button>
           </DialogFooter>
@@ -194,7 +194,7 @@ const AdminHeroPage = () => {
             <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Tem certeza que deseja excluir este slide?</DialogDescription></DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Excluir</Button>
+            <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
