@@ -38,7 +38,7 @@ const AdminReviewsPage = () => {
     { key: 'product_slug', header: 'Produto', render: (r) => <span className="font-medium text-white">{r.product_slug}</span> },
     { key: 'customer_name', header: 'Cliente', sortable: true },
     { key: 'rating', header: 'Nota', render: (r) => <ReviewStars rating={r.rating} size="sm" /> },
-    { key: 'comment', header: 'Comentário', render: (r) => <span className="line-clamp-2 max-w-xs text-[hsl(var(--admin-text-muted))]">{r.comment}</span> },
+    { key: 'comment', header: 'Comentário', render: (r) => <span className="line-clamp-2 max-w-xs text-white/50">{r.comment}</span> },
     {
       key: 'is_approved', header: 'Status',
       render: (r) => <AdminStatusBadge label={r.is_approved ? 'Aprovada' : 'Pendente'} variant={r.is_approved ? 'success' : 'warning'} />,
@@ -98,20 +98,20 @@ const AdminReviewsPage = () => {
 
       {/* View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <DialogContent className="max-w-2xl liquid-glass">
           <DialogHeader><DialogTitle className="text-white">Detalhes da Avaliação</DialogTitle></DialogHeader>
           {selectedReview && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><p className="text-sm text-[hsl(var(--admin-text-muted))]">Produto</p><p className="font-medium text-white">{selectedReview.product_slug}</p></div>
-                <div><p className="text-sm text-[hsl(var(--admin-text-muted))]">Cliente</p><p className="font-medium text-white">{selectedReview.customer_name}</p><p className="text-sm text-[hsl(var(--admin-text-muted))]">{selectedReview.customer_email}</p></div>
+                <div><p className="text-sm text-white/50">Produto</p><p className="font-medium text-white">{selectedReview.product_slug}</p></div>
+                <div><p className="text-sm text-white/50">Cliente</p><p className="font-medium text-white">{selectedReview.customer_name}</p><p className="text-sm text-white/50">{selectedReview.customer_email}</p></div>
               </div>
-              <div><p className="text-sm text-[hsl(var(--admin-text-muted))] mb-1">Avaliação</p><ReviewStars rating={selectedReview.rating} size="md" /></div>
-              {selectedReview.title && <div><p className="text-sm text-[hsl(var(--admin-text-muted))]">Título</p><p className="font-medium text-white">{selectedReview.title}</p></div>}
-              <div><p className="text-sm text-[hsl(var(--admin-text-muted))]">Comentário</p><p className="mt-1 text-white">{selectedReview.comment}</p></div>
+              <div><p className="text-sm text-white/50 mb-1">Avaliação</p><ReviewStars rating={selectedReview.rating} size="md" /></div>
+              {selectedReview.title && <div><p className="text-sm text-white/50">Título</p><p className="font-medium text-white">{selectedReview.title}</p></div>}
+              <div><p className="text-sm text-white/50">Comentário</p><p className="mt-1 text-white">{selectedReview.comment}</p></div>
               {selectedReview.images && selectedReview.images.length > 0 && (
-                <div><p className="text-sm text-[hsl(var(--admin-text-muted))] mb-2">Imagens</p>
-                  <div className="flex gap-2 flex-wrap">{selectedReview.images.map((img, i) => <img key={i} src={img} alt={`Imagem ${i+1}`} className="w-24 h-24 object-cover rounded-lg border border-[hsl(var(--admin-card-border))]" />)}</div>
+                <div><p className="text-sm text-white/50 mb-2">Imagens</p>
+                  <div className="flex gap-2 flex-wrap">{selectedReview.images.map((img, i) => <img key={i} src={img} alt={`Imagem ${i+1}`} className="w-24 h-24 object-cover rounded-lg border border-white/[0.08]" />)}</div>
                 </div>
               )}
               <div className="flex items-center gap-4">
@@ -121,7 +121,7 @@ const AdminReviewsPage = () => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Fechar</Button>
+            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="border-white/[0.08] bg-transparent text-white hover:bg-white/[0.06]">Fechar</Button>
             {selectedReview && !selectedReview.is_approved && (
               <Button onClick={() => { approveReview.mutate({ id: selectedReview.id, approved: true }); setIsViewDialogOpen(false); }}
                 className="admin-btn admin-btn-save">Aprovar</Button>
@@ -132,11 +132,11 @@ const AdminReviewsPage = () => {
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <DialogContent className="liquid-glass">
           <DialogHeader><DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
-            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Tem certeza que deseja excluir esta avaliação?</DialogDescription></DialogHeader>
+            <DialogDescription className="text-white/50">Tem certeza que deseja excluir esta avaliação?</DialogDescription></DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white">Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-white/[0.08] bg-transparent text-white">Cancelar</Button>
             <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={isProcessing}>{isProcessing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar</Button>
           </DialogFooter>
         </DialogContent>

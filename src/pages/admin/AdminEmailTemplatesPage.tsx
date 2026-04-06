@@ -23,10 +23,10 @@ import { VisualWorkflowBuilder } from '@/components/admin/workflows';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 /* ─── Shared admin styles ─── */
-const cardCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]";
-const inputCls = "bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus:border-[hsl(var(--admin-accent-purple))] focus:ring-1 focus:ring-[hsl(var(--admin-accent-purple)/0.3)]";
-const mutedText = "text-[hsl(var(--admin-text-muted))]";
-const btnOutline = "border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-white/5 transition-colors";
+const cardCls = "liquid-glass";
+const inputCls = "liquid-input text-white";
+const mutedText = "text-white/50";
+const btnOutline = "border-white/10 bg-transparent text-white hover:bg-white/[0.06] transition-colors";
 
 type PageTab = 'templates' | 'workflows';
 
@@ -127,7 +127,7 @@ const AdminEmailTemplatesPage = () => {
         {/* ═══════════ HEADER ═══════════ */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] flex items-center justify-center shadow-lg shadow-purple-500/20">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
               <Radio className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -173,10 +173,10 @@ const AdminEmailTemplatesPage = () => {
                   className={`flex-1 flex items-center justify-center gap-3 px-6 py-4 transition-all border-b-2
                     ${isActive
                       ? 'border-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.06)] text-white'
-                      : 'border-transparent text-[hsl(var(--admin-text-muted))] hover:bg-white/3 hover:text-white'
+                      : 'border-transparent text-white/50 hover:bg-white/3 hover:text-white'
                     }`}
                 >
-                  <Icon className={`h-5 w-5 ${isActive ? 'text-[hsl(var(--admin-accent-purple))]' : ''}`} />
+                  <Icon className={`h-5 w-5 ${isActive ? 'text-purple-400' : ''}`} />
                   <div className="text-left hidden sm:block">
                     <p className="text-sm font-semibold">{tab.label}</p>
                     <p className="text-[10px] opacity-60">{tab.desc}</p>
@@ -211,8 +211,8 @@ const AdminEmailTemplatesPage = () => {
               <CardContent className="p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(var(--admin-accent-purple)/0.2)] to-[hsl(var(--admin-accent-pink)/0.1)] flex items-center justify-center border border-[hsl(var(--admin-accent-purple)/0.2)]">
-                      <Zap className="h-4.5 w-4.5 text-[hsl(var(--admin-accent-purple))]" />
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(var(--admin-accent-purple)/0.2)] to-[hsl(var(--admin-accent-pink)/0.1)] flex items-center justify-center border border-purple-500/20">
+                      <Zap className="h-4.5 w-4.5 text-purple-400" />
                     </div>
                     <div>
                       <h3 className="text-sm font-semibold text-white">Matriz de Cobertura de Eventos</h3>
@@ -280,8 +280,8 @@ const AdminEmailTemplatesPage = () => {
 
                 {/* Channel filter */}
                 <Tabs value={channelTab} onValueChange={v => setChannelTab(v as any)}>
-                  <TabsList className="admin-tabs-vivid bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-card-border))] h-9">
-                    <TabsTrigger value="all" className="text-xs h-7 data-[state=active]:bg-[hsl(var(--admin-accent-purple)/0.15)] data-[state=active]:text-white">Todos</TabsTrigger>
+                  <TabsList className="admin-tabs-vivid bg-white/[0.03] border border-white/[0.08] h-9">
+                    <TabsTrigger value="all" className="text-xs h-7 data-[state=active]:bg-purple-500/15 data-[state=active]:text-white">Todos</TabsTrigger>
                     <TabsTrigger value="email" className="text-xs h-7 gap-1 data-[state=active]:bg-blue-500/15 data-[state=active]:text-blue-400">
                       <Mail className="h-3 w-3" />E-mail
                     </TabsTrigger>
@@ -309,17 +309,17 @@ const AdminEmailTemplatesPage = () => {
                 </Button>
 
                 {/* View mode */}
-                <div className="flex border rounded-lg overflow-hidden border-[hsl(var(--admin-card-border))]">
+                <div className="flex border rounded-lg overflow-hidden border-white/[0.08]">
                   <Button
                     variant="ghost" size="sm"
-                    className={`h-9 rounded-none px-2.5 ${tpl.viewMode === 'grid' ? 'bg-[hsl(var(--admin-accent-purple)/0.15)] text-white' : `text-[hsl(var(--admin-text-muted))] hover:text-white`}`}
+                    className={`h-9 rounded-none px-2.5 ${tpl.viewMode === 'grid' ? 'bg-purple-500/15 text-white' : `text-white/50 hover:text-white`}`}
                     onClick={() => tpl.setViewMode('grid')}
                   >
                     <LayoutGrid className="h-3.5 w-3.5" />
                   </Button>
                   <Button
                     variant="ghost" size="sm"
-                    className={`h-9 rounded-none px-2.5 ${tpl.viewMode === 'list' ? 'bg-[hsl(var(--admin-accent-purple)/0.15)] text-white' : `text-[hsl(var(--admin-text-muted))] hover:text-white`}`}
+                    className={`h-9 rounded-none px-2.5 ${tpl.viewMode === 'list' ? 'bg-purple-500/15 text-white' : `text-white/50 hover:text-white`}`}
                     onClick={() => tpl.setViewMode('list')}
                   >
                     <LayoutList className="h-3.5 w-3.5" />
@@ -350,7 +350,7 @@ const AdminEmailTemplatesPage = () => {
               {/* Bulk actions bar */}
               {totalSelected > 0 && (
                 <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/5">
-                  <Badge className="bg-[hsl(var(--admin-accent-purple)/0.15)] text-[hsl(var(--admin-accent-purple))] border-0">
+                  <Badge className="bg-purple-500/15 text-purple-400 border-0">
                     {totalSelected} selecionado{totalSelected > 1 ? 's' : ''}
                   </Badge>
                   {selectedEmails.size > 0 && (
@@ -384,14 +384,14 @@ const AdminEmailTemplatesPage = () => {
                   <h2 className="text-base font-semibold text-white">Templates de E-mail</h2>
                   <Badge className="bg-blue-500/10 text-blue-400 border-0 text-xs">{tpl.filteredEmails.length}</Badge>
                   <div className="flex-1" />
-                  {emailCollapsed ? <ChevronDown className="h-4 w-4 text-[hsl(var(--admin-text-muted))]" /> : <ChevronUp className="h-4 w-4 text-[hsl(var(--admin-text-muted))]" />}
+                  {emailCollapsed ? <ChevronDown className="h-4 w-4 text-white/50" /> : <ChevronUp className="h-4 w-4 text-white/50" />}
                 </button>
 
                 {!emailCollapsed && (
                   tpl.loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                       {[1, 2, 3].map(i => (
-                        <div key={i} className="h-48 bg-[hsl(var(--admin-bg))] animate-pulse rounded-2xl border border-[hsl(var(--admin-card-border))]" />
+                        <div key={i} className="h-48 bg-white/[0.03] animate-pulse rounded-2xl border border-white/[0.08]" />
                       ))}
                     </div>
                   ) : tpl.filteredEmails.length === 0 ? (
@@ -463,14 +463,14 @@ const AdminEmailTemplatesPage = () => {
                   <h2 className="text-base font-semibold text-white">Templates WhatsApp</h2>
                   <Badge className="bg-green-500/10 text-green-400 border-0 text-xs">{tpl.filteredWhats.length}</Badge>
                   <div className="flex-1" />
-                  {whatsCollapsed ? <ChevronDown className="h-4 w-4 text-[hsl(var(--admin-text-muted))]" /> : <ChevronUp className="h-4 w-4 text-[hsl(var(--admin-text-muted))]" />}
+                  {whatsCollapsed ? <ChevronDown className="h-4 w-4 text-white/50" /> : <ChevronUp className="h-4 w-4 text-white/50" />}
                 </button>
 
                 {!whatsCollapsed && (
                   tpl.loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                       {[1, 2, 3].map(i => (
-                        <div key={i} className="h-48 bg-[hsl(var(--admin-bg))] animate-pulse rounded-2xl border border-[hsl(var(--admin-card-border))]" />
+                        <div key={i} className="h-48 bg-white/[0.03] animate-pulse rounded-2xl border border-white/[0.08]" />
                       ))}
                     </div>
                   ) : tpl.filteredWhats.length === 0 ? (

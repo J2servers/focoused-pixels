@@ -101,7 +101,7 @@ const AdminPromotionsPage = () => {
     {
       key: 'start_date', header: 'Período',
       render: (p) => (
-        <span className="text-sm text-[hsl(var(--admin-text-muted))]">
+        <span className="text-sm text-white/50">
           {format(new Date(p.start_date), 'dd/MM/yy', { locale: ptBR })} - {format(new Date(p.end_date), 'dd/MM/yy', { locale: ptBR })}
         </span>
       ),
@@ -151,49 +151,49 @@ const AdminPromotionsPage = () => {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <DialogContent className="max-w-lg liquid-glass">
           <DialogHeader><DialogTitle className="text-white">{selectedPromo ? 'Editar Promoção' : 'Nova Promoção'}</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Nome *</Label><Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} /></div>
+            <div className="space-y-2"><Label className="text-white/50">Nome *</Label><Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Tipo</Label>
+              <div className="space-y-2"><Label className="text-white/50">Tipo</Label>
                 <Select value={formData.type} onValueChange={(v) => setFormData({ ...formData, type: v })}><SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="percentage">Percentual (%)</SelectItem><SelectItem value="fixed">Valor Fixo (R$)</SelectItem></SelectContent></Select>
               </div>
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Valor *</Label><Input type="number" value={formData.value} onChange={(e) => setFormData({ ...formData, value: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-white/50">Valor *</Label><Input type="number" value={formData.value} onChange={(e) => setFormData({ ...formData, value: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Regra</Label>
+              <div className="space-y-2"><Label className="text-white/50">Regra</Label>
                 <Select value={formData.rule} onValueChange={(v) => setFormData({ ...formData, rule: v })}><SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="general">Geral</SelectItem><SelectItem value="category">Por Categoria</SelectItem><SelectItem value="product">Por Produto</SelectItem></SelectContent></Select>
               </div>
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Prioridade</Label><Input type="number" value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-white/50">Prioridade</Label><Input type="number" value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Início *</Label><Input type="datetime-local" value={formData.start_date} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} /></div>
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Fim *</Label><Input type="datetime-local" value={formData.end_date} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-white/50">Início *</Label><Input type="datetime-local" value={formData.start_date} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-white/50">Fim *</Label><Input type="datetime-local" value={formData.end_date} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Status</Label>
+              <div className="space-y-2"><Label className="text-white/50">Status</Label>
                 <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}><SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="active">Ativa</SelectItem><SelectItem value="inactive">Inativa</SelectItem></SelectContent></Select>
               </div>
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Banner URL</Label><Input value={formData.banner_url} onChange={(e) => setFormData({ ...formData, banner_url: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-white/50">Banner URL</Label><Input value={formData.banner_url} onChange={(e) => setFormData({ ...formData, banner_url: e.target.value })} /></div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white">Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-white/[0.08] bg-transparent text-white">Cancelar</Button>
             <Button onClick={handleSave} disabled={isSaving} className="admin-btn admin-btn-save">{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <DialogContent className="liquid-glass">
           <DialogHeader><DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
-            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Tem certeza que deseja excluir "{selectedPromo?.name}"?</DialogDescription></DialogHeader>
+            <DialogDescription className="text-white/50">Tem certeza que deseja excluir "{selectedPromo?.name}"?</DialogDescription></DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-white">Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-white/[0.08] bg-transparent text-white">Cancelar</Button>
             <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar</Button>
           </DialogFooter>
         </DialogContent>

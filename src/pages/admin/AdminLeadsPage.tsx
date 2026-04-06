@@ -88,15 +88,15 @@ const AdminLeadsPage = () => {
       key: 'name', header: 'Contato', sortable: true,
       render: (lead) => (
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
             <span className="text-white text-xs font-bold">{lead.name.charAt(0).toUpperCase()}</span>
           </div>
           <div>
             <p className="font-medium text-white text-sm">{lead.name}</p>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[11px] text-[hsl(var(--admin-text-muted))] flex items-center gap-1"><Mail className="h-3 w-3" />{lead.email}</span>
+              <span className="text-[11px] text-white/50 flex items-center gap-1"><Mail className="h-3 w-3" />{lead.email}</span>
             </div>
-            {lead.phone && <span className="text-[11px] text-[hsl(var(--admin-text-muted))] flex items-center gap-1 mt-0.5"><Phone className="h-3 w-3" />{lead.phone}</span>}
+            {lead.phone && <span className="text-[11px] text-white/50 flex items-center gap-1 mt-0.5"><Phone className="h-3 w-3" />{lead.phone}</span>}
           </div>
         </div>
       ),
@@ -105,8 +105,8 @@ const AdminLeadsPage = () => {
       key: 'source', header: 'Origem', sortable: true,
       render: (lead) => (
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded bg-[hsl(var(--admin-accent-purple)/0.15)] flex items-center justify-center">
-            <Globe className="h-3 w-3 text-[hsl(var(--admin-accent-purple))]" />
+          <div className="w-6 h-6 rounded bg-purple-500/15 flex items-center justify-center">
+            <Globe className="h-3 w-3 text-purple-400" />
           </div>
           <span className="text-sm text-white">{lead.source}</span>
         </div>
@@ -117,11 +117,11 @@ const AdminLeadsPage = () => {
       render: (lead) => (
         <div className="flex flex-wrap gap-1 max-w-[180px]">
           {(lead.tags || []).slice(0, 3).map((tag, i) => (
-            <span key={i} className="text-[10px] px-1.5 py-0.5 rounded-full bg-[hsl(var(--admin-accent-purple)/0.1)] text-[hsl(var(--admin-accent-purple))] border border-[hsl(var(--admin-accent-purple)/0.2)]">
+            <span key={i} className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
               {tag}
             </span>
           ))}
-          {(lead.tags || []).length > 3 && <span className="text-[10px] text-[hsl(var(--admin-text-muted))]">+{lead.tags.length - 3}</span>}
+          {(lead.tags || []).length > 3 && <span className="text-[10px] text-white/50">+{lead.tags.length - 3}</span>}
         </div>
       ),
     },
@@ -135,7 +135,7 @@ const AdminLeadsPage = () => {
         const isRecent = isAfter(new Date(lead.created_at), subDays(new Date(), 1));
         return (
           <div>
-            <span className="text-sm text-[hsl(var(--admin-text-muted))]">{format(new Date(lead.created_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
+            <span className="text-sm text-white/50">{format(new Date(lead.created_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
             {isRecent && <Badge className="ml-2 text-[9px] bg-green-500/20 text-green-400 border-0">Novo</Badge>}
           </div>
         );
@@ -146,10 +146,10 @@ const AdminLeadsPage = () => {
       render: (lead) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"><MoreVertical className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-white/50 hover:text-white hover:bg-white/[0.06]"><MoreVertical className="h-4 w-4" /></Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">
-            <DropdownMenuItem onClick={() => handleToggleSubscription(lead)} className="hover:bg-[hsl(var(--admin-sidebar-hover))]">
+          <DropdownMenuContent align="end" className="liquid-glass text-white">
+            <DropdownMenuItem onClick={() => handleToggleSubscription(lead)} className="hover:bg-white/[0.06]">
               {lead.is_subscribed ? <><UserX className="h-4 w-4 mr-2" />Cancelar Inscrição</> : <><UserCheck className="h-4 w-4 mr-2" />Reativar</>}
             </DropdownMenuItem>
             <DropdownMenuItem className="text-red-400 hover:bg-red-500/10" onClick={() => setDeleteId(lead.id)}><Trash2 className="h-4 w-4 mr-2" />Remover</DropdownMenuItem>
@@ -167,7 +167,7 @@ const AdminLeadsPage = () => {
         { value: 'unsubscribed', label: 'Cancelados', icon: UserX },
       ].map(f => (
         <Button key={f.value} variant={filterSubscribed === f.value ? 'default' : 'outline'} size="sm" onClick={() => setFilterSubscribed(f.value)}
-          className={filterSubscribed === f.value ? "bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))] text-white" : "border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text-muted))] hover:bg-[hsl(var(--admin-sidebar-hover))] hover:text-white"}>
+          className={filterSubscribed === f.value ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white" : "border-white/[0.08] bg-transparent text-white/50 hover:bg-white/[0.06] hover:text-white"}>
           {f.icon && <f.icon className="h-4 w-4 mr-1" />}{f.label}
         </Button>
       ))}
@@ -201,40 +201,40 @@ const AdminLeadsPage = () => {
         {/* Insights Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Conversion Rate */}
-          <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+          <Card className="liquid-glass">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
-                <BarChart3 className="h-4 w-4 text-[hsl(var(--admin-accent-purple))]" />
+                <BarChart3 className="h-4 w-4 text-purple-400" />
                 <h3 className="text-sm font-semibold text-white">Taxa de Inscrição</h3>
               </div>
               <div className="flex items-end gap-3">
                 <span className="text-3xl font-bold text-white">{conversionRate}%</span>
-                <span className="text-xs text-[hsl(var(--admin-text-muted))] mb-1">dos leads estão inscritos</span>
+                <span className="text-xs text-white/50 mb-1">dos leads estão inscritos</span>
               </div>
-              <Progress value={conversionRate} className="h-2 mt-3 bg-[hsl(var(--admin-bg))]" />
+              <Progress value={conversionRate} className="h-2 mt-3 bg-white/[0.03]" />
             </CardContent>
           </Card>
 
           {/* Source Distribution */}
-          <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+          <Card className="liquid-glass">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Globe className="h-4 w-4 text-green-400" />
                 <h3 className="text-sm font-semibold text-white">Origens</h3>
               </div>
               {sourceDistribution.length === 0 ? (
-                <p className="text-sm text-[hsl(var(--admin-text-muted))] text-center py-3">Sem dados</p>
+                <p className="text-sm text-white/50 text-center py-3">Sem dados</p>
               ) : (
                 <div className="space-y-2">
                   {sourceDistribution.map(([source, count]) => (
                     <div key={source} className="flex items-center justify-between">
                       <span className="text-xs text-white">{source}</span>
                       <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 rounded-full bg-[hsl(var(--admin-bg))] overflow-hidden">
-                          <div className="h-full rounded-full bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))]"
+                        <div className="w-16 h-1.5 rounded-full bg-white/[0.03] overflow-hidden">
+                          <div className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
                             style={{ width: `${(count / leads.length) * 100}%` }} />
                         </div>
-                        <span className="text-[10px] text-[hsl(var(--admin-text-muted))] w-6 text-right">{count}</span>
+                        <span className="text-[10px] text-white/50 w-6 text-right">{count}</span>
                       </div>
                     </div>
                   ))}
@@ -244,19 +244,19 @@ const AdminLeadsPage = () => {
           </Card>
 
           {/* Tag Cloud */}
-          <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+          <Card className="liquid-glass">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Tag className="h-4 w-4 text-[hsl(var(--admin-accent-pink))]" />
+                <Tag className="h-4 w-4 text-pink-400" />
                 <h3 className="text-sm font-semibold text-white">Tags Populares</h3>
               </div>
               {tagDistribution.length === 0 ? (
-                <p className="text-sm text-[hsl(var(--admin-text-muted))] text-center py-3">Sem tags</p>
+                <p className="text-sm text-white/50 text-center py-3">Sem tags</p>
               ) : (
                 <div className="flex flex-wrap gap-1.5">
                   {tagDistribution.map(([tag, count]) => (
-                    <span key={tag} className="text-xs px-2 py-1 rounded-full bg-[hsl(var(--admin-accent-purple)/0.1)] text-[hsl(var(--admin-accent-purple))] border border-[hsl(var(--admin-accent-purple)/0.2)]">
-                      {tag} <span className="text-[hsl(var(--admin-text-muted))]">({count})</span>
+                    <span key={tag} className="text-xs px-2 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                      {tag} <span className="text-white/50">({count})</span>
                     </span>
                   ))}
                 </div>
@@ -267,7 +267,7 @@ const AdminLeadsPage = () => {
 
         {/* Bulk Actions */}
         {selectedLeads.length > 0 && (
-          <div className="flex items-center gap-4 p-4 bg-[hsl(var(--admin-accent-purple)/0.1)] border border-[hsl(var(--admin-accent-purple)/0.3)] rounded-xl">
+          <div className="flex items-center gap-4 p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl">
             <span className="text-sm font-medium text-white">{selectedLeads.length} lead(s) selecionado(s)</span>
             <Button className="admin-btn admin-btn-delete" size="sm" onClick={handleBulkDelete}><Trash2 className="h-4 w-4 mr-2" />Deletar Selecionados</Button>
           </div>
@@ -293,13 +293,13 @@ const AdminLeadsPage = () => {
       </div>
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <AlertDialogContent className="liquid-glass">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">Remover Lead</AlertDialogTitle>
-            <AlertDialogDescription className="text-[hsl(var(--admin-text-muted))]">Tem certeza? Esta ação não pode ser desfeita.</AlertDialogDescription>
+            <AlertDialogDescription className="text-white/50">Tem certeza? Esta ação não pode ser desfeita.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[hsl(var(--admin-card-border))] bg-transparent text-white hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="border-white/[0.08] bg-transparent text-white hover:bg-white/[0.06]">Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="admin-btn admin-btn-delete"><Trash2 className="h-4 w-4 mr-1" />Deletar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

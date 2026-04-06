@@ -76,12 +76,12 @@ const AdminHeroPage = () => {
     {
       key: 'desktop_image', header: 'Preview', className: 'w-32',
       render: (s) => (
-        <div className="w-28 h-16 rounded-lg bg-[hsl(var(--admin-bg))] overflow-hidden border border-[hsl(var(--admin-card-border))]">
+        <div className="w-28 h-16 rounded-lg bg-white/[0.03] overflow-hidden border border-white/[0.08]">
           <img src={s.desktop_image} alt={s.title || 'Slide'} className="w-full h-full object-cover" />
         </div>
       ),
     },
-    { key: 'title', header: 'Título', sortable: true, render: (s) => <span className="font-medium text-[hsl(var(--admin-text))]">{s.title || '—'}</span> },
+    { key: 'title', header: 'Título', sortable: true, render: (s) => <span className="font-medium text-white">{s.title || '—'}</span> },
     { key: 'display_order', header: 'Ordem', sortable: true },
     {
       key: 'status', header: 'Status',
@@ -136,33 +136,33 @@ const AdminHeroPage = () => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-          <DialogHeader><DialogTitle className="text-[hsl(var(--admin-text))]">{selectedSlide ? 'Editar Slide' : 'Novo Slide'}</DialogTitle></DialogHeader>
+        <DialogContent className="max-w-2xl liquid-glass">
+          <DialogHeader><DialogTitle className="text-white">{selectedSlide ? 'Editar Slide' : 'Novo Slide'}</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Título</Label><Input className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} /></div>
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Subtítulo</Label><Input className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.subtitle} onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-white/50">Título</Label><Input className="border-white/[0.08] bg-white/[0.03] text-white" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-white/50">Subtítulo</Label><Input className="border-white/[0.08] bg-white/[0.03] text-white" value={formData.subtitle} onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Texto CTA</Label><Input className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.cta_text} onChange={(e) => setFormData({ ...formData, cta_text: e.target.value })} /></div>
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Link CTA</Label><Input className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.cta_link} onChange={(e) => setFormData({ ...formData, cta_link: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-white/50">Texto CTA</Label><Input className="border-white/[0.08] bg-white/[0.03] text-white" value={formData.cta_text} onChange={(e) => setFormData({ ...formData, cta_text: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-white/50">Link CTA</Label><Input className="border-white/[0.08] bg-white/[0.03] text-white" value={formData.cta_link} onChange={(e) => setFormData({ ...formData, cta_link: e.target.value })} /></div>
             </div>
-            <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Imagem Desktop *</Label>
+            <div className="space-y-2"><Label className="text-white/50">Imagem Desktop *</Label>
               <ImageUpload value={formData.desktop_image} onChange={(url) => setFormData({ ...formData, desktop_image: url })} folder="hero" aspectRatio="aspect-[16/9]" /></div>
-            <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Imagem Mobile</Label>
+            <div className="space-y-2"><Label className="text-white/50">Imagem Mobile</Label>
               <ImageUpload value={formData.mobile_image} onChange={(url) => setFormData({ ...formData, mobile_image: url })} folder="hero" aspectRatio="aspect-[9/16]" /></div>
             <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Ordem</Label><Input type="number" className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })} /></div>
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Status</Label>
-                <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}><SelectTrigger className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]"><SelectValue /></SelectTrigger>
+              <div className="space-y-2"><Label className="text-white/50">Ordem</Label><Input type="number" className="border-white/[0.08] bg-white/[0.03] text-white" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-white/50">Status</Label>
+                <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}><SelectTrigger className="border-white/[0.08] bg-white/[0.03] text-white"><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="active">Ativo</SelectItem><SelectItem value="inactive">Inativo</SelectItem></SelectContent></Select></div>
-              <div className="space-y-2"><Label className="text-[hsl(var(--admin-text-muted))]">Tema</Label>
-                <Select value={formData.theme} onValueChange={(v) => setFormData({ ...formData, theme: v })}><SelectTrigger className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]"><SelectValue /></SelectTrigger>
+              <div className="space-y-2"><Label className="text-white/50">Tema</Label>
+                <Select value={formData.theme} onValueChange={(v) => setFormData({ ...formData, theme: v })}><SelectTrigger className="border-white/[0.08] bg-white/[0.03] text-white"><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="dark">Escuro</SelectItem><SelectItem value="light">Claro</SelectItem></SelectContent></Select></div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-sidebar-hover))]">Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-white/[0.08] bg-transparent text-white hover:bg-white/[0.06]">Cancelar</Button>
             <Button onClick={handleSave} disabled={isSaving} className="admin-btn admin-btn-save">
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar
             </Button>
@@ -172,10 +172,10 @@ const AdminHeroPage = () => {
 
       {/* Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="max-w-4xl bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-          <DialogHeader><DialogTitle className="text-[hsl(var(--admin-text))]">Preview do Slide</DialogTitle></DialogHeader>
+        <DialogContent className="max-w-4xl liquid-glass">
+          <DialogHeader><DialogTitle className="text-white">Preview do Slide</DialogTitle></DialogHeader>
           {selectedSlide && (
-            <div className="relative aspect-[16/9] rounded-lg overflow-hidden border border-[hsl(var(--admin-card-border))]">
+            <div className="relative aspect-[16/9] rounded-lg overflow-hidden border border-white/[0.08]">
               <img src={selectedSlide.desktop_image} alt={selectedSlide.title || 'Slide'} className="w-full h-full object-cover" />
               <div className={`absolute inset-0 flex flex-col justify-center p-8 ${selectedSlide.theme === 'dark' ? 'bg-black/50 text-white' : 'bg-white/50 text-black'}`}>
                 {selectedSlide.title && <h2 className="text-4xl font-bold mb-2">{selectedSlide.title}</h2>}
@@ -189,11 +189,11 @@ const AdminHeroPage = () => {
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
-          <DialogHeader><DialogTitle className="text-[hsl(var(--admin-text))]">Confirmar exclusão</DialogTitle>
-            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Tem certeza que deseja excluir este slide?</DialogDescription></DialogHeader>
+        <DialogContent className="liquid-glass">
+          <DialogHeader><DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
+            <DialogDescription className="text-white/50">Tem certeza que deseja excluir este slide?</DialogDescription></DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-white/[0.08] bg-transparent text-white">Cancelar</Button>
             <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar</Button>
           </DialogFooter>
         </DialogContent>

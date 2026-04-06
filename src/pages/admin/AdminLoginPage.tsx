@@ -88,11 +88,11 @@ const AdminLoginPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--admin-bg))]">
+      <div className="min-h-screen flex items-center justify-center bg-white/[0.03]">
         <div className="relative">
           <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-purple)/0.3)] animate-ping" />
           <div className="absolute inset-0 rounded-full bg-[hsl(var(--admin-accent-pink)/0.2)] animate-pulse delay-75" />
-          <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]">
+          <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.4)]">
             <Loader2 className="h-7 w-7 animate-spin text-white" />
           </div>
         </div>
@@ -110,13 +110,13 @@ const AdminLoginPage = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,hsl(var(--admin-accent-pink)/0.1),transparent_50%)]" />
         
         <div className="relative z-10 flex flex-col justify-center px-16">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-2xl shadow-[hsl(var(--admin-accent-purple)/0.4)] mb-8 animate-pulse">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-2xl shadow-[hsl(var(--admin-accent-purple)/0.4)] mb-8 animate-pulse">
             <Sparkles className="h-8 w-8 text-white drop-shadow-[0_0_8px_white]" />
           </div>
           <h1 className="text-4xl font-bold admin-gradient-text mb-4">
             Pincel de Luz Admin
           </h1>
-          <p className="text-lg text-[hsl(var(--admin-text-muted))] max-w-md leading-relaxed">
+          <p className="text-lg text-white/50 max-w-md leading-relaxed">
             Gerencie seu catálogo de produtos, promoções e muito mais em um só lugar.
           </p>
           <div className="mt-12 space-y-4">
@@ -126,8 +126,8 @@ const AdminLoginPage = () => {
               'Moderação de avaliações de clientes',
               'Relatórios e métricas em tempo real',
             ].map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 text-[hsl(var(--admin-text-muted))]">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] to-[hsl(var(--admin-accent-pink))]" />
+              <div key={i} className="flex items-center gap-3 text-white/50">
+                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
                 <span className="text-sm">{feature}</span>
               </div>
             ))}
@@ -141,11 +141,11 @@ const AdminLoginPage = () => {
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center bg-[hsl(var(--admin-bg))] p-6">
-        <Card className="w-full max-w-md border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] shadow-2xl shadow-black/20">
+      <div className="flex-1 flex items-center justify-center bg-white/[0.03] p-6">
+        <Card className="w-full max-w-md border-white/[0.08] bg-[hsl(var(--admin-card))] shadow-2xl shadow-black/20">
           <CardHeader className="text-center space-y-4 pb-2">
             <div className="lg:hidden mx-auto">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] mx-auto">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-blue))] flex items-center justify-center shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] mx-auto">
                 <Sparkles className="h-7 w-7 text-white" />
               </div>
             </div>
@@ -153,7 +153,7 @@ const AdminLoginPage = () => {
               <CardTitle className="text-2xl font-bold text-white">
                 {showResetForm ? 'Recuperar Senha' : 'Bem-vindo de volta'}
               </CardTitle>
-              <CardDescription className="mt-2 text-[hsl(var(--admin-text-muted))]">
+              <CardDescription className="mt-2 text-white/50">
                 {showResetForm 
                   ? 'Digite seu email para recuperar a senha' 
                   : 'Faça login para acessar o painel'}
@@ -165,15 +165,15 @@ const AdminLoginPage = () => {
             {showResetForm ? (
               <form onSubmit={resetForm.handleSubmit(onReset)} className="space-y-4">
                 <div>
-                  <Label htmlFor="reset-email" className="text-sm font-medium text-[hsl(var(--admin-text-muted))]">Email</Label>
+                  <Label htmlFor="reset-email" className="text-sm font-medium text-white/50">Email</Label>
                   <div className="relative mt-2">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
                     <Input
                       id="reset-email"
                       type="email"
                       {...resetForm.register('email')}
                       placeholder="seu@email.com"
-                      className="pl-10 h-11 bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-2 focus-visible:ring-[hsl(var(--admin-accent-purple))] focus-visible:border-[hsl(var(--admin-accent-purple))]"
+                      className="pl-10 h-11 bg-[hsl(var(--admin-sidebar))] border-white/[0.08] text-white placeholder:text-white/50 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-[hsl(var(--admin-accent-purple))]"
                     />
                   </div>
                   {resetForm.formState.errors.email && (
@@ -183,7 +183,7 @@ const AdminLoginPage = () => {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-purple))] hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-purple))] hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -197,7 +197,7 @@ const AdminLoginPage = () => {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="w-full text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-[hsl(var(--admin-sidebar-hover))]"
+                  className="w-full text-white/50 hover:text-white hover:bg-white/[0.06]"
                   onClick={() => setShowResetForm(false)}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -207,15 +207,15 @@ const AdminLoginPage = () => {
             ) : (
               <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
                 <div>
-                  <Label htmlFor="email" className="text-sm font-medium text-[hsl(var(--admin-text-muted))]">Email</Label>
+                  <Label htmlFor="email" className="text-sm font-medium text-white/50">Email</Label>
                   <div className="relative mt-2">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
                     <Input
                       id="email"
                       type="email"
                       {...loginForm.register('email')}
                       placeholder="seu@email.com"
-                      className="pl-10 h-11 bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-2 focus-visible:ring-[hsl(var(--admin-accent-purple))] focus-visible:border-[hsl(var(--admin-accent-purple))]"
+                      className="pl-10 h-11 bg-[hsl(var(--admin-sidebar))] border-white/[0.08] text-white placeholder:text-white/50 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-[hsl(var(--admin-accent-purple))]"
                     />
                   </div>
                   {loginForm.formState.errors.email && (
@@ -226,20 +226,20 @@ const AdminLoginPage = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="password" className="text-sm font-medium text-[hsl(var(--admin-text-muted))]">Senha</Label>
+                  <Label htmlFor="password" className="text-sm font-medium text-white/50">Senha</Label>
                   <div className="relative mt-2">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       {...loginForm.register('password')}
                       placeholder="••••••••"
-                      className="pl-10 pr-10 h-11 bg-[hsl(var(--admin-sidebar))] border-[hsl(var(--admin-card-border))] text-white placeholder:text-[hsl(var(--admin-text-muted))] focus-visible:ring-2 focus-visible:ring-[hsl(var(--admin-accent-purple))] focus-visible:border-[hsl(var(--admin-accent-purple))]"
+                      className="pl-10 pr-10 h-11 bg-[hsl(var(--admin-sidebar))] border-white/[0.08] text-white placeholder:text-white/50 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-[hsl(var(--admin-accent-purple))]"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[hsl(var(--admin-text-muted))] hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -251,7 +251,7 @@ const AdminLoginPage = () => {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-[hsl(var(--admin-accent-purple))] via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-purple))] hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-purple-500 via-[hsl(var(--admin-accent-pink))] to-[hsl(var(--admin-accent-purple))] hover:opacity-90 text-white shadow-lg shadow-[hsl(var(--admin-accent-purple)/0.3)] transition-all duration-300" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -266,7 +266,7 @@ const AdminLoginPage = () => {
                   <Button
                     type="button"
                     variant="link"
-                    className="text-sm text-[hsl(var(--admin-accent-purple))] hover:text-[hsl(var(--admin-accent-pink))]"
+                    className="text-sm text-purple-400 hover:text-pink-400"
                     onClick={() => setShowResetForm(true)}
                   >
                     Esqueceu sua senha?

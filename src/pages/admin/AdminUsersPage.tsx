@@ -59,7 +59,7 @@ const AdminUsersPage = () => {
   const columns: Column<AdminUser>[] = [
     {
       key: 'full_name', header: 'Nome',
-      render: (u) => <span className="font-medium text-[hsl(var(--admin-text))]">{u.profile?.full_name || 'Sem nome'}</span>,
+      render: (u) => <span className="font-medium text-white">{u.profile?.full_name || 'Sem nome'}</span>,
     },
     {
       key: 'role', header: 'Função',
@@ -70,7 +70,7 @@ const AdminUsersPage = () => {
     },
     {
       key: 'id', header: 'ID',
-      render: (u) => <span className="font-mono text-xs text-[hsl(var(--admin-text-muted))]">{u.id.slice(0, 8)}…</span>,
+      render: (u) => <span className="font-mono text-xs text-white/50">{u.id.slice(0, 8)}…</span>,
     },
     {
       key: 'actions', header: 'Ações', className: 'w-28',
@@ -125,30 +125,30 @@ const AdminUsersPage = () => {
 
       {/* Create Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <DialogContent className="max-w-md liquid-glass">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-[hsl(var(--admin-text))]">
-              <Shield className="h-5 w-5 text-[hsl(var(--admin-accent-purple))]" />Novo Usuário Admin
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <Shield className="h-5 w-5 text-purple-400" />Novo Usuário Admin
             </DialogTitle>
-            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">Preencha os dados para criar acesso ao painel</DialogDescription>
+            <DialogDescription className="text-white/50">Preencha os dados para criar acesso ao painel</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label className="text-[hsl(var(--admin-text-muted))]">Nome Completo *</Label>
-              <Input className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.full_name} onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} />
+              <Label className="text-white/50">Nome Completo *</Label>
+              <Input className="border-white/[0.08] bg-white/[0.03] text-white" value={formData.full_name} onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label className="text-[hsl(var(--admin-text-muted))]">Email *</Label>
-              <Input type="email" className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+              <Label className="text-white/50">Email *</Label>
+              <Input type="email" className="border-white/[0.08] bg-white/[0.03] text-white" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label className="text-[hsl(var(--admin-text-muted))]">Senha *</Label>
-              <Input type="password" className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="Mínimo 6 caracteres" />
+              <Label className="text-white/50">Senha *</Label>
+              <Input type="password" className="border-white/[0.08] bg-white/[0.03] text-white" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="Mínimo 6 caracteres" />
             </div>
             <div className="space-y-2">
-              <Label className="text-[hsl(var(--admin-text-muted))]">Função</Label>
+              <Label className="text-white/50">Função</Label>
               <Select value={formData.role} onValueChange={(v) => setFormData({ ...formData, role: v })}>
-                <SelectTrigger className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="border-white/[0.08] bg-white/[0.03] text-white"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Admin (acesso total)</SelectItem>
                   <SelectItem value="editor">Editor (gerencia conteúdo)</SelectItem>
@@ -158,7 +158,7 @@ const AdminUsersPage = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-white/[0.08] bg-transparent text-white">Cancelar</Button>
             <Button onClick={handleAddUser} disabled={isSaving} className="admin-btn admin-btn-create">
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Criar Usuário
             </Button>
@@ -168,16 +168,16 @@ const AdminUsersPage = () => {
 
       {/* Edit Role Dialog */}
       <Dialog open={isEditRoleOpen} onOpenChange={setIsEditRoleOpen}>
-        <DialogContent className="max-w-sm bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <DialogContent className="max-w-sm liquid-glass">
           <DialogHeader>
-            <DialogTitle className="text-[hsl(var(--admin-text))]">Alterar função</DialogTitle>
-            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">
+            <DialogTitle className="text-white">Alterar função</DialogTitle>
+            <DialogDescription className="text-white/50">
               Alterar função de "{selectedUser?.profile?.full_name || 'Usuário'}"
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <Select value={editRole} onValueChange={setEditRole}>
-              <SelectTrigger className="border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="border-white/[0.08] bg-white/[0.03] text-white"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="admin">Admin (acesso total)</SelectItem>
                 <SelectItem value="editor">Editor (gerencia conteúdo)</SelectItem>
@@ -186,7 +186,7 @@ const AdminUsersPage = () => {
             </Select>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditRoleOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsEditRoleOpen(false)} className="border-white/[0.08] bg-transparent text-white">Cancelar</Button>
             <Button onClick={handleEditRole} disabled={isSaving} className="admin-btn admin-btn-save">
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar
             </Button>
@@ -196,15 +196,15 @@ const AdminUsersPage = () => {
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <DialogContent className="liquid-glass">
           <DialogHeader>
-            <DialogTitle className="text-[hsl(var(--admin-text))]">Remover acesso</DialogTitle>
-            <DialogDescription className="text-[hsl(var(--admin-text-muted))]">
+            <DialogTitle className="text-white">Remover acesso</DialogTitle>
+            <DialogDescription className="text-white/50">
               Remover acesso de "{selectedUser?.profile?.full_name}" ao painel?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-[hsl(var(--admin-card-border))] bg-transparent text-[hsl(var(--admin-text))]">Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-white/[0.08] bg-transparent text-white">Cancelar</Button>
             <Button className="admin-btn admin-btn-delete" onClick={handleDeleteRole} disabled={isSaving}>{isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar</Button>
           </DialogFooter>
         </DialogContent>
