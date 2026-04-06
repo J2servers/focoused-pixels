@@ -11,6 +11,14 @@ import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCheckoutProfile } from '@/hooks/useCheckoutProfile';
 import type { Json } from '@/integrations/supabase/types';
+import {
+  generateIdempotencyKey,
+  getIdempotencyEntry,
+  setIdempotencyEntry,
+  shouldAllowAction,
+  cleanupIdempotencyEntries,
+} from '@/lib/idempotency';
+import { isRateLimited, paymentCircuitBreaker } from '@/lib/rate-limit';
 
 export interface PaymentState {
   orderId: string;
@@ -345,6 +353,21 @@ export function usePaymentFlow() {
 
   const handleGeneratePix = useCallback(async () => {
     if (!paymentState || isProcessing) return;
+    // Debounce guard
+    if (!shouldAllowAction('generate_pix')) {
+      toast.info('Aguarde antes de tentar novamente...');
+      return;
+    }
+    // Rate limit: max 3 PIX requests per minute
+    if (isRateLimited('pix_generation', 3, 60_000)) {
+      toast.error('Muitas tentativas. Aguarde 1 minuto.');
+      return;
+    }
+    // Circuit breaker
+    if (!paymentCircuitBreaker.canExecute()) {
+      toast.error('Serviço temporariamente indisponível. Tente em 30 segundos.');
+      return;
+    }
     setIsProcessing(true);
     try {
       const orderId = await ensureOrderExists();
@@ -354,6 +377,7 @@ export function usePaymentFlow() {
         payerEmail: paymentState.customerEmail, payerName: paymentState.customerName,
         payerPhone: paymentState.customerPhone,
       });
+      paymentCircuitBreaker.recordSuccess();
       setPixData({
         qrCode: result.qrCode, qrCodeBase64: result.qrCodeBase64,
         paymentId: result.paymentId, expirationDate: result.expirationDate,
@@ -361,6 +385,7 @@ export function usePaymentFlow() {
       });
       toast.success('PIX gerado com sucesso!');
     } catch (error) {
+      paymentCircuitBreaker.recordFailure();
       console.error('Error generating PIX:', error);
     } finally {
       setIsProcessing(false);
@@ -369,6 +394,18 @@ export function usePaymentFlow() {
 
   const handleGenerateBoleto = useCallback(async () => {
     if (!paymentState || isProcessing) return;
+    if (!shouldAllowAction('generate_boleto')) {
+      toast.info('Aguarde antes de tentar novamente...');
+      return;
+    }
+    if (isRateLimited('boleto_generation', 3, 60_000)) {
+      toast.error('Muitas tentativas. Aguarde 1 minuto.');
+      return;
+    }
+    if (!paymentCircuitBreaker.canExecute()) {
+      toast.error('Serviço temporariamente indisponível. Tente em 30 segundos.');
+      return;
+    }
     if (!paymentState.customerCpf || paymentState.customerCpf.replace(/\D/g, '').length < 11) {
       toast.error('CPF válido é obrigatório para boleto');
       return;
@@ -400,6 +437,18 @@ export function usePaymentFlow() {
 
   const handleCreditCard = useCallback(async () => {
     if (!paymentState || isProcessing) return;
+    if (!shouldAllowAction('credit_card')) {
+      toast.info('Aguarde antes de tentar novamente...');
+      return;
+    }
+    if (isRateLimited('card_payment', 3, 60_000)) {
+      toast.error('Muitas tentativas. Aguarde 1 minuto.');
+      return;
+    }
+    if (!paymentCircuitBreaker.canExecute()) {
+      toast.error('Serviço temporariamente indisponível. Tente em 30 segundos.');
+      return;
+    }
     setIsProcessing(true);
     try {
       const orderId = await ensureOrderExists();
