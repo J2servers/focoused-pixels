@@ -1,10 +1,12 @@
 import { DynamicTopBar, DynamicMainHeader, NavigationBar, DynamicFooter } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { storeInfo } from '@/data/store';
+import { PageSEO } from '@/components/seo/PageSEO';
 
 const PrivacyPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <PageSEO title="Política de Privacidade" description="Política de privacidade e proteção de dados da Pincel de Luz Personalizados. Saiba como tratamos seus dados pessoais." path="/privacidade" />
       <DynamicTopBar />
       <DynamicMainHeader />
       <NavigationBar />
