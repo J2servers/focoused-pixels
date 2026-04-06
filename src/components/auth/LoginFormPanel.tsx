@@ -7,22 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FirstPurchaseBanner } from '@/components/conversion/FirstPurchaseBanner';
 
-interface LoginFormData {
-  email: string;
-  password: string;
-}
-
-interface SignupFormData {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  acceptTerms: boolean;
-}
-
-interface ResetFormData {
-  email: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyFormReturn = UseFormReturn<any>;
 
 interface Props {
   formMode: 'login' | 'signup' | 'reset';
