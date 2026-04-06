@@ -1123,25 +1123,41 @@
 
 /* ═══ Mobile overflow fix & zoom ═══ */
 @media (max-width: 768px) {
-  html, body {
-    overflow-x: hidden;
-  }
   html {
+    overflow: clip;
     zoom: 0.8;
     -moz-transform: scale(0.8);
     -moz-transform-origin: 0 0;
   }
-  /* Compensate zoom for viewport height */
   body {
-    min-height: 125vh;
+    overflow-x: clip;
     min-height: calc(100vh / 0.8);
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
   }
-  /* Remove neumorphism outer shadows on mobile to prevent side overflow */
+  #root {
+    overflow: clip;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+  }
+  /* Flatten neumorphism on mobile — use simple border instead */
   .neu-concave,
   .neu-convex,
   .neu-raised {
-    --neu-distance: 4px;
-    --neu-blur: 8px;
-    --neu-intensity: 0.5;
+    box-shadow: 0 1px 3px hsl(var(--neu-dark) / 0.2) !important;
+    border: 1px solid hsl(var(--border)) !important;
+  }
+  .neu-concave::before,
+  .neu-convex::before,
+  .neu-raised::before,
+  .neu-pressed::before {
+    display: none !important;
+  }
+  .neu-raised:hover,
+  .neu-convex:hover {
+    box-shadow: 0 2px 6px hsl(var(--neu-dark) / 0.25) !important;
+    transform: none !important;
   }
 }
