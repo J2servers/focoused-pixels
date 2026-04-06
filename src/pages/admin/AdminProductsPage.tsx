@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { AdminLayout, DataTable, Column, ImageUpload, MultiImageUpload } from '@/components/admin';
 import { ExportButtons } from '@/components/admin/ExportButtons';
-import { FormFieldInfo } from '@/components/admin/FormFieldInfo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -11,11 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Separator } from '@/components/ui/separator';
 import {
-  Plus, Trash2, Loader2, Save, X, Check,
+  Plus, Trash2, Loader2, Save, X,
   DollarSign, Package, Ruler, Layers, TrendingUp, Star,
-  ImageIcon, Eye, BarChart3,
+  ImageIcon, Eye,
 } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -29,29 +27,30 @@ import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 const generateSlug = (name: string) =>
   name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-/* ═══ Vivid helpers ═══ */
-const SECTION_COLORS = {
-  cyan: { border: 'border-[hsl(var(--admin-accent-cyan)/0.2)]', headerBg: 'bg-[hsl(var(--admin-accent-cyan)/0.06)]', text: 'text-[hsl(var(--admin-accent-cyan))]', glow: 'shadow-[0_0_10px_hsl(var(--admin-accent-cyan)/0.08)]' },
-  purple: { border: 'border-[hsl(var(--admin-accent-purple)/0.2)]', headerBg: 'bg-[hsl(var(--admin-accent-purple)/0.06)]', text: 'text-[hsl(var(--admin-accent-purple))]', glow: 'shadow-[0_0_10px_hsl(var(--admin-accent-purple)/0.08)]' },
-  pink: { border: 'border-[hsl(var(--admin-accent-pink)/0.2)]', headerBg: 'bg-[hsl(var(--admin-accent-pink)/0.06)]', text: 'text-[hsl(var(--admin-accent-pink))]', glow: 'shadow-[0_0_10px_hsl(var(--admin-accent-pink)/0.08)]' },
-  green: { border: 'border-emerald-500/20', headerBg: 'bg-emerald-500/5', text: 'text-emerald-400', glow: 'shadow-[0_0_10px_rgba(16,185,129,0.08)]' },
-  amber: { border: 'border-amber-500/20', headerBg: 'bg-amber-500/5', text: 'text-amber-400', glow: 'shadow-[0_0_10px_rgba(245,158,11,0.08)]' },
-};
-
-function VSection({ icon: Icon, title, color = 'cyan', children }: { icon: React.ComponentType<{ className?: string }>; title: string; color?: keyof typeof SECTION_COLORS; children: React.ReactNode }) {
-  const c = SECTION_COLORS[color];
+/* ═══ Liquid helpers ═══ */
+function LiquidSection({ icon: Icon, title, accent = 'cyan', children }: { icon: React.ComponentType<{ className?: string }>; title: string; accent?: string; children: React.ReactNode }) {
+  const colors: Record<string, string> = {
+    cyan: 'border-cyan-500/20 bg-cyan-500/[0.04]',
+    green: 'border-emerald-500/20 bg-emerald-500/[0.04]',
+    amber: 'border-amber-500/20 bg-amber-500/[0.04]',
+    purple: 'border-purple-500/20 bg-purple-500/[0.04]',
+    pink: 'border-pink-500/20 bg-pink-500/[0.04]',
+  };
+  const textColors: Record<string, string> = {
+    cyan: 'text-cyan-400', green: 'text-emerald-400', amber: 'text-amber-400', purple: 'text-purple-400', pink: 'text-pink-400',
+  };
   return (
-    <div className={`rounded-xl border ${c.border} ${c.glow} overflow-hidden`}>
-      <div className={`flex items-center gap-2 px-3 py-2 ${c.headerBg} border-b ${c.border}`}>
-        <Icon className={`h-3.5 w-3.5 ${c.text}`} />
-        <span className={`text-[11px] font-bold uppercase tracking-[0.1em] ${c.text}`}>{title}</span>
+    <div className={`rounded-xl border ${colors[accent] || colors.cyan} overflow-hidden`}>
+      <div className={`flex items-center gap-2 px-3 py-2 border-b ${colors[accent] || colors.cyan}`}>
+        <Icon className={`h-3.5 w-3.5 ${textColors[accent] || textColors.cyan}`} />
+        <span className={`text-[11px] font-bold uppercase tracking-[0.1em] ${textColors[accent] || textColors.cyan}`}>{title}</span>
       </div>
       <div className="p-3">{children}</div>
     </div>
   );
 }
 
-function Field({ label, value, onChange, type = 'text', prefix, suffix, placeholder }: {
+function LiquidField({ label, value, onChange, type = 'text', prefix, suffix, placeholder }: {
   label: string; value: string; onChange: (v: string) => void;
   type?: string; prefix?: string; suffix?: string; placeholder?: string;
 }) {
@@ -61,16 +60,16 @@ function Field({ label, value, onChange, type = 'text', prefix, suffix, placehol
       <div className="relative">
         {prefix && <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-white/30">{prefix}</span>}
         <Input type={type} step={type === 'number' ? '0.01' : undefined} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
-          className={`h-8 text-xs bg-white/[0.04] border-white/[0.08] text-white/90 focus:border-[hsl(var(--admin-accent-cyan)/0.5)] ${prefix ? 'pl-8' : ''} ${suffix ? 'pr-8' : ''}`} />
+          className={`h-8 text-xs liquid-input ${prefix ? 'pl-8' : ''} ${suffix ? 'pr-8' : ''}`} />
         {suffix && <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-white/30">{suffix}</span>}
       </div>
     </div>
   );
 }
 
-function KPI({ label, value, sub, accent = 'cyan' }: { label: string; value: string; sub?: string; accent?: 'green' | 'amber' | 'red' | 'cyan' }) {
-  const bg = { green: 'border-emerald-500/20 bg-emerald-500/5', amber: 'border-amber-500/20 bg-amber-500/5', red: 'border-red-500/20 bg-red-500/5', cyan: 'border-[hsl(var(--admin-accent-cyan)/0.2)] bg-[hsl(var(--admin-accent-cyan)/0.05)]' };
-  const txt = { green: 'text-emerald-400', amber: 'text-amber-400', red: 'text-red-400', cyan: 'text-[hsl(var(--admin-accent-cyan))]' };
+function LiquidKPI({ label, value, sub, accent = 'cyan' }: { label: string; value: string; sub?: string; accent?: 'green' | 'amber' | 'red' | 'cyan' }) {
+  const bg = { green: 'border-emerald-500/20 bg-emerald-500/5', amber: 'border-amber-500/20 bg-amber-500/5', red: 'border-red-500/20 bg-red-500/5', cyan: 'border-cyan-500/20 bg-cyan-500/5' };
+  const txt = { green: 'text-emerald-400', amber: 'text-amber-400', red: 'text-red-400', cyan: 'text-cyan-400' };
   return (
     <div className={`rounded-xl border p-2 ${bg[accent]} flex flex-col items-center text-center min-h-[50px]`}>
       <span className={`text-sm font-bold ${txt[accent]} leading-none`}>{value}</span>
@@ -104,7 +103,7 @@ function buildForm(p?: Product) {
   };
 }
 
-/* ═══ DETAIL PANEL — 3/5 of page, split 2/3 fields + 1/3 images ═══ */
+/* ═══ DETAIL PANEL ═══ */
 function ProductPanel({ product, categories, canEdit, onSave, isSaving, onDelete, onClose, isNew }: {
   product: Product | null; categories: { id: string; name: string; parent_id: string | null }[];
   canEdit: boolean; onSave: (data: ProductFormData, id?: string) => Promise<void>;
@@ -151,10 +150,9 @@ function ProductPanel({ product, categories, canEdit, onSave, isSaving, onDelete
   };
 
   return (
-    <div className="h-full flex flex-col bg-[hsl(var(--admin-bg))]">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-[hsl(var(--admin-accent-purple)/0.2)] bg-[hsl(var(--admin-card))]"
-        style={{ boxShadow: '0 4px 20px hsl(var(--admin-accent-purple) / 0.06)' }}>
+      <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-white/[0.08] liquid-glass">
         <h3 className="text-sm font-bold text-white truncate">
           {isNew ? '✨ Novo Produto' : product?.name || 'Produto'}
         </h3>
@@ -180,83 +178,68 @@ function ProductPanel({ product, categories, canEdit, onSave, isSaving, onDelete
       {/* Body: 2/3 fields + 1/3 images */}
       <ScrollArea className="flex-1">
         <div className="flex h-full">
-          {/* LEFT 2/3: All editable fields */}
           <div className="w-2/3 p-4 space-y-3 border-r border-white/[0.04]">
-
-            {/* KPIs */}
             {product && (
               <div className="grid grid-cols-3 gap-2 mb-1">
-                <KPI label="Preço" value={fmt(hasPromo ? promo! : price)} sub={hasPromo ? `de ${fmt(price)}` : undefined} accent={hasPromo ? 'green' : 'cyan'} />
-                <KPI label="Estoque" value={`${stock}`} sub={`mín. ${form.min_stock}`} accent={stockAccent} />
-                <KPI label="Margem" value={`${margin.toFixed(0)}%`} sub={fmt(price - costT)} accent={marginAccent} />
+                <LiquidKPI label="Preço" value={fmt(hasPromo ? promo! : price)} sub={hasPromo ? `de ${fmt(price)}` : undefined} accent={hasPromo ? 'green' : 'cyan'} />
+                <LiquidKPI label="Estoque" value={`${stock}`} sub={`mín. ${form.min_stock}`} accent={stockAccent} />
+                <LiquidKPI label="Margem" value={`${margin.toFixed(0)}%`} sub={fmt(price - costT)} accent={marginAccent} />
               </div>
             )}
-
-            {/* 📋 Básico */}
-            <VSection icon={Layers} title="Informações Básicas" color="cyan">
+            <LiquidSection icon={Layers} title="Informações Básicas" accent="cyan">
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
-                  <Field label="Nome *" value={form.name} onChange={(v) => set('name', v)} placeholder="Nome do produto" />
-                  <Field label="Slug (URL)" value={form.slug} onChange={(v) => set('slug', v)} placeholder="auto-gerado" />
+                  <LiquidField label="Nome *" value={form.name} onChange={(v) => set('name', v)} placeholder="Nome do produto" />
+                  <LiquidField label="Slug (URL)" value={form.slug} onChange={(v) => set('slug', v)} placeholder="auto-gerado" />
                 </div>
                 <div>
                   <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium mb-1 block">Descrição Curta</label>
-                  <Textarea value={form.short_description} onChange={(e) => set('short_description', e.target.value)}
-                    className="text-xs bg-white/[0.04] border-white/[0.08] text-white/90 min-h-[40px]" rows={2} />
+                  <Textarea value={form.short_description} onChange={(e) => set('short_description', e.target.value)} className="text-xs liquid-input min-h-[40px]" rows={2} />
                 </div>
                 <div>
                   <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium mb-1 block">Descrição Completa</label>
-                  <Textarea value={form.full_description} onChange={(e) => set('full_description', e.target.value)}
-                    className="text-xs bg-white/[0.04] border-white/[0.08] text-white/90 min-h-[60px]" rows={4} />
+                  <Textarea value={form.full_description} onChange={(e) => set('full_description', e.target.value)} className="text-xs liquid-input min-h-[60px]" rows={4} />
                 </div>
               </div>
-            </VSection>
-
-            {/* 💰 Preços */}
-            <VSection icon={DollarSign} title="Preços & Estoque" color="green">
+            </LiquidSection>
+            <LiquidSection icon={DollarSign} title="Preços & Estoque" accent="green">
               <div className="grid grid-cols-4 gap-2">
-                <Field label="Preço Venda *" value={form.price} onChange={(v) => set('price', v)} type="number" prefix="R$" />
-                <Field label="Preço Promo" value={form.promotional_price} onChange={(v) => set('promotional_price', v)} type="number" prefix="R$" />
-                <Field label="Estoque" value={form.stock} onChange={(v) => set('stock', v)} type="number" />
-                <Field label="Est. Mínimo" value={form.min_stock} onChange={(v) => set('min_stock', v)} type="number" />
+                <LiquidField label="Preço Venda *" value={form.price} onChange={(v) => set('price', v)} type="number" prefix="R$" />
+                <LiquidField label="Preço Promo" value={form.promotional_price} onChange={(v) => set('promotional_price', v)} type="number" prefix="R$" />
+                <LiquidField label="Estoque" value={form.stock} onChange={(v) => set('stock', v)} type="number" />
+                <LiquidField label="Est. Mínimo" value={form.min_stock} onChange={(v) => set('min_stock', v)} type="number" />
               </div>
-            </VSection>
-
-            {/* 📊 Custos */}
-            <VSection icon={TrendingUp} title="Custos" color="amber">
+            </LiquidSection>
+            <LiquidSection icon={TrendingUp} title="Custos" accent="amber">
               <div className="grid grid-cols-3 gap-2">
-                <Field label="Material" value={form.cost_material} onChange={(v) => set('cost_material', v)} type="number" prefix="R$" />
-                <Field label="Mão de Obra" value={form.cost_labor} onChange={(v) => set('cost_labor', v)} type="number" prefix="R$" />
-                <Field label="Frete Custo" value={form.cost_shipping} onChange={(v) => set('cost_shipping', v)} type="number" prefix="R$" />
+                <LiquidField label="Material" value={form.cost_material} onChange={(v) => set('cost_material', v)} type="number" prefix="R$" />
+                <LiquidField label="Mão de Obra" value={form.cost_labor} onChange={(v) => set('cost_labor', v)} type="number" prefix="R$" />
+                <LiquidField label="Frete Custo" value={form.cost_shipping} onChange={(v) => set('cost_shipping', v)} type="number" prefix="R$" />
               </div>
-            </VSection>
-
-            {/* 📐 Dimensões */}
-            <VSection icon={Ruler} title="Peso & Dimensões" color="purple">
+            </LiquidSection>
+            <LiquidSection icon={Ruler} title="Peso & Dimensões" accent="purple">
               <div className="grid grid-cols-4 gap-2">
-                <Field label="Peso" value={form.weight_kg} onChange={(v) => set('weight_kg', v)} type="number" suffix="kg" />
-                <Field label="Comp." value={form.length_cm} onChange={(v) => set('length_cm', v)} type="number" suffix="cm" />
-                <Field label="Largura" value={form.width_cm} onChange={(v) => set('width_cm', v)} type="number" suffix="cm" />
-                <Field label="Altura" value={form.height_cm} onChange={(v) => set('height_cm', v)} type="number" suffix="cm" />
+                <LiquidField label="Peso" value={form.weight_kg} onChange={(v) => set('weight_kg', v)} type="number" suffix="kg" />
+                <LiquidField label="Comp." value={form.length_cm} onChange={(v) => set('length_cm', v)} type="number" suffix="cm" />
+                <LiquidField label="Largura" value={form.width_cm} onChange={(v) => set('width_cm', v)} type="number" suffix="cm" />
+                <LiquidField label="Altura" value={form.height_cm} onChange={(v) => set('height_cm', v)} type="number" suffix="cm" />
               </div>
-            </VSection>
-
-            {/* 🏷️ Organização */}
-            <VSection icon={Layers} title="Organização" color="pink">
+            </LiquidSection>
+            <LiquidSection icon={Layers} title="Organização" accent="pink">
               <div className="space-y-2">
                 <div className="grid grid-cols-3 gap-2">
-                  <Field label="SKU" value={form.sku} onChange={(v) => set('sku', v)} />
+                  <LiquidField label="SKU" value={form.sku} onChange={(v) => set('sku', v)} />
                   <div className="space-y-1">
                     <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Categoria</label>
                     <Select value={form.category_id} onValueChange={(v) => set('category_id', v)}>
-                      <SelectTrigger className="h-8 text-xs bg-white/[0.04] border-white/[0.08] text-white/90"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectTrigger className="h-8 text-xs liquid-input"><SelectValue placeholder="Selecione" /></SelectTrigger>
                       <SelectContent>{categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-1">
                     <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Status</label>
                     <Select value={form.status} onValueChange={(v) => set('status', v)}>
-                      <SelectTrigger className="h-8 text-xs bg-white/[0.04] border-white/[0.08] text-white/90"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-8 text-xs liquid-input"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="draft">📝 Rascunho</SelectItem>
                         <SelectItem value="active">✅ Ativo</SelectItem>
@@ -265,31 +248,26 @@ function ProductPanel({ product, categories, canEdit, onSave, isSaving, onDelete
                     </Select>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.03] border border-[hsl(var(--admin-accent-purple)/0.12)]">
+                <div className="flex items-center gap-2 p-2 rounded-lg liquid-glass">
                   <Switch checked={form.is_featured} onCheckedChange={(v) => set('is_featured', v)} className="admin-switch-orange" />
                   <span className="text-[11px] text-white/60">Produto em Destaque</span>
                 </div>
               </div>
-            </VSection>
-
-            {/* View in store */}
+            </LiquidSection>
             {product && (
               <a href={`/produto/${product.slug}`} target="_blank" rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 h-9 rounded-xl border border-[hsl(var(--admin-accent-purple)/0.2)] text-[hsl(var(--admin-accent-purple))] hover:bg-[hsl(var(--admin-accent-purple)/0.08)] text-xs font-medium transition-colors w-full">
+                className="flex items-center justify-center gap-1.5 h-9 rounded-xl border border-purple-500/20 text-purple-400 hover:bg-purple-500/[0.08] text-xs font-medium transition-colors w-full">
                 <Eye className="h-3 w-3" />Ver na loja
               </a>
             )}
           </div>
-
-          {/* RIGHT 1/3: Images */}
           <div className="w-1/3 p-4 space-y-4">
-            <VSection icon={ImageIcon} title="Imagem Principal" color="purple">
+            <LiquidSection icon={ImageIcon} title="Imagem Principal" accent="purple">
               <ImageUpload value={form.cover_image} onChange={(url) => set('cover_image', url)} folder="products" aspectRatio="aspect-square" />
-            </VSection>
-
-            <VSection icon={ImageIcon} title="Galeria" color="cyan">
+            </LiquidSection>
+            <LiquidSection icon={ImageIcon} title="Galeria" accent="cyan">
               <MultiImageUpload value={form.gallery_images} onChange={(urls) => set('gallery_images', urls)} folder="products" maxImages={6} />
-            </VSection>
+            </LiquidSection>
           </div>
         </div>
       </ScrollArea>
@@ -326,10 +304,7 @@ const AdminProductsPage = () => {
 
   const handleSave = async (data: ProductFormData, id?: string) => {
     if (id) { await updateProduct.mutateAsync({ id, data }); }
-    else {
-      await createProduct.mutateAsync(data);
-      setIsCreating(false);
-    }
+    else { await createProduct.mutateAsync(data); setIsCreating(false); }
   };
 
   const handleDelete = async () => {
@@ -339,21 +314,11 @@ const AdminProductsPage = () => {
     if (selectedProduct?.id === deleteTarget.id) setSelectedProduct(null);
   };
 
-  const handleRowClick = (product: Product) => {
-    setIsCreating(false);
-    setSelectedProduct(product);
-  };
-
-  const handleNewProduct = () => {
-    setSelectedProduct(null);
-    setIsCreating(true);
-  };
-
   const columns: Column<Product>[] = [
     {
       key: 'cover_image', header: '', className: 'w-10',
       render: (p) => (
-        <div className="w-9 h-9 rounded-lg bg-[hsl(var(--admin-sidebar))] overflow-hidden flex items-center justify-center border border-white/[0.06]">
+        <div className="w-9 h-9 rounded-lg liquid-glass overflow-hidden flex items-center justify-center">
           {p.cover_image ? <img src={p.cover_image} alt="" className="w-full h-full object-cover" /> : <ImageIcon className="h-3.5 w-3.5 text-white/15" />}
         </div>
       ),
@@ -401,8 +366,6 @@ const AdminProductsPage = () => {
         />
 
       <div className={cn("flex h-[calc(100vh-8rem)]", !isMobile && "flex-row")}>
-
-        {/* LEFT: Product List — 2/5 */}
         <div className={cn(
           "flex flex-col min-h-0 overflow-hidden transition-all duration-300",
           panelOpen && !isMobile ? "w-2/5" : "w-full",
@@ -413,10 +376,10 @@ const AdminProductsPage = () => {
             isLoading={isLoading}
             searchPlaceholder="Buscar produtos..."
             showAllRows
-            onRowClick={handleRowClick}
+            onRowClick={(p) => { setIsCreating(false); setSelectedProduct(p); }}
             filterContent={
               <Select value={filterCategoryId} onValueChange={setFilterCategoryId}>
-                <SelectTrigger className="w-full sm:w-44 h-9 bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white text-xs">
+                <SelectTrigger className="w-full sm:w-44 h-9 liquid-input text-xs">
                   <SelectValue placeholder="Categoria" />
                 </SelectTrigger>
                 <SelectContent>
@@ -432,7 +395,7 @@ const AdminProductsPage = () => {
             actions={
               <div className="flex items-center gap-2">
                 <ExportButtons data={filteredProducts.map(p => ({ nome: p.name, sku: p.sku || '', preco: p.price, estoque: p.stock ?? 0, status: p.status }))} filename="produtos" title="Produtos" columns={[{ key: 'nome', header: 'Nome' }, { key: 'sku', header: 'SKU' }, { key: 'preco', header: 'Preço' }, { key: 'estoque', header: 'Estoque' }, { key: 'status', header: 'Status' }]} />
-                <Button onClick={handleNewProduct} disabled={!canEdit()} className="admin-btn admin-btn-create">
+                <Button onClick={() => { setSelectedProduct(null); setIsCreating(true); }} disabled={!canEdit()} className="admin-btn admin-btn-create">
                   <Plus className="h-4 w-4 mr-1" />Novo Produto
                 </Button>
               </div>
@@ -440,32 +403,29 @@ const AdminProductsPage = () => {
           />
         </div>
 
-        {/* RIGHT: Detail Panel — 3/5 (desktop) */}
         {!isMobile && panelOpen && (
-          <div className="w-3/5 border-l border-[hsl(var(--admin-card-border))] bg-[hsl(var(--admin-card))] overflow-hidden animate-in slide-in-from-right-5 duration-300">
+          <div className="w-3/5 border-l border-white/[0.06] liquid-glass overflow-hidden animate-in slide-in-from-right-5 duration-300">
             {panelContent}
           </div>
         )}
       </div>
 
-      {/* Mobile: Sheet */}
       {isMobile && (
         <Sheet open={panelOpen} onOpenChange={(open) => { if (!open) { setSelectedProduct(null); setIsCreating(false); } }}>
-          <SheetContent side="bottom" className="h-[90vh] p-0 bg-[hsl(var(--admin-card))] border-t border-[hsl(var(--admin-accent-cyan)/0.2)] rounded-t-2xl">
+          <SheetContent side="bottom" className="h-[90vh] p-0 liquid-glass border-t border-cyan-500/20 rounded-t-2xl">
             {panelContent}
           </SheetContent>
         </Sheet>
       )}
 
-      {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
+        <DialogContent className="liquid-glass border-white/[0.1]">
           <DialogHeader>
             <DialogTitle className="text-white">Confirmar exclusão</DialogTitle>
             <DialogDescription>Tem certeza que deseja excluir "{deleteTarget?.name}"?</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="border-white/10 text-white">Cancelar</Button>
             <Button className="admin-btn admin-btn-delete" onClick={handleDelete} disabled={deleteProduct.isPending}>
               {deleteProduct.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}<Trash2 className="h-4 w-4 mr-1" />Deletar
             </Button>
