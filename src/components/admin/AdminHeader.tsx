@@ -65,7 +65,7 @@ export const AdminHeader = ({ title }: AdminHeaderProps) => {
             onClick={() => {
               if (!companyInfo?.id) return;
               updateCompany.mutate(
-                { dark_mode_enabled: !isDarkMode },
+                { id: companyInfo.id, data: { dark_mode_enabled: !isDarkMode } as any },
                 { onSuccess: () => toast.success(isDarkMode ? 'Tema claro ativado' : 'Tema escuro ativado') }
               );
             }}
