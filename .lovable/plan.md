@@ -1,62 +1,85 @@
 
-# 50 Melhorias Táticas — Pincel de Luz
+# 🔄 Reconstrução Total do Admin — Liquidmorphism Vivid
 
-## 🛒 Conversão & Vendas (1-15)
-1. **Micro-animação de pulso no botão "Comprar"** — Atrair atenção visual
-2. **Badge "Mais Vendido" nos top 3 produtos** — Prova social automática
-3. **Desconto PIX visível no card** — Mostrar economia em cada card
-4. **Timer de urgência no card de produto** — Quando promoção ativa
-5. **Selo de "Frete Grátis" nos cards** — Badge quando acima do mínimo
-6. **Barra de progresso de frete grátis no header mobile** — Incentivo constante
-7. **Notificação de estoque baixo no QuickView** — Urgência
-8. **Auto-scroll suave para seção de produtos** — Após hero
-9. **Botão "Continuar Comprando" após add to cart** — Reduzir abandono
-10. **Skeleton loading melhorado com shimmer** — Percepção de velocidade
-11. **Animação de item entrando no carrinho** — Feedback visual
-12. **"Você também pode gostar" no QuickView** — Cross-sell
-13. **Preço parcelado destacado no card** — "12x R$ X,XX"
-14. **Indicador "Personalização Grátis"** — Badge nos cards aplicáveis
-15. **CTA "Peça seu orçamento em 30s"** — Copy mais urgente
+## Estratégia: Rename → Rebuild → Delete
+Para cada arquivo: renomear `.old.tsx` → criar novo do zero usando o antigo como referência de funcionalidade → deletar o `.old`.
 
-## 📱 UX Mobile (16-25)
-16. **Haptic feedback simulado (scale animation)** — Nos botões principais
-17. **Swipe-to-delete no carrinho mobile** — Gestos nativos
-18. **Pull-to-refresh na home** — Padrão mobile
-19. **Sticky summary no checkout mobile** — Sempre visível o total
-20. **Bottom sheet para filtros na busca** — Em vez de sidebar
-21. **Animação de transição entre páginas** — Fluidez
-22. **Loading spinner centralizado durante navegação** — Evitar tela branca
-23. **Indicador de "Voltar ao topo"** — Após scroll longo
-24. **Carrossel horizontal de categorias com snap** — Touch-friendly
-25. **Zoom em imagens com pinch** — Na galeria de produto
+---
 
-## ⚡ Performance & Técnico (26-35)
-26. **Memo nos cards de produto** — Evitar re-renders
-27. **Debounce na busca** — Reduzir chamadas
-28. **Intersection Observer para lazy sections** — Carregar sob demanda
-29. **Preconnect para CDN de imagens** — Acelerar carregamento
-30. **Cache de categorias com staleTime 5min** — Reduzir queries
-31. **Virtual scroll para listas longas** — Performance em catálogos grandes
-32. **Image placeholder com blur hash** — Carregamento percebido
-33. **Prefetch de página de produto no hover** — Navegação instantânea
-34. **Service Worker para offline básico** — Cache de assets
-35. **Compressão de estado do carrinho** — Reduzir localStorage
+## 🎨 DNA Visual: Liquidmorphism Vivid
+- **Background:** gradientes suaves e leves (roxo→azul→ciano em baixa opacidade)
+- **Cards:** fundo translúcido (`backdrop-blur-xl`) com bordas gradientes vivas
+- **Transparência:** 60-80% de opacidade nos containers, revelando o gradiente de fundo
+- **Texto:** alto contraste (branco puro sobre vidro escuro)
+- **Botões:** sólidos, vibrantes, sem pulse, com hover suave
+- **Inputs:** vidro escuro com bordas luminosas no focus
 
-## 🎨 Design & Visual (36-45)
-36. **Micro-interações nos ícones de garantia** — Animação hover
-37. **Gradiente animado no hero** — Efeito visual premium
-38. **Efeito glass nos cards de resumo** — Modernidade
-39. **Tooltip nos badges** — Explicar descontos
-40. **Animação de entrada staggered nos cards** — Efeito cascata
-41. **Hover state nos links do footer** — Underline animado
-42. **Separadores visuais entre seções** — Linhas gradient
-43. **Loading dots animados no chat** — Em vez de spinner
-44. **Ícones animados no "Como Funciona"** — Lottie-style CSS
-45. **Dark mode toggle suave** — Transição sem flash
+---
 
-## 🔧 Funcional & Admin (46-50)
-46. **Notificação sonora no admin** — Novo pedido
-47. **Atalhos de teclado no admin** — Ctrl+S, Ctrl+N
-48. **Exportar dados como Excel** — Além de CSV
-49. **Preview de email template** — Antes de salvar
-50. **Dashboard widget de performance** — Core Web Vitals
+## FASE 1 — Tokens CSS + Base (2 arquivos)
+1. `src/index.css` — Novos tokens `--admin-liquid-*`, gradientes de fundo, classes base
+2. `src/components/admin/AdminButtonStyles.ts` — Nova paleta de botões sólidos vivid
+
+## FASE 2 — Core Layout (4 arquivos)
+3. `AdminLayout.tsx` — Layout com background gradiente + blur
+4. `AdminSidebar.tsx` — Sidebar liquidmorphism com grupos colapsáveis
+5. `AdminHeader.tsx` — Header translúcido com breadcrumbs
+6. `AdminPageGuide.tsx` — Cards de guia com vidro colorido
+
+## FASE 3 — Componentes Reutilizáveis (6 arquivos)
+7. `DataTable.tsx` — Tabela com linhas hover translúcidas
+8. `AdminSummaryCard.tsx` — KPI cards com gradientes vivos
+9. `AdminStatusBadge.tsx` — Badges com glow sutil
+10. `AdminFilterBar.tsx` — Barra de filtros em vidro
+11. `ExportButtons.tsx` — Botões de exportação vivid
+12. `ProductDetailPanel.tsx` — Painel split-view liquid
+
+## FASE 4 — Páginas Principais (6 arquivos)
+13. `AdminDashboardPage.tsx` — Dashboard com charts em vidro
+14. `AdminProductsPage.tsx` — Produtos split-view liquid
+15. `AdminCategoriesPage.tsx` — Categorias split-view liquid
+16. `AdminOrdersPage.tsx` — Pedidos com kanban liquid
+17. `AdminSettingsPage.tsx` — Configurações em abas liquid
+18. `AdminCompanyPage.tsx` — Empresa com seções liquid
+
+## FASE 5 — Páginas Secundárias (8 arquivos)
+19. `AdminCouponsPage.tsx`
+20. `AdminPromotionsPage.tsx`
+21. `AdminHeroPage.tsx`
+22. `AdminUsersPage.tsx`
+23. `AdminLeadsPage.tsx`
+24. `AdminQuotesPage.tsx`
+25. `AdminEmailTemplatesPage.tsx`
+26. `AdminKanbanPage.tsx`
+
+## FASE 6 — Páginas Especializadas (6 arquivos)
+27. `AdminCashFlowPage.tsx` + subcomponentes cashflow
+28. `AdminReviewsPage.tsx`
+29. `AdminRawMaterialsPage.tsx`
+30. `AdminWorkflowsPage.tsx` + subcomponentes workflows
+31. `AdminWhatsAppPage.tsx` + subcomponentes whatsapp
+32. `AdminWhyChooseUsPage.tsx`
+
+## FASE 7 — Páginas Restantes + Subcomponentes (12 arquivos)
+33. `AdminApiDocsPage.tsx`
+34. `AdminMediaPage.tsx`
+35. `AdminLogsPage.tsx`
+36. `AdminLoginPage.tsx`
+37. Settings subcomponentes (6 arquivos)
+38. Templates subcomponentes (4 arquivos)
+39. Company subcomponentes (3 arquivos)
+40. Dashboard subcomponentes (7 arquivos)
+
+---
+
+## 📊 Totais
+- **~84 arquivos** a reconstruir
+- **~7-8 fases** (1 fase por mensagem)
+- **Hooks NÃO são alterados** (só UI)
+- **Zero tempo de inatividade** (rename protege o original)
+
+## ⚠️ Regras
+- Cada arquivo novo é escrito DO ZERO, sem copiar/colar do antigo
+- O antigo serve APENAS como referência de funcionalidade (quais hooks, quais dados)
+- Nenhum arquivo é deletado até o novo estar 100% funcional e verificado
+- Build check (tsc --noEmit) ao final de cada fase
