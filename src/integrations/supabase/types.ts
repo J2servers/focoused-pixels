@@ -376,6 +376,10 @@ export type Database = {
           id: string
           installments: number | null
           lgpd_contact_email: string | null
+          login_bg_image: string | null
+          login_logo: string | null
+          login_subtitle: string | null
+          login_title: string | null
           logo_header_size: number | null
           logo_mobile_size: number | null
           logo_sidebar_size: number | null
@@ -484,6 +488,10 @@ export type Database = {
           id?: string
           installments?: number | null
           lgpd_contact_email?: string | null
+          login_bg_image?: string | null
+          login_logo?: string | null
+          login_subtitle?: string | null
+          login_title?: string | null
           logo_header_size?: number | null
           logo_mobile_size?: number | null
           logo_sidebar_size?: number | null
@@ -592,6 +600,10 @@ export type Database = {
           id?: string
           installments?: number | null
           lgpd_contact_email?: string | null
+          login_bg_image?: string | null
+          login_logo?: string | null
+          login_subtitle?: string | null
+          login_title?: string | null
           logo_header_size?: number | null
           logo_mobile_size?: number | null
           logo_sidebar_size?: number | null
@@ -957,6 +969,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ip_blocklist: {
+        Row: {
+          blocked_until: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          ip_hash: string
+          permanent: boolean | null
+          reason: string | null
+        }
+        Insert: {
+          blocked_until?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          ip_hash: string
+          permanent?: boolean | null
+          reason?: string | null
+        }
+        Update: {
+          blocked_until?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          ip_hash?: string
+          permanent?: boolean | null
+          reason?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string
@@ -996,6 +1038,33 @@ export type Database = {
           tags?: string[] | null
           unsubscribed_at?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      login_attempts: {
+        Row: {
+          created_at: string
+          email_hash: string
+          id: string
+          ip_hash: string
+          success: boolean
+          user_agent_hash: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_hash: string
+          id?: string
+          ip_hash: string
+          success?: boolean
+          user_agent_hash?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_hash?: string
+          id?: string
+          ip_hash?: string
+          success?: boolean
+          user_agent_hash?: string | null
         }
         Relationships: []
       }
@@ -2586,6 +2655,7 @@ export type Database = {
       }
     }
     Functions: {
+      cleanup_old_login_attempts: { Args: never; Returns: undefined }
       has_admin_access: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
