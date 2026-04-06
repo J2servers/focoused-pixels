@@ -72,6 +72,7 @@ const SearchPage = () => {
   // Desktop Version
   return (
     <div className="min-h-screen flex flex-col">
+      <PageSEO title={`Busca: ${query}`} description={`Resultados de busca para "${query}" na Pincel de Luz Personalizados.`} path={`/busca?q=${query}`} noindex />
       <DynamicTopBar />
       <DynamicMainHeader />
       <NavigationBar />

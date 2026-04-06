@@ -72,8 +72,9 @@ export function MobileHeader() {
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 className="neu-icon-btn"
+                aria-label="Abrir menu de navegação"
               >
-                <Menu className="h-5 w-5 text-foreground" />
+                <Menu className="h-5 w-5 text-foreground" aria-hidden="true" />
               </motion.button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] p-0 border-r-0" style={{
@@ -94,10 +95,10 @@ export function MobileHeader() {
           </Sheet>
 
           {/* Logo */}
-          <Link to="/" className="absolute left-1/2 -translate-x-1/2">
+          <Link to="/" className="absolute left-1/2 -translate-x-1/2" aria-label="Página inicial">
             <img
               src={company?.header_logo || logoPincel}
-              alt="Logo"
+              alt={company?.company_name || 'Pincel de Luz - Página inicial'}
               className="w-auto max-w-[160px] object-contain"
               style={{ height: `${mobileLogoHeight}px` }}
             />
@@ -109,13 +110,14 @@ export function MobileHeader() {
               whileTap={{ scale: 0.9 }}
               onClick={() => setSearchOpen(true)}
               className="neu-icon-btn"
+              aria-label="Abrir busca"
             >
-              <Search className="h-[18px] w-[18px] text-foreground" />
+              <Search className="h-[18px] w-[18px] text-foreground" aria-hidden="true" />
             </motion.button>
 
-            <Link to="/carrinho">
+            <Link to="/carrinho" aria-label={`Carrinho${itemCount > 0 ? ` com ${itemCount} itens` : ''}`}>
               <motion.div whileTap={{ scale: 0.9 }} className="neu-icon-btn relative">
-                <ShoppingCart className="h-[18px] w-[18px] text-foreground" />
+                <ShoppingCart className="h-[18px] w-[18px] text-foreground" aria-hidden="true" />
                 {itemCount > 0 && (
                   <span
                     className="absolute -top-1.5 -right-1.5 text-[9px] font-bold rounded-full h-[18px] w-[18px] flex items-center justify-center"
