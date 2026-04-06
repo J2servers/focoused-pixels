@@ -18,7 +18,7 @@ import { WishlistButton } from '@/components/product/WishlistButton';
 import { useActivePromotions } from '@/hooks/usePromotions';
 import { PromotionCountdown } from './PromotionCountdown';
 import { analytics } from '@/components/analytics/EventTracker';
-import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 
 interface ProductCardOptimizedProps {
   product: Product;
@@ -39,7 +39,9 @@ export const ProductCardOptimized = memo(function ProductCardOptimized({
   const { addItem } = useCart();
   const { data: promotions = [] } = useActivePromotions();
   const navigate = useNavigate();
-  const { freeShippingMinimum, pixDiscountPercent } = useSiteSettings();
+  const { data: companyInfo } = useCompanyInfo();
+  const freeShippingMinimum = companyInfo?.free_shipping_minimum ?? 159;
+  const pixDiscountPercent = companyInfo?.pix_discount_percent ?? 5;
   const categoryId = (product as { categoryId?: string }).categoryId;
 
   const activePromotion = useMemo(() => {
