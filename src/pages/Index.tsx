@@ -138,8 +138,8 @@ const Index = () => {
             </div>
           ) : (
             parentCategories.map((category) => {
-              const categoryProducts = getProductsByCategory(category.id);
-              if (categoryProducts.length === 0) return null;
+              const categoryProducts = categoryProductsMap.get(category.id);
+              if (!categoryProducts?.length) return null;
               return (
                 <MobileProductSection
                   key={category.id}
@@ -213,14 +213,14 @@ const Index = () => {
           </section>
         ) : (
           parentCategories.map((category) => {
-            const categoryProducts = getProductsByCategory(category.id);
-            if (categoryProducts.length === 0) return null;
+            const categoryProducts = categoryProductsMap.get(category.id);
+            if (!categoryProducts?.length) return null;
             return (
               <CategoryProductsSection
                 key={category.id}
                 category={category}
                 products={categoryProducts}
-                onAddToCart={() => setMiniCartOpen(true)}
+                onAddToCart={handleOpenMiniCart}
               />
             );
           })
