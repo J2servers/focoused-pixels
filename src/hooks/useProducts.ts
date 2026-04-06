@@ -146,6 +146,8 @@ export function useProductsByCategory(categorySlug: string | undefined) {
       return (data || []).map(mapDbProduct);
     },
     enabled: !!categorySlug,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 
@@ -171,6 +173,8 @@ export function useProductBySlug(slug: string | undefined) {
       return mapDbProduct(data);
     },
     enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 
@@ -206,6 +210,8 @@ export function useSearchProducts(query: string) {
       return (data || []).map(mapDbProduct);
     },
     enabled: query.length >= 2,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 }
 
@@ -229,6 +235,8 @@ export function useFeaturedProducts(limit = 8) {
       if (error) throw error;
       return (data || []).map(mapDbProduct);
     },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 
@@ -281,6 +289,8 @@ export function useCategoryBySlug(slug: string | undefined) {
       };
     },
     enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 
