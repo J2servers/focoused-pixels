@@ -1,9 +1,10 @@
 import { DynamicTopBar, DynamicMainHeader, NavigationBar, DynamicFooter } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
-import { storeInfo } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { PageSEO } from '@/components/seo/PageSEO';
 
 const TermsPage = () => {
+  const settings = useSiteSettings();
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <PageSEO title="Termos de Uso" description="Termos e condições de uso da loja Pincel de Luz Personalizados. Leia antes de realizar sua compra." path="/termos" />

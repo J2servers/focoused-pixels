@@ -1,9 +1,10 @@
 import { DynamicTopBar, DynamicMainHeader, NavigationBar, DynamicFooter } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
-import { storeInfo } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { PageSEO } from '@/components/seo/PageSEO';
 
 const PrivacyPage = () => {
+  const settings = useSiteSettings();
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <PageSEO title="Política de Privacidade" description="Política de privacidade e proteção de dados da Pincel de Luz Personalizados. Saiba como tratamos seus dados pessoais." path="/privacidade" />
@@ -23,7 +24,7 @@ const PrivacyPage = () => {
               <section>
                 <h2 className="text-xl font-bold mb-4 text-foreground">1. Introdução</h2>
                 <p className="text-muted-foreground">
-                  A <strong className="text-foreground">{storeInfo.fullName}</strong> está comprometida em proteger 
+                  A <strong className="text-foreground">{settings.companyName}</strong> está comprometida em proteger 
                   a privacidade dos visitantes do nosso site e clientes. Esta Política de Privacidade descreve como 
                   coletamos, usamos, armazenamos e protegemos suas informações pessoais.
                 </p>
@@ -124,13 +125,11 @@ const PrivacyPage = () => {
                   entre em contato conosco:
                 </p>
                 <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-                  <p className="text-foreground font-medium">{storeInfo.fullName}</p>
-                  <p className="text-muted-foreground">E-mail: {storeInfo.email}</p>
-                  <p className="text-muted-foreground">Telefone: {storeInfo.phone}</p>
-                  <p className="text-muted-foreground">
-                    Endereço: {storeInfo.address.street}, {storeInfo.address.neighborhood} - {storeInfo.address.city}/{storeInfo.address.state}
-                  </p>
-                  <p className="text-muted-foreground">CNPJ: {storeInfo.cnpj}</p>
+                  <p className="text-foreground font-medium">{settings.companyName}</p>
+                  {settings.email && <p className="text-muted-foreground">E-mail: {settings.email}</p>}
+                  {settings.phone && <p className="text-muted-foreground">Telefone: {settings.phone}</p>}
+                  {settings.address && <p className="text-muted-foreground">Endereço: {settings.address}</p>}
+                  {settings.cnpj && <p className="text-muted-foreground">CNPJ: {settings.cnpj}</p>}
                 </div>
               </section>
             </div>
