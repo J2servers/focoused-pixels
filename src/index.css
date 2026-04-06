@@ -698,6 +698,94 @@
     color: transparent;
   }
 
+  /* ═══ Vivid Gradient Admin Buttons ═══ */
+  .admin-btn-purple {
+    background: linear-gradient(135deg, hsl(280 90% 55%), hsl(280 90% 45%));
+    color: white; border: none;
+    transition: all 0.2s ease;
+  }
+  .admin-btn-purple:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  .admin-btn-green {
+    background: linear-gradient(135deg, hsl(160 100% 40%), hsl(145 80% 35%));
+    color: white; border: none;
+    transition: all 0.2s ease;
+  }
+  .admin-btn-green:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  .admin-btn-blue {
+    background: linear-gradient(135deg, hsl(210 100% 55%), hsl(220 90% 45%));
+    color: white; border: none;
+    transition: all 0.2s ease;
+  }
+  .admin-btn-blue:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  .admin-btn-orange {
+    background: linear-gradient(135deg, hsl(30 100% 50%), hsl(25 90% 45%));
+    color: white; border: none;
+    transition: all 0.2s ease;
+  }
+  .admin-btn-orange:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  .admin-btn-pink {
+    background: linear-gradient(135deg, hsl(340 100% 60%), hsl(330 90% 50%));
+    color: white; border: none;
+    transition: all 0.2s ease;
+  }
+  .admin-btn-pink:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  .admin-btn-cyan {
+    background: linear-gradient(135deg, hsl(185 100% 45%), hsl(190 90% 40%));
+    color: white; border: none;
+    transition: all 0.2s ease;
+  }
+  .admin-btn-cyan:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  .admin-btn-amber {
+    background: linear-gradient(135deg, hsl(45 100% 50%), hsl(38 90% 45%));
+    color: hsl(0 0% 10%); border: none;
+    transition: all 0.2s ease;
+  }
+  .admin-btn-amber:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+  /* ═══ Vivid Gradient Admin Cards ═══ */
+  .admin-vivid-card-purple {
+    background: linear-gradient(135deg, hsl(280 70% 20%), hsl(280 60% 15%));
+    border: 1px solid hsl(280 90% 55% / 0.3);
+  }
+  .admin-vivid-card-green {
+    background: linear-gradient(135deg, hsl(160 50% 15%), hsl(145 45% 12%));
+    border: 1px solid hsl(160 100% 45% / 0.3);
+  }
+  .admin-vivid-card-blue {
+    background: linear-gradient(135deg, hsl(210 50% 18%), hsl(220 45% 14%));
+    border: 1px solid hsl(210 100% 60% / 0.3);
+  }
+  .admin-vivid-card-orange {
+    background: linear-gradient(135deg, hsl(30 50% 16%), hsl(25 45% 12%));
+    border: 1px solid hsl(30 100% 55% / 0.3);
+  }
+  .admin-vivid-card-pink {
+    background: linear-gradient(135deg, hsl(340 50% 18%), hsl(330 45% 14%));
+    border: 1px solid hsl(340 100% 65% / 0.3);
+  }
+  .admin-vivid-card-cyan {
+    background: linear-gradient(135deg, hsl(185 50% 15%), hsl(190 45% 12%));
+    border: 1px solid hsl(185 100% 50% / 0.3);
+  }
+  .admin-vivid-card-amber {
+    background: linear-gradient(135deg, hsl(45 50% 16%), hsl(40 45% 12%));
+    border: 1px solid hsl(45 100% 55% / 0.3);
+  }
+
+  /* ═══ Vivid Filled Tab System ═══ */
+  .admin-tabs-vivid [data-state="active"] {
+    background: linear-gradient(135deg, hsl(280 90% 55%), hsl(340 100% 60%)) !important;
+    color: white !important;
+    border-color: transparent !important;
+    font-weight: 600;
+  }
+
   .admin-glass {
     background: hsl(var(--admin-card) / 0.8);
     backdrop-filter: blur(12px);
