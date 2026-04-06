@@ -38,7 +38,7 @@ interface Product {
   width_cm: number | null;
   height_cm: number | null;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 interface ProductDetailPanelProps {
