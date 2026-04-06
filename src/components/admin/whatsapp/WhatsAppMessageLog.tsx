@@ -96,7 +96,7 @@ const WhatsAppMessageLog = () => {
   const inst2Sent = messages.filter(m => m.status === 'sent' && m.instance_name === 'pinceldeluz2').length;
 
   return (
-    <Card className="bg-white/[0.04] border-white/[0.08]">
+    <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
       <CardHeader>
         <div className="flex items-center justify-between flex-wrap gap-3">
           <CardTitle className="text-white flex items-center gap-2">
@@ -114,31 +114,31 @@ const WhatsAppMessageLog = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
           <div className="bg-green-500/10 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-green-400">{totalSent}</p>
-            <p className="text-xs text-white/50">Enviadas</p>
+            <p className="text-xs text-[hsl(var(--admin-text-muted))]">Enviadas</p>
           </div>
           <div className="bg-red-500/10 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-red-400">{totalFailed}</p>
-            <p className="text-xs text-white/50">Falharam</p>
+            <p className="text-xs text-[hsl(var(--admin-text-muted))]">Falharam</p>
           </div>
           <div className="bg-blue-500/10 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-blue-400">{inst1Sent}</p>
-            <p className="text-xs text-white/50">Via Principal</p>
+            <p className="text-xs text-[hsl(var(--admin-text-muted))]">Via Principal</p>
           </div>
           <div className="bg-purple-500/10 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-purple-400">{inst2Sent}</p>
-            <p className="text-xs text-white/50">Via Secundário</p>
+            <p className="text-xs text-[hsl(var(--admin-text-muted))]">Via Secundário</p>
           </div>
         </div>
 
         {/* Filters */}
         <div className="flex flex-wrap gap-2 mt-3">
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
             <Input placeholder="Buscar por telefone, nome, pedido..." value={search} onChange={e => setSearch(e.target.value)}
-              className="pl-10 bg-white/[0.03] border-white/[0.08] text-white text-sm" />
+              className="pl-10 bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white text-sm" />
           </div>
           <Select value={filterInstance} onValueChange={setFilterInstance}>
-            <SelectTrigger className="w-[160px] bg-white/[0.03] border-white/[0.08] text-white text-sm">
+            <SelectTrigger className="w-[160px] bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white text-sm">
               <SelectValue placeholder="Instância" />
             </SelectTrigger>
             <SelectContent>
@@ -148,7 +148,7 @@ const WhatsAppMessageLog = () => {
             </SelectContent>
           </Select>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[130px] bg-white/[0.03] border-white/[0.08] text-white text-sm">
+            <SelectTrigger className="w-[130px] bg-[hsl(var(--admin-bg))] border-[hsl(var(--admin-card-border))] text-white text-sm">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -162,17 +162,17 @@ const WhatsAppMessageLog = () => {
       <CardContent>
         {loading ? (
           <div className="text-center py-8">
-            <RefreshCw className="h-6 w-6 animate-spin text-white/50 mx-auto" />
+            <RefreshCw className="h-6 w-6 animate-spin text-[hsl(var(--admin-text-muted))] mx-auto" />
           </div>
         ) : filtered.length === 0 ? (
-          <p className="text-center text-white/50 py-8 text-sm">
+          <p className="text-center text-[hsl(var(--admin-text-muted))] py-8 text-sm">
             Nenhuma mensagem encontrada
           </p>
         ) : (
           <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
             {filtered.map(msg => (
               <div key={msg.id}
-                className="bg-white/[0.03] rounded-lg p-3 border border-[rgb(255 255 255 / 0.5)] hover:border-white/[0.08] transition-colors">
+                className="bg-[hsl(var(--admin-bg))] rounded-lg p-3 border border-[hsl(var(--admin-card-border)/0.5)] hover:border-[hsl(var(--admin-card-border))] transition-colors">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -180,15 +180,15 @@ const WhatsAppMessageLog = () => {
                         {msg.recipient_name || msg.recipient_phone}
                       </span>
                       {msg.recipient_name && (
-                        <span className="text-white/50 text-xs">{msg.recipient_phone}</span>
+                        <span className="text-[hsl(var(--admin-text-muted))] text-xs">{msg.recipient_phone}</span>
                       )}
                       {msg.order_number && (
-                        <Badge variant="outline" className="text-xs border-white/[0.08] text-white/50">
+                        <Badge variant="outline" className="text-xs border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))]">
                           #{msg.order_number}
                         </Badge>
                       )}
                     </div>
-                    <p className="text-white/50 text-xs mt-1 line-clamp-2">
+                    <p className="text-[hsl(var(--admin-text-muted))] text-xs mt-1 line-clamp-2">
                       {msg.message_text}
                     </p>
                     {msg.error_message && (
@@ -197,10 +197,10 @@ const WhatsAppMessageLog = () => {
                   </div>
                   <div className="flex flex-col items-end gap-1 shrink-0">
                     {statusBadge(msg.status)}
-                    <Badge variant="outline" className="text-[10px] border-white/[0.08] text-white/50">
+                    <Badge variant="outline" className="text-[10px] border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))]">
                       {msg.instance_name === 'pinceldeluz1' ? '📱 Principal' : '📱 Secundário'}
                     </Badge>
-                    <span className="text-[10px] text-white/50">
+                    <span className="text-[10px] text-[hsl(var(--admin-text-muted))]">
                       {format(new Date(msg.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
                     </span>
                   </div>

@@ -50,7 +50,7 @@ function WorkflowNodeConfig({ selectedNode, currentWorkflow, emailTemplates, wha
   const Icon = meta.icon;
 
   return (
-    <div className="w-[340px] shrink-0 border-l border-white/[0.06] flex flex-col bg-gradient-to-b from-[rgb(255 255 255 / 0.03)] to-[rgb(255 255 255 / 0.95)]">
+    <div className="w-[340px] shrink-0 border-l border-white/[0.06] flex flex-col bg-gradient-to-b from-[hsl(var(--admin-bg))] to-[hsl(var(--admin-bg)/0.95)]">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-white/[0.06]">
         <div className={`w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center`}>

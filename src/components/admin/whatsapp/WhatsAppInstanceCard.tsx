@@ -163,16 +163,16 @@ const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusCha
   const cfg = statusConfigs[status];
 
   return (
-    <Card className="bg-white/[0.04] border-white/[0.08]">
+    <Card className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-white flex items-center gap-2 text-base">
               <QrCode className="h-4 w-4 text-green-400" />
               {displayName}
-              <span className="text-xs text-white/50">#{priority}</span>
+              <span className="text-xs text-[hsl(var(--admin-text-muted))]">#{priority}</span>
             </CardTitle>
-            <CardDescription className="text-white/50 text-xs mt-1">
+            <CardDescription className="text-[hsl(var(--admin-text-muted))] text-xs mt-1">
               {instanceName}
             </CardDescription>
           </div>
@@ -181,7 +181,7 @@ const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusCha
               <cfg.icon className={`h-3 w-3 ${status === 'connecting' ? 'animate-spin' : ''}`} />
               {cfg.label}
             </Badge>
-            <Button variant="ghost" size="icon" onClick={checkStatus} className="h-7 w-7 text-white/50 hover:text-white">
+            <Button variant="ghost" size="icon" onClick={checkStatus} className="h-7 w-7 text-[hsl(var(--admin-text-muted))] hover:text-white">
               <RefreshCw className="h-3.5 w-3.5" />
             </Button>
           </div>
@@ -214,21 +214,21 @@ const WhatsAppInstanceCard = ({ instanceName, displayName, priority, onStatusCha
                 className="w-48 h-48 object-contain"
               />
             </div>
-            <p className="text-white/50 text-xs">
+            <p className="text-[hsl(var(--admin-text-muted))] text-xs">
               WhatsApp → Menu (⋮) → Aparelhos conectados
             </p>
             <Button variant="outline" size="sm" onClick={handleConnect} disabled={!!actionLoading}
-              className="border-white/[0.08] text-white/50 hover:text-white text-xs">
+              className="border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text-muted))] hover:text-white text-xs">
               <RefreshCw className={`h-3.5 w-3.5 mr-1 ${actionLoading === 'connect' ? 'animate-spin' : ''}`} />
               Novo QR Code
             </Button>
           </div>
         ) : (
           <div className="text-center space-y-3">
-            <div className="w-16 h-16 mx-auto rounded-full bg-[rgb(255 255 255 / 0.3)] flex items-center justify-center">
-              <Smartphone className="h-8 w-8 text-white/50" />
+            <div className="w-16 h-16 mx-auto rounded-full bg-[hsl(var(--admin-card-border)/0.3)] flex items-center justify-center">
+              <Smartphone className="h-8 w-8 text-[hsl(var(--admin-text-muted))]" />
             </div>
-            <p className="text-white/50 text-sm">Não conectado</p>
+            <p className="text-[hsl(var(--admin-text-muted))] text-sm">Não conectado</p>
             <Button onClick={handleCreateInstance} disabled={!!actionLoading}
               className="admin-btn admin-btn-save">
               {actionLoading === 'create' ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <QrCode className="h-4 w-4 mr-1" />}

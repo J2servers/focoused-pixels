@@ -27,7 +27,7 @@ export const AdminHeader = ({ title }: AdminHeaderProps) => {
 
   const initials = profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'AD';
 
-  const handleLogout = async () => { await signOut(); navigate('/admin/login'); };
+  const handleLogout = async () => { await signOut(); navigate('/gateway-x7k9m2'); };
 
   const roleBadgeStyle = (() => {
     switch (role) {

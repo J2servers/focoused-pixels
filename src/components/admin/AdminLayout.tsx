@@ -28,8 +28,8 @@ export const AdminLayout = ({
 
   useEffect(() => {
     if (!isLoading) {
-      if (!user) { navigate('/admin/login'); return; }
-      if (!role) { navigate('/admin/login'); return; }
+      if (!user) { navigate('/gateway-x7k9m2'); return; }
+      if (!role) { navigate('/gateway-x7k9m2'); return; }
       if (requireAdmin && !isAdmin()) { navigate('/admin'); return; }
       if (requireEditor && !canEdit()) { navigate('/admin'); return; }
     }

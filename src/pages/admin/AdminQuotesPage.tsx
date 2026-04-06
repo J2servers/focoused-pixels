@@ -291,7 +291,7 @@ const AdminQuotesPage = () => {
                   </div>
                 </div>
 
-                <Separator className="bg-[rgb(255 255 255 / 0.08)]" />
+                <Separator className="bg-[hsl(var(--admin-card-border))]" />
 
                 {/* Status Update */}
                 <div>

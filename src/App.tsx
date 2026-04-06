@@ -136,7 +136,8 @@ const App = () => (
                 <Route path="/cadastro" element={<RegisterPage />} />
                 
                 {/* Admin Routes */}
-                <Route path="/admin/login" element={<AdminLoginPage />} />
+                <Route path="/admin/login" element={<NotFound />} />
+                <Route path="/gateway-x7k9m2" element={<AdminLoginPage />} />
                 <Route path="/admin" element={<AdminDashboardPage />} />
                 <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
                 <Route path="/admin/orcamentos" element={<AdminQuotesPage />} />

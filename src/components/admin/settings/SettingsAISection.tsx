@@ -58,7 +58,7 @@ export const SettingsAISection = ({ settings, u }: Props) => (
             <FieldGroup label="Provedor">
               <Select value={settings.ai_external_provider || 'openai'} onValueChange={v => u('ai_external_provider', v)}>
                 <SelectTrigger className={selectClass}><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-white/[0.04] border-white/[0.08] text-white">
+                <SelectContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text))]">
                   {AI_PROVIDERS.map(p => (
                     <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
                   ))}
@@ -76,7 +76,7 @@ export const SettingsAISection = ({ settings, u }: Props) => (
 
           <FieldGroup label="Chave de API (API Key)">
             <div className="relative">
-              <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+              <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--admin-text-muted))]" />
               <Input
                 className={cn(inputClass, 'pl-10')}
                 type="password"

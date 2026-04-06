@@ -172,7 +172,7 @@ const AdminEmailTemplatesPage = () => {
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex-1 flex items-center justify-center gap-3 px-6 py-4 transition-all border-b-2
                     ${isActive
-                      ? 'border-[hsl(270 70% 60%)] bg-purple-500/[0.06] text-white'
+                      ? 'border-[hsl(var(--admin-accent-purple))] bg-[hsl(var(--admin-accent-purple)/0.06)] text-white'
                       : 'border-transparent text-white/50 hover:bg-white/3 hover:text-white'
                     }`}
                 >
@@ -211,7 +211,7 @@ const AdminEmailTemplatesPage = () => {
               <CardContent className="p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[rgb(168 85 247 / 0.2)] to-[rgb(236 72 153 / 0.1)] flex items-center justify-center border border-purple-500/20">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(var(--admin-accent-purple)/0.2)] to-[hsl(var(--admin-accent-pink)/0.1)] flex items-center justify-center border border-purple-500/20">
                       <Zap className="h-4.5 w-4.5 text-purple-400" />
                     </div>
                     <div>
