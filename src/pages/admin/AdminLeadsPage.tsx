@@ -21,6 +21,7 @@ import { useLeads, useUpdateLead, useDeleteLead, Lead } from '@/hooks/useLeads';
 import { toast } from 'sonner';
 import { format, subDays, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const AdminLeadsPage = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -176,6 +177,18 @@ const AdminLeadsPage = () => {
   return (
     <AdminLayout title="Leads">
       <div className="space-y-6">
+        <AdminPageGuide
+          title="👥 Guia de Leads"
+          description="Gerencie contatos capturados e acompanhe conversões."
+          steps={[
+            { title: "Visualizar leads", description: "Todos os contatos capturados por formulários e pop-ups aparecem listados aqui." },
+            { title: "Filtrar status", description: "Filtre entre todos, inscritos ou desinscritos na newsletter." },
+            { title: "Ações em massa", description: "Selecione múltiplos leads para aplicar tags ou excluir em lote." },
+            { title: "Exportar lista", description: "Exporte a lista de leads em CSV para usar em ferramentas de e-mail marketing." },
+            { title: "Editar lead", description: "Clique em um lead para editar nome, e-mail, telefone e tags." },
+          ]}
+        />
+
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <AdminSummaryCard title="Total de Leads" value={leads.length} icon={Users} variant="purple" />

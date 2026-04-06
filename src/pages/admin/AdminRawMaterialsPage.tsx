@@ -11,6 +11,7 @@ import { ExportButtons } from '@/components/admin/ExportButtons';
 import { Plus, Pencil, Trash2, Loader2, Boxes, AlertTriangle, Package } from 'lucide-react';
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge';
 import { useRawMaterials, useCreateRawMaterial, useUpdateRawMaterial, useDeleteRawMaterial, type RawMaterial, type RawMaterialInput } from '@/hooks/useRawMaterials';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const UNITS = ['un', 'kg', 'm', 'm²', 'cm', 'ml', 'L', 'pç', 'rolo', 'folha'];
 const CATEGORIES = ['Acrílico', 'MDF', 'LED', 'Vinil', 'Cola', 'Parafusos', 'Embalagem', 'Elétrica', 'Outros'];
@@ -96,6 +97,18 @@ const AdminRawMaterialsPage = () => {
   return (
     <AdminLayout title="Matérias-Primas" requireEditor>
       <div className="space-y-5">
+        <AdminPageGuide
+          title="🧱 Guia de Matérias-Primas"
+          description="Controle o estoque de insumos para produção."
+          steps={[
+            { title: "Cadastrar material", description: "Clique em 'Novo Material' e preencha nome, SKU, unidade, quantidade e custo." },
+            { title: "Estoque mínimo", description: "Defina a quantidade mínima para receber alertas de reposição." },
+            { title: "Categorias", description: "Organize materiais por categoria: Acrílico, MDF, LED, Vinil, etc." },
+            { title: "Custo por unidade", description: "Mantenha o custo atualizado para cálculo automático de margem dos produtos." },
+            { title: "Exportar", description: "Exporte a lista de materiais para controle externo ou compras." },
+          ]}
+        />
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <AdminSummaryCard title="Total Materiais" value={materials.length} icon={Boxes} variant="blue" />
           <AdminSummaryCard title="Estoque Baixo" value={lowStockCount} icon={AlertTriangle} variant="pink" />

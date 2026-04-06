@@ -11,6 +11,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useAdminReviews, useApproveReview, useDeleteReview, type Review } from '@/hooks/useAdminReviews';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const AdminReviewsPage = () => {
   const { canEdit } = useAuthContext();
@@ -69,6 +70,18 @@ const AdminReviewsPage = () => {
   return (
     <AdminLayout title="Avaliações" requireEditor>
       <div className="space-y-6">
+        <AdminPageGuide
+          title="⭐ Guia de Avaliações"
+          description="Modere avaliações de clientes sobre os produtos."
+          steps={[
+            { title: "Aprovar/Rejeitar", description: "Revise cada avaliação e aprove para exibir na loja ou rejeite conteúdo inadequado." },
+            { title: "Filtrar por status", description: "Veja apenas avaliações pendentes, aprovadas ou rejeitadas." },
+            { title: "Ver imagens", description: "Clientes podem enviar fotos nas avaliações — visualize-as aqui." },
+            { title: "Excluir avaliação", description: "Remova permanentemente avaliações spam ou ofensivas." },
+            { title: "Compra verificada", description: "O badge 'Compra verificada' aparece automaticamente para compradores reais." },
+          ]}
+        />
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <AdminSummaryCard title="Total" value={reviews.length} icon={MessageSquare} variant="purple" />
           <AdminSummaryCard title="Pendentes" value={pendingCount} icon={Clock} variant="orange" />

@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const API_BASE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/crm-webhook`;
 
@@ -317,6 +318,17 @@ export default function AdminApiDocsPage() {
   return (
     <AdminLayout title="API & Integração CRM">
       <div className="space-y-6">
+        <AdminPageGuide
+          title="🔌 Guia da Documentação API"
+          description="Consulte endpoints e configure chaves de acesso à API."
+          steps={[
+            { title: "Endpoints", description: "Veja a lista completa de endpoints disponíveis com método, URL e descrição." },
+            { title: "Autenticação", description: "Todas as requisições exigem uma chave API válida no header Authorization." },
+            { title: "Testar chamadas", description: "Use os exemplos de cURL para testar endpoints diretamente no terminal." },
+            { title: "Criar chave API", description: "Gere novas chaves de acesso com permissões específicas para cada integração." },
+          ]}
+        />
+
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2 text-white">

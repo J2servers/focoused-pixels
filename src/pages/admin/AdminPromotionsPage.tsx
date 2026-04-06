@@ -16,6 +16,7 @@ import {
   type Promotion, type PromotionFormData,
 } from '@/hooks/useAdminPromotions';
 import { toast } from 'sonner';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const INITIAL_FORM = {
   name: '', type: 'percentage', value: '', rule: 'general',
@@ -126,6 +127,18 @@ const AdminPromotionsPage = () => {
   return (
     <AdminLayout title="Promoções" requireEditor>
       <div className="space-y-6">
+        <AdminPageGuide
+          title="🏷️ Guia de Promoções"
+          description="Crie promoções com regras automáticas de desconto."
+          steps={[
+            { title: "Criar promoção", description: "Defina nome, tipo de desconto (% ou fixo), valor e período de validade." },
+            { title: "Regras de aplicação", description: "Escolha se a promoção vale para todos os produtos ou categorias específicas." },
+            { title: "Prioridade", description: "Defina a ordem de prioridade quando múltiplas promoções se aplicam ao mesmo produto." },
+            { title: "Banner promocional", description: "Faça upload de um banner para exibir na loja durante a promoção." },
+            { title: "Ativar/Desativar", description: "Controle quais promoções estão ativas sem precisar excluí-las." },
+          ]}
+        />
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <AdminSummaryCard title="Total" value={promotions.length} icon={Tag} variant="purple" />
           <AdminSummaryCard title="Ativas" value={activeCount} icon={CheckCircle} variant="green" />

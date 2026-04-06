@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Trash2, Pencil, Loader2, Shield, Users, UserCheck } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useAdminUsers, useCreateAdminUser, useUpdateUserRole, useDeleteAdminUser, type AdminUser } from '@/hooks/useAdminUsers';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const ROLE_VARIANTS: Record<string, { label: string; variant: 'danger' | 'info' | 'neutral' }> = {
   admin: { label: 'Admin', variant: 'danger' },
@@ -95,6 +96,17 @@ const AdminUsersPage = () => {
   return (
     <AdminLayout title="Usuários" requireAdmin>
       <div className="space-y-5">
+        <AdminPageGuide
+          title="👤 Guia de Usuários"
+          description="Gerencie contas de usuários e permissões de acesso."
+          steps={[
+            { title: "Criar usuário", description: "Adicione novos usuários com nome, e-mail e nível de permissão." },
+            { title: "Definir role", description: "Atribua papéis: Admin (acesso total), Editor (edição) ou Viewer (somente leitura)." },
+            { title: "Desativar conta", description: "Desative contas sem excluí-las para bloquear o acesso temporariamente." },
+            { title: "Resetar senha", description: "Envie um link de redefinição de senha para o e-mail do usuário." },
+          ]}
+        />
+
         <div className="grid grid-cols-3 gap-4">
           <AdminSummaryCard title="Total" value={users.length} icon={Users} variant="purple" />
           <AdminSummaryCard title="Admins" value={adminCount} icon={Shield} variant="pink" />

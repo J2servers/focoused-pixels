@@ -18,6 +18,7 @@ import { useCreateOrderFromQuote } from '@/hooks/useOrders';
 import { Eye, FileText, ArrowRightCircle, Clock, CheckCircle, XCircle, TrendingUp, DollarSign, BarChart3, Package, User, Mail, Phone, Building2 } from 'lucide-react';
 import { format, subDays, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const STATUS_MAP: Record<string, { label: string; variant: 'warning' | 'success' | 'danger' | 'info'; color: string }> = {
   pending: { label: 'Pendente', variant: 'warning', color: 'amber' },
@@ -145,6 +146,18 @@ const AdminQuotesPage = () => {
   return (
     <AdminLayout title="Orçamentos" requireEditor>
       <div className="space-y-6">
+        <AdminPageGuide
+          title="📄 Guia de Orçamentos"
+          description="Gerencie solicitações de orçamento dos clientes."
+          steps={[
+            { title: "Visualizar orçamentos", description: "Todos os pedidos de orçamento enviados pelos clientes aparecem aqui." },
+            { title: "Atualizar status", description: "Mude entre Pendente, Aprovado, Rejeitado ou Convertido conforme a negociação." },
+            { title: "Converter em pedido", description: "Clique em 'Converter' para transformar um orçamento aprovado em pedido real." },
+            { title: "Filtrar", description: "Use filtros de status e busca para encontrar orçamentos específicos." },
+            { title: "Detalhes do cliente", description: "Veja nome, e-mail, telefone e empresa do solicitante." },
+          ]}
+        />
+
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <AdminSummaryCard title="Total" value={quotes.length} icon={FileText} variant="purple" />

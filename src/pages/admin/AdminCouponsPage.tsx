@@ -21,6 +21,7 @@ import { Plus, Pencil, Trash2, Tag, Percent, DollarSign, TicketPercent, Copy, Za
 import { format, differenceInDays, isPast } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const initialFormData = {
   code: '', description: '',
@@ -227,6 +228,18 @@ const AdminCouponsPage = () => {
   return (
     <AdminLayout title="Cupons de Desconto" requireEditor>
       <div className="space-y-6">
+        <AdminPageGuide
+          title="🎟️ Guia de Cupons"
+          description="Crie e gerencie cupons de desconto para campanhas promocionais."
+          steps={[
+            { title: "Criar cupom", description: "Clique em 'Novo Cupom' e defina código, tipo (% ou fixo), valor e validade." },
+            { title: "Limitar uso", description: "Configure limite de uso total e valor mínimo de pedido para o cupom funcionar." },
+            { title: "Ativar/Desativar", description: "Alterne o status do cupom sem precisar excluí-lo." },
+            { title: "Monitorar uso", description: "Veja quantas vezes cada cupom foi utilizado na coluna de uso." },
+            { title: "Copiar código", description: "Clique no ícone de cópia para copiar o código do cupom rapidamente." },
+          ]}
+        />
+
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <AdminSummaryCard title="Total de Cupons" value={coupons.length} icon={Tag} variant="purple" />

@@ -8,6 +8,7 @@ import { MessageSquare, Wifi, WifiOff, Phone, CheckCircle, AlertTriangle, Activi
 import WhatsAppInstanceCard from '@/components/admin/whatsapp/WhatsAppInstanceCard';
 import WhatsAppTestMessage from '@/components/admin/whatsapp/WhatsAppTestMessage';
 import WhatsAppMessageLog from '@/components/admin/whatsapp/WhatsAppMessageLog';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const cardCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]";
 const mutedText = "text-[hsl(var(--admin-text-muted))]";
@@ -30,6 +31,17 @@ const AdminWhatsAppPage = () => {
   return (
     <AdminLayout title="WhatsApp Business">
       <div className="space-y-6">
+        <AdminPageGuide
+          title="📱 Guia do WhatsApp Business"
+          description="Configure a integração com WhatsApp para atendimento e notificações."
+          steps={[
+            { title: "Conectar instância", description: "Configure a API Evolution com URL e chave para conectar seu WhatsApp." },
+            { title: "Testar mensagem", description: "Envie uma mensagem de teste para validar a conexão antes de usar." },
+            { title: "Logs de mensagem", description: "Acompanhe o histórico de todas as mensagens enviadas via WhatsApp." },
+            { title: "Templates", description: "Use templates pré-definidos para mensagens de pedido, entrega e promoções." },
+          ]}
+        />
+
         {/* ─── Header ─── */}
         <div className="flex items-start justify-between">
           <div>

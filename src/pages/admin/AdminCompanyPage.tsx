@@ -17,6 +17,7 @@ import {
   CompanyContactSection,
   CompanyPoliciesSection,
 } from '@/components/admin/company/CompanySections';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const cardCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]";
 const mutedText = "text-[hsl(var(--admin-text-muted))]";
@@ -138,6 +139,19 @@ const AdminCompanyPage = () => {
   return (
     <AdminLayout title="Empresa e Branding" requireEditor>
       <div className="space-y-6">
+        <AdminPageGuide
+          title="🏢 Guia de Empresa e Branding"
+          description="Configure dados da empresa, logos, cores e políticas da loja."
+          steps={[
+            { title: "Dados da empresa", description: "Preencha CNPJ, endereço, telefone, WhatsApp e e-mail de contato." },
+            { title: "Logos", description: "Faça upload dos logos do header e footer com controle de altura em pixels." },
+            { title: "Cores da marca", description: "Defina as cores primária, secundária e de destaque da sua identidade visual." },
+            { title: "Redes sociais", description: "Adicione links do Instagram, Facebook, TikTok, YouTube e LinkedIn." },
+            { title: "Políticas", description: "Escreva as políticas de privacidade, termos de uso e política de trocas." },
+            { title: "Credibilidade", description: "Configure frete grátis, parcelamento, tempo de produção e garantia." },
+          ]}
+        />
+
         {/* ─── Header ─── */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
