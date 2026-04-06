@@ -724,6 +724,13 @@ const AdminLoginPage = () => {
           </div>
         </div>
       </div>
+      {/* Intruder Detection Modal */}
+      {showIntruderModal && intruderInfo && (
+        <IntruderModal
+          info={intruderInfo}
+          onClose={() => setShowIntruderModal(false)}
+        />
+      )}
     </div>
   );
 };
