@@ -9,6 +9,7 @@ import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 import { useCategories } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import logoPincel from '@/assets/logo-pincel-de-luz.png';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 
 export function MobileHeader() {
@@ -18,7 +19,10 @@ export function MobileHeader() {
   const [scrolled, setScrolled] = useState(false);
   const { data: company } = useCompanyInfo();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
-  const { itemCount } = useCart();
+  const { itemCount, total } = useCart();
+  const { freeShippingMinimum } = useSiteSettings();
+  const freeShippingProgress = Math.min((total / (freeShippingMinimum || 159)) * 100, 100);
+  const hasFreeShipping = total >= (freeShippingMinimum || 159);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
