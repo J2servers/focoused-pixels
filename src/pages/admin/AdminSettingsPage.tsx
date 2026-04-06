@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { useCompanyInfo, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
+import { useCompanyInfoAdmin, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
 import { usePaymentCredentials, useUpdatePaymentCredentials, PaymentCredentials } from '@/hooks/usePaymentCredentials';
 import { useEmailCredentials, useUpdateEmailCredentials, EmailCredentials } from '@/hooks/useEmailCredentials';
 import { useSendTestEmail, useTestEmailConnection } from '@/hooks/useEmailGateway';
@@ -32,7 +32,7 @@ const TAB_ORDER: SettingsTab[] = ['geral', 'pagamentos', 'email', 'seguranca', '
 
 const AdminSettingsPage = () => {
   const { profile, updatePassword, canEdit } = useAuthContext();
-  const { data: companyInfo, isLoading: l1 } = useCompanyInfo();
+  const { data: companyInfo, isLoading: l1 } = useCompanyInfoAdmin();
   const { data: paymentCreds, isLoading: l2 } = usePaymentCredentials();
   const { data: emailCreds, isLoading: l3 } = useEmailCredentials();
   const updateCompany = useUpdateCompanyInfo();
