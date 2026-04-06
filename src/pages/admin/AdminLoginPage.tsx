@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Loader2, Mail, Lock, Shield, ShieldAlert, AlertTriangle } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Mail, Lock, Shield, ShieldAlert, AlertTriangle, Skull } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,10 +11,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { isAuthError } from '@/lib/auth-error';
+import { supabase } from '@/integrations/supabase/client';
 
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 const ATTEMPT_WINDOW_MS = 5 * 60 * 1000; // 5 minute window
+const PERMANENT_BAN_THRESHOLD = 15; // After 15 total fails = permanent ban until clear
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -28,17 +30,24 @@ interface LoginAttempt {
   success: boolean;
 }
 
-const getAttemptData = (): { attempts: LoginAttempt[]; lockedUntil: number | null } => {
+interface SecurityData {
+  attempts: LoginAttempt[];
+  lockedUntil: number | null;
+  totalFails: number;
+  permanentBan: boolean;
+}
+
+const getSecurityData = (): SecurityData => {
   try {
     const raw = sessionStorage.getItem('_sec_gate');
-    if (!raw) return { attempts: [], lockedUntil: null };
+    if (!raw) return { attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false };
     return JSON.parse(raw);
   } catch {
-    return { attempts: [], lockedUntil: null };
+    return { attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false };
   }
 };
 
-const saveAttemptData = (data: { attempts: LoginAttempt[]; lockedUntil: number | null }) => {
+const saveSecurityData = (data: SecurityData) => {
   sessionStorage.setItem('_sec_gate', JSON.stringify(data));
 };
 
@@ -48,6 +57,7 @@ const AdminLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
+  const [isPermanentBan, setIsPermanentBan] = useState(false);
   const [lockRemaining, setLockRemaining] = useState(0);
   const [failedCount, setFailedCount] = useState(0);
   const lockTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -58,7 +68,11 @@ const AdminLoginPage = () => {
 
   // Check lockout on mount
   useEffect(() => {
-    const data = getAttemptData();
+    const data = getSecurityData();
+    if (data.permanentBan) {
+      setIsPermanentBan(true);
+      return;
+    }
     if (data.lockedUntil && Date.now() < data.lockedUntil) {
       setIsLocked(true);
       setLockRemaining(Math.ceil((data.lockedUntil - Date.now()) / 1000));
@@ -71,14 +85,14 @@ const AdminLoginPage = () => {
 
   // Countdown timer for lockout
   useEffect(() => {
-    if (isLocked) {
+    if (isLocked && !isPermanentBan) {
       lockTimerRef.current = setInterval(() => {
-        const data = getAttemptData();
+        const data = getSecurityData();
         if (!data.lockedUntil || Date.now() >= data.lockedUntil) {
           setIsLocked(false);
           setLockRemaining(0);
           setFailedCount(0);
-          saveAttemptData({ attempts: [], lockedUntil: null });
+          saveSecurityData({ ...data, attempts: [], lockedUntil: null });
           if (lockTimerRef.current) clearInterval(lockTimerRef.current);
         } else {
           setLockRemaining(Math.ceil((data.lockedUntil - Date.now()) / 1000));
@@ -88,7 +102,7 @@ const AdminLoginPage = () => {
     return () => {
       if (lockTimerRef.current) clearInterval(lockTimerRef.current);
     };
-  }, [isLocked]);
+  }, [isLocked, isPermanentBan]);
 
   useEffect(() => {
     if (!isLoading && user && role) {
@@ -97,49 +111,86 @@ const AdminLoginPage = () => {
   }, [user, role, isLoading, navigate]);
 
   const recordAttempt = (success: boolean) => {
-    const data = getAttemptData();
+    const data = getSecurityData();
     const now = Date.now();
 
-    // Clean old attempts outside window
     const recentAttempts = data.attempts.filter(
       a => now - a.timestamp < ATTEMPT_WINDOW_MS
     );
     recentAttempts.push({ timestamp: now, success });
+
+    const newTotalFails = success ? 0 : data.totalFails + 1;
+
+    // Permanent ban check
+    if (newTotalFails >= PERMANENT_BAN_THRESHOLD) {
+      saveSecurityData({ attempts: recentAttempts, lockedUntil: null, totalFails: newTotalFails, permanentBan: true });
+      setIsPermanentBan(true);
+      return;
+    }
 
     const recentFails = recentAttempts.filter(a => !a.success);
     setFailedCount(recentFails.length);
 
     if (recentFails.length >= MAX_ATTEMPTS) {
       const lockedUntil = now + LOCKOUT_DURATION_MS;
-      saveAttemptData({ attempts: recentAttempts, lockedUntil });
+      saveSecurityData({ attempts: recentAttempts, lockedUntil, totalFails: newTotalFails, permanentBan: false });
       setIsLocked(true);
       setLockRemaining(Math.ceil(LOCKOUT_DURATION_MS / 1000));
       return;
     }
 
-    saveAttemptData({ attempts: recentAttempts, lockedUntil: data.lockedUntil });
+    saveSecurityData({ attempts: recentAttempts, lockedUntil: data.lockedUntil, totalFails: newTotalFails, permanentBan: false });
+  };
+
+  const verifyEmailHasAdminRole = async (email: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-gate-check', {
+        body: { email },
+      });
+      if (error) return false;
+      return data?.allowed === true;
+    } catch {
+      return false;
+    }
   };
 
   const onLogin = async (data: LoginFormData) => {
-    if (isLocked) {
-      toast.error('Conta bloqueada temporariamente. Aguarde o desbloqueio.');
+    if (isLocked || isPermanentBan) {
+      toast.error('Acesso bloqueado.');
       return;
     }
 
     setIsSubmitting(true);
     try {
+      // STEP 1: Pre-verify email has admin role BEFORE attempting auth
+      const hasAccess = await verifyEmailHasAdminRole(data.email);
+      
+      if (!hasAccess) {
+        recordAttempt(false);
+        const remaining = MAX_ATTEMPTS - (failedCount + 1);
+        
+        // Generic message - never reveal if email exists or not
+        if (remaining <= 0) {
+          toast.error('🔒 Acesso bloqueado por excesso de tentativas.');
+        } else {
+          toast.error('Acesso negado. Este portal é exclusivo para pessoal autorizado.');
+        }
+        setIsSubmitting(false);
+        return;
+      }
+
+      // STEP 2: Only attempt auth if email is verified as admin
       const { error } = await signIn(data.email, data.password);
 
       if (error) {
         recordAttempt(false);
-
         const remaining = MAX_ATTEMPTS - (failedCount + 1);
 
         if (isAuthError(error, 'Invalid login credentials')) {
           if (remaining <= 0) {
-            toast.error('🔒 Conta bloqueada por 15 minutos devido a tentativas excessivas.');
+            toast.error('🔒 Conta bloqueada por 15 minutos.');
           } else {
-            toast.error(`Credenciais inválidas. ${remaining} tentativa${remaining !== 1 ? 's' : ''} restante${remaining !== 1 ? 's' : ''}.`);
+            toast.error(`Senha incorreta. ${remaining} tentativa${remaining !== 1 ? 's' : ''} restante${remaining !== 1 ? 's' : ''}.`);
           }
         } else if (isAuthError(error, 'Email not confirmed')) {
           toast.error('Email não confirmado.');
@@ -148,8 +199,7 @@ const AdminLoginPage = () => {
         }
       } else {
         recordAttempt(true);
-        // Clear attempts on success
-        saveAttemptData({ attempts: [], lockedUntil: null });
+        saveSecurityData({ attempts: [], lockedUntil: null, totalFails: 0, permanentBan: false });
         toast.success('✅ Acesso autorizado.');
       }
     } catch {
@@ -179,6 +229,35 @@ const AdminLoginPage = () => {
     );
   }
 
+  // PERMANENT BAN SCREEN
+  if (isPermanentBan) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
+        <Card className="w-full max-w-md border-red-500/20 bg-red-950/20 shadow-2xl shadow-red-900/20 backdrop-blur-xl">
+          <CardContent className="pt-8 pb-8">
+            <div className="flex flex-col items-center gap-6 text-center">
+              <div className="w-24 h-24 rounded-full bg-red-500/10 border-2 border-red-500/30 flex items-center justify-center">
+                <Skull className="h-12 w-12 text-red-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-red-300 mb-2">Acesso Permanentemente Bloqueado</h2>
+                <p className="text-red-400/60 text-sm">
+                  Múltiplas tentativas de acesso não autorizado foram detectadas. 
+                  Este incidente foi registrado e reportado.
+                </p>
+              </div>
+              <div className="w-full p-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                <p className="text-[11px] text-red-400/40 font-mono">
+                  INCIDENT_LOGGED • IP_RECORDED • SESSION_TERMINATED
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex bg-[#0a0a0f]">
       {/* Left Side - Security Branding */}
@@ -191,17 +270,19 @@ const AdminLoginPage = () => {
             <Shield className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent mb-4">
-            Acesso Restrito
+            Zona Restrita
           </h1>
           <p className="text-lg text-white/40 max-w-md leading-relaxed">
-            Portal protegido com segurança avançada. Acesso exclusivo para pessoal autorizado.
+            Portal blindado com verificação em duas etapas. Apenas pessoal com credenciais válidas e role autorizado pode prosseguir.
           </p>
           <div className="mt-12 space-y-4">
             {[
-              'Bloqueio automático após tentativas falhas',
-              'Sessões monitoradas e rastreáveis',
+              'Verificação de role antes da autenticação',
+              'Bloqueio automático após 5 tentativas',
+              'Ban permanente após 15 tentativas',
               'Sem recuperação de senha por email',
-              'Controle de acesso baseado em roles (RBAC)',
+              'Emails não cadastrados são rejeitados',
+              'Controle RBAC (Admin/Editor/Suporte)',
             ].map((feature, i) => (
               <div key={i} className="flex items-center gap-3 text-white/40">
                 <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400" />
@@ -242,7 +323,7 @@ const AdminLoginPage = () => {
               <div className="mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-amber-300">
-                  {MAX_ATTEMPTS - failedCount} tentativa{MAX_ATTEMPTS - failedCount !== 1 ? 's' : ''} restante{MAX_ATTEMPTS - failedCount !== 1 ? 's' : ''} antes do bloqueio de 15 minutos.
+                  {MAX_ATTEMPTS - failedCount} tentativa{MAX_ATTEMPTS - failedCount !== 1 ? 's' : ''} restante{MAX_ATTEMPTS - failedCount !== 1 ? 's' : ''} antes do bloqueio.
                 </p>
               </div>
             )}
@@ -255,7 +336,7 @@ const AdminLoginPage = () => {
                   </div>
                   <div className="text-center">
                     <p className="text-white/60 text-sm">
-                      Múltiplas tentativas de login falhas detectadas.
+                      Múltiplas tentativas falhas detectadas.
                     </p>
                     <p className="text-white/40 text-xs mt-2">
                       O acesso será restaurado automaticamente.
@@ -323,7 +404,7 @@ const AdminLoginPage = () => {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Verificando...
+                      Verificando credenciais...
                     </>
                   ) : (
                     <>
@@ -333,10 +414,10 @@ const AdminLoginPage = () => {
                   )}
                 </Button>
 
-                {/* Security notice */}
+                {/* Security notice - NO password reset link */}
                 <div className="pt-4 border-t border-white/[0.06]">
                   <p className="text-[11px] text-white/20 text-center leading-relaxed">
-                    Este portal é monitorado. Tentativas não autorizadas serão registradas e reportadas. Recuperação de senha disponível apenas via administrador do sistema.
+                    Este portal é monitorado e rastreado. Tentativas não autorizadas serão registradas. Não existe recuperação de senha neste portal — contate o administrador do sistema.
                   </p>
                 </div>
               </form>
