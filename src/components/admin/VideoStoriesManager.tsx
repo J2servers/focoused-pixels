@@ -180,10 +180,11 @@ export function VideoStoriesManager() {
                 <Switch
                   checked={form.status === 'active'}
                   onCheckedChange={(v) => setForm(f => ({ ...f, status: v ? 'active' : 'inactive' }))}
+                  className="admin-switch-orange"
                 />
                 <Label>Ativo</Label>
               </div>
-              <Button onClick={handleSave} className="w-full" disabled={createMutation.isPending || updateMutation.isPending}>
+              <Button onClick={handleSave} className="admin-btn admin-btn-save w-full" disabled={createMutation.isPending || updateMutation.isPending}>
                 {(createMutation.isPending || updateMutation.isPending) ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>
@@ -240,7 +241,7 @@ export function VideoStoriesManager() {
                   <Switch
                     checked={story.status === 'active'}
                     onCheckedChange={() => handleToggleStatus(story)}
-                    className="scale-75"
+                    className="admin-switch-orange scale-75"
                   />
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(story)}>
                     <Edit className="h-3.5 w-3.5" />
