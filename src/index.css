@@ -717,40 +717,40 @@
 
   /* CYAN — Adicionar / Criar */
   .admin-btn-create {
-    background: hsl(185 100% 40%);
-    color: white;
+    background: hsl(185 100% 40%) !important;
+    color: white !important;
     animation: adminBtnPulseCyan 2.5s ease-in-out infinite;
   }
   @keyframes adminBtnPulseCyan { 0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 18px 4px hsl(185 100% 40%/0.4)} }
 
   /* RED — Deletar / Excluir / Apagar */
   .admin-btn-delete {
-    background: hsl(0 80% 50%);
-    color: white;
+    background: hsl(0 80% 50%) !important;
+    color: white !important;
     animation: adminBtnPulseRed 2.5s ease-in-out infinite;
   }
   @keyframes adminBtnPulseRed { 0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 18px 4px hsl(0 80% 50%/0.4)} }
 
   /* YELLOW — Editar / Testar */
   .admin-btn-edit {
-    background: hsl(45 100% 48%);
-    color: hsl(0 0% 8%);
+    background: hsl(45 100% 48%) !important;
+    color: hsl(0 0% 8%) !important;
     animation: adminBtnPulseYellow 2.5s ease-in-out infinite;
   }
   @keyframes adminBtnPulseYellow { 0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 18px 4px hsl(45 100% 48%/0.4)} }
 
   /* PURPLE — Visualizar / Importar / Exibir */
   .admin-btn-view {
-    background: hsl(280 90% 50%);
-    color: white;
+    background: hsl(280 90% 50%) !important;
+    color: white !important;
     animation: adminBtnPulsePurple 2.5s ease-in-out infinite;
   }
   @keyframes adminBtnPulsePurple { 0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 18px 4px hsl(280 90% 50%/0.4)} }
 
   /* GREEN — Salvar / Enviar / Instalar / Prosseguir */
   .admin-btn-save {
-    background: hsl(145 80% 38%);
-    color: white;
+    background: hsl(145 80% 38%) !important;
+    color: white !important;
     animation: adminBtnPulseGreen 2.5s ease-in-out infinite;
   }
   @keyframes adminBtnPulseGreen { 0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 18px 4px hsl(145 80% 38%/0.4)} }
