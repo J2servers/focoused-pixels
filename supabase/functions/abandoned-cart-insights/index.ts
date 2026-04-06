@@ -3,7 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Max-Age": "86400",
 };
@@ -16,7 +17,10 @@ serve(async (req) => {
   if (req.method !== "POST") {
     return new Response(
       JSON.stringify({ success: false, error: "Method not allowed" }),
-      { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      {
+        status: 405,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 
@@ -27,8 +31,14 @@ serve(async (req) => {
 
     if (!supabaseUrl || !serviceRoleKey || !anonKey) {
       return new Response(
-        JSON.stringify({ success: false, error: "Supabase credentials are not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({
+          success: false,
+          error: "Supabase credentials are not configured",
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -36,7 +46,10 @@ serve(async (req) => {
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(
         JSON.stringify({ success: false, error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -46,13 +59,17 @@ serve(async (req) => {
     });
 
     const token = authHeader.replace("Bearer ", "").trim();
-    const { data: claimsData, error: claimsError } = await authClient.auth.getClaims(token);
+    const { data: claimsData, error: claimsError } = await authClient.auth
+      .getClaims(token);
     const userId = claimsData?.claims?.sub;
 
     if (claimsError || !userId) {
       return new Response(
         JSON.stringify({ success: false, error: "Invalid user token" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -60,14 +77,20 @@ serve(async (req) => {
       auth: { persistSession: false },
     });
 
-    const { data: isAdmin, error: adminError } = await adminClient.rpc("has_admin_access", {
-      _user_id: userId,
-    });
+    const { data: isAdmin, error: adminError } = await adminClient.rpc(
+      "has_admin_access",
+      {
+        _user_id: userId,
+      },
+    );
 
     if (adminError || !isAdmin) {
       return new Response(
         JSON.stringify({ success: false, error: "Forbidden" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -85,7 +108,9 @@ serve(async (req) => {
     const abandonedSessions = sessions.filter((s) => !s.recovered);
     const recoveredSessions = sessions.filter((s) => s.recovered);
     const withReminder = sessions.filter((s) => s.reminder_sent);
-    const recoveredAfterReminder = recoveredSessions.filter((s) => s.reminder_sent);
+    const recoveredAfterReminder = recoveredSessions.filter((s) =>
+      s.reminder_sent
+    );
 
     // Top products analysis
     interface ProductInsight {
@@ -112,7 +137,13 @@ serve(async (req) => {
           existing.value += quantity * price;
           existing.sessions += 1;
         } else {
-          productMap.set(id, { key: id, name, quantity, value: quantity * price, sessions: 1 });
+          productMap.set(id, {
+            key: id,
+            name,
+            quantity,
+            value: quantity * price,
+            sessions: 1,
+          });
         }
       }
     }
@@ -130,7 +161,9 @@ serve(async (req) => {
       sessionsAbandoned: abandonedSessions.length,
       sessionsRecovered: recoveredSessions.length,
       remindersSent: withReminder.length,
-      recoveryRate: withReminder.length > 0 ? (recoveredAfterReminder.length / withReminder.length) * 100 : 0,
+      recoveryRate: withReminder.length > 0
+        ? (recoveredAfterReminder.length / withReminder.length) * 100
+        : 0,
       totalAbandonedValue: Number(totalAbandonedValue.toFixed(2)),
       topProductName: topProducts[0]?.name || "N/A",
       topProducts,
@@ -143,8 +176,14 @@ serve(async (req) => {
   } catch (error) {
     console.error("[abandoned-cart-insights] error:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unexpected error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : "Unexpected error",
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 });
