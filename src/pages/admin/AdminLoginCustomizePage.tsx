@@ -43,7 +43,7 @@ const AdminLoginCustomizePage = () => {
   const loadSettings = async () => {
     const { data } = await supabase
       .from('company_info')
-      .select('login_logo, login_bg_image, login_title, login_subtitle, login_logo_height, login_title_size, login_subtitle_size')
+      .select('login_logo, login_bg_image, login_title, login_subtitle, login_logo_height, login_title_size, login_subtitle_size, login_brand_text')
       .limit(1)
       .single();
     if (data) {
@@ -56,6 +56,7 @@ const AdminLoginCustomizePage = () => {
         login_logo_height: (d.login_logo_height as number) || 48,
         login_title_size: (d.login_title_size as number) || 48,
         login_subtitle_size: (d.login_subtitle_size as number) || 14,
+        login_brand_text: (d.login_brand_text as string) || null,
       });
     }
     setIsLoading(false);
@@ -73,6 +74,7 @@ const AdminLoginCustomizePage = () => {
         login_logo_height: settings.login_logo_height,
         login_title_size: settings.login_title_size,
         login_subtitle_size: settings.login_subtitle_size,
+        login_brand_text: settings.login_brand_text,
       } as Record<string, unknown>)
       .neq('id', '00000000-0000-0000-0000-000000000000');
 
