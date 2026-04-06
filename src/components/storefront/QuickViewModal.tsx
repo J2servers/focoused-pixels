@@ -1,4 +1,4 @@
-﻿import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -9,6 +9,7 @@ import { useCart } from '@/hooks/useCart';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { analytics } from '@/components/analytics/EventTracker';
 
 interface Product {
   id: string;
@@ -52,6 +53,7 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
       image: product.image,
       quantity,
     });
+    analytics.addToCart({ id: product.id, name: product.name, price: product.price });
     toast.success(`${quantity}x ${product.name} adicionado ao carrinho!`);
     onOpenChange(false);
   };
