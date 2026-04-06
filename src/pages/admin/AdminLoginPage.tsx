@@ -391,6 +391,52 @@ const AdminLoginPage = () => {
     saveSecData(recent, d.l, tf, false);
   }, []);
 
+  const collectIntruderInfo = useCallback((): IntruderInfo => {
+    const nav = navigator as any;
+    let gpu = 'Desconhecido';
+    try {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (gl) {
+        const dbg = (gl as any).getExtension('WEBGL_debug_renderer_info');
+        if (dbg) gpu = (gl as any).getParameter(dbg.UNMASKED_RENDERER_WEBGL) || 'Desconhecido';
+      }
+    } catch { /* silent */ }
+
+    return {
+      ip: 'Rastreando...',
+      userAgent: navigator.userAgent,
+      platform: navigator.platform || 'Desconhecido',
+      language: navigator.language,
+      screenRes: `${screen.width}x${screen.height} @${window.devicePixelRatio}x`,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      cores: navigator.hardwareConcurrency || 0,
+      memory: nav.deviceMemory ? `${nav.deviceMemory} GB` : 'N/A',
+      gpu,
+      connectionType: nav.connection?.effectiveType || 'Desconhecido',
+      timestamp: new Date().toISOString(),
+      fingerprint: fpRef.current,
+      attemptCount: fails + 1,
+      referrer: document.referrer,
+      cookiesEnabled: navigator.cookieEnabled,
+      doNotTrack: navigator.doNotTrack || 'Não definido',
+      online: navigator.onLine,
+      plugins: Array.from(navigator.plugins || []).map(p => p.name).slice(0, 5),
+      touchSupport: 'ontouchstart' in window,
+    };
+  }, [fails]);
+
+  const showIntruderWarning = useCallback(() => {
+    const info = collectIntruderInfo();
+    // Try to get real IP
+    fetch('https://api.ipify.org?format=json')
+      .then(r => r.json())
+      .then(d => { info.ip = d.ip || 'Oculto por VPN'; setIntruderInfo({ ...info }); })
+      .catch(() => { info.ip = 'Protegido / VPN detectada'; setIntruderInfo({ ...info }); });
+    setIntruderInfo(info);
+    setShowIntruderModal(true);
+  }, [collectIntruderInfo]);
+
   const gate = async (email: string): Promise<boolean> => {
     try {
       const { data, error } = await supabase.functions.invoke('admin-gate-check', {
