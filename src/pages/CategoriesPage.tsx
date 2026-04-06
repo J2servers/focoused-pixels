@@ -12,7 +12,6 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ChevronRight, Package } from 'lucide-react';
 import { PageSEO } from '@/components/seo/PageSEO';
-import { Search, ChevronRight, Package } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
