@@ -1,6 +1,7 @@
 ﻿import { MessageCircle, ShoppingCart, Truck, Shield, Clock, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { storeInfo, discountTiers } from '@/data/store';
+import { discountTiers } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { Product } from '@/data/products';
 
 interface ProductWhatsAppQuoteProps {

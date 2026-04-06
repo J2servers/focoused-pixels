@@ -20,6 +20,7 @@ interface CheckoutCartSummaryProps {
 }
 
 export function CheckoutCartSummary({ items, total }: CheckoutCartSummaryProps) {
+  const settings = useSiteSettings();
   return (
     <div className="space-y-4 sticky top-4">
       {/* Cart Items */}
@@ -101,7 +102,7 @@ export function CheckoutCartSummary({ items, total }: CheckoutCartSummaryProps) 
               <div>
                 <h4 className="text-sm font-medium">Frete Grátis</h4>
                 <p className="text-xs text-muted-foreground">
-                  Acima de R$ {storeInfo.freeShippingMinimum}
+                  Acima de R$ {settings.freeShippingMinimum}
                 </p>
               </div>
             </div>
@@ -125,7 +126,7 @@ export function CheckoutCartSummary({ items, total }: CheckoutCartSummaryProps) 
               <div>
                 <h4 className="text-sm font-medium">Produção Rápida</h4>
                 <p className="text-xs text-muted-foreground">
-                  {storeInfo.productionTime}
+                  {settings.productionTime}
                 </p>
               </div>
             </div>
@@ -139,7 +140,7 @@ export function CheckoutCartSummary({ items, total }: CheckoutCartSummaryProps) 
           <p className="text-sm text-center text-muted-foreground">
             Dúvidas? Fale conosco pelo{' '}
             <a
-              href={`https://wa.me/${storeInfo.whatsapp.replace(/\D/g, '')}`}
+              href={`https://wa.me/${settings.whatsapp?.replace(/\D/g, '') || ''}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-success font-medium hover:underline"
