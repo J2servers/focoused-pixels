@@ -20,6 +20,7 @@ import type { EmailTemplate, WhatsAppTemplate, Channel } from '@/components/admi
 import { EmailTemplateCard, WhatsAppTemplateCard } from '@/components/admin/templates/TemplateCards';
 import { EmailEditorDialog, WhatsAppEditorDialog, PreviewDialog, DeleteTemplateDialog, TestSendDialog } from '@/components/admin/templates/TemplateDialogs';
 import { VisualWorkflowBuilder } from '@/components/admin/workflows';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 /* ─── Shared admin styles ─── */
 const cardCls = "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))]";
@@ -110,6 +111,18 @@ const AdminEmailTemplatesPage = () => {
   return (
     <AdminLayout title="Comunicação & Automação" requireEditor>
       <div className="space-y-6">
+
+        <AdminPageGuide
+          title="📧 Guia de Comunicação & Automação"
+          description="Gerencie templates de e-mail, WhatsApp e workflows automatizados."
+          steps={[
+            { title: "Criar template", description: "Clique em 'Novo Template' e escolha entre e-mail ou WhatsApp." },
+            { title: "Variáveis dinâmicas", description: "Use variáveis como {{nome}}, {{pedido}} para personalizar mensagens automaticamente." },
+            { title: "Pré-visualizar", description: "Clique no ícone de olho para ver como o template ficará antes de enviar." },
+            { title: "Testar envio", description: "Envie uma mensagem de teste para validar formatação e conteúdo." },
+            { title: "Workflows", description: "Na aba 'Workflows', crie automações visuais com gatilhos e ações encadeadas." },
+          ]}
+        />
 
         {/* ═══════════ HEADER ═══════════ */}
         <div className="flex items-start justify-between gap-4">

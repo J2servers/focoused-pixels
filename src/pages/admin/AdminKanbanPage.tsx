@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 interface KanbanColumn {
   status: ProductionStatus;
@@ -93,6 +94,18 @@ const AdminKanbanPage = () => {
   return (
     <AdminLayout title="Kanban de Produção" requireEditor>
       <div className="space-y-5">
+        <AdminPageGuide
+          title="📋 Guia do Kanban de Produção"
+          description="Acompanhe visualmente o status de produção de cada pedido."
+          steps={[
+            { title: "Arrastar cards", description: "Mova pedidos entre colunas arrastando os cards para atualizar o status de produção." },
+            { title: "Colunas de status", description: "Cada coluna representa uma etapa: Pendente → Material → Produção → Qualidade → Pronto → Enviado." },
+            { title: "Filtrar pedidos", description: "Use a busca para encontrar pedidos específicos pelo número ou nome do cliente." },
+            { title: "Notas de produção", description: "Adicione observações em cada pedido para comunicar detalhes à equipe." },
+            { title: "Configurar colunas", description: "Oculte ou exiba colunas conforme seu fluxo de produção." },
+          ]}
+        />
+
         {/* Summary */}
         <div className="flex items-center justify-between gap-3">
           <div className="grid grid-cols-3 gap-3 flex-1">

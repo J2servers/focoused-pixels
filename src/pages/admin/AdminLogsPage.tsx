@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ExportButtons } from '@/components/admin/ExportButtons';
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge';
 import { useAdminLogs, type AuditLog } from '@/hooks/useAdminLogs';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const TABLE_NAMES: Record<string, string> = {
   products: 'Produtos',
@@ -110,6 +111,17 @@ const AdminLogsPage = () => {
   return (
     <AdminLayout title="Logs de Auditoria">
       <div className="space-y-4">
+        <AdminPageGuide
+          title="📝 Guia de Logs de Auditoria"
+          description="Rastreie todas as ações realizadas no painel administrativo."
+          steps={[
+            { title: "Histórico completo", description: "Cada criação, edição e exclusão é registrada automaticamente com data e hora." },
+            { title: "Filtrar por tabela", description: "Selecione a tabela específica (produtos, pedidos, etc.) para filtrar os logs." },
+            { title: "Buscar ações", description: "Use a busca para encontrar logs por ação, tabela ou ID do registro." },
+            { title: "Dados antigos vs novos", description: "Cada log mostra o que foi alterado comparando valores anteriores e novos." },
+          ]}
+        />
+
         <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar nos logs...">
           <Select value={actionFilter} onValueChange={setActionFilter}>
             <SelectTrigger className="w-[150px] bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-white">

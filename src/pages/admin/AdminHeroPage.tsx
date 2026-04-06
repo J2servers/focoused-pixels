@@ -13,6 +13,7 @@ import {
   type HeroSlide, type HeroSlideFormData,
 } from '@/hooks/useAdminHeroSlides';
 import { AdminSummaryCard } from '@/components/admin/AdminSummaryCard';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const INITIAL_FORM = {
   title: '', subtitle: '', cta_text: '', cta_link: '',
@@ -105,6 +106,18 @@ const AdminHeroPage = () => {
   return (
     <AdminLayout title="Banner Hero" requireEditor>
       <div className="space-y-5">
+        <AdminPageGuide
+          title="🖼️ Guia do Banner Hero"
+          description="Gerencie os banners rotativos da página inicial da loja."
+          steps={[
+            { title: "Adicionar banner", description: "Clique em 'Novo Banner' e faça upload das imagens desktop e mobile." },
+            { title: "Definir CTA", description: "Configure texto e link do botão de ação que aparece sobre o banner." },
+            { title: "Ordenar banners", description: "Use o campo 'Ordem' para definir a sequência de exibição dos banners." },
+            { title: "Tema do banner", description: "Escolha entre tema claro ou escuro para melhor contraste do texto." },
+            { title: "Ativar/Desativar", description: "Altere o status para controlar quais banners estão visíveis na loja." },
+          ]}
+        />
+
         {/* Summary Cards */}
         <div className="grid grid-cols-3 gap-4">
           <AdminSummaryCard title="Total de Slides" value={slides.length} icon={Image} variant="purple" />

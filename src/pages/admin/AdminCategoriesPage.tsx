@@ -21,6 +21,7 @@ import {
   useAdminCategoriesAll, useCreateCategory, useUpdateCategory, useDeleteCategory,
   type Category, type CategoryFormData,
 } from '@/hooks/useAdminCategories';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const generateSlug = (name: string) =>
   name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -260,6 +261,19 @@ const AdminCategoriesPage = () => {
 
   return (
     <AdminLayout title="Categorias" requireEditor>
+      <div className="space-y-5">
+        <AdminPageGuide
+          title="📂 Guia de Categorias"
+          description="Organize produtos em categorias e subcategorias."
+          steps={[
+            { title: "Criar categoria", description: "Clique em 'Nova Categoria' e defina nome, slug e imagem." },
+            { title: "Subcategorias", description: "Selecione uma categoria pai para criar subcategorias hierárquicas." },
+            { title: "Ordem de exibição", description: "Use o campo 'Ordem' para definir a posição da categoria no menu da loja." },
+            { title: "Editar inline", description: "Selecione uma categoria na lista para editar no painel lateral." },
+            { title: "Status", description: "Ative ou desative categorias sem excluí-las da base de dados." },
+          ]}
+        />
+
       <div className={cn("flex h-[calc(100vh-8rem)]", !isMobile && "flex-row")}>
 
         {/* LEFT: List — 2/5 */}
@@ -328,6 +342,7 @@ const AdminCategoriesPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </AdminLayout>
   );
 };

@@ -18,6 +18,7 @@ import {
   ImageConfigRow, ColorField,
 } from '@/components/admin/whychooseus/WhyChooseUsHelpers';
 import { LivePreview } from '@/components/admin/whychooseus/WhyChooseUsPreview';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const AdminWhyChooseUsPage = () => {
   const { data: companyInfo, isLoading } = useCompanyInfoAdmin();
@@ -68,6 +69,17 @@ const AdminWhyChooseUsPage = () => {
   return (
     <AdminLayout title="Página Por Que Escolher" requireEditor>
       <div className="space-y-6">
+        <AdminPageGuide
+          title="✨ Guia da Página 'Por Que Escolher'"
+          description="Edite os diferenciais exibidos na página institucional."
+          steps={[
+            { title: "Editar itens", description: "Clique em cada card para editar título, descrição e ícone do diferencial." },
+            { title: "Adicionar item", description: "Crie novos diferenciais para destacar os pontos fortes da sua empresa." },
+            { title: "Reordenar", description: "Arraste os itens para definir a ordem de exibição na página." },
+            { title: "Preview", description: "Visualize como a página ficará para os visitantes em tempo real." },
+          ]}
+        />
+
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-white">Controle total da página comercial</h2>

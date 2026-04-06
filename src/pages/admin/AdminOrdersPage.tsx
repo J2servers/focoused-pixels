@@ -23,6 +23,7 @@ import { ExportButtons } from '@/components/admin/ExportButtons';
 import { Search, Eye, Package, Truck, Clock, CheckCircle, DollarSign, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendente', color: 'bg-yellow-500' },
@@ -186,6 +187,19 @@ const AdminOrdersPage = () => {
   return (
     <AdminLayout title="Vendas" requireEditor>
       <div className="space-y-6">
+        <AdminPageGuide
+          title="🛒 Guia de Vendas/Pedidos"
+          description="Gerencie pedidos, pagamentos, produção e entregas."
+          steps={[
+            { title: "Status do pedido", description: "Atualize o status entre: Pendente → Confirmado → Em produção → Enviado → Entregue." },
+            { title: "Status de pagamento", description: "Acompanhe se o pagamento está pendente, pago ou cancelado." },
+            { title: "Código de rastreio", description: "Adicione o código de rastreio dos Correios para o cliente acompanhar a entrega." },
+            { title: "Detalhes do pedido", description: "Clique no pedido para ver itens, valores, dados do cliente e histórico." },
+            { title: "Exportar vendas", description: "Exporte relatórios de vendas em CSV ou PDF para análise financeira." },
+            { title: "Produção", description: "Acompanhe o status de produção de cada pedido com cores indicativas." },
+          ]}
+        />
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <AdminSummaryCard title="Aguardando Pgto" value={awaitingOrders.length} icon={Clock} variant="orange" />
           <AdminSummaryCard title="Valor Aguardando" value={fmtCurrency(awaitingRevenue)} icon={AlertTriangle} variant="orange" />

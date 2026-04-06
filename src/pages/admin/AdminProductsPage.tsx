@@ -24,6 +24,7 @@ import {
   useAdminProducts, useAdminCategories, useCreateProduct, useUpdateProduct, useDeleteProduct,
   type Product, type ProductFormData,
 } from '@/hooks/useAdminProducts';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 const generateSlug = (name: string) =>
   name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -385,6 +386,20 @@ const AdminProductsPage = () => {
 
   return (
     <AdminLayout title="Produtos" requireEditor>
+      <div className="space-y-5">
+        <AdminPageGuide
+          title="📦 Guia de Produtos"
+          description="Cadastre, edite e organize todos os produtos da loja."
+          steps={[
+            { title: "Adicionar produto", description: "Clique em 'Novo Produto' e preencha nome, preço, descrição e imagens." },
+            { title: "Editar inline", description: "Selecione um produto na lista para editar todos os campos no painel lateral." },
+            { title: "Imagens", description: "Faça upload da imagem de capa e galeria diretamente no painel de edição." },
+            { title: "Estoque", description: "Configure quantidade em estoque e estoque mínimo para alertas automáticos." },
+            { title: "Custos e margem", description: "Defina custos de material, mão de obra e frete para calcular a margem." },
+            { title: "Status", description: "Alterne entre Ativo, Rascunho ou Arquivado para controlar a visibilidade." },
+          ]}
+        />
+
       <div className={cn("flex h-[calc(100vh-8rem)]", !isMobile && "flex-row")}>
 
         {/* LEFT: Product List — 2/5 */}
@@ -457,6 +472,7 @@ const AdminProductsPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </AdminLayout>
   );
 };

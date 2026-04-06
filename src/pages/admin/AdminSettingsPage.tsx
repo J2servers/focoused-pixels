@@ -17,6 +17,7 @@ import { SettingsSecuritySection } from '@/components/admin/settings/SettingsSec
 import { SettingsOperationsSection } from '@/components/admin/settings/SettingsOperationsSection';
 import { SettingsAISection } from '@/components/admin/settings/SettingsAISection';
 import { type SettingsTab } from '@/components/admin/settings/SettingsShared';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 /* ─── Tab Config ─── */
 interface TabMeta { label: string; icon: LucideIcon; accentVar: string; }
@@ -109,6 +110,19 @@ const AdminSettingsPage = () => {
   return (
     <AdminLayout title="Configurações">
       <div className="space-y-5">
+        <AdminPageGuide
+          title="⚙️ Guia de Configurações"
+          description="Configure checkout, pagamentos, e-mail, segurança e integrações."
+          steps={[
+            { title: "Geral", description: "Configure SEO, modo manutenção, cookies e aparência geral da loja." },
+            { title: "Pagamentos", description: "Ative e configure gateways: Stripe, Mercado Pago, EFI, PIX e boleto." },
+            { title: "E-mail/SMTP", description: "Configure servidor SMTP para envio de e-mails transacionais." },
+            { title: "Operações", description: "Defina frete, parcelamento, descontos por quantidade e tempo de produção." },
+            { title: "Segurança", description: "Gerencie chaves de API e permissões de acesso." },
+            { title: "IA", description: "Configure o assistente de IA com modelo, saudação e avatar personalizados." },
+          ]}
+        />
+
         {/* ── Header Bar ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

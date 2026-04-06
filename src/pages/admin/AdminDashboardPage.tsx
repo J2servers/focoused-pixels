@@ -23,6 +23,7 @@ import {
   Globe, UserPlus, Heart, Webhook, Layers, Target, Zap, Filter,
   PieChart as PieChartIcon, Award, RefreshCw, ShoppingBag, Repeat, XCircle
 } from 'lucide-react';
+import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
 
 // ===== MOBILE DASHBOARD =====
 function MobileDashboard({ m, abandoned }: { m: any; abandoned: any }) {
@@ -459,12 +460,27 @@ const AdminDashboardPage = () => {
   if (isLoading || !m) {
     return (
       <AdminLayout title="Dashboard">
+      <div className="space-y-5">
+        <AdminPageGuide
+          title="📊 Guia do Dashboard"
+          description="Visão geral de vendas, pedidos, leads e métricas do negócio em tempo real."
+          steps={[
+            { title: "Resumo financeiro", description: "Veja receita total, ticket médio e comparação com período anterior nos cards do topo." },
+            { title: "Gráficos de vendas", description: "Analise tendências de faturamento por dia, semana ou mês nos gráficos interativos." },
+            { title: "Alertas de estoque", description: "Produtos com estoque baixo aparecem em destaque para reposição imediata." },
+            { title: "Atividade recente", description: "Acompanhe pedidos, cadastros e ações recentes no feed de atividades." },
+            { title: "Ranking de produtos", description: "Identifique os produtos mais vendidos e com melhor margem de lucro." },
+            { title: "Visitas ao site", description: "Monitore o tráfego de visitantes e páginas mais acessadas." },
+          ]}
+        />
+
         <div className="grid grid-cols-4 gap-3">
           {Array.from({ length: 16 }).map((_, i) => (
             <Skeleton key={i} className="h-20 rounded-xl bg-[hsl(var(--admin-sidebar))]" />
           ))}
         </div>
-      </AdminLayout>
+      </div>
+    </AdminLayout>
     );
   }
 
