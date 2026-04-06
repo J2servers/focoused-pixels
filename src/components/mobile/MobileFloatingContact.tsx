@@ -15,9 +15,9 @@ export function MobileFloatingContact() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: company } = useCompanyInfo();
 
-  const whatsappNumber = company?.whatsapp?.replace(/\D/g, '') || '5511999999999';
+  const whatsappNumber = company?.whatsapp?.replace(/\D/g, '') || '';
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Olá! Vim pelo site e gostaria de mais informações.`;
-  const phoneUrl = `tel:${company?.phone?.replace(/\D/g, '') || '11999999999'}`;
+  const phoneUrl = `tel:${company?.phone?.replace(/\D/g, '') || ''}`;
 
   return (
     <>

@@ -57,7 +57,7 @@ const TermsPage = () => {
                   3.2. O pedido só será confirmado após a aprovação do pagamento.
                 </p>
                 <p className="text-muted-foreground mb-4">
-                  3.3. Aceitamos as seguintes formas de pagamento: {storeInfo.footerLinks.payment.join(', ')}.
+                  3.3. Aceitamos as seguintes formas de pagamento: {["PIX", "Boleto", "Cartão de Crédito", "Cartão de Débito"].join(', ')}.
                 </p>
                 <p className="text-muted-foreground">
                   3.4. Reservamo-nos o direito de cancelar pedidos em caso de suspeita de fraude.

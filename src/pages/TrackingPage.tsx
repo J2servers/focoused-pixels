@@ -310,7 +310,7 @@ export default function TrackingPage() {
                     </p>
                     <Button variant="outline" asChild>
                       <a 
-                        href="https://wa.me/5511999999999?text=Olá! Gostaria de informações sobre meu pedido com código de rastreio: {result.code}" 
+                        href={whatsappLink} 
                         target="_blank"
                         rel="noopener noreferrer"
                       >

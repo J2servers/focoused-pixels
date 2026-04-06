@@ -9,7 +9,7 @@ import { Star, Truck, Shield, Clock, CreditCard, ShoppingBag, Zap, Package, Chev
 import { useProductBySlug, useCategoryBySlug } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
-import { storeInfo, discountTiers } from '@/data/store';
+import { discountTiers } from '@/data/store';
 import { toast } from 'sonner';
 import {
   ProductImageGallery,
@@ -354,14 +354,14 @@ const ProductPage = () => {
 
                   <ProductColorDropdown
                     label="Cor de fundo da Placa:"
-                    colors={storeInfo.customizationOptions.backgroundColors}
+                    colors={["Branco","Preto","Transparente","Azul Royal","Rosa","Lilás","Verde","Vermelho","Dourado","Prata"]}
                     selectedColor={selectedBgColor}
                     onSelectColor={setSelectedBgColor}
                     required
                   />
                   <ProductColorDropdown
                     label="Cor da placa onde vai a Logo:"
-                    colors={storeInfo.customizationOptions.mirrorColors}
+                    colors={["Dourado","Prata","Rose Gold","Bronze","Azul","Vermelho","Verde","Lilás","Preto","Branco"]}
                     selectedColor={selectedLogoColor}
                     onSelectColor={setSelectedLogoColor}
                     required

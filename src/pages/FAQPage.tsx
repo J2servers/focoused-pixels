@@ -5,11 +5,13 @@ import { PageSEO, FAQSchema } from '@/components/seo/PageSEO';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { storeInfo } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { MessageCircle, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 
+const FAQPageInner = () => {
+  const settings = useSiteSettings();
 const faqCategories = [
   {
     category: 'Pedidos e Pagamentos',
@@ -20,7 +22,7 @@ const faqCategories = [
       },
       {
         question: 'Quais formas de pagamento vocês aceitam?',
-        answer: `Aceitamos ${storeInfo.footerLinks.payment.join(', ')}. O parcelamento em até ${settings.installments}x sem juros está disponível para cartão de crédito.`,
+        answer: `Aceitamos ${["PIX", "Boleto", "Cartão de Crédito", "Cartão de Débito"].join(', ')}. O parcelamento em até ${settings.installments}x sem juros está disponível para cartão de crédito.`,
       },
       {
         question: 'O pagamento é seguro?',
@@ -53,7 +55,7 @@ const faqCategories = [
       },
       {
         question: 'Quais materiais vocês trabalham?',
-        answer: `Trabalhamos com ${storeInfo.customizationOptions.materials.join(', ')}. Cada material tem características específicas e indicações de uso que nossa equipe pode orientar.`,
+        answer: `Trabalhamos com ${["Acrílico Cristal", "Acrílico Espelhado", "MDF", "Acrílico com LED"].join(', ')}. Cada material tem características específicas e indicações de uso que nossa equipe pode orientar.`,
       },
     ],
   },

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Trash2, Minus, Plus, MessageCircle, ShoppingBag, FileText, CreditCard } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
-import { storeInfo } from '@/data/store';
+
 import { CartCrossSell } from '@/components/cart/CartCrossSell';
 import { PageSEO } from '@/components/seo/PageSEO';
 
