@@ -198,7 +198,7 @@ export function ProductDetailPanel({ product, categories, onEdit, onDelete, onCl
             {category && <InfoRow label="Categoria" value={category.name} icon={Layers} />}
             <InfoRow label="Slug" value={<span className="font-mono text-[10px]">/{product.slug}</span>} />
             <InfoRow label="Criado em" value={new Date(product.created_at).toLocaleDateString('pt-BR')} />
-            <InfoRow label="Atualizado" value={new Date(product.updated_at).toLocaleDateString('pt-BR')} />
+            {product.updated_at && <InfoRow label="Atualizado" value={new Date(product.updated_at).toLocaleDateString('pt-BR')} />}
           </div>
 
           {/* Link para loja */}
