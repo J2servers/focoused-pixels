@@ -78,6 +78,7 @@ export function mapDbProduct(p: DbProduct) {
     customizable: true,
     minQuantity: 1,
     inStock: (p.stock || 0) > 0,
+    stock: p.stock ?? undefined,
     tags: p.tags || [],
     specifications: [],
   };

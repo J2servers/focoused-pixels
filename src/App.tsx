@@ -69,7 +69,16 @@ const AdminWorkflowsPage = lazy(() => import("./pages/admin/AdminWorkflowsPage")
 const AdminCashFlowPage = lazy(() => import("./pages/admin/AdminCashFlowPage"));
 const AdminRawMaterialsPage = lazy(() => import("./pages/admin/AdminRawMaterialsPage"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 2 * 60 * 1000, // 2 min default
+      gcTime: 10 * 60 * 1000,   // 10 min gc
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center">

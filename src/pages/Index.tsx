@@ -3,7 +3,7 @@
  * Performance-optimized with lazy loading for below-fold components
  */
 
-import { useState, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense, useMemo, useCallback } from 'react';
 import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { 
   MobileHeader, 
@@ -20,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProducts, useCategories } from '@/hooks/useProducts';
+import type { Product } from '@/data/products';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ProductCardOptimized } from '@/components/conversion/ProductCardOptimized';
 import {
@@ -51,8 +52,8 @@ function CategoryProductsSection({
   products, 
   onAddToCart 
 }: { 
-  category: any; 
-  products: any[]; 
+  category: { name: string; slug: string };
+  products: Product[]; 
   onAddToCart: () => void;
 }) {
   return (
@@ -90,16 +91,23 @@ const Index = () => {
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
-  const parentCategories = categories.filter(c => !c.parent_id);
+  const parentCategories = useMemo(() => categories.filter(c => !c.parent_id), [categories]);
 
-  const getProductsByCategory = (categoryId: string) => {
-    const childIds = categories.filter(c => c.parent_id === categoryId).map(c => c.id);
-    const allCategoryIds = [categoryId, ...childIds];
-    return products.filter(p => {
-      const productCategory = categories.find(c => c.slug === p.category);
-      return productCategory && allCategoryIds.includes(productCategory.id);
-    }).slice(0, 8);
-  };
+  const categoryProductsMap = useMemo(() => {
+    const map = new Map<string, any[]>();
+    for (const cat of parentCategories) {
+      const childIds = categories.filter(c => c.parent_id === cat.id).map(c => c.id);
+      const allCategoryIds = new Set([cat.id, ...childIds]);
+      const prods = products.filter(p => {
+        const productCategory = categories.find(c => c.slug === p.category);
+        return productCategory && allCategoryIds.has(productCategory.id);
+      }).slice(0, 8);
+      if (prods.length > 0) map.set(cat.id, prods);
+    }
+    return map;
+  }, [parentCategories, categories, products]);
+
+  const handleOpenMiniCart = useCallback(() => setMiniCartOpen(true), []);
 
   // ═══ Mobile ═══
   if (isMobile) {
@@ -131,8 +139,8 @@ const Index = () => {
             </div>
           ) : (
             parentCategories.map((category) => {
-              const categoryProducts = getProductsByCategory(category.id);
-              if (categoryProducts.length === 0) return null;
+              const categoryProducts = categoryProductsMap.get(category.id);
+              if (!categoryProducts?.length) return null;
               return (
                 <MobileProductSection
                   key={category.id}
@@ -188,7 +196,7 @@ const Index = () => {
           <RainbowCategoryStrip categories={parentCategories} />
         )}
 
-        <BestSellersSection onAddToCart={() => setMiniCartOpen(true)} />
+        <BestSellersSection onAddToCart={handleOpenMiniCart} />
         <SectionDivider />
         <WeeklyUrgencySection />
         <SectionDivider />
@@ -206,14 +214,14 @@ const Index = () => {
           </section>
         ) : (
           parentCategories.map((category) => {
-            const categoryProducts = getProductsByCategory(category.id);
-            if (categoryProducts.length === 0) return null;
+            const categoryProducts = categoryProductsMap.get(category.id);
+            if (!categoryProducts?.length) return null;
             return (
               <CategoryProductsSection
                 key={category.id}
                 category={category}
                 products={categoryProducts}
-                onAddToCart={() => setMiniCartOpen(true)}
+                onAddToCart={handleOpenMiniCart}
               />
             );
           })

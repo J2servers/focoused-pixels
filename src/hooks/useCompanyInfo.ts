@@ -261,6 +261,22 @@ export function useCompanyInfo() {
   return useQuery({
     queryKey: ['company-info'],
     queryFn: async () => {
+      // Try the public view first (works for all users, excludes sensitive fields)
+      const { data: publicData, error: publicError } = await supabase
+        .from('company_info_public' as any)
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (!publicError && publicData && typeof publicData === 'object') {
+        return {
+          ...defaultCompanyInfo,
+          ...(publicData as Record<string, unknown>),
+        } as CompanyInfo;
+      }
+
+      // Fallback: try direct table (works for admins)
       const { data, error } = await supabase
         .from('company_info')
         .select('*')
@@ -272,7 +288,6 @@ export function useCompanyInfo() {
         console.error('Error fetching company info:', error);
       }
 
-      // Merge database data with defaults
       if (data) {
         return {
           ...defaultCompanyInfo,
@@ -283,6 +298,25 @@ export function useCompanyInfo() {
       return { id: '', ...defaultCompanyInfo } as CompanyInfo;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes cache
+  });
+}
+
+/** Admin-only hook that reads from the real table (includes sensitive fields like API keys) */
+export function useCompanyInfoAdmin() {
+  return useQuery({
+    queryKey: ['company-info-admin'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('company_info')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) throw error;
+      return { ...defaultCompanyInfo, ...data } as CompanyInfo;
+    },
+    staleTime: 1000 * 60 * 2,
   });
 }
 

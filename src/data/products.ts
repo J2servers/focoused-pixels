@@ -40,6 +40,8 @@ export interface Product {
   customizable: boolean;
   minQuantity?: number;
   inStock: boolean;
+  stock?: number;
+  categoryId?: string;
   tags?: string[];
   specifications?: { label: string; value: string }[];
 }

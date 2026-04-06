@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useCompanyInfo, useUpdateCompanyInfo } from '@/hooks/useCompanyInfo';
+import { useCompanyInfoAdmin, useUpdateCompanyInfo } from '@/hooks/useCompanyInfo';
 import { defaultWhyChooseUsConfig, mergeWhyChooseUsConfig, WhyChooseUsConfig } from '@/lib/whyChooseUsConfig';
 import {
   Loader2, Palette, Save, Type, Image as ImageIcon, Link2,
@@ -217,7 +217,7 @@ const LivePreview = ({ config }: { config: WhyChooseUsConfig }) => {
    MAIN ADMIN PAGE
    ══════════════════════════════════════════════════════════════ */
 const AdminWhyChooseUsPage = () => {
-  const { data: companyInfo, isLoading } = useCompanyInfo();
+  const { data: companyInfo, isLoading } = useCompanyInfoAdmin();
   const updateCompany = useUpdateCompanyInfo();
   const [config, setConfig] = useState<WhyChooseUsConfig>(defaultWhyChooseUsConfig);
 
