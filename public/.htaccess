@@ -1,0 +1,48 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Force HTTPS
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Serve correct MIME types for JS modules
+  AddType application/javascript .js .mjs
+  AddType text/css .css
+  AddType image/svg+xml .svg
+  AddType application/json .json
+  AddType application/wasm .wasm
+  AddType font/woff2 .woff2
+  AddType font/woff .woff
+
+  # Enable CORS for fonts
+  <FilesMatch "\.(woff2?|ttf|otf|eot)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+
+  # Cache static assets aggressively
+  <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|webp)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Don't cache HTML
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+
+  # SPA Fallback - serve index.html for any route that doesn't match a file
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ /index.html [L,QSA]
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
