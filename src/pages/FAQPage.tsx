@@ -1,6 +1,7 @@
 import { DynamicTopBar, DynamicMainHeader, NavigationBar, DynamicFooter } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
+import { PageSEO, FAQSchema } from '@/components/seo/PageSEO';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -129,8 +130,16 @@ const FAQPage = () => {
     ),
   })).filter(cat => cat.questions.length > 0);
 
+  const allFaqs = faqCategories.flatMap(cat => cat.questions);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <PageSEO
+        title="Perguntas Frequentes"
+        description="Encontre respostas sobre pedidos, pagamentos, produção, personalização, entrega e garantia dos produtos Pincel de Luz."
+        path="/faq"
+      />
+      <FAQSchema faqs={allFaqs} />
       <DynamicTopBar />
       <DynamicMainHeader />
       <NavigationBar />

@@ -11,6 +11,7 @@
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { analytics } from '@/components/analytics/EventTracker';
 
 export function WhatsAppButton() {
   const { whatsapp, whatsappMessageTemplate } = useSiteSettings();
@@ -32,8 +33,9 @@ export function WhatsAppButton() {
       transition={{ delay: 1, type: 'spring', stiffness: 260, damping: 20 }}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-whatsapp hover:bg-whatsapp/90 text-white px-4 py-3 rounded-full shadow-lg group"
+      className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-whatsapp hover:bg-whatsapp/90 text-white px-4 py-3 rounded-full shadow-lg group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-whatsapp"
       aria-label="Fale conosco pelo WhatsApp"
+      onClick={() => analytics.whatsappClick('floating_button')}
     >
       <motion.div
         animate={{ rotate: [0, -10, 10, -10, 0] }}

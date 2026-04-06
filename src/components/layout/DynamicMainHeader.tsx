@@ -46,7 +46,7 @@ export function DynamicMainHeader() {
   const headerLogoHeight = Math.min(Math.max(company?.header_logo_height ?? 64, 24), 180);
 
   return (
-    <header className="sticky top-0 z-50">
+    <header className="sticky top-0 z-50" role="banner">
       {/* Glass backdrop layer */}
       <div
         className="absolute inset-0 transition-all duration-700"
@@ -77,8 +77,8 @@ export function DynamicMainHeader() {
           <div className="lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <FloatingIconBtn>
-                  <Menu className="h-5 w-5" />
+                <FloatingIconBtn ariaLabel="Abrir menu de navegação">
+                  <Menu className="h-5 w-5" aria-hidden="true" />
                 </FloatingIconBtn>
               </SheetTrigger>
               <SheetContent side="left" className="w-[320px] p-0 border-r-0" style={{
@@ -135,10 +135,11 @@ export function DynamicMainHeader() {
                   placeholder="O que você está procurando?"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="Buscar produtos"
                   className="w-full h-12 pl-5 pr-14 rounded-full border-0 shadow-none bg-transparent text-sm font-medium placeholder:text-muted-foreground/50"
                 />
                 <motion.div whileTap={{ scale: 0.85 }} className="absolute right-2 top-1/2 -translate-y-1/2">
-                  <Button type="submit" size="icon" className="h-8 w-8 rounded-full">
+                  <Button type="submit" size="icon" className="h-8 w-8 rounded-full" aria-label="Buscar">
                     <Search className="h-4 w-4" />
                   </Button>
                 </motion.div>
@@ -150,8 +151,8 @@ export function DynamicMainHeader() {
           <div className="flex items-center gap-3 md:gap-4">
             {/* Mobile search */}
             <div className="lg:hidden">
-              <FloatingIconBtn onClick={() => setSearchOpen(true)}>
-                <Search className="h-[18px] w-[18px]" />
+              <FloatingIconBtn onClick={() => setSearchOpen(true)} ariaLabel="Abrir busca">
+                <Search className="h-[18px] w-[18px]" aria-hidden="true" />
               </FloatingIconBtn>
             </div>
 
@@ -177,16 +178,16 @@ export function DynamicMainHeader() {
             </Link>
 
             {/* User */}
-            <Link to="/minha-area">
-              <FloatingIconBtn>
-                <User className="h-[18px] w-[18px]" />
+            <Link to="/minha-area" aria-label="Minha conta">
+              <FloatingIconBtn ariaLabel="Minha conta">
+                <User className="h-[18px] w-[18px]" aria-hidden="true" />
               </FloatingIconBtn>
             </Link>
 
             {/* Cart */}
-            <Link to="/carrinho" className="relative">
-              <FloatingIconBtn>
-                <ShoppingCart className="h-[18px] w-[18px]" />
+            <Link to="/carrinho" className="relative" aria-label={`Carrinho${itemCount > 0 ? ` com ${itemCount} itens` : ''}`}>
+              <FloatingIconBtn ariaLabel="Carrinho de compras">
+                <ShoppingCart className="h-[18px] w-[18px]" aria-hidden="true" />
                 <AnimatePresence>
                   {itemCount > 0 && (
                     <motion.span
@@ -254,15 +255,16 @@ export function DynamicMainHeader() {
 }
 
 /* ── Floating Icon Button ── */
-function FloatingIconBtn({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
+function FloatingIconBtn({ children, onClick, ariaLabel }: { children: React.ReactNode; onClick?: () => void; ariaLabel?: string }) {
   return (
     <motion.button
       type="button"
       onClick={onClick}
+      aria-label={ariaLabel}
       whileTap={{ scale: 0.85, y: 2 }}
       whileHover={{ scale: 1.08, y: -4 }}
       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-      className="w-12 h-12 rounded-full flex items-center justify-center relative text-foreground cursor-pointer"
+      className="w-12 h-12 rounded-full flex items-center justify-center relative text-foreground cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
       style={{
         background: 'hsl(var(--background) / 0.8)',
         boxShadow: `

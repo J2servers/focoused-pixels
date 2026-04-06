@@ -36,7 +36,7 @@ export function DynamicFooter() {
   ];
 
   return (
-    <footer className="bg-background">
+    <footer className="bg-background" role="contentinfo">
       {/* Newsletter */}
       <div className="py-10">
         <div className="container mx-auto px-4">
@@ -48,10 +48,11 @@ export function DynamicFooter() {
             <form className="flex gap-3 w-full md:w-auto">
               <Input 
                 type="email" 
-                placeholder="Seu melhor email" 
+                placeholder="Seu melhor email"
+                aria-label="Endereço de email para newsletter"
                 className="min-w-[250px] rounded-xl"
               />
-              <Button className="rounded-xl">Cadastrar</Button>
+              <Button className="rounded-xl" aria-label="Cadastrar para newsletter">Cadastrar</Button>
             </form>
           </div>
         </div>
@@ -73,23 +74,26 @@ export function DynamicFooter() {
               crachás empresariais e muito mais em acrílico e MDF de alta qualidade.
             </p>
             {/* Social */}
-            <div className="flex gap-3">
+            <div className="flex gap-3" role="list" aria-label="Redes sociais">
               {company?.social_instagram && (
                 <a href={company.social_instagram} target="_blank" rel="noopener noreferrer" 
-                   className="p-2.5 rounded-xl neu-btn hover:text-primary transition-colors">
-                  <Instagram className="h-5 w-5" />
+                   className="p-2.5 rounded-xl neu-btn hover:text-primary transition-colors"
+                   aria-label="Instagram" role="listitem">
+                  <Instagram className="h-5 w-5" aria-hidden="true" />
                 </a>
               )}
               {company?.social_facebook && (
                 <a href={company.social_facebook} target="_blank" rel="noopener noreferrer"
-                   className="p-2.5 rounded-xl neu-btn hover:text-primary transition-colors">
-                  <Facebook className="h-5 w-5" />
+                   className="p-2.5 rounded-xl neu-btn hover:text-primary transition-colors"
+                   aria-label="Facebook" role="listitem">
+                  <Facebook className="h-5 w-5" aria-hidden="true" />
                 </a>
               )}
               {company?.social_youtube && (
                 <a href={company.social_youtube} target="_blank" rel="noopener noreferrer"
-                   className="p-2.5 rounded-xl neu-btn hover:text-primary transition-colors">
-                  <Youtube className="h-5 w-5" />
+                   className="p-2.5 rounded-xl neu-btn hover:text-primary transition-colors"
+                   aria-label="YouTube" role="listitem">
+                  <Youtube className="h-5 w-5" aria-hidden="true" />
                 </a>
               )}
             </div>

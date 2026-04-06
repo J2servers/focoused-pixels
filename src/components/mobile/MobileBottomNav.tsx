@@ -17,7 +17,7 @@ export function MobileBottomNav() {
   const { itemCount } = useCart();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-pb">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-pb" role="navigation" aria-label="Navegação principal">
       <div
         className="mx-3 mb-2 rounded-2xl overflow-hidden"
         style={{
@@ -40,7 +40,9 @@ export function MobileBottomNav() {
               <Link
                 key={item.path}
                 to={item.path}
-                className="flex flex-col items-center justify-center flex-1 h-full relative group"
+                className="flex flex-col items-center justify-center flex-1 h-full relative group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                aria-label={item.label}
+                aria-current={isActive ? 'page' : undefined}
               >
                 <motion.div
                   whileTap={{ scale: 0.85 }}
@@ -63,6 +65,7 @@ export function MobileBottomNav() {
                       "h-5 w-5 transition-all duration-300",
                       isActive ? "text-primary stroke-[2.5px]" : "text-muted-foreground stroke-[1.8px]"
                     )}
+                    aria-hidden="true"
                   />
 
                   {isCart && itemCount > 0 && (

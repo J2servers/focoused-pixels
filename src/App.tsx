@@ -1,4 +1,4 @@
-﻿import { lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +10,8 @@ import { PageViewTracker } from "@/components/PageViewTracker";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAbandonedCartTracker } from "@/hooks/useAbandonedCartTracker";
+import { SkipToContent } from "@/components/accessibility/SkipToContent";
+import { AnalyticsInit } from "@/components/analytics/EventTracker";
 
 // Eager-load homepage for fast FCP
 import Index from "./pages/Index";
@@ -91,9 +93,11 @@ const App = () => (
         <Sonner />
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <SiteSettingsProvider>
+            <SkipToContent />
             <ScrollToTop />
             <PageViewTracker />
             <RuntimeTrackers />
+            <AnalyticsInit />
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<Index />} />

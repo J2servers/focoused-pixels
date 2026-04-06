@@ -31,6 +31,8 @@ import {
   WeeklyUrgencySection,
 } from '@/components/conversion';
 import { RainbowCategoryStrip } from '@/components/conversion/RainbowCategoryStrip';
+import { PageSEO, WebSiteSchema, LocalBusinessSchema } from '@/components/seo/PageSEO';
+import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 
 // Lazy load below-fold heavy components
 const SocialProofSection = lazy(() => import('@/components/conversion/SocialProofSection').then(m => ({ default: m.SocialProofSection })));
@@ -81,6 +83,7 @@ function CategoryProductsSection({
 const Index = () => {
   const [miniCartOpen, setMiniCartOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { data: companyData } = useCompanyInfo();
   
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
@@ -100,8 +103,15 @@ const Index = () => {
   if (isMobile) {
     return (
       <div className="min-h-screen flex flex-col bg-background pb-16">
+        <PageSEO
+          title="Pincel de Luz Personalizados | Letreiros LED, Displays e Personalização"
+          description="Especialistas em comunicação visual: letreiros LED, displays QR Code, crachás e produtos personalizados. Frete grátis acima de R$ 159."
+          path="/"
+        />
+        <WebSiteSchema />
+        <LocalBusinessSchema company={companyData} />
         <MobileHeader />
-        <main className="flex-1">
+        <main id="main-content" className="flex-1" role="main">
           <Suspense fallback={<Skeleton className="aspect-[16/9] mx-4 mt-2 rounded-2xl" />}>
             <MobileHeroCarousel />
           </Suspense>
@@ -158,11 +168,18 @@ const Index = () => {
   // ═══ Desktop ═══
   return (
     <div className="min-h-screen flex flex-col bg-background page-enter">
+      <PageSEO
+        title="Pincel de Luz Personalizados | Letreiros LED, Displays e Personalização"
+        description="Especialistas em comunicação visual: letreiros LED, displays QR Code, crachás e produtos personalizados em acrílico e MDF. Frete grátis acima de R$ 159."
+        path="/"
+      />
+      <WebSiteSchema />
+      <LocalBusinessSchema company={companyData} />
       <TrustBar />
       <DynamicMainHeader />
       <NavigationBar />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1" role="main">
         <HeroConversion />
 
         {!categoriesLoading && (
