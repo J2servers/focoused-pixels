@@ -56,15 +56,28 @@ const MatrixRain = () => {
 // ─── Intruder Info Modal ───
 interface IntruderInfo {
   ip: string;
+  city: string;
+  region: string;
+  country: string;
+  isp: string;
+  org: string;
+  lat: string;
+  lon: string;
   userAgent: string;
   platform: string;
   language: string;
+  languages: string;
   screenRes: string;
+  viewportSize: string;
+  colorDepth: string;
   timezone: string;
+  timezoneOffset: string;
   cores: number;
   memory: string;
   gpu: string;
+  gpuVendor: string;
   connectionType: string;
+  downlink: string;
   timestamp: string;
   fingerprint: string;
   attemptCount: number;
@@ -74,6 +87,15 @@ interface IntruderInfo {
   online: boolean;
   plugins: string[];
   touchSupport: boolean;
+  maxTouchPoints: number;
+  webdriver: boolean;
+  pdfViewerEnabled: boolean;
+  canvasFingerprint: string;
+  audioFingerprint: string;
+  webglVendor: string;
+  batteryLevel: string;
+  charging: string;
+  localTime: string;
 }
 
 const IntruderModal = ({ info, onClose }: { info: IntruderInfo; onClose: () => void }) => {
@@ -308,20 +330,23 @@ const AdminLoginPage = () => {
 
   const form = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
-  // Background image & branding from company_info
+  // Background image & branding from login_page_settings (public view - no auth needed)
   const [loginSettings, setLoginSettings] = useState<{
     login_logo?: string | null;
     login_bg_image?: string | null;
     login_title?: string | null;
     login_subtitle?: string | null;
+    login_logo_height?: number | null;
+    login_title_size?: number | null;
+    login_subtitle_size?: number | null;
     company_name?: string | null;
     header_logo?: string | null;
   }>({});
 
   useEffect(() => {
     supabase
-      .from('company_info')
-      .select('login_logo, login_bg_image, login_title, login_subtitle, company_name, header_logo')
+      .from('login_page_settings' as any)
+      .select('*')
       .limit(1)
       .single()
       .then(({ data }) => {
@@ -394,45 +419,117 @@ const AdminLoginPage = () => {
   const collectIntruderInfo = useCallback((): IntruderInfo => {
     const nav = navigator as any;
     let gpu = 'Desconhecido';
+    let gpuVendor = 'Desconhecido';
+    let canvasFp = 'N/A';
+    let webglVendor = 'N/A';
+
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       if (gl) {
         const dbg = (gl as any).getExtension('WEBGL_debug_renderer_info');
-        if (dbg) gpu = (gl as any).getParameter(dbg.UNMASKED_RENDERER_WEBGL) || 'Desconhecido';
+        if (dbg) {
+          gpu = (gl as any).getParameter(dbg.UNMASKED_RENDERER_WEBGL) || 'Desconhecido';
+          gpuVendor = (gl as any).getParameter(dbg.UNMASKED_VENDOR_WEBGL) || 'Desconhecido';
+        }
+        webglVendor = (gl as any).getParameter((gl as any).VENDOR) || 'N/A';
       }
+      // Canvas fingerprint
+      const c2 = document.createElement('canvas');
+      c2.width = 200; c2.height = 50;
+      const ctx = c2.getContext('2d');
+      if (ctx) {
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillText('IntruderFP_2026', 2, 2);
+        canvasFp = c2.toDataURL().slice(-32);
+      }
+    } catch { /* silent */ }
+
+    // Audio fingerprint
+    let audioFp = 'N/A';
+    try {
+      const actx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioFp = `sr:${actx.sampleRate}_ch:${actx.destination.maxChannelCount}`;
+      actx.close();
     } catch { /* silent */ }
 
     return {
       ip: 'Rastreando...',
+      city: '...',
+      region: '...',
+      country: '...',
+      isp: '...',
+      org: '...',
+      lat: '...',
+      lon: '...',
       userAgent: navigator.userAgent,
-      platform: navigator.platform || 'Desconhecido',
+      platform: navigator.platform || nav.userAgentData?.platform || 'Desconhecido',
       language: navigator.language,
+      languages: (navigator.languages || []).join(', '),
       screenRes: `${screen.width}x${screen.height} @${window.devicePixelRatio}x`,
+      viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+      colorDepth: `${screen.colorDepth}bit`,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timezoneOffset: `UTC${new Date().getTimezoneOffset() > 0 ? '-' : '+'}${Math.abs(new Date().getTimezoneOffset() / 60)}`,
       cores: navigator.hardwareConcurrency || 0,
       memory: nav.deviceMemory ? `${nav.deviceMemory} GB` : 'N/A',
       gpu,
+      gpuVendor,
       connectionType: nav.connection?.effectiveType || 'Desconhecido',
+      downlink: nav.connection?.downlink ? `${nav.connection.downlink} Mbps` : 'N/A',
       timestamp: new Date().toISOString(),
       fingerprint: fpRef.current,
       attemptCount: fails + 1,
-      referrer: document.referrer,
+      referrer: document.referrer || 'Acesso Direto',
       cookiesEnabled: navigator.cookieEnabled,
       doNotTrack: navigator.doNotTrack || 'Não definido',
       online: navigator.onLine,
       plugins: Array.from(navigator.plugins || []).map(p => p.name).slice(0, 5),
       touchSupport: 'ontouchstart' in window,
+      maxTouchPoints: navigator.maxTouchPoints || 0,
+      webdriver: !!(nav.webdriver),
+      pdfViewerEnabled: !!(nav.pdfViewerEnabled),
+      canvasFingerprint: canvasFp,
+      audioFingerprint: audioFp,
+      webglVendor,
+      batteryLevel: '...',
+      charging: '...',
+      localTime: new Date().toLocaleString('pt-BR'),
     };
   }, [fails]);
 
   const showIntruderWarning = useCallback(() => {
     const info = collectIntruderInfo();
-    // Try to get real IP
-    fetch('https://api.ipify.org?format=json')
+
+    // Battery API
+    if ('getBattery' in navigator) {
+      (navigator as any).getBattery().then((b: any) => {
+        info.batteryLevel = `${Math.round(b.level * 100)}%`;
+        info.charging = b.charging ? 'Carregando' : 'Bateria';
+        setIntruderInfo({ ...info });
+      }).catch(() => {});
+    }
+
+    // IP + Geolocation via free API
+    fetch('https://ipapi.co/json/')
       .then(r => r.json())
-      .then(d => { info.ip = d.ip || 'Oculto por VPN'; setIntruderInfo({ ...info }); })
-      .catch(() => { info.ip = 'Protegido / VPN detectada'; setIntruderInfo({ ...info }); });
+      .then(d => {
+        info.ip = d.ip || 'Oculto';
+        info.city = d.city || 'Desconhecido';
+        info.region = d.region || 'Desconhecido';
+        info.country = `${d.country_name || '??'} (${d.country_code || '??'})`;
+        info.isp = d.org || 'Desconhecido';
+        info.org = d.asn || 'N/A';
+        info.lat = String(d.latitude || '??');
+        info.lon = String(d.longitude || '??');
+        setIntruderInfo({ ...info });
+      })
+      .catch(() => {
+        info.ip = 'Protegido / VPN';
+        setIntruderInfo({ ...info });
+      });
+
     setIntruderInfo(info);
     setShowIntruderModal(true);
   }, [collectIntruderInfo]);
