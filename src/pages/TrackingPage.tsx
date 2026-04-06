@@ -10,6 +10,7 @@ import { NavigationBar } from '@/components/layout/NavigationBar';
 import { DynamicFooter } from '@/components/layout/DynamicFooter';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { supabase } from '@/integrations/supabase/client';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -30,6 +31,7 @@ interface TrackingResult {
 }
 
 export default function TrackingPage() {
+  const siteSettings = useSiteSettings();
   const [trackingCode, setTrackingCode] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
   const [loading, setLoading] = useState(false);
@@ -310,7 +312,7 @@ export default function TrackingPage() {
                     </p>
                     <Button variant="outline" asChild>
                       <a 
-                        href={whatsappLink} 
+                        href={`https://wa.me/${siteSettings.whatsapp?.replace(/\D/g, '') || ''}`} 
                         target="_blank"
                         rel="noopener noreferrer"
                       >
