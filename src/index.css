@@ -1125,6 +1125,7 @@
 @media (max-width: 768px) {
   html, body {
     overflow-x: hidden;
+    max-width: 100vw;
   }
   html {
     zoom: 0.8;
@@ -1136,12 +1137,37 @@
     min-height: 125vh;
     min-height: calc(100vh / 0.8);
   }
-  /* Remove neumorphism outer shadows on mobile to prevent side overflow */
+
+  /* Clip all edge overflow from shadows/borders */
+  #root {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Reduce neumorphism shadows on mobile */
   .neu-concave,
   .neu-convex,
   .neu-raised {
-    --neu-distance: 4px;
-    --neu-blur: 8px;
-    --neu-intensity: 0.5;
+    --neu-distance: 3px;
+    --neu-blur: 6px;
+    --neu-intensity: 0.4;
+  }
+
+  /* Reduce animated neon border thickness 55% on mobile */
+  :root {
+    --neon-border-width: 0.45px;
+  }
+
+  /* Thinner gradient animated border on mobile */
+  .neon-border-gradient::before {
+    padding: 0.45px !important;
+  }
+
+  /* Thinner p-[1.5px] wrappers on product cards */
+  .p-\[1\.5px\] {
+    padding: 0.7px !important;
+  }
+  .p-\[2px\] {
+    padding: 0.9px !important;
   }
 }
