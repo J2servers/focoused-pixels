@@ -62,6 +62,19 @@ export const AdminHeader = ({ title }: AdminHeaderProps) => {
 
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon"
+            onClick={() => {
+              if (!companyInfo?.id) return;
+              updateCompany.mutate(
+                { dark_mode_enabled: !isDarkMode },
+                { onSuccess: () => toast.success(isDarkMode ? 'Tema claro ativado' : 'Tema escuro ativado') }
+              );
+            }}
+            className="relative text-white/35 hover:text-white hover:bg-white/[0.06]"
+            title={isDarkMode ? 'Mudar para tema claro' : 'Mudar para tema escuro'}>
+            {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+
+          <Button variant="ghost" size="icon"
             className="relative text-white/35 hover:text-white hover:bg-white/[0.06]">
             <Bell className="h-5 w-5" />
             <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full ring-2 ring-black/30"
