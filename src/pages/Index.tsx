@@ -51,8 +51,8 @@ function CategoryProductsSection({
   products, 
   onAddToCart 
 }: { 
-  category: any; 
-  products: any[]; 
+  category: { name: string; slug: string };
+  products: Product[]; 
   onAddToCart: () => void;
 }) {
   return (
