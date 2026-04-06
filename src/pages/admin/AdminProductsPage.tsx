@@ -266,7 +266,7 @@ function ProductPanel({ product, categories, canEdit, onSave, isSaving, onDelete
                   </div>
                 </div>
                 <div className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.03] border border-[hsl(var(--admin-accent-purple)/0.12)]">
-                  <Switch checked={form.is_featured} onCheckedChange={(v) => set('is_featured', v)} />
+                  <Switch checked={form.is_featured} onCheckedChange={(v) => set('is_featured', v)} className="admin-switch-orange" />
                   <span className="text-[11px] text-white/60">Produto em Destaque</span>
                 </div>
               </div>

@@ -449,7 +449,7 @@ const AdminCouponsPage = () => {
                 <Label className="text-white text-sm font-medium">Cupom Ativo</Label>
                 <p className="text-[10px] text-[hsl(var(--admin-text-muted))]">Desativado, o cupom não poderá ser utilizado</p>
               </div>
-              <Switch checked={formData.is_active} onCheckedChange={(c) => setFormData({ ...formData, is_active: c })} />
+              <Switch checked={formData.is_active} onCheckedChange={(c) => setFormData({ ...formData, is_active: c })} className="admin-switch-orange" />
             </div>
           </div>
 
