@@ -9,9 +9,9 @@ import logo from '@/assets/logo-pincel-de-luz.png';
 import { useMemo } from 'react';
 
 export function Footer() {
+  const settings = useSiteSettings();
   const { data: categories = [], isLoading } = useCategories();
 
-  // Filter only parent categories for the footer
   const parentCategories = useMemo(() => 
     categories.filter(c => !c.parent_id).slice(0, 6), 
     [categories]
@@ -48,8 +48,8 @@ export function Footer() {
           <div>
             <Link to="/" className="block mb-4">
               <img 
-                src={logo} 
-                alt={storeInfo.fullName} 
+                src={settings.footerLogo || logo} 
+                alt={settings.companyName} 
                 className="h-16 w-auto object-contain"
               />
             </Link>
@@ -58,30 +58,24 @@ export function Footer() {
               Produtos únicos e exclusivos para você e sua empresa.
             </p>
             <div className="flex gap-3">
-              <a 
-                href={storeInfo.social.instagram} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
-              >
+              {settings.socialInstagram && (
+              <a href={settings.socialInstagram} target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a 
-                href={storeInfo.social.facebook} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
-              >
+              )}
+              {settings.socialFacebook && (
+              <a href={settings.socialFacebook} target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a 
-                href={storeInfo.social.youtube} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
-              >
+              )}
+              {settings.socialYoutube && (
+              <a href={settings.socialYoutube} target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors">
                 <Youtube className="h-5 w-5" />
               </a>
+              )}
             </div>
           </div>
 
@@ -114,22 +108,18 @@ export function Footer() {
           <div>
             <h4 className="font-bold text-lg mb-4">Institucional</h4>
             <ul className="space-y-2">
-              {storeInfo.footerLinks.institutional.map((link) => (
+              {[
+                { name: 'Sobre Nós', href: '/sobre' },
+                { name: 'Política de Privacidade', href: '/privacidade' },
+                { name: 'Termos de Uso', href: '/termos' },
+                { name: 'Garantia', href: '/garantia' },
+                { name: 'Trocas e Devoluções', href: '/trocas' },
+                { name: 'Perguntas Frequentes', href: '/faq' },
+                { name: 'Contato', href: '/contato' },
+                { name: 'Rastreio', href: '/rastreio' },
+              ].map((link) => (
                 <li key={link.name}>
-                  <Link 
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-              {storeInfo.footerLinks.help.map((link) => (
-                <li key={link.name}>
-                  <Link 
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
+                  <Link to={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -141,33 +131,35 @@ export function Footer() {
           <div>
             <h4 className="font-bold text-lg mb-4">Contato</h4>
             <ul className="space-y-3">
+              {settings.email && (
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4 mt-0.5 text-primary" />
-                <a href={`mailto:${storeInfo.email}`} className="hover:text-primary transition-colors">
-                  {storeInfo.email}
+                <a href={`mailto:${settings.email}`} className="hover:text-primary transition-colors">
+                  {settings.email}
                 </a>
               </li>
+              )}
+              {settings.phone && (
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4 mt-0.5 text-primary" />
-                <a href={`tel:${storeInfo.phone.replace(/\D/g, '')}`} className="hover:text-primary transition-colors">
-                  {storeInfo.phone}
+                <a href={`tel:${settings.phone.replace(/\D/g, '')}`} className="hover:text-primary transition-colors">
+                  {settings.phone}
                 </a>
               </li>
+              )}
+              {settings.address && (
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 mt-0.5 text-primary" />
-                <span>{storeInfo.address.city}, {storeInfo.address.state}</span>
+                <span>{settings.address}</span>
               </li>
+              )}
             </ul>
 
-            {/* Formas de Pagamento */}
             <div className="mt-6">
               <h5 className="font-semibold text-sm mb-2">Formas de Pagamento</h5>
               <div className="flex flex-wrap gap-2">
-                {storeInfo.footerLinks.payment.map((method) => (
-                  <span 
-                    key={method}
-                    className="text-xs bg-background px-2 py-1 rounded border border-border"
-                  >
+                {['PIX', 'Boleto', `Cartão de Crédito em até ${settings.installments}x`, 'Cartão de Débito'].map((method) => (
+                  <span key={method} className="text-xs bg-background px-2 py-1 rounded border border-border">
                     {method}
                   </span>
                 ))}
@@ -181,8 +173,8 @@ export function Footer() {
       <div className="border-t border-border">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} {storeInfo.name}. Todos os direitos reservados.</p>
-            <p>CNPJ: {storeInfo.cnpj}</p>
+            <p>{settings.copyrightText || `© ${new Date().getFullYear()} ${settings.companyName}. Todos os direitos reservados.`}</p>
+            {settings.cnpj && <p>CNPJ: {settings.cnpj}</p>}
           </div>
         </div>
       </div>
