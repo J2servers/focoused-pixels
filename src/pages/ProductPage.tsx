@@ -4,9 +4,8 @@ import { DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/la
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Star, Truck, Shield, Clock, CreditCard, ShoppingBag, Zap, Package, Copy } from 'lucide-react';
+import { Star, Truck, Shield, Clock, CreditCard, ShoppingBag, Zap, Package, ChevronRight } from 'lucide-react';
 import { useProductBySlug, useCategoryBySlug } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
@@ -23,21 +22,18 @@ import {
   RelatedProducts,
   VolumeDiscountTable,
   ProductCustomizationForm,
-  BuyTogetherSection,
   HowItWorksSteps,
 } from '@/components/product';
 import type { CustomizationData } from '@/components/product/ProductCustomizationForm';
 import { ProductReviews } from '@/components/reviews';
 import { TrustBar, ViewingNowBadge } from '@/components/conversion';
 import { UrgencyBadge } from '@/components/conversion/UrgencyBadge';
-import { DynamicSocialProof } from '@/components/conversion/DynamicSocialProof';
 import { ProductShareButtons } from '@/components/product/ProductShareButtons';
 import { ProductFAQ } from '@/components/product/ProductFAQ';
 import { FreightCalculator } from '@/components/product/FreightCalculator';
 import { WishlistButton } from '@/components/product/WishlistButton';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import { RecentlyViewedBar } from '@/components/product/RecentlyViewedBar';
-// New improvement components
 import { StickyBuyBar } from '@/components/product/StickyBuyBar';
 import { ProductJsonLd } from '@/components/product/ProductJsonLd';
 import { PixDiscount } from '@/components/product/PixDiscount';
@@ -48,6 +44,17 @@ import { DeliveryEstimate } from '@/components/product/DeliveryEstimate';
 import { NotifyWhenAvailable } from '@/components/product/NotifyWhenAvailable';
 
 const AIChatWidget = lazy(() => import('@/components/chat/AIChatWidget').then(m => ({ default: m.AIChatWidget })));
+
+/* ─── Section wrapper for visual consistency ─── */
+const Section = ({ children, className = '', label }: { children: React.ReactNode; className?: string; label?: string }) => (
+  <section aria-label={label} className={`rounded-2xl border border-border/40 bg-card p-4 md:p-5 ${className}`}>
+    {children}
+  </section>
+);
+
+const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+  <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">{children}</h2>
+);
 
 const ProductPage = () => {
   const { productSlug } = useParams();
@@ -71,19 +78,12 @@ const ProductPage = () => {
     method: string; price: number; days: string; cep: string; city: string; state: string;
   } | null>(null);
 
-  // Track recently viewed
   useEffect(() => {
     if (product) {
-      addRecentlyViewed({
-        slug: product.slug,
-        name: product.name,
-        image: product.image,
-        price: product.price,
-      });
+      addRecentlyViewed({ slug: product.slug, name: product.name, image: product.image, price: product.price });
     }
   }, [product?.slug]);
 
-  // #49 Scroll to top on product change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setSelectedSize(null);
@@ -95,25 +95,23 @@ const ProductPage = () => {
     setCustomizationData({ customText: '', logoFiles: [], whatsappNumber: '' });
   }, [productSlug]);
 
+  /* ─── Loading ─── */
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <TrustBar />
         <DynamicMainHeader />
         <NavigationBar />
-        <main className="flex-1">
-          <div className="container mx-auto px-4 py-6">
-            <Skeleton className="h-6 w-64 mb-6 rounded-xl" />
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-              <Skeleton className="aspect-square rounded-2xl" />
-              <div className="space-y-4">
-                <Skeleton className="h-8 w-3/4 rounded-xl" />
-                <Skeleton className="h-6 w-1/2 rounded-xl" />
-                <Skeleton className="h-10 w-1/3 rounded-xl" />
-                <Skeleton className="h-20 w-full rounded-xl" />
-                <Skeleton className="h-12 w-full rounded-xl" />
-                <Skeleton className="h-12 w-full rounded-xl" />
-              </div>
+        <main className="flex-1 container mx-auto px-4 py-6">
+          <Skeleton className="h-5 w-48 mb-6" />
+          <div className="grid lg:grid-cols-[1fr_1fr] gap-6 lg:gap-10">
+            <Skeleton className="aspect-square rounded-2xl" />
+            <div className="space-y-4">
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-12 w-1/3" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-14 w-full" />
             </div>
           </div>
         </main>
@@ -122,18 +120,18 @@ const ProductPage = () => {
     );
   }
 
+  /* ─── Not Found ─── */
   if (!product) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background">
         <TrustBar />
         <DynamicMainHeader />
         <NavigationBar />
         <main className="flex-1 container mx-auto px-4 py-16 text-center">
-          <div className="rounded-2xl neu-concave p-12 max-w-md mx-auto">
-            <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
-            <Link to="/">
-              <Button>Voltar para a home</Button>
-            </Link>
+          <div className="max-w-md mx-auto space-y-4">
+            <h1 className="text-2xl font-bold">Produto não encontrado</h1>
+            <p className="text-muted-foreground">O produto que você procura não está disponível.</p>
+            <Link to="/"><Button size="lg">Voltar para a Home</Button></Link>
           </div>
         </main>
         <DynamicFooter />
@@ -156,11 +154,7 @@ const ProductPage = () => {
   const discountedPrice = product.price * (1 - currentDiscount / 100);
   const installments = companyInfo?.max_installments || storeInfo.installments;
   const minInstallmentValue = companyInfo?.min_installment_value || 50;
-  // #50 Smart installment calculation
-  const maxInstallments = Math.min(
-    installments,
-    Math.floor(product.price / minInstallmentValue) || 1
-  );
+  const maxInstallments = Math.min(installments, Math.floor(product.price / minInstallmentValue) || 1);
 
   const handleAddToCart = () => {
     if (product.sizes && product.sizes.length > 0 && !selectedSize) {
@@ -171,30 +165,19 @@ const ProductPage = () => {
       toast.error('Por favor, selecione uma cor');
       return false;
     }
-
     addItem({
-      id: product.id,
-      name: product.name,
-      price: discountedPrice,
-      image: product.image,
-      quantity,
-      size: selectedSize || undefined,
-      color: selectedColor || selectedBgColor || undefined,
+      id: product.id, name: product.name, price: discountedPrice, image: product.image,
+      quantity, size: selectedSize || undefined, color: selectedColor || selectedBgColor || undefined,
       customization: {
         customText: customizationData.customText || undefined,
         whatsappNumber: customizationData.whatsappNumber || undefined,
-        logoFileNames: customizationData.logoFiles.length > 0
-          ? customizationData.logoFiles.map(f => f.name)
-          : undefined,
+        logoFileNames: customizationData.logoFiles.length > 0 ? customizationData.logoFiles.map(f => f.name) : undefined,
         backgroundColorChoice: selectedBgColor || undefined,
         logoColorChoice: selectedLogoColor || undefined,
       },
     });
     toast.success('Produto adicionado ao carrinho!', {
-      action: {
-        label: 'Ver carrinho',
-        onClick: () => navigate('/carrinho'),
-      },
+      action: { label: 'Ver carrinho', onClick: () => navigate('/carrinho') },
     });
     return true;
   };
@@ -202,235 +185,173 @@ const ProductPage = () => {
   const handleBuyNow = () => {
     const added = handleAddToCart();
     if (!added) return;
-
     const subtotal = discountedPrice * quantity;
     const shippingCost = selectedFreight?.price || 0;
-    const totalAmount = subtotal + shippingCost;
-    
     sessionStorage.setItem('pending_payment', JSON.stringify({
-      orderId: `quick-${Date.now()}`,
-      amount: totalAmount,
-      customerName: '',
-      customerEmail: '',
-      customerCpf: '',
-      customerPhone: '',
+      orderId: `quick-${Date.now()}`, amount: subtotal + shippingCost,
+      customerName: '', customerEmail: '', customerCpf: '', customerPhone: '',
       description: `${product.name} x${quantity}`,
-      cartItems: [{
-        name: product.name,
-        quantity,
-        price: discountedPrice,
-        size: selectedSize || undefined,
-        color: selectedColor || undefined,
-      }],
-      shipping: selectedFreight ? {
-        method: selectedFreight.method,
-        cost: shippingCost,
-        days: selectedFreight.days,
-        cep: selectedFreight.cep,
-        city: selectedFreight.city,
-        state: selectedFreight.state,
-      } : null,
+      cartItems: [{ name: product.name, quantity, price: discountedPrice, size: selectedSize || undefined, color: selectedColor || undefined }],
+      shipping: selectedFreight ? { method: selectedFreight.method, cost: shippingCost, days: selectedFreight.days, cep: selectedFreight.cep, city: selectedFreight.city, state: selectedFreight.state } : null,
     }));
-
     navigate('/pagamento');
   };
 
+  const formatPrice = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`;
+
   return (
     <>
-      <div className="min-h-screen flex flex-col bg-background page-enter">
-        {/* SEO - #4 JSON-LD + OG tags */}
-        <ProductJsonLd
-          product={product}
-          category={category ? { name: category.name, slug: category.slug } : null}
-          url={productUrl}
-        />
-
+      <div className="min-h-screen flex flex-col bg-background">
+        <ProductJsonLd product={product} category={category ? { name: category.name, slug: category.slug } : null} url={productUrl} />
         <TrustBar />
         <DynamicMainHeader />
         <NavigationBar />
 
-        <main className="flex-1">
-          <div className="container mx-auto px-4 py-4 md:py-6">
-            {/* Breadcrumb */}
-            <Breadcrumb className="mb-4">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                {category && (
-                  <>
-                    <BreadcrumbItem>
-                      <BreadcrumbLink href={`/categoria/${category.slug}`}>
-                        {category.name}
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                  </>
-                )}
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{product.name}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+        <main className="flex-1" id="main-content">
+          <div className="container mx-auto px-3 sm:px-4 py-4 md:py-6 max-w-7xl">
 
-            <div className="grid lg:grid-cols-2 gap-6 lg:gap-12">
-              {/* Image Gallery - Enhanced with swipe, keyboard, fullscreen */}
-              <div className="rounded-2xl neu-pressed p-2 md:p-3">
-                <ProductImageGallery 
-                  images={images}
-                  productName={product.name}
-                  badge={product.badge}
-                  discount={product.discount}
-                />
+            {/* ─── Breadcrumb ─── */}
+            <nav aria-label="Navegação" className="mb-4 md:mb-6">
+              <Breadcrumb>
+                <BreadcrumbList className="text-xs sm:text-sm">
+                  <BreadcrumbItem><BreadcrumbLink href="/">Home</BreadcrumbLink></BreadcrumbItem>
+                  <BreadcrumbSeparator><ChevronRight className="h-3 w-3" /></BreadcrumbSeparator>
+                  {category && (
+                    <>
+                      <BreadcrumbItem>
+                        <BreadcrumbLink href={`/categoria/${category.slug}`}>{category.name}</BreadcrumbLink>
+                      </BreadcrumbItem>
+                      <BreadcrumbSeparator><ChevronRight className="h-3 w-3" /></BreadcrumbSeparator>
+                    </>
+                  )}
+                  <BreadcrumbItem><BreadcrumbPage className="font-medium truncate max-w-[200px]">{product.name}</BreadcrumbPage></BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </nav>
+
+            {/* ═══════════════════════════════════════════════════
+                HERO: Image + Core Info (2-col desktop, stacked mobile)
+                ═══════════════════════════════════════════════════ */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-10">
+
+              {/* ─── LEFT: Image Gallery ─── */}
+              <div className="lg:sticky lg:top-4 lg:self-start">
+                <div className="rounded-2xl overflow-hidden border border-border/30 bg-card">
+                  <ProductImageGallery images={images} productName={product.name} badge={product.badge} discount={product.discount} />
+                </div>
+                {/* Share — desktop only */}
+                <div className="hidden lg:block mt-4">
+                  <ProductShareButtons productName={product.name} productSlug={product.slug} productImage={product.image} productPrice={product.price} />
+                </div>
               </div>
 
-              {/* Product Info */}
-              <div className="space-y-4 md:space-y-5">
-                {/* Title & Rating */}
-                <div className="rounded-2xl neu-flat p-4 md:p-6">
-                  <h1 className="text-xl md:text-2xl lg:text-3xl font-bold mb-2 text-foreground">
-                    {product.name}
-                  </h1>
-                  
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-3.5 w-3.5 ${
-                            i < Math.floor(product.rating) 
-                              ? 'fill-accent text-accent' 
-                              : 'fill-muted text-muted'
-                          }`}
-                        />
-                      ))}
+              {/* ─── RIGHT: Product Info ─── */}
+              <div className="space-y-4">
+
+                {/* ── 1. Title + Rating + Wishlist ── */}
+                <Section label="Informações do produto">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground leading-tight">
+                        {product.name}
+                      </h1>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
+                        <div className="flex items-center gap-0.5" aria-label={`Avaliação: ${product.rating} de 5 estrelas`}>
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={`h-3.5 w-3.5 ${i < Math.floor(product.rating) ? 'fill-amber-400 text-amber-400' : 'fill-muted text-muted'}`} />
+                          ))}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {product.rating.toFixed(1)} · {product.reviews} avaliações
+                        </span>
+                        <ViewingNowBadge productSlug={product.slug} variant="minimal" />
+                      </div>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {product.rating.toFixed(1)} ({product.reviews} avaliações)
-                    </span>
-                    <ViewingNowBadge productSlug={product.slug} variant="minimal" />
                     <WishlistButton product={{ id: product.id, name: product.name, price: product.price, image: product.image, slug: product.slug }} size="sm" />
                   </div>
 
-                  {/* Price Block */}
-                  <div className="space-y-1">
+                  {/* Description */}
+                  {product.description && (
+                    <p className="text-sm text-muted-foreground leading-relaxed mt-3">{product.description}</p>
+                  )}
+                </Section>
+
+                {/* ── 2. Pricing Block ── */}
+                <Section label="Preço" className="space-y-3">
+                  <div className="flex items-end gap-3 flex-wrap">
                     {product.originalPrice && (
-                      <p className="text-base text-muted-foreground line-through">
-                        R$ {product.originalPrice.toFixed(2).replace('.', ',')}
-                      </p>
+                      <span className="text-base text-muted-foreground line-through" aria-label="Preço original">
+                        {formatPrice(product.originalPrice)}
+                      </span>
                     )}
-                    <p className="text-2xl md:text-3xl font-bold text-primary">
-                      R$ {product.price.toFixed(2).replace('.', ',')}
+                    <span className="text-3xl sm:text-4xl font-extrabold text-primary tabular-nums" aria-label="Preço atual">
+                      {formatPrice(product.price)}
+                    </span>
+                    {product.discount && product.discount > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-destructive/10 text-destructive text-xs font-bold px-2.5 py-1">
+                        -{product.discount}%
+                      </span>
+                    )}
+                  </div>
+
+                  {maxInstallments > 1 && (
+                    <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                      <CreditCard className="h-3.5 w-3.5 shrink-0" />
+                      ou em até <strong className="text-foreground">{maxInstallments}x</strong> de{' '}
+                      <strong className="text-foreground">{formatPrice(product.price / maxInstallments)}</strong> sem juros
                     </p>
-                    {/* #50 Smart installments */}
-                    {maxInstallments > 1 && (
-                      <p className="text-xs text-muted-foreground">
-                        ou em até {maxInstallments}x de R$ {(product.price / maxInstallments).toFixed(2).replace('.', ',')} sem juros
-                      </p>
-                    )}
-                  </div>
-
-                  {/* #7 PIX Discount */}
-                  <div className="mt-3">
-                    <PixDiscount price={discountedPrice} quantity={quantity} />
-                  </div>
-
-                  {/* #10 Stock Indicator */}
-                  <div className="mt-3">
-                    <StockIndicator stock={product.inStock ? undefined : 0} />
-                  </div>
-
-                  {/* Free Shipping Badge */}
-                  {product.freeShipping && (
-                    <div className="flex items-center gap-2 mt-3 neu-pressed px-3 py-2 rounded-xl w-fit">
-                      <Truck className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-medium text-primary">Frete Grátis</span>
-                    </div>
                   )}
 
-                  <UrgencyBadge productId={product.id} className="mt-3" />
-                </div>
+                  <PixDiscount price={discountedPrice} quantity={quantity} />
 
-                {/* Share Buttons - Enhanced with Twitter, Pinterest, Native */}
-                <ProductShareButtons
-                  productName={product.name}
-                  productSlug={product.slug}
-                  productImage={product.image}
-                  productPrice={product.price}
-                />
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <StockIndicator stock={product.inStock ? undefined : 0} />
+                    {product.freeShipping && (
+                      <div className="flex items-center gap-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold px-3 py-1.5">
+                        <Truck className="h-3.5 w-3.5" />
+                        Frete Grátis
+                      </div>
+                    )}
+                  </div>
 
-                {/* Short Description */}
-                {product.description && (
-                  <p className="text-sm text-muted-foreground leading-relaxed px-1">
-                    {product.description}
-                  </p>
+                  <UrgencyBadge productId={product.id} />
+                </Section>
+
+                {/* ── 3. Actions (Buy / Cart) ── */}
+                {product.inStock ? (
+                  <Section label="Ações de compra" className="space-y-3">
+                    <Button onClick={handleBuyNow} size="lg" className="w-full h-13 sm:h-14 text-base sm:text-lg font-bold gap-2 rounded-xl">
+                      <Zap className="h-5 w-5" />
+                      COMPRAR AGORA
+                    </Button>
+                    <Button onClick={handleAddToCart} size="lg" variant="outline" className="w-full h-12 sm:h-13 text-base font-semibold gap-2 rounded-xl">
+                      <ShoppingBag className="h-5 w-5" />
+                      ADICIONAR AO CARRINHO
+                    </Button>
+                  </Section>
+                ) : (
+                  <NotifyWhenAvailable productName={product.name} productId={product.id} inStock={product.inStock} />
                 )}
 
-                {/* #22 Notify When Available */}
-                <NotifyWhenAvailable
-                  productName={product.name}
-                  productId={product.id}
-                  inStock={product.inStock}
-                />
-
-                {/* Buy Now & Add to Cart */}
-                {product.inStock && (
-                  <div className="flex flex-col gap-3">
-                    <button
-                      onClick={handleBuyNow}
-                      className="w-full h-12 sm:h-14 rounded-2xl flex items-center justify-center gap-2 text-sm sm:text-lg font-bold transition-all duration-200 active:scale-[0.97]"
-                      style={{
-                        background: 'hsl(var(--primary))',
-                        color: 'hsl(var(--primary-foreground))',
-                        boxShadow: '6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)), -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(0 0% 100% / 0.2), inset 0 -1px 0 hsl(var(--neu-dark) / 0.15)',
-                        border: '1px solid hsl(var(--border) / 0.4)',
-                      }}
-                    >
-                      <Zap className="h-5 w-5 flex-shrink-0" />
-                      <span className="truncate">COMPRAR AGORA</span>
-                    </button>
-                    <button
-                      onClick={handleAddToCart}
-                      className="w-full h-12 sm:h-14 rounded-2xl flex items-center justify-center gap-2 text-sm sm:text-lg font-bold transition-all duration-200 active:scale-[0.97]"
-                      style={{
-                        background: 'hsl(var(--background))',
-                        color: 'hsl(var(--foreground))',
-                        boxShadow: '6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)), -6px -6px 12px hsl(var(--neu-light) / var(--neu-intensity)), inset 0 1px 0 hsl(var(--neu-light) / 0.5), inset 0 -1px 0 hsl(var(--neu-dark) / 0.1)',
-                        border: '1px solid hsl(var(--border) / 0.5)',
-                      }}
-                    >
-                      <ShoppingBag className="h-5 w-5 flex-shrink-0" />
-                      <span className="truncate">ADICIONAR AO CARRINHO</span>
-                    </button>
-                  </div>
-                )}
-
-                {/* Quick Trust Badges */}
-                <div className="grid grid-cols-2 gap-2.5">
-                  <div className="flex items-center gap-2 text-xs md:text-sm rounded-xl p-3 neu-concave">
-                    <Shield className="h-4 w-4 text-primary shrink-0" />
-                    <span>Compra Segura</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs md:text-sm rounded-xl p-3 neu-concave">
-                    <Clock className="h-4 w-4 text-primary shrink-0" />
-                    <span>Entrega Rápida</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs md:text-sm rounded-xl p-3 neu-concave">
-                    <CreditCard className="h-4 w-4 text-primary shrink-0" />
-                    <span>Até {maxInstallments}x s/ juros</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs md:text-sm rounded-xl p-3 neu-concave">
-                    <Package className="h-4 w-4 text-primary shrink-0" />
-                    <span>{companyInfo?.production_time || storeInfo.productionTime}</span>
-                  </div>
+                {/* ── 4. Trust Badges ── */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="list" aria-label="Garantias">
+                  {[
+                    { icon: Shield, text: 'Compra Segura' },
+                    { icon: Clock, text: 'Entrega Rápida' },
+                    { icon: CreditCard, text: `Até ${maxInstallments}x s/ juros` },
+                    { icon: Package, text: companyInfo?.production_time || storeInfo.productionTime },
+                  ].map(({ icon: Icon, text }) => (
+                    <div key={text} role="listitem" className="flex items-center gap-2 rounded-xl border border-border/40 bg-muted/30 p-2.5 sm:p-3 text-xs sm:text-sm text-foreground">
+                      <Icon className="h-4 w-4 text-primary shrink-0" />
+                      <span className="leading-tight">{text}</span>
+                    </div>
+                  ))}
                 </div>
 
-                {/* Volume Discount Table */}
-                <VolumeDiscountTable tiers={discountTiers} currentQuantity={quantity} />
+                {/* ── 5. Customization Options ── */}
+                <Section label="Opções de personalização" className="space-y-4">
+                  <SectionTitle>Personalização</SectionTitle>
 
-                {/* Color Dropdowns (FocoLaser style) */}
-                <div className="space-y-3">
                   <ProductColorDropdown
                     label="Cor de fundo da Placa:"
                     colors={storeInfo.customizationOptions.backgroundColors}
@@ -445,101 +366,71 @@ const ProductPage = () => {
                     onSelectColor={setSelectedLogoColor}
                     required
                   />
-                </div>
 
-                {/* Legacy circle color selector for simple products */}
-                {product.colors && product.colors.length > 0 && (
-                  <ProductColorSelector
-                    colors={product.colors}
-                    selectedColor={selectedColor}
-                    onSelectColor={setSelectedColor}
-                  />
-                )}
+                  {product.colors && product.colors.length > 0 && (
+                    <ProductColorSelector colors={product.colors} selectedColor={selectedColor} onSelectColor={setSelectedColor} />
+                  )}
 
-                {/* Size Selector with Guide */}
-                {product.sizes && product.sizes.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <ProductSizeSelector
-                        sizes={product.sizes}
-                        selectedSize={selectedSize}
-                        onSelectSize={setSelectedSize}
-                      />
+                  {product.sizes && product.sizes.length > 0 && (
+                    <div className="space-y-2">
+                      <ProductSizeSelector sizes={product.sizes} selectedSize={selectedSize} onSelectSize={setSelectedSize} />
+                      <SizeGuideModal sizes={product.sizes} productName={product.name} />
                     </div>
-                    <SizeGuideModal sizes={product.sizes} productName={product.name} />
-                  </div>
-                )}
+                  )}
 
-                {/* Customization Form: text, upload, whatsapp */}
-                <ProductCustomizationForm
-                  data={customizationData}
-                  onDataChange={setCustomizationData}
-                />
+                  <ProductCustomizationForm data={customizationData} onDataChange={setCustomizationData} />
+                </Section>
 
-                {/* How It Works */}
+                {/* ── 6. Quantity & Volume ── */}
+                <Section label="Quantidade" className="space-y-4">
+                  <SectionTitle>Quantidade</SectionTitle>
+                  <ProductQuantityCalculator quantity={quantity} onQuantityChange={setQuantity} unitPrice={product.price} minQuantity={product.minQuantity} />
+                  <VolumeDiscountTable tiers={discountTiers} currentQuantity={quantity} />
+                </Section>
+
+                {/* ── 7. Shipping ── */}
+                <Section label="Entrega" className="space-y-4">
+                  <SectionTitle>Entrega</SectionTitle>
+                  <FreightCalculator productPrice={product.price * quantity} onFreightSelect={setSelectedFreight} />
+                  {selectedFreight && (
+                    <DeliveryEstimate freightDays={selectedFreight.days} productionDays={companyInfo?.production_time || storeInfo.productionTime} />
+                  )}
+                </Section>
+
+                {/* ── 8. WhatsApp Quote ── */}
+                <ProductWhatsAppQuote product={product} quantity={quantity} selectedSize={selectedSize} selectedColor={selectedColor || selectedBgColor} onAddToCart={handleAddToCart} />
+
+                {/* ── 9. How It Works ── */}
                 <HowItWorksSteps />
 
-                {/* Quantity Calculator */}
-                <ProductQuantityCalculator
-                  quantity={quantity}
-                  onQuantityChange={setQuantity}
-                  unitPrice={product.price}
-                  minQuantity={product.minQuantity}
-                />
-
-                {/* WhatsApp Quote */}
-                <ProductWhatsAppQuote
-                  product={product}
-                  quantity={quantity}
-                  selectedSize={selectedSize}
-                  selectedColor={selectedColor || selectedBgColor}
-                  onAddToCart={handleAddToCart}
-                />
-
-                {/* Freight Calculator */}
-                <FreightCalculator 
-                  productPrice={product.price * quantity} 
-                  onFreightSelect={setSelectedFreight}
-                />
-
-                {/* Delivery Estimate */}
-                {selectedFreight && (
-                  <DeliveryEstimate
-                    freightDays={selectedFreight.days}
-                    productionDays={companyInfo?.production_time || storeInfo.productionTime}
-                  />
-                )}
+                {/* Share — mobile only */}
+                <div className="lg:hidden">
+                  <ProductShareButtons productName={product.name} productSlug={product.slug} productImage={product.image} productPrice={product.price} />
+                </div>
               </div>
             </div>
 
-            {/* #16 Section Navigation Tabs */}
-            <div className="mt-12">
+            {/* ═══════════════════════════════════════════════════
+                BELOW THE FOLD: Details, Reviews, FAQ, Related
+                ═══════════════════════════════════════════════════ */}
+            <div className="mt-10 md:mt-16 space-y-8 md:space-y-12">
               <ProductSectionTabs />
+
+              <section id="product-details" aria-label="Detalhes do produto" className="max-w-4xl">
+                <Section label="Especificações">
+                  <ProductSpecifications product={product} />
+                </Section>
+              </section>
+
+              <ProductReviews productSlug={product.slug} productName={product.name} />
+
+              <section id="product-faq" aria-label="Perguntas frequentes">
+                <ProductFAQ productName={product.name} />
+              </section>
+
+              <RelatedProducts product={product} limit={4} />
+              <RecentlyViewedBar />
             </div>
-
-            {/* Specifications & Details */}
-            <div id="product-details" className="max-w-3xl">
-              <div className="rounded-2xl neu-flat p-6">
-                <ProductSpecifications product={product} />
-              </div>
-            </div>
-
-            {/* Product Reviews - with sort, filter, pagination */}
-            <ProductReviews 
-              productSlug={product.slug} 
-              productName={product.name} 
-            />
-
-            {/* FAQ */}
-            <div id="product-faq">
-              <ProductFAQ productName={product.name} />
-            </div>
-
-            {/* Related Products - from DB */}
-            <RelatedProducts product={product} limit={4} />
-
-            {/* Recently Viewed */}
-            <RecentlyViewedBar />
           </div>
         </main>
 
@@ -549,7 +440,6 @@ const ProductPage = () => {
           <AIChatWidget />
         </Suspense>
 
-        {/* #1 Sticky Bottom Buy Bar on Mobile */}
         <StickyBuyBar
           productName={product.name}
           productImage={product.image}
