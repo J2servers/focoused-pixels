@@ -49,7 +49,7 @@ export function LoginFormPanel({
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input id="login-email" type="email" autoComplete="email" {...loginForm.register('email')} placeholder="seu@email.com" className="pl-10 h-12 bg-muted/50 border-border focus-visible:ring-2 focus-visible:ring-primary" />
             </div>
-            {loginForm.formState.errors.email && <p className="text-sm text-destructive">{loginForm.formState.errors.email.message}</p>}
+            {loginForm.formState.errors.email && <p className="text-sm text-destructive">{String(loginForm.formState.errors.email.message)}</p>}
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -63,7 +63,7 @@ export function LoginFormPanel({
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {loginForm.formState.errors.password && <p className="text-sm text-destructive">{loginForm.formState.errors.password.message}</p>}
+            {loginForm.formState.errors.password && <p className="text-sm text-destructive">{String(loginForm.formState.errors.password.message)}</p>}
           </div>
           <Button type="submit" className="w-full h-12 bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 transition-opacity text-base font-semibold" disabled={isSubmitting}>
             {isSubmitting ? <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Entrando...</> : <>Entrar<ArrowRight className="h-5 w-5 ml-2" /></>}
@@ -95,7 +95,7 @@ export function LoginFormPanel({
               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input id="signup-name" type="text" autoComplete="name" {...signupForm.register('fullName')} placeholder="Seu nome completo" className="pl-10 h-12 bg-muted/50" />
             </div>
-            {signupForm.formState.errors.fullName && <p className="text-sm text-destructive">{signupForm.formState.errors.fullName.message}</p>}
+            {signupForm.formState.errors.fullName && <p className="text-sm text-destructive">{String(signupForm.formState.errors.fullName.message)}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="signup-email">Email</Label>
@@ -103,7 +103,7 @@ export function LoginFormPanel({
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input id="signup-email" type="email" autoComplete="email" {...signupForm.register('email')} placeholder="seu@email.com" className="pl-10 h-12 bg-muted/50" />
             </div>
-            {signupForm.formState.errors.email && <p className="text-sm text-destructive">{signupForm.formState.errors.email.message}</p>}
+            {signupForm.formState.errors.email && <p className="text-sm text-destructive">{String(signupForm.formState.errors.email.message)}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="signup-password">Senha</Label>
@@ -114,7 +114,7 @@ export function LoginFormPanel({
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {signupForm.formState.errors.password && <p className="text-sm text-destructive">{signupForm.formState.errors.password.message}</p>}
+            {signupForm.formState.errors.password && <p className="text-sm text-destructive">{String(signupForm.formState.errors.password.message)}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="signup-confirm">Confirmar senha</Label>
@@ -125,7 +125,7 @@ export function LoginFormPanel({
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {signupForm.formState.errors.confirmPassword && <p className="text-sm text-destructive">{signupForm.formState.errors.confirmPassword.message}</p>}
+            {signupForm.formState.errors.confirmPassword && <p className="text-sm text-destructive">{String(signupForm.formState.errors.confirmPassword.message)}</p>}
           </div>
           <div className="flex items-start space-x-2">
             <Checkbox id="terms" checked={signupForm.watch('acceptTerms')} onCheckedChange={(v) => signupForm.setValue('acceptTerms', v === true)} />
@@ -133,7 +133,7 @@ export function LoginFormPanel({
               Aceito os <a href="/termos" className="text-primary hover:underline">Termos de Uso</a> e <a href="/privacidade" className="text-primary hover:underline">Política de Privacidade</a>
             </label>
           </div>
-          {signupForm.formState.errors.acceptTerms && <p className="text-sm text-destructive">{signupForm.formState.errors.acceptTerms.message}</p>}
+          {signupForm.formState.errors.acceptTerms && <p className="text-sm text-destructive">{String(signupForm.formState.errors.acceptTerms.message)}</p>}
 
           <Button type="submit" className="w-full h-12 bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 text-base font-semibold" disabled={isSubmitting}>
             {isSubmitting ? <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Criando...</> : <>Criar conta<ArrowRight className="h-5 w-5 ml-2" /></>}
@@ -159,7 +159,7 @@ export function LoginFormPanel({
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input id="reset-email" type="email" autoComplete="email" {...resetForm.register('email')} placeholder="seu@email.com" className="pl-10 h-12 bg-muted/50" />
             </div>
-            {resetForm.formState.errors.email && <p className="text-sm text-destructive">{resetForm.formState.errors.email.message}</p>}
+            {resetForm.formState.errors.email && <p className="text-sm text-destructive">{String(resetForm.formState.errors.email.message)}</p>}
           </div>
           <Button type="submit" className="w-full h-12" disabled={isSubmitting}>
             {isSubmitting ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : null}Enviar link de recuperação
