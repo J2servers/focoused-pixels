@@ -2,12 +2,13 @@ import { DynamicTopBar, DynamicMainHeader, NavigationBar, DynamicFooter } from '
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AIChatWidget } from '@/components/chat/AIChatWidget';
 import { Card, CardContent } from '@/components/ui/card';
-import { storeInfo } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { Target, Eye, Heart, Award, Users, Lightbulb } from 'lucide-react';
 import logo from '@/assets/logo-pincel-de-luz.png';
 import { PageSEO } from '@/components/seo/PageSEO';
 
 const AboutPage = () => {
+  const settings = useSiteSettings();
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <PageSEO
@@ -23,9 +24,9 @@ const AboutPage = () => {
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <img src={logo} alt={storeInfo.fullName} className="h-20 md:h-28 mx-auto mb-6" />
+            <img src={logo} alt={settings.companyName} className="h-20 md:h-28 mx-auto mb-6" />
             <h1 className="text-3xl md:text-5xl font-bold mb-4">
-              Sobre a {storeInfo.fullName}
+              Sobre a {settings.companyName}
             </h1>
             <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
               Transformando ideias em peças únicas de comunicação visual desde 2018
@@ -40,7 +41,7 @@ const AboutPage = () => {
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">Nossa História</h2>
               <div className="prose prose-lg max-w-none text-muted-foreground">
                 <p className="mb-4">
-                  A <strong className="text-foreground">{storeInfo.fullName}</strong> nasceu da paixão por transformar 
+                  A <strong className="text-foreground">{settings.companyName}</strong> nasceu da paixão por transformar 
                   ambientes e criar peças que contam histórias. Fundada em 2018, começamos como uma pequena oficina 
                   especializada em corte a laser e, ao longo dos anos, nos tornamos referência em comunicação visual 
                   personalizada no Brasil.
@@ -148,7 +149,7 @@ const AboutPage = () => {
                 </div>
                 <h3 className="font-semibold mb-2">Entrega Garantida</h3>
                 <p className="text-sm text-muted-foreground">
-                  Produção em {storeInfo.productionTime} e envio para todo Brasil
+                  Produção em {settings.productionTime} e envio para todo Brasil
                 </p>
               </div>
             </div>
@@ -189,7 +190,7 @@ const AboutPage = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href={storeInfo.whatsappLink}
+                href={`https://wa.me/${settings.whatsapp?.replace(/\D/g, '') || ''}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-8 py-3 bg-success text-success-foreground rounded-lg font-semibold hover:bg-success/90 transition-colors"
@@ -197,10 +198,10 @@ const AboutPage = () => {
                 Falar no WhatsApp
               </a>
               <a
-                href={`mailto:${storeInfo.email}`}
+                href={`mailto:${settings.email}`}
                 className="inline-flex items-center justify-center px-8 py-3 border border-border rounded-lg font-semibold hover:bg-muted transition-colors"
               >
-                {storeInfo.email}
+                {settings.email}
               </a>
             </div>
           </div>

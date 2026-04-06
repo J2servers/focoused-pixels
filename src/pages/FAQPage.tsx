@@ -5,11 +5,13 @@ import { PageSEO, FAQSchema } from '@/components/seo/PageSEO';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { storeInfo } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { MessageCircle, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 
+const FAQPageInner = () => {
+  const settings = useSiteSettings();
 const faqCategories = [
   {
     category: 'Pedidos e Pagamentos',
@@ -20,7 +22,7 @@ const faqCategories = [
       },
       {
         question: 'Quais formas de pagamento vocês aceitam?',
-        answer: `Aceitamos ${storeInfo.footerLinks.payment.join(', ')}. O parcelamento em até ${storeInfo.installments}x sem juros está disponível para cartão de crédito.`,
+        answer: `Aceitamos ${["PIX", "Boleto", "Cartão de Crédito", "Cartão de Débito"].join(', ')}. O parcelamento em até ${settings.installments}x sem juros está disponível para cartão de crédito.`,
       },
       {
         question: 'O pagamento é seguro?',
@@ -37,7 +39,7 @@ const faqCategories = [
     questions: [
       {
         question: 'Qual o prazo de produção?',
-        answer: `O prazo de produção é de ${storeInfo.productionTime}, contados a partir da aprovação do layout e confirmação do pagamento. Pedidos com maior volume podem ter prazos diferenciados.`,
+        answer: `O prazo de produção é de ${settings.productionTime}, contados a partir da aprovação do layout e confirmação do pagamento. Pedidos com maior volume podem ter prazos diferenciados.`,
       },
       {
         question: 'Em qual formato devo enviar minha arte/logo?',
@@ -53,7 +55,7 @@ const faqCategories = [
       },
       {
         question: 'Quais materiais vocês trabalham?',
-        answer: `Trabalhamos com ${storeInfo.customizationOptions.materials.join(', ')}. Cada material tem características específicas e indicações de uso que nossa equipe pode orientar.`,
+        answer: `Trabalhamos com ${["Acrílico Cristal", "Acrílico Espelhado", "MDF", "Acrílico com LED"].join(', ')}. Cada material tem características específicas e indicações de uso que nossa equipe pode orientar.`,
       },
     ],
   },
@@ -62,7 +64,7 @@ const faqCategories = [
     questions: [
       {
         question: 'Como funciona o frete?',
-        answer: `O frete é calculado com base no CEP de entrega. Oferecemos frete grátis para pedidos acima de R$ ${storeInfo.freeShippingMinimum}. Enviamos para todo o Brasil via Correios ou transportadora.`,
+        answer: `O frete é calculado com base no CEP de entrega. Oferecemos frete grátis para pedidos acima de R$ ${settings.freeShippingMinimum}. Enviamos para todo o Brasil via Correios ou transportadora.`,
       },
       {
         question: 'Qual o prazo de entrega?',
@@ -83,7 +85,7 @@ const faqCategories = [
     questions: [
       {
         question: 'Os produtos têm garantia?',
-        answer: `Sim! Oferecemos garantia de ${storeInfo.warranty} contra defeitos de fabricação. A garantia não cobre danos por mau uso, quedas ou exposição inadequada.`,
+        answer: `Sim! Oferecemos garantia de ${settings.warranty} contra defeitos de fabricação. A garantia não cobre danos por mau uso, quedas ou exposição inadequada.`,
       },
       {
         question: 'Posso devolver um produto personalizado?',
@@ -221,7 +223,7 @@ const FAQPage = () => {
                   Nossa equipe está pronta para ajudar! Entre em contato pelo WhatsApp.
                 </p>
                 <a
-                  href={storeInfo.whatsappLink}
+                  href={`https://wa.me/${settings.whatsapp?.replace(/\\D/g, "") || ""}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

@@ -1,9 +1,10 @@
 import { DynamicTopBar, DynamicMainHeader, NavigationBar, DynamicFooter } from '@/components/layout';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
-import { storeInfo } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { PageSEO } from '@/components/seo/PageSEO';
 
 const TermsPage = () => {
+  const settings = useSiteSettings();
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <PageSEO title="Termos de Uso" description="Termos e condições de uso da loja Pincel de Luz Personalizados. Leia antes de realizar sua compra." path="/termos" />
@@ -23,7 +24,7 @@ const TermsPage = () => {
               <section>
                 <h2 className="text-xl font-bold mb-4 text-foreground">1. Aceitação dos Termos</h2>
                 <p className="text-muted-foreground">
-                  Ao acessar e utilizar o site da <strong className="text-foreground">{storeInfo.fullName}</strong>, 
+                  Ao acessar e utilizar o site da <strong className="text-foreground">{settings.companyName}</strong>, 
                   você concorda em cumprir e estar vinculado a estes Termos de Uso. Se você não concordar com 
                   qualquer parte destes termos, não deverá utilizar nosso site.
                 </p>
@@ -42,7 +43,7 @@ const TermsPage = () => {
                   2.3. As medidas informadas podem ter variação de até 2mm devido ao processo de fabricação.
                 </p>
                 <p className="text-muted-foreground">
-                  2.4. O prazo de produção é de {storeInfo.productionTime}, contados a partir da aprovação 
+                  2.4. O prazo de produção é de {settings.productionTime}, contados a partir da aprovação 
                   do layout e confirmação do pagamento.
                 </p>
               </section>
@@ -56,7 +57,7 @@ const TermsPage = () => {
                   3.2. O pedido só será confirmado após a aprovação do pagamento.
                 </p>
                 <p className="text-muted-foreground mb-4">
-                  3.3. Aceitamos as seguintes formas de pagamento: {storeInfo.footerLinks.payment.join(', ')}.
+                  3.3. Aceitamos as seguintes formas de pagamento: {["PIX", "Boleto", "Cartão de Crédito", "Cartão de Débito"].join(', ')}.
                 </p>
                 <p className="text-muted-foreground">
                   3.4. Reservamo-nos o direito de cancelar pedidos em caso de suspeita de fraude.
@@ -88,7 +89,7 @@ const TermsPage = () => {
                   5.1. O prazo de entrega varia de acordo com a localidade e método de envio escolhido.
                 </p>
                 <p className="text-muted-foreground mb-4">
-                  5.2. O frete grátis é válido para pedidos acima de R$ {storeInfo.freeShippingMinimum} 
+                  5.2. O frete grátis é válido para pedidos acima de R$ {settings.freeShippingMinimum} 
                   (consulte condições).
                 </p>
                 <p className="text-muted-foreground mb-4">
@@ -102,7 +103,7 @@ const TermsPage = () => {
               <section>
                 <h2 className="text-xl font-bold mb-4 text-foreground">6. Garantia</h2>
                 <p className="text-muted-foreground mb-4">
-                  6.1. Oferecemos garantia de {storeInfo.warranty} contra defeitos de fabricação.
+                  6.1. Oferecemos garantia de {settings.warranty} contra defeitos de fabricação.
                 </p>
                 <p className="text-muted-foreground mb-4">
                   6.2. A garantia não cobre danos causados por mau uso, quedas, exposição inadequada 
@@ -133,7 +134,7 @@ const TermsPage = () => {
                 <h2 className="text-xl font-bold mb-4 text-foreground">8. Propriedade Intelectual</h2>
                 <p className="text-muted-foreground mb-4">
                   8.1. Todo o conteúdo do site (textos, imagens, logos, design) é propriedade da 
-                  {storeInfo.fullName} e está protegido por leis de propriedade intelectual.
+                  {settings.companyName} e está protegido por leis de propriedade intelectual.
                 </p>
                 <p className="text-muted-foreground">
                   8.2. É proibida a reprodução, distribuição ou uso não autorizado do conteúdo do site.
@@ -143,7 +144,7 @@ const TermsPage = () => {
               <section>
                 <h2 className="text-xl font-bold mb-4 text-foreground">9. Limitação de Responsabilidade</h2>
                 <p className="text-muted-foreground">
-                  A {storeInfo.fullName} não se responsabiliza por danos indiretos, incidentais ou 
+                  A {settings.companyName} não se responsabiliza por danos indiretos, incidentais ou 
                   consequenciais decorrentes do uso ou impossibilidade de uso de nossos produtos ou serviços.
                 </p>
               </section>
@@ -161,7 +162,7 @@ const TermsPage = () => {
                 <h2 className="text-xl font-bold mb-4 text-foreground">11. Lei Aplicável</h2>
                 <p className="text-muted-foreground">
                   Estes Termos de Uso são regidos pelas leis da República Federativa do Brasil. 
-                  Fica eleito o foro da comarca de {storeInfo.address.city}/{storeInfo.address.state} 
+                  Fica eleito o foro da comarca de {settings.address}/{""} 
                   para dirimir quaisquer questões.
                 </p>
               </section>
@@ -172,9 +173,9 @@ const TermsPage = () => {
                   Dúvidas sobre estes Termos de Uso podem ser enviadas para:
                 </p>
                 <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-                  <p className="text-foreground font-medium">{storeInfo.fullName}</p>
-                  <p className="text-muted-foreground">E-mail: {storeInfo.email}</p>
-                  <p className="text-muted-foreground">WhatsApp: {storeInfo.phone}</p>
+                  <p className="text-foreground font-medium">{settings.companyName}</p>
+                  <p className="text-muted-foreground">E-mail: {settings.email}</p>
+                  <p className="text-muted-foreground">WhatsApp: {settings.phone}</p>
                 </div>
               </section>
             </div>

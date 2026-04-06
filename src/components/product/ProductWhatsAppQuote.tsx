@@ -1,6 +1,7 @@
 ﻿import { MessageCircle, ShoppingCart, Truck, Shield, Clock, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { storeInfo, discountTiers } from '@/data/store';
+import { discountTiers } from '@/data/store';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { Product } from '@/data/products';
 
 interface ProductWhatsAppQuoteProps {
@@ -18,6 +19,7 @@ export const ProductWhatsAppQuote = ({
   selectedColor,
   onAddToCart
 }: ProductWhatsAppQuoteProps) => {
+  const settings = useSiteSettings();
   // Calcular desconto
   const getDiscountPercent = (qty: number): number => {
     let discount = 0;
@@ -52,7 +54,8 @@ export const ProductWhatsAppQuote = ({
       (product.customizable ? `\n✨ Este produto é personalizável!\n` : '') +
       `\nPoderia me enviar mais detalhes sobre prazo e personalização?`;
     
-    window.open(`${storeInfo.whatsappLink}?text=${encodeURIComponent(message)}`, '_blank');
+    const whatsappNum = settings.whatsapp?.replace(/\D/g, '') || '';
+    window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const isDisabled = !product.inStock || 
@@ -98,28 +101,28 @@ export const ProductWhatsAppQuote = ({
           <div className="p-1.5 rounded-full bg-secondary">
             <Truck className="h-4 w-4 text-primary" />
           </div>
-          <span>Frete Grátis +R${storeInfo.freeShippingMinimum}</span>
+          <span>Frete Grátis +R${settings.freeShippingMinimum}</span>
         </div>
         
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <div className="p-1.5 rounded-full bg-secondary">
             <Shield className="h-4 w-4 text-primary" />
           </div>
-          <span>{storeInfo.warranty} garantia</span>
+          <span>{settings.warranty} garantia</span>
         </div>
         
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <div className="p-1.5 rounded-full bg-secondary">
             <Clock className="h-4 w-4 text-primary" />
           </div>
-          <span>{storeInfo.productionTime}</span>
+          <span>{settings.productionTime}</span>
         </div>
         
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <div className="p-1.5 rounded-full bg-secondary">
             <Check className="h-4 w-4 text-primary" />
           </div>
-          <span>Parcelamos em {storeInfo.installments}x</span>
+          <span>Parcelamos em {settings.installments}x</span>
         </div>
       </div>
     </div>
