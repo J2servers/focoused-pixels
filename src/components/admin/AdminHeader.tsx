@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Bell, User } from 'lucide-react';
+import { Search, Bell, User, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -9,6 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { UniversalSearch } from './UniversalSearch';
+import { useCompanyInfo, useUpdateCompanyInfo } from '@/hooks/useCompanyInfo';
+import { toast } from 'sonner';
 
 interface AdminHeaderProps { title: string; }
 
@@ -16,6 +18,9 @@ export const AdminHeader = ({ title }: AdminHeaderProps) => {
   const { profile, role, signOut } = useAuthContext();
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
+  const { data: companyInfo } = useCompanyInfo();
+  const updateCompany = useUpdateCompanyInfo();
+  const isDarkMode = companyInfo?.dark_mode_enabled ?? true;
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -56,6 +61,19 @@ export const AdminHeader = ({ title }: AdminHeaderProps) => {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon"
+            onClick={() => {
+              if (!companyInfo?.id) return;
+              updateCompany.mutate(
+                { id: companyInfo.id, data: { dark_mode_enabled: !isDarkMode } as any },
+                { onSuccess: () => toast.success(isDarkMode ? 'Tema claro ativado' : 'Tema escuro ativado') }
+              );
+            }}
+            className="relative text-white/35 hover:text-white hover:bg-white/[0.06]"
+            title={isDarkMode ? 'Mudar para tema claro' : 'Mudar para tema escuro'}>
+            {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+
           <Button variant="ghost" size="icon"
             className="relative text-white/35 hover:text-white hover:bg-white/[0.06]">
             <Bell className="h-5 w-5" />
