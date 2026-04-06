@@ -15,11 +15,11 @@ interface AdminLayoutProps {
   requireAdmin?: boolean;
 }
 
-export const AdminLayout = ({ 
-  children, 
-  title, 
+export const AdminLayout = ({
+  children,
+  title,
   requireEditor = false,
-  requireAdmin = false 
+  requireAdmin = false,
 }: AdminLayoutProps) => {
   const navigate = useNavigate();
   const { user, role, isLoading, canEdit, isAdmin } = useAuthContext();
@@ -37,15 +37,16 @@ export const AdminLayout = ({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--admin-bg))]">
+      <div className="min-h-screen flex items-center justify-center admin-liquid-bg">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-violet-500/30 animate-ping" />
-            <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-violet-500 via-pink-500 to-blue-500 flex items-center justify-center shadow-lg shadow-violet-500/40">
+            <div className="absolute inset-0 rounded-full blur-xl opacity-40"
+              style={{ background: 'linear-gradient(135deg, hsl(280 80% 55%), hsl(210 100% 55%))' }} />
+            <div className="relative w-14 h-14 rounded-2xl liquid-glass flex items-center justify-center">
               <Loader2 className="h-7 w-7 animate-spin text-white" />
             </div>
           </div>
-          <p className="text-sm text-white/40 font-medium">Carregando...</p>
+          <p className="text-sm text-white/40 font-medium tracking-wide">Carregando...</p>
         </div>
       </div>
     );
@@ -54,20 +55,23 @@ export const AdminLayout = ({
   if (!user || !role) return null;
 
   return (
-    <div className="min-h-screen admin-dark bg-[hsl(var(--admin-bg))]">
+    <div className="min-h-screen admin-dark admin-liquid-bg">
       <Helmet>
         <meta name="robots" content="noindex, nofollow" />
         <title>{title} | Admin</title>
       </Helmet>
+
       <AdminSidebar onCollapseChange={setSidebarCollapsed} />
+
       <div className={cn(
-        "flex flex-col min-h-screen transition-all duration-300",
-        isMobile ? "ml-0" : sidebarCollapsed ? "ml-[68px]" : "ml-[260px]"
+        'flex flex-col min-h-screen transition-all duration-300',
+        isMobile ? 'ml-0' : sidebarCollapsed ? 'ml-[68px]' : 'ml-[260px]',
       )}>
         <AdminHeader title={title} />
+
         <main className={cn(
-          "flex-1 overflow-y-auto p-3 md:p-4",
-          isMobile && "pt-16"
+          'flex-1 overflow-y-auto p-4 md:p-6',
+          isMobile && 'pt-16',
         )}>
           <div className="w-full motion-fade-up">{children}</div>
         </main>
