@@ -53,16 +53,16 @@ export function MobileProductSection({
   if (products.length === 0) return null;
 
   return (
-    <section className="py-2.5">
-      <div className="flex items-center justify-between px-3 mb-2">
-        <h2 className="text-sm font-bold">{title}</h2>
+    <section className="py-1.5">
+      <div className="flex items-center justify-between px-3 mb-1.5">
+        <h2 className="text-xs font-bold">{title}</h2>
         {showAll && categorySlug && (
           <Link 
             to={`/categoria/${categorySlug}`} 
-            className="text-xs text-primary font-medium flex items-center"
+            className="text-[10px] text-primary font-medium flex items-center"
           >
             Ver todos
-            <ChevronRight className="h-3.5 w-3.5" />
+            <ChevronRight className="h-3 w-3" />
           </Link>
         )}
       </div>
@@ -70,33 +70,33 @@ export function MobileProductSection({
       <div className="relative">
         {/* Left fade */}
         <div 
-          className="absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none transition-opacity duration-300"
+          className="absolute left-0 top-0 bottom-2 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none transition-opacity duration-300"
           style={{ opacity: showLeftFade ? 1 : 0 }}
         />
         
         {/* Right fade with chevron */}
         <div 
-          className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none flex items-center justify-end pr-1 transition-opacity duration-300"
+          className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none flex items-center justify-end pr-1 transition-opacity duration-300"
           style={{ opacity: showRightFade ? 1 : 0 }}
         >
-          <ChevronRight className="h-5 w-5 text-muted-foreground animate-bounce-x" />
+          <ChevronRight className="h-4 w-4 text-muted-foreground animate-bounce-x" />
         </div>
 
         {/* Horizontal Scroll */}
         <div 
           ref={scrollContainerRef}
-          className="overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory"
+          className="overflow-x-auto pb-1.5 scrollbar-none snap-x snap-mandatory"
           style={{ 
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          <div className="flex gap-2 px-3">
+          <div className="flex gap-1.5 px-3">
             {products.slice(0, 10).map((product, index) => (
               <div
                 key={product.id}
-                className="w-[130px] flex-shrink-0 snap-start"
+                className="w-[115px] flex-shrink-0 snap-start"
               >
                 <MobileProductCard product={product} index={index} />
               </div>
@@ -116,16 +116,14 @@ export function MobileProductGrid({
   title?: string;
 }) {
   return (
-    <section className="py-2.5 px-3">
+    <section className="py-1.5 px-3">
       {title && (
-        <h2 className="text-sm font-bold mb-2">{title}</h2>
+        <h2 className="text-xs font-bold mb-1.5">{title}</h2>
       )}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-3 gap-1.5">
         {products.map((product, index) => (
-          <div key={product.id} className="flex">
-            <div className="w-full">
-              <MobileProductCard product={product} index={index} />
-            </div>
+          <div key={product.id}>
+            <MobileProductCard product={product} index={index} />
           </div>
         ))}
       </div>

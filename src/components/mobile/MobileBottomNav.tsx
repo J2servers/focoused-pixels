@@ -26,7 +26,7 @@ export function MobileBottomNav() {
           borderTop: '1px solid hsl(var(--neon-primary) / 0.15)',
         }}
       >
-        <div className="flex items-center justify-around h-[50px] px-1">
+        <div className="flex items-center justify-around h-[44px] px-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const isCart = item.path === '/carrinho';

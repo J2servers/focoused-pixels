@@ -36,8 +36,8 @@ export function MobileHeroCarousel() {
   }
 
   return (
-    <div className="w-full px-3 py-2">
-      <div className="relative w-full h-[150px] max-w-[600px] mx-auto rounded-xl overflow-hidden neu-raised">
+    <div className="w-full px-3 py-1.5">
+      <div className="relative w-full h-[130px] max-w-[600px] mx-auto rounded-lg overflow-hidden neu-raised">
         <AnimatePresence mode="wait">
           {slides.map((slide, index) => (
             index === currentSlide && (
@@ -56,7 +56,7 @@ export function MobileHeroCarousel() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 
-                <div className="absolute bottom-0 left-0 right-0 p-4">
+                <div className="absolute bottom-0 left-0 right-0 p-3">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -64,14 +64,14 @@ export function MobileHeroCarousel() {
                     className="text-white text-center"
                   >
                     {slide.title && (
-                      <h2 className="text-base font-bold mb-0.5">{slide.title}</h2>
+                      <h2 className="text-sm font-bold mb-0.5">{slide.title}</h2>
                     )}
                     {slide.subtitle && (
-                      <p className="text-xs opacity-90 mb-2 line-clamp-1">{slide.subtitle}</p>
+                      <p className="text-[10px] opacity-90 mb-1.5 line-clamp-1">{slide.subtitle}</p>
                     )}
                     {slide.cta_text && slide.cta_link && (
                       <Link to={slide.cta_link}>
-                        <Button size="sm" variant="secondary" className="font-semibold text-xs h-7 px-4 rounded-xl">
+                        <Button size="sm" variant="secondary" className="font-semibold text-[10px] h-6 px-3 rounded-lg">
                           {slide.cta_text}
                         </Button>
                       </Link>
@@ -84,13 +84,13 @@ export function MobileHeroCarousel() {
         </AnimatePresence>
 
         {slides.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1 z-10">
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === currentSlide ? 'w-5 bg-white' : 'w-1.5 bg-white/50'
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  index === currentSlide ? 'w-4 bg-white' : 'w-1 bg-white/50'
                 }`}
               />
             ))}
