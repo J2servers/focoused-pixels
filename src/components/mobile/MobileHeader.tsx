@@ -8,8 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 import { useCategories } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
-import logoPincel from '@/assets/logo-pincel-de-luz.png';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { resolveBrandImage } from '@/lib/branding';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 
 export function MobileHeader() {
@@ -32,6 +32,7 @@ export function MobileHeader() {
 
   const parentCategories = useMemo(() => categories.filter(c => !c.parent_id), [categories]);
   const mobileLogoHeight = Math.min(Math.max(company?.header_logo_mobile_height ?? 36, 20), 140);
+  const mobileLogo = resolveBrandImage(company?.header_logo, company?.footer_logo);
   const categorySuggestions = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return parentCategories.slice(0, 6);
@@ -99,13 +100,17 @@ export function MobileHeader() {
           </Sheet>
 
           {/* Logo */}
-          <Link to="/" className="absolute left-1/2 -translate-x-1/2" aria-label="Página inicial">
-            <img
-              src={company?.header_logo || logoPincel}
-              alt={company?.company_name || 'Pincel de Luz - Página inicial'}
-              className="w-auto max-w-[160px] object-contain"
-              style={{ height: `${mobileLogoHeight}px` }}
-            />
+          <Link to="/" className="absolute left-1/2 -translate-x-1/2" aria-label={company?.company_name || 'Página inicial'}>
+            {mobileLogo ? (
+              <img
+                src={mobileLogo}
+                alt={company?.company_name || 'Página inicial'}
+                className="w-auto max-w-[160px] object-contain"
+                style={{ height: `${mobileLogoHeight}px` }}
+              />
+            ) : (
+              <span className="text-sm font-semibold text-foreground">{company?.company_name || 'Início'}</span>
+            )}
           </Link>
 
           {/* Right */}
