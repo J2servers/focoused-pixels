@@ -112,7 +112,7 @@ const Index = () => {
   // ═══ Mobile ═══
   if (isMobile) {
     return (
-      <div className="min-h-screen flex flex-col bg-background pb-[52px]">
+      <div className="min-h-screen flex flex-col bg-background pb-[46px]">
         <PageSEO
           title="Pincel de Luz Personalizados | Letreiros LED, Displays e Personalização"
           description="Especialistas em comunicação visual: letreiros LED, displays QR Code, crachás e produtos personalizados. Frete grátis acima de R$ 159."
@@ -160,7 +160,7 @@ const Index = () => {
               </div>
             </div>
           )}
-          <div className="px-4 py-2">
+          <div className="px-2 py-1">
             <GuaranteesSection />
           </div>
           <HowItWorksSection />
