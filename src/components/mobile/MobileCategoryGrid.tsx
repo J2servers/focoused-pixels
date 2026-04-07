@@ -64,11 +64,7 @@ export function MobileCategoryGrid() {
                   className="block group h-full active:scale-[0.98] transition-all duration-200"
                 >
                   <div
-                    className="relative rounded-lg overflow-hidden h-full flex flex-col"
-                    style={{
-                      boxShadow: '0 1px 2px hsl(var(--neu-dark) / 0.08)',
-                      border: '0.4px solid hsl(270 80% 60% / 0.2)',
-                    }}
+                    className="relative rounded-lg overflow-hidden h-full flex flex-col neu-raised"
                   >
                     {/* Neon top accent */}
                     <div
