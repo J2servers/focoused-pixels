@@ -57,7 +57,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
         to={`/produto/${product.slug}`}
         className="block group h-full"
       >
-        <div className="relative rounded-lg transition-all duration-200 active:scale-[0.98] h-full flex flex-col" style={{ boxShadow: '0 1px 3px hsl(var(--neu-dark) / 0.1)', border: '0.4px solid hsl(270 80% 60% / 0.2)' }}>
+        <div className="relative rounded-lg neu-raised transition-all duration-200 active:scale-[0.98] h-full flex flex-col">
           {/* Image */}
           <div className="relative aspect-[4/4] overflow-hidden rounded-t-lg m-[0.5px] mb-0 flex-shrink-0">
             <img
