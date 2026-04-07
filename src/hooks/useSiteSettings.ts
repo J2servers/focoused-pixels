@@ -89,7 +89,7 @@ export function useSiteSettings() {
     seoDescription: settings?.seo_description || 'Produtos personalizados em acrílico, MDF e LED.',
     seoKeywords: settings?.seo_keywords || '',
     ogImage: settings?.og_image || null,
-    faviconUrl: settings?.favicon_url || '/favicon-pincel.png',
+    faviconUrl: settings?.favicon_url || settings?.header_logo || settings?.footer_logo || null,
 
     // Appearance
     primaryColor: settings?.primary_color || '#7c3aed',
