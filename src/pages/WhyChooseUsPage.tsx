@@ -415,10 +415,8 @@ const WhyChooseUsPage = () => {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="min-w-[220px] group border-2 hover:brightness-110 hover:-translate-y-0.5 transition-all"
+                    className="min-w-[220px] group border-2 hover:brightness-110 hover:-translate-y-0.5 transition-all bg-purple-50 text-purple-50"
                     style={{
-                      backgroundColor: 'transparent',
-                      color: 'var(--wcup-text-on-dark)',
                       borderColor: 'rgba(255,255,255,0.3)',
                     }}
                   >
