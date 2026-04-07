@@ -29,11 +29,11 @@ export function MobileCategoryGrid() {
   if (parents.length === 0) return null;
 
   return (
-    <section className="py-4">
-      <div className="flex items-center justify-between px-4 mb-3">
-        <h2 className="text-base font-bold text-foreground">Categorias</h2>
-        <Link to="/categorias" className="text-sm text-primary font-medium flex items-center">
-          Ver todas <ChevronRight className="h-4 w-4" />
+    <section className="py-2.5">
+      <div className="flex items-center justify-between px-3 mb-2">
+        <h2 className="text-sm font-bold text-foreground">Categorias</h2>
+        <Link to="/categorias" className="text-xs text-primary font-medium flex items-center">
+          Ver todas <ChevronRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
@@ -56,30 +56,25 @@ export function MobileCategoryGrid() {
           className="overflow-x-auto pb-2 scrollbar-none"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="flex gap-3 px-4">
+          <div className="flex gap-2 px-3">
             {parents.map((cat) => (
-              <div key={cat.id} className="w-[120px] flex-shrink-0">
+              <div key={cat.id} className="w-[90px] flex-shrink-0">
                 <Link
                   to={`/categoria/${cat.slug}`}
                   className="block group h-full active:scale-[0.98] transition-all duration-200"
                 >
                   <div
-                    className="relative rounded-2xl overflow-hidden h-full flex flex-col"
+                    className="relative rounded-xl overflow-hidden h-full flex flex-col"
                     style={{
-                      boxShadow: `
-                        4px 4px 10px hsl(var(--neu-dark) / var(--neu-intensity)),
-                        -3px -3px 8px hsl(var(--neu-light) / var(--neu-intensity)),
-                        inset 0 1px 0 hsl(0 0% 100% / 0.1)
-                      `,
-                      border: '1.5px solid hsl(270 80% 60% / 0.35)',
+                      boxShadow: '2px 2px 5px hsl(var(--neu-dark) / 0.15), -2px -2px 5px hsl(var(--neu-light) / 0.25)',
+                      border: '0.5px solid hsl(270 80% 60% / 0.25)',
                     }}
                   >
                     {/* Neon top accent */}
                     <div
-                      className="absolute top-0 left-0 right-0 h-[2px] z-10"
+                      className="absolute top-0 left-0 right-0 h-[1px] z-10"
                       style={{
                         background: 'hsl(270 80% 60%)',
-                        boxShadow: '0 0 8px hsl(270 80% 60% / 0.5)',
                       }}
                     />
 
@@ -101,8 +96,8 @@ export function MobileCategoryGrid() {
                     </div>
 
                     {/* Label */}
-                    <div className="p-2 bg-card">
-                      <p className="text-[11px] font-semibold text-foreground leading-tight line-clamp-2 text-center">
+                    <div className="p-1.5 bg-card">
+                      <p className="text-[9px] font-semibold text-foreground leading-tight line-clamp-2 text-center">
                         {cat.name}
                       </p>
                     </div>

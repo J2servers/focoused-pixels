@@ -36,8 +36,8 @@ export function MobileHeroCarousel() {
   }
 
   return (
-    <div className="w-full px-4 py-3">
-      <div className="relative w-full h-[180px] max-w-[600px] mx-auto rounded-2xl overflow-hidden neu-raised">
+    <div className="w-full px-3 py-2">
+      <div className="relative w-full h-[150px] max-w-[600px] mx-auto rounded-xl overflow-hidden neu-raised">
         <AnimatePresence mode="wait">
           {slides.map((slide, index) => (
             index === currentSlide && (
