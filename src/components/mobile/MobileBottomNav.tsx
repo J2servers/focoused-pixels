@@ -19,19 +19,14 @@ export function MobileBottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-pb" role="navigation" aria-label="Navegação principal">
       <div
-        className="mx-3 mb-2 rounded-2xl overflow-hidden"
+        className="mx-0 mb-0 overflow-hidden"
         style={{
           background: 'hsl(var(--background))',
-          boxShadow: `
-            6px 6px 16px hsl(var(--neu-dark) / 0.3),
-            -6px -6px 16px hsl(var(--neu-light) / 0.5),
-            inset 0 1px 0 hsl(var(--neu-light) / 0.4),
-            inset 0 -1px 0 hsl(var(--neu-dark) / 0.05)
-          `,
-          border: '1px solid hsl(var(--neon-primary) / 0.2)',
+          boxShadow: '0 -1px 4px hsl(var(--neu-dark) / 0.12)',
+          borderTop: '1px solid hsl(var(--neon-primary) / 0.15)',
         }}
       >
-        <div className="flex items-center justify-around h-[60px] px-1">
+        <div className="flex items-center justify-around h-[50px] px-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const isCart = item.path === '/carrinho';
@@ -45,24 +40,19 @@ export function MobileBottomNav() {
                 aria-current={isActive ? 'page' : undefined}
               >
                 <motion.div
-                  whileTap={{ scale: 0.85 }}
-                  className="relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300"
+                  whileTap={{ scale: 0.9 }}
+                  className="relative w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200"
                   style={isActive ? {
-                    background: 'hsl(var(--background))',
-                    boxShadow: `inset 3px 3px 6px hsl(var(--neu-dark) / 0.35),
-                                inset -3px -3px 6px hsl(var(--neu-light) / 0.5)`,
-                    border: '1px solid hsl(var(--neon-primary) / 0.4)',
+                    background: 'hsl(var(--primary) / 0.1)',
+                    border: '1px solid hsl(var(--neon-primary) / 0.3)',
                   } : {
-                    background: 'hsl(var(--background))',
-                    boxShadow: `2px 2px 5px hsl(var(--neu-dark) / 0.15),
-                                -2px -2px 5px hsl(var(--neu-light) / 0.3),
-                                inset 0 1px 0 hsl(var(--neu-light) / 0.2)`,
+                    background: 'transparent',
                     border: '1px solid transparent',
                   }}
                 >
                   <item.icon
                     className={cn(
-                      "h-5 w-5 transition-all duration-300",
+                      "h-4 w-4 transition-all duration-200",
                       isActive ? "text-primary stroke-[2.5px]" : "text-muted-foreground stroke-[1.8px]"
                     )}
                     aria-hidden="true"
@@ -86,7 +76,7 @@ export function MobileBottomNav() {
 
                 <span
                   className={cn(
-                    "text-[10px] mt-0.5 transition-all duration-300",
+                    "text-[9px] mt-0 transition-all duration-200 leading-none",
                     isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
                   )}
                 >

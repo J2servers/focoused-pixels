@@ -1121,7 +1121,7 @@
 .typing-dot:nth-child(2) { animation: typingDot 1.2s ease-in-out 0.2s infinite; }
 .typing-dot:nth-child(3) { animation: typingDot 1.2s ease-in-out 0.4s infinite; }
 
-/* ═══ Mobile overflow fix ═══ */
+/* ═══ Mobile structural density redesign ═══ */
 @media (max-width: 768px) {
   html, body {
     overflow-x: clip !important;
@@ -1135,35 +1135,43 @@
     width: 100%;
   }
 
-  /* Container must not add side margins on mobile */
   .container {
     max-width: 100% !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
   }
 
-  /* Reduce neumorphism shadows on mobile */
+  /* Kill heavy neumorphic shadows on mobile — keep subtle depth only */
+  .neu-flat,
   .neu-concave,
   .neu-convex,
-  .neu-raised {
-    --neu-distance: 3px;
-    --neu-blur: 6px;
-    --neu-intensity: 0.4;
+  .neu-raised,
+  .neu-pressed {
+    --neu-distance: 2px;
+    --neu-blur: 4px;
+    --neu-intensity: 0.25;
+    --neu-inner-distance: 1px;
+    --neu-inner-blur: 3px;
   }
 
-  /* Reduce animated neon border thickness 55% on mobile */
+  /* Thinner animated borders */
   :root {
     --neon-border-width: 0.45px;
   }
-
+  .neu-flat::before,
+  .neu-raised::before,
+  .neu-pressed::before,
+  .neu-concave::before,
+  .neu-convex::before,
+  .neu-btn::before,
+  .shadow-product::before,
   .neon-border-gradient::before {
-    padding: 0.45px !important;
+    padding: 0.5px !important;
   }
 
-  .p-\[1\.5px\] {
-    padding: 0.7px !important;
-  }
-  .p-\[2px\] {
-    padding: 0.9px !important;
+  /* Remove hover lift on mobile */
+  .neu-raised:hover,
+  .neu-convex:hover {
+    transform: none;
   }
 }

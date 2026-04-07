@@ -69,7 +69,7 @@ export function MobileHeader() {
           borderBottom: '1px solid hsl(var(--neon-primary) / 0.2)',
         }}
       >
-        <div className="flex items-center justify-between h-16 px-4">
+        <div className="flex items-center justify-between h-12 px-3">
           {/* Menu */}
           <Sheet>
             <SheetTrigger asChild>
@@ -244,7 +244,7 @@ export function MobileHeader() {
       </AnimatePresence>
 
       {/* Promo Strip */}
-      <div className="py-1.5 text-center text-[11px] font-semibold" style={{
+      <div className="py-1 text-center text-[10px] font-semibold" style={{
         background: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--purple-dark)))',
         color: 'hsl(var(--primary-foreground))',
       }}>
