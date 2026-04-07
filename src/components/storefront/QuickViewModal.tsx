@@ -9,6 +9,7 @@ import { useCart } from '@/hooks/useCart';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
 interface Product {
   id: string;
@@ -37,7 +38,7 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
-  const { whatsapp, whatsappMessageTemplate } = useSiteSettings();
+  const { whatsapp } = useSiteSettings();
   const navigate = useNavigate();
 
   if (!product) return null;
@@ -58,8 +59,9 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
 
   const handleWhatsApp = () => {
     const message = `Olá! Tenho interesse no produto: ${product.name} - R$ ${product.price.toFixed(2).replace('.', ',')}`;
-    const phone = whatsapp?.replace(/\D/g, '');
-    window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(message)}`, '_blank');
+    const whatsappLink = buildWhatsAppUrl(whatsapp, message);
+    if (!whatsappLink) return;
+    window.open(whatsappLink, '_blank');
   };
 
   const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % allImages.length);

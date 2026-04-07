@@ -14,13 +14,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, Home, MessageCircle, Clock } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
 const QuoteSuccessPage = () => {
-  const { checkoutSuccessMessage, whatsapp, whatsappMessageTemplate } = useSiteSettings();
+  const { checkoutSuccessMessage, whatsapp } = useSiteSettings();
 
-  const whatsappLink = whatsapp 
-    ? `https://wa.me/${whatsapp}?text=${encodeURIComponent('Olá! Acabei de enviar um orçamento pelo site e gostaria de mais informações.')}`
-    : '#';
+  const whatsappLink = buildWhatsAppUrl(whatsapp, 'Olá! Acabei de enviar um orçamento pelo site e gostaria de mais informações.');
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -63,7 +62,7 @@ const QuoteSuccessPage = () => {
                 </Button>
               </Link>
 
-              {whatsapp && (
+              {whatsappLink && (
                 <a
                   href={whatsappLink}
                   target="_blank"

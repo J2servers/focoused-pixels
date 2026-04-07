@@ -2,7 +2,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useCompanyInfo } from '@/hooks/useCompanyInfo';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
 // WhatsApp icon
 const WhatsAppIcon = () => (
@@ -13,11 +14,12 @@ const WhatsAppIcon = () => (
 
 export function MobileFloatingContact() {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: company } = useCompanyInfo();
+  const { whatsapp, phone } = useSiteSettings();
 
-  const whatsappNumber = company?.whatsapp?.replace(/\D/g, '') || '';
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Olá! Vim pelo site e gostaria de mais informações.`;
-  const phoneUrl = `tel:${company?.phone?.replace(/\D/g, '') || ''}`;
+  const whatsappUrl = buildWhatsAppUrl(whatsapp, 'Olá! Vim pelo site e gostaria de mais informações.');
+  const phoneUrl = phone ? `tel:${phone.replace(/\D/g, '')}` : '';
+
+  if (!whatsappUrl && !phoneUrl) return null;
 
   return (
     <>
@@ -44,22 +46,26 @@ export function MobileFloatingContact() {
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
             className="fixed bottom-32 right-4 z-50 flex flex-col gap-3"
           >
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-[#25D366] text-white px-4 py-3 rounded-full shadow-lg"
-            >
-              <WhatsAppIcon />
-              <span className="font-medium text-sm">WhatsApp</span>
-            </a>
-            <a
-              href={phoneUrl}
-              className="flex items-center gap-3 bg-primary text-primary-foreground px-4 py-3 rounded-full shadow-lg"
-            >
-              <Phone className="h-5 w-5" />
-              <span className="font-medium text-sm">Ligar</span>
-            </a>
+            {whatsappUrl && (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 bg-[#25D366] text-white px-4 py-3 rounded-full shadow-lg"
+              >
+                <WhatsAppIcon />
+                <span className="font-medium text-sm">WhatsApp</span>
+              </a>
+            )}
+            {phoneUrl && (
+              <a
+                href={phoneUrl}
+                className="flex items-center gap-3 bg-primary text-primary-foreground px-4 py-3 rounded-full shadow-lg"
+              >
+                <Phone className="h-5 w-5" />
+                <span className="font-medium text-sm">Ligar</span>
+              </a>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

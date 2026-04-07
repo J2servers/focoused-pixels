@@ -216,16 +216,18 @@ const FAQPage = () => {
                   <p className="text-muted-foreground mb-6">
                     Nossa equipe está pronta para ajudar! Entre em contato pelo WhatsApp.
                   </p>
-                  <a
-                    href={`https://wa.me/${settings.whatsapp?.replace(/\D/g, "") || ""}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button size="lg" className="bg-success hover:bg-success/90">
-                      <MessageCircle className="h-5 w-5 mr-2" />
-                      Falar no WhatsApp
-                    </Button>
-                  </a>
+                  {settings.whatsappLink && (
+                    <a
+                      href={settings.whatsappLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button size="lg" className="bg-success hover:bg-success/90">
+                        <MessageCircle className="h-5 w-5 mr-2" />
+                        Falar no WhatsApp
+                      </Button>
+                    </a>
+                  )}
                 </CardContent>
               </Card>
             </div>

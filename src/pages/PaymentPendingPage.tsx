@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, Home, MessageCircle, Mail } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
 const PaymentPendingPage = () => {
   const { whatsapp, email } = useSiteSettings();
@@ -11,9 +12,7 @@ const PaymentPendingPage = () => {
   
   const paymentId = searchParams.get('payment_id');
 
-  const whatsappLink = whatsapp 
-    ? `https://wa.me/${whatsapp}?text=${encodeURIComponent('Olá! Fiz um pagamento via boleto e gostaria de confirmar.')}`
-    : '#';
+  const whatsappLink = buildWhatsAppUrl(whatsapp, 'Olá! Fiz um pagamento via boleto e gostaria de confirmar.');
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -71,7 +70,7 @@ const PaymentPendingPage = () => {
                 </Button>
               </Link>
 
-              {whatsapp && (
+              {whatsappLink && (
                 <a
                   href={whatsappLink}
                   target="_blank"

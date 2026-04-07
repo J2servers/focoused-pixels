@@ -310,15 +310,17 @@ export default function TrackingPage() {
                     <p className="text-muted-foreground mb-4">
                       Tem dúvidas sobre seu pedido? Entre em contato conosco!
                     </p>
-                    <Button variant="outline" asChild>
-                      <a 
-                        href={`https://wa.me/${siteSettings.whatsapp?.replace(/\D/g, '') || ''}`} 
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Falar no WhatsApp
-                      </a>
-                    </Button>
+                    {siteSettings.whatsappLink && (
+                      <Button variant="outline" asChild>
+                        <a 
+                          href={siteSettings.whatsappLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Falar no WhatsApp
+                        </a>
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>

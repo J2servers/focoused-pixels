@@ -19,6 +19,7 @@ import { PromotionCountdown } from '@/components/conversion/PromotionCountdown';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { 
   Package, 
   Truck, 
@@ -122,15 +123,15 @@ const CustomerAreaPage = () => {
   };
 
   const handlePostPurchaseFollowUp = (order: typeof orders[number]) => {
-    const whatsappNumber = (siteSettings.whatsapp || '').replace(/\D/g, '');
     const message = [
       `Olá! Recebi o pedido ${order.order_number} e quero participar da recompensa de cliente.`,
       'Quero enviar foto + avaliação para ganhar meu cupom especial.',
       `Nome: ${order.customer_name}`,
       `E-mail: ${order.customer_email}`,
     ].join('\n');
-    if (!whatsappNumber) return;
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    const whatsappLink = buildWhatsAppUrl(siteSettings.whatsapp, message);
+    if (!whatsappLink) return;
+    window.open(whatsappLink, '_blank');
   };
 
   const getStatusColor = (status: string) => {

@@ -12,6 +12,7 @@ import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 import { CartCrossSell } from '@/components/cart/CartCrossSell';
 import { PageSEO } from '@/components/seo/PageSEO';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
 const CartPage = () => {
   const { items, removeItem, updateQuantity, total, clearCart, itemCount } = useCart();
@@ -21,7 +22,6 @@ const CartPage = () => {
   const handleCheckoutWhatsApp = () => {
     if (items.length === 0) return;
 
-    const whatsappNumber = (siteSettings.whatsapp || '').replace(/\D/g, '');
     const itemsList = items
       .map(item => `- ${item.name}${item.size ? ` (${item.size})` : ''} | Qtd: ${item.quantity} | R$ ${(item.price * item.quantity).toFixed(2)}`)
       .join('\n');
@@ -38,12 +38,10 @@ const CartPage = () => {
       'Pode me ajudar com o fechamento e prazo de produção?',
     ].join('\n');
 
-    if (whatsappNumber) {
-      window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-      return;
-    }
+    const whatsappLink = buildWhatsAppUrl(siteSettings.whatsapp, message);
+    if (!whatsappLink) return;
 
-    window.open(`${`https://wa.me/${siteSettings.whatsapp?.replace(/\\D/g, "") || ""}`}?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(whatsappLink, '_blank');
   };
 
   const handlePayNow = () => {

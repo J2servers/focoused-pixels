@@ -137,17 +137,19 @@ export function CheckoutCartSummary({ items, total }: CheckoutCartSummaryProps) 
       {/* Contact */}
       <Card>
         <CardContent className="pt-6">
-          <p className="text-sm text-center text-muted-foreground">
-            Dúvidas? Fale conosco pelo{' '}
-            <a
-              href={`https://wa.me/${settings.whatsapp?.replace(/\D/g, '') || ''}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-success font-medium hover:underline"
-            >
-              WhatsApp
-            </a>
-          </p>
+          {settings.whatsappLink && (
+            <p className="text-sm text-center text-muted-foreground">
+              Dúvidas? Fale conosco pelo{' '}
+              <a
+                href={settings.whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-success font-medium hover:underline"
+              >
+                WhatsApp
+              </a>
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
