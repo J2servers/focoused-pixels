@@ -64,12 +64,12 @@ export function MobileHeader() {
         style={{
           background: 'hsl(var(--background))',
           boxShadow: scrolled
-            ? `0 4px 16px hsl(var(--neu-dark) / 0.25), inset 0 -1px 0 hsl(var(--neu-dark) / 0.06), inset 0 1px 0 hsl(var(--neu-light) / 0.5)`
-            : `0 2px 8px hsl(var(--neu-dark) / 0.12), inset 0 1px 0 hsl(var(--neu-light) / 0.4)`,
-          borderBottom: '1px solid hsl(var(--neon-primary) / 0.2)',
+            ? `0 1px 4px hsl(var(--neu-dark) / 0.1)`
+            : `0 1px 2px hsl(var(--neu-dark) / 0.06)`,
+          borderBottom: '1px solid hsl(var(--neon-primary) / 0.12)',
         }}
       >
-        <div className="flex items-center justify-between h-12 px-3">
+        <div className="flex items-center justify-between h-10 px-2">
           {/* Menu */}
           <Sheet>
             <SheetTrigger asChild>
