@@ -1310,3 +1310,14 @@
   border-color: hsl(255 20% 25%) !important;
   background: hsl(255 20% 25%) !important;
 }
+
+/* ═══ ADMIN SHADOW NUKE — Remove ALL shadows from admin panel ═══ */
+.admin-liquid-bg *,
+.admin-liquid-bg *::before,
+.admin-liquid-bg *::after,
+[role="dialog"][data-state] *,
+[role="dialog"][data-state] *::before,
+[role="dialog"][data-state] *::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
