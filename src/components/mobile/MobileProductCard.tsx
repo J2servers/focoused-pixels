@@ -57,9 +57,9 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
         to={`/produto/${product.slug}`}
         className="block group h-full"
       >
-        <div className="relative rounded-2xl neu-raised transition-all duration-300 active:scale-[0.98] h-full flex flex-col">
-          {/* Image - fixed aspect ratio */}
-          <div className="relative aspect-square overflow-hidden rounded-t-2xl m-[2px] mb-0 flex-shrink-0">
+        <div className="relative rounded-xl neu-raised transition-all duration-200 active:scale-[0.98] h-full flex flex-col">
+          {/* Image */}
+          <div className="relative aspect-[4/5] overflow-hidden rounded-t-xl m-[1px] mb-0 flex-shrink-0">
             <img
               src={product.image}
               alt={product.name}
@@ -69,66 +69,66 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             />
             
             {/* Badges */}
-            <div className="absolute top-2 left-2 flex flex-col gap-1">
+            <div className="absolute top-1.5 left-1.5 flex flex-col gap-0.5">
               {product.badge === 'lancamento' && (
-                <Badge className="bg-accent text-accent-foreground text-[10px] px-1.5 py-0.5 rounded-xl">
+                <Badge className="bg-accent text-accent-foreground text-[8px] px-1 py-0 rounded-lg leading-tight">
                   DESTAQUE
                 </Badge>
               )}
               {hasDiscount && (
-                <Badge className="bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-xl animate-pulse shadow-[0_0_10px_hsl(0_80%_50%/0.5)]">
+                <Badge className="bg-destructive text-destructive-foreground text-[8px] px-1 py-0 rounded-lg animate-pulse">
                   -{discountPercent}%
                 </Badge>
               )}
               {!product.inStock && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 rounded-xl">
+                <Badge variant="secondary" className="text-[8px] px-1 py-0 rounded-lg">
                   ESGOTADO
                 </Badge>
               )}
             </div>
 
             {/* Quick Add Button */}
-            <div className="absolute bottom-2 right-2">
+            <div className="absolute bottom-1.5 right-1.5">
               <Button
                 size="icon"
                 onClick={handleAddToCart}
                 disabled={!product.inStock}
-                className="h-9 w-9 rounded-xl shadow-lg"
+                className="h-7 w-7 rounded-lg shadow-sm"
               >
-                <ShoppingCart className="h-4 w-4" />
+                <ShoppingCart className="h-3 w-3" />
               </Button>
             </div>
           </div>
 
-          {/* Content - fixed heights for uniformity */}
-          <div className="p-3 flex flex-col flex-grow mx-[2px] mb-[2px]">
-            <h3 className="font-medium text-xs text-foreground line-clamp-2 h-8 leading-tight">
+          {/* Content */}
+          <div className="p-2 flex flex-col flex-grow mx-[1px] mb-[1px]">
+            <h3 className="font-medium text-[10px] text-foreground line-clamp-2 leading-tight min-h-[24px]">
               {product.name}
             </h3>
             
-            {/* Price - fixed height block */}
-            <div className="mt-auto pt-1.5">
-              <div className="h-4">
+            {/* Price */}
+            <div className="mt-auto pt-1">
+              <div className="h-3">
                 {hasDiscount && product.originalPrice ? (
-                  <p className="text-[10px] text-muted-foreground line-through leading-none">
+                  <p className="text-[8px] text-muted-foreground line-through leading-none">
                     R$ {product.originalPrice.toFixed(2).replace('.', ',')}
                   </p>
                 ) : <div />}
               </div>
-              <p className="text-base font-bold text-primary leading-tight">
+              <p className="text-sm font-bold text-primary leading-tight">
                 R$ {product.price.toFixed(2).replace('.', ',')}
               </p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">
+              <p className="text-[8px] text-muted-foreground mt-0.5">
                 ou 12x de R$ {(product.price / 12).toFixed(2).replace('.', ',')}
               </p>
             </div>
 
             {/* Free Shipping Badge */}
-            <div className="h-5 mt-1.5">
+            <div className="h-4 mt-1">
               {product.freeShipping && (
-                <div className="flex items-center gap-1 text-success">
-                  <Truck className="h-3 w-3" />
-                  <span className="text-[10px] font-medium">Frete Grátis</span>
+                <div className="flex items-center gap-0.5 text-success">
+                  <Truck className="h-2.5 w-2.5" />
+                  <span className="text-[8px] font-medium">Frete Grátis</span>
                 </div>
               )}
             </div>
