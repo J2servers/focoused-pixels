@@ -52,8 +52,8 @@ export function DynamicMainHeader() {
         className="absolute inset-0 transition-all duration-700"
         style={{
           background: scrolled
-            ? 'hsl(var(--background) / 0.85)'
-            : 'hsl(var(--background) / 0.95)',
+            ? 'hsl(var(--background) / 0.25)'
+            : 'hsl(var(--background) / 0.30)',
           backdropFilter: scrolled ? 'blur(20px) saturate(1.4)' : 'blur(12px)',
           WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(1.4)' : 'blur(12px)',
         }}
