@@ -68,7 +68,7 @@ export function MobileFloatingContact() {
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         whileTap={{ scale: 0.9 }}
-        className="fixed bottom-12 right-2 z-50 w-10 h-10 rounded-full bg-[#25D366] text-white shadow-sm flex items-center justify-center"
+        className="fixed bottom-14 right-3 z-50 w-11 h-11 rounded-full bg-[#25D366] text-white shadow-md flex items-center justify-center"
       >
         <AnimatePresence mode="wait">
           {isOpen ? (

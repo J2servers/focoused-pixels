@@ -53,9 +53,9 @@ export function MobileProductSection({
   if (products.length === 0) return null;
 
   return (
-    <section className="py-1.5">
-      <div className="flex items-center justify-between px-2 mb-1">
-        <h2 className="text-xs font-bold">{title}</h2>
+    <section className="py-2.5">
+      <div className="flex items-center justify-between px-3 mb-2">
+        <h2 className="text-sm font-bold">{title}</h2>
         {showAll && categorySlug && (
           <Link 
             to={`/categoria/${categorySlug}`} 
@@ -92,11 +92,11 @@ export function MobileProductSection({
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          <div className="flex gap-1.5 px-2">
+          <div className="flex gap-2 px-3">
             {products.slice(0, 10).map((product, index) => (
               <div
                 key={product.id}
-                className="w-[120px] flex-shrink-0 snap-start"
+                className="w-[130px] flex-shrink-0 snap-start"
               >
                 <MobileProductCard product={product} index={index} />
               </div>
@@ -116,11 +116,11 @@ export function MobileProductGrid({
   title?: string;
 }) {
   return (
-    <section className="py-1.5 px-2">
+    <section className="py-2.5 px-3">
       {title && (
         <h2 className="text-sm font-bold mb-2">{title}</h2>
       )}
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className="grid grid-cols-2 gap-2">
         {products.map((product, index) => (
           <div key={product.id} className="flex">
             <div className="w-full">

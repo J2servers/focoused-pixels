@@ -1140,23 +1140,22 @@
     padding-right: 0.5rem !important;
   }
 
-  /* Kill heavy neumorphic shadows on mobile — near-flat with minimal depth */
+  /* Kill heavy neumorphic shadows on mobile — keep subtle depth only */
   .neu-flat,
   .neu-concave,
   .neu-convex,
   .neu-raised,
   .neu-pressed {
-    --neu-distance: 1px;
-    --neu-blur: 2px;
-    --neu-intensity: 0.15;
+    --neu-distance: 2px;
+    --neu-blur: 4px;
+    --neu-intensity: 0.25;
     --neu-inner-distance: 1px;
-    --neu-inner-blur: 2px;
-    box-shadow: 0 1px 3px hsl(var(--neu-dark) / 0.12) !important;
+    --neu-inner-blur: 3px;
   }
 
   /* Thinner animated borders */
   :root {
-    --neon-border-width: 0.4px;
+    --neon-border-width: 0.45px;
   }
   .neu-flat::before,
   .neu-raised::before,
@@ -1166,13 +1165,12 @@
   .neu-btn::before,
   .shadow-product::before,
   .neon-border-gradient::before {
-    padding: 0.4px !important;
+    padding: 0.5px !important;
   }
 
   /* Remove hover lift on mobile */
   .neu-raised:hover,
   .neu-convex:hover {
-    transform: none !important;
-    box-shadow: 0 1px 3px hsl(var(--neu-dark) / 0.12) !important;
+    transform: none;
   }
 }
