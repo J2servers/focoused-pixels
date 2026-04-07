@@ -54,8 +54,8 @@ export function MobileProductSection({
 
   return (
     <section className="py-1.5">
-      <div className="flex items-center justify-between px-3 mb-2">
-        <h2 className="text-sm font-bold">{title}</h2>
+      <div className="flex items-center justify-between px-2 mb-1">
+        <h2 className="text-xs font-bold">{title}</h2>
         {showAll && categorySlug && (
           <Link 
             to={`/categoria/${categorySlug}`} 

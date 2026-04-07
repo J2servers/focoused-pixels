@@ -30,8 +30,8 @@ export function MobileCategoryGrid() {
 
   return (
     <section className="py-1.5">
-      <div className="flex items-center justify-between px-3 mb-2">
-        <h2 className="text-sm font-bold text-foreground">Categorias</h2>
+      <div className="flex items-center justify-between px-2 mb-1">
+        <h2 className="text-xs font-bold text-foreground">Categorias</h2>
         <Link to="/categorias" className="text-xs text-primary font-medium flex items-center">
           Ver todas <ChevronRight className="h-3.5 w-3.5" />
         </Link>

@@ -244,7 +244,7 @@ export function MobileHeader() {
       </AnimatePresence>
 
       {/* Promo Strip */}
-      <div className="py-1 text-center text-[10px] font-semibold" style={{
+      <div className="py-0.5 text-center text-[9px] font-semibold" style={{
         background: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--purple-dark)))',
         color: 'hsl(var(--primary-foreground))',
       }}>
