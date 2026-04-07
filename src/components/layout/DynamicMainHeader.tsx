@@ -9,7 +9,7 @@ import { useCart } from '@/hooks/useCart';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 import { useCategories } from '@/hooks/useProducts';
 import { motion, AnimatePresence } from 'framer-motion';
-import logoPincelDeLuz from '@/assets/logo-pincel-de-luz.png';
+import { resolveBrandImage } from '@/lib/branding';
 
 export function DynamicMainHeader() {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export function DynamicMainHeader() {
     }
   };
 
-  const headerLogo = company?.header_logo || logoPincelDeLuz;
+  const headerLogo = resolveBrandImage(company?.header_logo, company?.footer_logo);
   const headerLogoHeight = Math.min(Math.max(company?.header_logo_height ?? 64, 24), 180);
 
   return (
@@ -99,14 +99,18 @@ export function DynamicMainHeader() {
 
           {/* Logo */}
           <Link to="/" className="flex-shrink-0 group">
-            <motion.img
-              src={headerLogo}
-              alt={company?.company_name || 'Logo'}
-              className="w-auto max-w-[240px] object-contain"
-              style={{ height: `${headerLogoHeight}px` }}
-              whileHover={{ scale: 1.03 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            />
+            {headerLogo ? (
+              <motion.img
+                src={headerLogo}
+                alt={company?.company_name || 'Logo'}
+                className="w-auto max-w-[240px] object-contain"
+                style={{ height: `${headerLogoHeight}px` }}
+                whileHover={{ scale: 1.03 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+              />
+            ) : (
+              <span className="text-xl font-semibold text-foreground">{company?.company_name || 'Início'}</span>
+            )}
           </Link>
 
           {/* Desktop search */}
