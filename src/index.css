@@ -1154,8 +1154,8 @@
     box-shadow:
       var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
       calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity)),
-      inset 1px 1px 2px hsl(var(--neu-light) / 0.3),
-      inset -1px -1px 2px hsl(var(--neu-dark) / 0.1) !important;
+      inset 2px 2px 5px hsl(var(--neu-dark) / 0.25),
+      inset -2px -2px 5px hsl(var(--neu-light) / 0.2) !important;
   }
 
   /* Product card shadow with depth */
