@@ -1204,3 +1204,80 @@
     overflow-x: clip;
   }
 }
+
+/* ═══ Admin Modal/Dialog Dark Contrast Fix ═══ */
+/* Force dark themed backgrounds on all overlays inside admin routes */
+[data-radix-dialog-content] {
+  background: hsl(250 25% 12%) !important;
+  color: hsl(0 0% 95%) !important;
+  border-color: hsl(255 20% 22%) !important;
+}
+
+[data-radix-dialog-overlay] {
+  background: hsl(0 0% 0% / 0.7) !important;
+}
+
+[data-radix-dialog-content] label,
+[data-radix-dialog-content] h2,
+[data-radix-dialog-content] h3,
+[data-radix-dialog-content] h4,
+[data-radix-dialog-content] p,
+[data-radix-dialog-content] span,
+[data-radix-dialog-content] div {
+  color: hsl(0 0% 92%);
+}
+
+[data-radix-dialog-content] .text-muted-foreground {
+  color: hsl(250 15% 65%) !important;
+}
+
+/* Inputs inside modals */
+[data-radix-dialog-content] input,
+[data-radix-dialog-content] textarea,
+[data-radix-dialog-content] select,
+[data-radix-dialog-content] [role="combobox"],
+[data-radix-dialog-content] [data-radix-select-trigger] {
+  background: hsl(250 25% 16%) !important;
+  border-color: hsl(255 20% 25%) !important;
+  color: hsl(0 0% 95%) !important;
+}
+
+[data-radix-dialog-content] input::placeholder,
+[data-radix-dialog-content] textarea::placeholder {
+  color: hsl(250 15% 50%) !important;
+}
+
+/* Select content dropdowns */
+[data-radix-select-content] {
+  background: hsl(250 25% 14%) !important;
+  border-color: hsl(255 20% 22%) !important;
+  color: hsl(0 0% 95%) !important;
+}
+
+[data-radix-select-content] [data-radix-select-item] {
+  color: hsl(0 0% 90%) !important;
+}
+
+[data-radix-select-content] [data-radix-select-item][data-highlighted] {
+  background: hsl(280 70% 55% / 0.25) !important;
+  color: hsl(0 0% 100%) !important;
+}
+
+/* Drawer content */
+[data-vaul-drawer] {
+  background: hsl(250 25% 12%) !important;
+  color: hsl(0 0% 95%) !important;
+  border-color: hsl(255 20% 22%) !important;
+}
+
+/* Cards inside modals */
+[data-radix-dialog-content] .bg-card,
+[data-radix-dialog-content] .bg-background,
+[data-radix-dialog-content] .bg-muted {
+  background: hsl(250 25% 15%) !important;
+}
+
+/* Badge readability */
+[data-radix-dialog-content] .border {
+  border-color: hsl(255 20% 25%);
+}
