@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { discountTiers } from '@/data/store';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { Product } from '@/data/products';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
 interface ProductWhatsAppQuoteProps {
   product: Product;
@@ -54,8 +55,9 @@ export const ProductWhatsAppQuote = ({
       (product.customizable ? `\n✨ Este produto é personalizável!\n` : '') +
       `\nPoderia me enviar mais detalhes sobre prazo e personalização?`;
     
-    const whatsappNum = settings.whatsapp?.replace(/\D/g, '') || '';
-    window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(message)}`, '_blank');
+    const whatsappUrl = buildWhatsAppUrl(settings.whatsapp, message);
+    if (!whatsappUrl) return;
+    window.open(whatsappUrl, '_blank');
   };
 
   const isDisabled = !product.inStock || 

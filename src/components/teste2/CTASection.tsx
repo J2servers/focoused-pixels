@@ -29,9 +29,9 @@ export function CTASection() {
             >
               Solicitar Orçamento <ArrowRight className="h-4 w-4" />
             </Link>
-            {settings.whatsapp && (
+            {settings.whatsappLink && (
               <a
-                href={`https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(settings.whatsappMessageTemplate)}`}
+                href={settings.whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-sm

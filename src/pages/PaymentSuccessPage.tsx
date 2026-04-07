@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Home, Package, MessageCircle } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
 const PaymentSuccessPage = () => {
   const { checkoutSuccessMessage, whatsapp } = useSiteSettings();
@@ -28,9 +29,7 @@ const PaymentSuccessPage = () => {
     };
   }, []);
 
-  const whatsappLink = whatsapp 
-    ? `https://wa.me/${whatsapp}?text=${encodeURIComponent('Olá! Acabei de realizar um pagamento e gostaria de confirmar meu pedido.')}`
-    : '#';
+  const whatsappLink = buildWhatsAppUrl(whatsapp, 'Olá! Acabei de realizar um pagamento e gostaria de confirmar meu pedido.');
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -81,7 +80,7 @@ const PaymentSuccessPage = () => {
                 </Button>
               </Link>
 
-              {whatsapp && (
+              {whatsappLink && (
                 <a
                   href={whatsappLink}
                   target="_blank"

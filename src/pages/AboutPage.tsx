@@ -189,14 +189,16 @@ const AboutPage = () => {
               Nossa equipe está pronta para ajudar!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href={`https://wa.me/${settings.whatsapp?.replace(/\D/g, '') || ''}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-8 py-3 bg-success text-success-foreground rounded-lg font-semibold hover:bg-success/90 transition-colors"
-              >
-                Falar no WhatsApp
-              </a>
+              {settings.whatsappLink && (
+                <a
+                  href={settings.whatsappLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-8 py-3 bg-success text-success-foreground rounded-lg font-semibold hover:bg-success/90 transition-colors"
+                >
+                  Falar no WhatsApp
+                </a>
+              )}
               <a
                 href={`mailto:${settings.email}`}
                 className="inline-flex items-center justify-center px-8 py-3 border border-border rounded-lg font-semibold hover:bg-muted transition-colors"

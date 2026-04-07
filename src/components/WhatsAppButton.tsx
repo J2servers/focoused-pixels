@@ -14,14 +14,9 @@ import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { analytics } from '@/components/analytics/EventTracker';
 
 export function WhatsAppButton() {
-  const { whatsapp, whatsappMessageTemplate } = useSiteSettings();
+  const { whatsappLink } = useSiteSettings();
 
-  // Build WhatsApp URL with custom message
-  const whatsappLink = whatsapp 
-    ? `https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappMessageTemplate)}`
-    : '#';
-
-  if (!whatsapp) return null;
+  if (!whatsappLink) return null;
 
   return (
     <motion.a

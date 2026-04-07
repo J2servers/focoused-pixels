@@ -78,6 +78,7 @@
  */
 
 import { useCompanyInfo } from './useCompanyInfo';
+import { buildWhatsAppUrl, normalizeWhatsAppNumber } from '@/lib/whatsapp';
 
 export function useSiteSettings() {
   const { data: settings, isLoading } = useCompanyInfo();
@@ -160,6 +161,11 @@ export function useSiteSettings() {
     // Integrations
     whatsappMessageTemplate: settings?.whatsapp_message_template || 'Olá! Gostaria de saber mais sobre os produtos.',
     whatsapp: settings?.whatsapp || '',
+    whatsappNumber: normalizeWhatsAppNumber(settings?.whatsapp),
+    whatsappLink: buildWhatsAppUrl(
+      settings?.whatsapp,
+      settings?.whatsapp_message_template || 'Olá! Gostaria de saber mais sobre os produtos.',
+    ),
     email: settings?.email || '',
     phone: settings?.phone || '',
     freeShippingMinimum: settings?.free_shipping_minimum || 159,

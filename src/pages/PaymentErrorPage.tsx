@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { XCircle, Home, RotateCcw, MessageCircle } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
 const PaymentErrorPage = () => {
   const { whatsapp } = useSiteSettings();
@@ -11,9 +12,7 @@ const PaymentErrorPage = () => {
   
   const error = searchParams.get('error') || 'Ocorreu um erro no pagamento';
 
-  const whatsappLink = whatsapp 
-    ? `https://wa.me/${whatsapp}?text=${encodeURIComponent('Olá! Tive um problema com meu pagamento e preciso de ajuda.')}`
-    : '#';
+  const whatsappLink = buildWhatsAppUrl(whatsapp, 'Olá! Tive um problema com meu pagamento e preciso de ajuda.');
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -62,7 +61,7 @@ const PaymentErrorPage = () => {
                 </Button>
               </Link>
 
-              {whatsapp && (
+              {whatsappLink && (
                 <a
                   href={whatsappLink}
                   target="_blank"
