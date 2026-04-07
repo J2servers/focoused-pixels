@@ -1140,32 +1140,44 @@
     padding-right: 0.5rem !important;
   }
 
-  /* Kill heavy neumorphic shadows on mobile — keep subtle depth only */
+  /* ═══ Mobile Neumorphism — Real depth with static purple border ═══ */
   .neu-flat,
   .neu-concave,
   .neu-convex,
   .neu-raised,
   .neu-pressed {
-    --neu-distance: 1px;
-    --neu-blur: 2px;
-    --neu-intensity: 0.15;
-    --neu-inner-distance: 1px;
-    --neu-inner-blur: 2px;
-    box-shadow: 0 1px 3px hsl(var(--neu-dark) / 0.12) !important;
+    --neu-distance: 3px;
+    --neu-blur: 6px;
+    --neu-intensity: 0.35;
+    --neu-inner-distance: 2px;
+    --neu-inner-blur: 4px;
+    box-shadow:
+      var(--neu-distance) var(--neu-distance) var(--neu-blur) hsl(var(--neu-dark) / var(--neu-intensity)),
+      calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) hsl(var(--neu-light) / var(--neu-intensity)),
+      inset 1px 1px 2px hsl(var(--neu-light) / 0.3),
+      inset -1px -1px 2px hsl(var(--neu-dark) / 0.1) !important;
   }
 
-  /* Kill product card heavy shadow */
+  /* Product card shadow with depth */
   .shadow-product {
-    box-shadow: 0 1px 3px hsl(var(--neu-dark) / 0.12) !important;
+    box-shadow:
+      2px 2px 5px hsl(var(--neu-dark) / 0.25),
+      -2px -2px 5px hsl(var(--neu-light) / 0.25),
+      inset 1px 1px 2px hsl(var(--neu-light) / 0.2),
+      inset -1px -1px 2px hsl(var(--neu-dark) / 0.08) !important;
   }
   .shadow-product-hover {
-    box-shadow: 0 2px 6px hsl(var(--neu-dark) / 0.15) !important;
+    box-shadow:
+      3px 3px 8px hsl(var(--neu-dark) / 0.3),
+      -3px -3px 8px hsl(var(--neu-light) / 0.3),
+      inset 1px 1px 3px hsl(var(--neu-light) / 0.25),
+      inset -1px -1px 3px hsl(var(--neu-dark) / 0.1) !important;
     transform: none !important;
   }
 
-  /* Thinner animated borders */
+  /* ═══ Replace animated gradient borders with static solid purple ═══ */
   :root {
-    --neon-border-width: 0.45px;
+    --neon-border-width: 0.5px;
   }
   .neu-flat::before,
   .neu-raised::before,
@@ -1176,6 +1188,9 @@
   .shadow-product::before,
   .neon-border-gradient::before {
     padding: 0.5px !important;
+    background: hsl(280 90% 65% / 0.5) !important;
+    background-size: unset !important;
+    animation: none !important;
   }
 
   /* Remove hover lift on mobile */
