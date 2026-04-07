@@ -1207,9 +1207,10 @@
 
 /* ═══ Admin Modal/Dialog Dark Contrast Fix ═══ */
 /* Force dark themed backgrounds on all overlays */
-[data-radix-dialog-content],
-[data-radix-dialog-content].liquid-glass,
-[data-radix-dialog-content].liquid-glass-lighter {
+/* Radix Dialog uses role="dialog" + data-state, not data-radix-dialog-content */
+[role="dialog"][data-state],
+[role="dialog"][data-state].liquid-glass,
+[role="dialog"][data-state].liquid-glass-lighter {
   background: hsl(250 25% 12%) !important;
   backdrop-filter: blur(20px) saturate(1.4) !important;
   -webkit-backdrop-filter: blur(20px) saturate(1.4) !important;
@@ -1217,53 +1218,56 @@
   border-color: hsl(255 20% 22%) !important;
 }
 
-[data-radix-dialog-overlay] {
+/* Overlay */
+[data-state][role="none"],
+.fixed.inset-0.bg-black\/80 {
   background: hsl(0 0% 0% / 0.7) !important;
 }
 
-[data-radix-dialog-content] label,
-[data-radix-dialog-content] h2,
-[data-radix-dialog-content] h3,
-[data-radix-dialog-content] h4,
-[data-radix-dialog-content] p,
-[data-radix-dialog-content] span:not([class*="absolute"]),
-[data-radix-dialog-content] div:not([class*="absolute"]):not([style*="background"]) {
+[role="dialog"][data-state] label,
+[role="dialog"][data-state] h2,
+[role="dialog"][data-state] h3,
+[role="dialog"][data-state] h4,
+[role="dialog"][data-state] p,
+[role="dialog"][data-state] span:not([class*="absolute"]),
+[role="dialog"][data-state] div:not([class*="absolute"]):not([style*="background"]) {
   color: hsl(0 0% 92%);
 }
 
-[data-radix-dialog-content] .text-muted-foreground {
+[role="dialog"][data-state] .text-muted-foreground {
   color: hsl(250 15% 65%) !important;
 }
 
 /* Inputs inside modals */
-[data-radix-dialog-content] input,
-[data-radix-dialog-content] textarea,
-[data-radix-dialog-content] select,
-[data-radix-dialog-content] [role="combobox"],
-[data-radix-dialog-content] [data-radix-select-trigger],
-[data-radix-dialog-content] button[role="combobox"] {
+[role="dialog"][data-state] input,
+[role="dialog"][data-state] textarea,
+[role="dialog"][data-state] select,
+[role="dialog"][data-state] [role="combobox"],
+[role="dialog"][data-state] button[role="combobox"] {
   background: hsl(250 25% 18%) !important;
   border-color: hsl(280 40% 35%) !important;
   color: hsl(0 0% 95%) !important;
 }
 
-[data-radix-dialog-content] input::placeholder,
-[data-radix-dialog-content] textarea::placeholder {
+[role="dialog"][data-state] input::placeholder,
+[role="dialog"][data-state] textarea::placeholder {
   color: hsl(250 15% 50%) !important;
 }
 
 /* Select content dropdowns - global (they render in portal outside dialog) */
-[data-radix-select-content] {
+[data-radix-popper-content-wrapper] [role="listbox"],
+[role="listbox"][data-state] {
   background: hsl(250 25% 14%) !important;
   border-color: hsl(255 20% 25%) !important;
   color: hsl(0 0% 95%) !important;
 }
 
-[data-radix-select-content] [data-radix-select-item] {
+[role="listbox"] [role="option"],
+[role="option"][data-state] {
   color: hsl(0 0% 90%) !important;
 }
 
-[data-radix-select-content] [data-radix-select-item][data-highlighted] {
+[role="option"][data-highlighted] {
   background: hsl(280 70% 55% / 0.25) !important;
   color: hsl(0 0% 100%) !important;
 }
@@ -1276,47 +1280,39 @@
 }
 
 /* Cards / sections inside modals - higher contrast separation */
-[data-radix-dialog-content] .bg-card,
-[data-radix-dialog-content] .bg-background,
-[data-radix-dialog-content] .bg-muted,
-[data-radix-dialog-content] [class*="bg-muted"],
-[data-radix-dialog-content] [class*="bg-card"],
-[data-radix-dialog-content] [class*="bg-background"],
-[data-radix-dialog-content] .rounded-lg[class*="border"],
-[data-radix-dialog-content] .rounded-md[class*="border"] {
+[role="dialog"][data-state] .bg-card,
+[role="dialog"][data-state] .bg-background,
+[role="dialog"][data-state] .bg-muted,
+[role="dialog"][data-state] [class*="bg-muted"],
+[role="dialog"][data-state] [class*="bg-card"],
+[role="dialog"][data-state] [class*="bg-background"],
+[role="dialog"][data-state] .rounded-lg[class*="border"],
+[role="dialog"][data-state] .rounded-md[class*="border"] {
   background: hsl(250 25% 17%) !important;
   border-color: hsl(255 20% 28%) !important;
 }
 
 /* Strong text inside modals */
-[data-radix-dialog-content] strong,
-[data-radix-dialog-content] b,
-[data-radix-dialog-content] .font-semibold,
-[data-radix-dialog-content] .font-bold {
+[role="dialog"][data-state] strong,
+[role="dialog"][data-state] b,
+[role="dialog"][data-state] .font-semibold,
+[role="dialog"][data-state] .font-bold {
   color: hsl(0 0% 98%) !important;
 }
 
 /* Badge readability */
-[data-radix-dialog-content] .border {
+[role="dialog"][data-state] .border {
   border-color: hsl(255 20% 28%) !important;
 }
 
 /* Inline style overrides for transparent/semi-transparent backgrounds inside modals */
-[data-radix-dialog-content] [style*="background"] {
+[role="dialog"][data-state] [style*="background"] {
   background: hsl(250 25% 15%) !important;
 }
 
-/* Popover inside modals */
-[data-radix-popper-content-wrapper] [data-radix-select-content],
-[data-radix-popper-content-wrapper] [role="listbox"] {
-  background: hsl(250 25% 14%) !important;
-  border-color: hsl(255 20% 25%) !important;
-  color: hsl(0 0% 95%) !important;
-}
-
 /* Separator inside modals */
-[data-radix-dialog-content] [data-orientation="horizontal"],
-[data-radix-dialog-content] hr {
+[role="dialog"][data-state] [data-orientation="horizontal"],
+[role="dialog"][data-state] hr {
   border-color: hsl(255 20% 25%) !important;
   background: hsl(255 20% 25%) !important;
 }
