@@ -1207,8 +1207,12 @@
 
 /* ═══ Admin Modal/Dialog Dark Contrast Fix ═══ */
 /* Force dark themed backgrounds on all overlays */
-[data-radix-dialog-content] {
+[data-radix-dialog-content],
+[data-radix-dialog-content].liquid-glass,
+[data-radix-dialog-content].liquid-glass-lighter {
   background: hsl(250 25% 12%) !important;
+  backdrop-filter: blur(20px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.4) !important;
   color: hsl(0 0% 95%) !important;
   border-color: hsl(255 20% 22%) !important;
 }
