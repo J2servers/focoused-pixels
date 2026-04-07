@@ -57,9 +57,9 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
         to={`/produto/${product.slug}`}
         className="block group h-full"
       >
-        <div className="relative rounded-xl neu-raised transition-all duration-200 active:scale-[0.98] h-full flex flex-col">
+        <div className="relative rounded-lg transition-all duration-200 active:scale-[0.98] h-full flex flex-col" style={{ boxShadow: '0 1px 3px hsl(var(--neu-dark) / 0.1)', border: '0.4px solid hsl(270 80% 60% / 0.2)' }}>
           {/* Image */}
-          <div className="relative aspect-[4/5] overflow-hidden rounded-t-xl m-[1px] mb-0 flex-shrink-0">
+          <div className="relative aspect-[4/4] overflow-hidden rounded-t-lg m-[0.5px] mb-0 flex-shrink-0">
             <img
               src={product.image}
               alt={product.name}
@@ -88,21 +88,21 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             </div>
 
             {/* Quick Add Button */}
-            <div className="absolute bottom-1.5 right-1.5">
+            <div className="absolute bottom-1 right-1">
               <Button
                 size="icon"
                 onClick={handleAddToCart}
                 disabled={!product.inStock}
-                className="h-7 w-7 rounded-lg shadow-sm"
+                className="h-6 w-6 rounded-md shadow-sm"
               >
-                <ShoppingCart className="h-3 w-3" />
+                <ShoppingCart className="h-2.5 w-2.5" />
               </Button>
             </div>
           </div>
 
           {/* Content */}
-          <div className="p-2 flex flex-col flex-grow mx-[1px] mb-[1px]">
-            <h3 className="font-medium text-[10px] text-foreground line-clamp-2 leading-tight min-h-[24px]">
+          <div className="p-1.5 flex flex-col flex-grow mx-[0.5px] mb-[0.5px]">
+            <h3 className="font-medium text-[9px] text-foreground line-clamp-2 leading-tight min-h-[20px]">
               {product.name}
             </h3>
             
@@ -115,7 +115,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
                   </p>
                 ) : <div />}
               </div>
-              <p className="text-sm font-bold text-primary leading-tight">
+              <p className="text-xs font-bold text-primary leading-tight">
                 R$ {product.price.toFixed(2).replace('.', ',')}
               </p>
               <p className="text-[8px] text-muted-foreground mt-0.5">

@@ -29,9 +29,9 @@ export function MobileCategoryGrid() {
   if (parents.length === 0) return null;
 
   return (
-    <section className="py-2.5">
-      <div className="flex items-center justify-between px-3 mb-2">
-        <h2 className="text-sm font-bold text-foreground">Categorias</h2>
+    <section className="py-1.5">
+      <div className="flex items-center justify-between px-2 mb-1">
+        <h2 className="text-xs font-bold text-foreground">Categorias</h2>
         <Link to="/categorias" className="text-xs text-primary font-medium flex items-center">
           Ver todas <ChevronRight className="h-3.5 w-3.5" />
         </Link>
@@ -56,18 +56,18 @@ export function MobileCategoryGrid() {
           className="overflow-x-auto pb-2 scrollbar-none"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="flex gap-2 px-3">
+          <div className="flex gap-1.5 px-2">
             {parents.map((cat) => (
-              <div key={cat.id} className="w-[90px] flex-shrink-0">
+              <div key={cat.id} className="w-[78px] flex-shrink-0">
                 <Link
                   to={`/categoria/${cat.slug}`}
                   className="block group h-full active:scale-[0.98] transition-all duration-200"
                 >
                   <div
-                    className="relative rounded-xl overflow-hidden h-full flex flex-col"
+                    className="relative rounded-lg overflow-hidden h-full flex flex-col"
                     style={{
-                      boxShadow: '2px 2px 5px hsl(var(--neu-dark) / 0.15), -2px -2px 5px hsl(var(--neu-light) / 0.25)',
-                      border: '0.5px solid hsl(270 80% 60% / 0.25)',
+                      boxShadow: '0 1px 2px hsl(var(--neu-dark) / 0.08)',
+                      border: '0.4px solid hsl(270 80% 60% / 0.2)',
                     }}
                   >
                     {/* Neon top accent */}
