@@ -1146,11 +1146,21 @@
   .neu-convex,
   .neu-raised,
   .neu-pressed {
-    --neu-distance: 2px;
-    --neu-blur: 4px;
-    --neu-intensity: 0.25;
+    --neu-distance: 1px;
+    --neu-blur: 2px;
+    --neu-intensity: 0.15;
     --neu-inner-distance: 1px;
-    --neu-inner-blur: 3px;
+    --neu-inner-blur: 2px;
+    box-shadow: 0 1px 3px hsl(var(--neu-dark) / 0.12) !important;
+  }
+
+  /* Kill product card heavy shadow */
+  .shadow-product {
+    box-shadow: 0 1px 3px hsl(var(--neu-dark) / 0.12) !important;
+  }
+  .shadow-product-hover {
+    box-shadow: 0 2px 6px hsl(var(--neu-dark) / 0.15) !important;
+    transform: none !important;
   }
 
   /* Thinner animated borders */
@@ -1172,5 +1182,10 @@
   .neu-raised:hover,
   .neu-convex:hover {
     transform: none;
+  }
+
+  /* Clip all sections to prevent shadow overflow */
+  main, section, .mobile-section {
+    overflow-x: clip;
   }
 }
