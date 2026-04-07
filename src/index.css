@@ -1206,7 +1206,7 @@
 }
 
 /* ═══ Admin Modal/Dialog Dark Contrast Fix ═══ */
-/* Force dark themed backgrounds on all overlays inside admin routes */
+/* Force dark themed backgrounds on all overlays */
 [data-radix-dialog-content] {
   background: hsl(250 25% 12%) !important;
   color: hsl(0 0% 95%) !important;
@@ -1222,8 +1222,8 @@
 [data-radix-dialog-content] h3,
 [data-radix-dialog-content] h4,
 [data-radix-dialog-content] p,
-[data-radix-dialog-content] span,
-[data-radix-dialog-content] div {
+[data-radix-dialog-content] span:not([class*="absolute"]),
+[data-radix-dialog-content] div:not([class*="absolute"]):not([style*="background"]) {
   color: hsl(0 0% 92%);
 }
 
@@ -1236,9 +1236,10 @@
 [data-radix-dialog-content] textarea,
 [data-radix-dialog-content] select,
 [data-radix-dialog-content] [role="combobox"],
-[data-radix-dialog-content] [data-radix-select-trigger] {
-  background: hsl(250 25% 16%) !important;
-  border-color: hsl(255 20% 25%) !important;
+[data-radix-dialog-content] [data-radix-select-trigger],
+[data-radix-dialog-content] button[role="combobox"] {
+  background: hsl(250 25% 18%) !important;
+  border-color: hsl(280 40% 35%) !important;
   color: hsl(0 0% 95%) !important;
 }
 
@@ -1247,10 +1248,10 @@
   color: hsl(250 15% 50%) !important;
 }
 
-/* Select content dropdowns */
+/* Select content dropdowns - global (they render in portal outside dialog) */
 [data-radix-select-content] {
   background: hsl(250 25% 14%) !important;
-  border-color: hsl(255 20% 22%) !important;
+  border-color: hsl(255 20% 25%) !important;
   color: hsl(0 0% 95%) !important;
 }
 
@@ -1270,14 +1271,48 @@
   border-color: hsl(255 20% 22%) !important;
 }
 
-/* Cards inside modals */
+/* Cards / sections inside modals - higher contrast separation */
 [data-radix-dialog-content] .bg-card,
 [data-radix-dialog-content] .bg-background,
-[data-radix-dialog-content] .bg-muted {
-  background: hsl(250 25% 15%) !important;
+[data-radix-dialog-content] .bg-muted,
+[data-radix-dialog-content] [class*="bg-muted"],
+[data-radix-dialog-content] [class*="bg-card"],
+[data-radix-dialog-content] [class*="bg-background"],
+[data-radix-dialog-content] .rounded-lg[class*="border"],
+[data-radix-dialog-content] .rounded-md[class*="border"] {
+  background: hsl(250 25% 17%) !important;
+  border-color: hsl(255 20% 28%) !important;
+}
+
+/* Strong text inside modals */
+[data-radix-dialog-content] strong,
+[data-radix-dialog-content] b,
+[data-radix-dialog-content] .font-semibold,
+[data-radix-dialog-content] .font-bold {
+  color: hsl(0 0% 98%) !important;
 }
 
 /* Badge readability */
 [data-radix-dialog-content] .border {
-  border-color: hsl(255 20% 25%);
+  border-color: hsl(255 20% 28%) !important;
+}
+
+/* Inline style overrides for transparent/semi-transparent backgrounds inside modals */
+[data-radix-dialog-content] [style*="background"] {
+  background: hsl(250 25% 15%) !important;
+}
+
+/* Popover inside modals */
+[data-radix-popper-content-wrapper] [data-radix-select-content],
+[data-radix-popper-content-wrapper] [role="listbox"] {
+  background: hsl(250 25% 14%) !important;
+  border-color: hsl(255 20% 25%) !important;
+  color: hsl(0 0% 95%) !important;
+}
+
+/* Separator inside modals */
+[data-radix-dialog-content] [data-orientation="horizontal"],
+[data-radix-dialog-content] hr {
+  border-color: hsl(255 20% 25%) !important;
+  background: hsl(255 20% 25%) !important;
 }
