@@ -21,7 +21,8 @@ interface Message {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
 const AUTO_POPUP_DELAY = 60 * 1000; // 1 min — aparece pulsando "digitando"
-const TEASER_DURATION = 8 * 1000;  // 8s mostrando "digitando" antes de abrir
+const TEASER_DURATION = 8 * 1000;  // 8s mostrando "digitando" antes de exibir balão
+const BUBBLE_VISIBLE_DURATION = 5 * 1000; // 5s mostrando balão da mensagem
 const AUTO_POPUP_MESSAGE = "Olá! 👋 Sou a Luna, consultora aqui da loja. Posso te ajudar a achar o produto ideal? Temos letreiros neon, displays, crachás e muito mais! ✨";
 const REDIRECT_REGEX = /\[REDIRECT:(\/[^\]\s]+)\]/i;
 
