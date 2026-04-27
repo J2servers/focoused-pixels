@@ -241,24 +241,29 @@ export function AIChatWidget() {
             {/* Balão da mensagem (5s) — acima do FAB */}
             <AnimatePresence>
               {showBubble && (
-                <motion.button
-                  type="button"
-                  onClick={handleOpenChat}
+                <motion.div
+                  key="luna-bubble"
                   initial={{ opacity: 0, y: 10, scale: 0.9 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.9 }}
                   transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-                  className="max-w-[260px] sm:max-w-[300px] text-left bg-gradient-to-br from-[hsl(250_30%_12%)] to-[hsl(260_28%_10%)] border border-primary/40 rounded-2xl rounded-br-sm px-4 py-3 shadow-2xl shadow-primary/40 cursor-pointer hover:scale-[1.02] transition-transform"
-                  aria-label="Abrir conversa com Luna"
+                  className="max-w-[260px] sm:max-w-[300px]"
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[11px] font-bold text-cyan-300">{aiAssistantName}</span>
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                  </div>
-                  <p className="text-xs text-white/95 leading-snug">
-                    {AUTO_POPUP_MESSAGE}
-                  </p>
-                </motion.button>
+                  <button
+                    type="button"
+                    onClick={handleOpenChat}
+                    className="w-full text-left bg-gradient-to-br from-[hsl(250_30%_12%)] to-[hsl(260_28%_10%)] border border-primary/40 rounded-2xl rounded-br-sm px-4 py-3 shadow-2xl shadow-primary/40 cursor-pointer hover:scale-[1.02] transition-transform"
+                    aria-label="Abrir conversa com Luna"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[11px] font-bold text-cyan-300">{aiAssistantName}</span>
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    </div>
+                    <p className="text-xs text-white/95 leading-snug">
+                      {AUTO_POPUP_MESSAGE}
+                    </p>
+                  </button>
+                </motion.div>
               )}
             </AnimatePresence>
 
