@@ -1,9 +1,6 @@
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
+import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
 const ResetSchema = z.object({
   target_user_id: z.string().uuid(),
@@ -11,9 +8,9 @@ const ResetSchema = z.object({
 })
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  const corsHeaders = buildCorsHeaders(req);
+  const __pre = handlePreflight(req);
+  if (__pre) return __pre;
 
   try {
     // 1. Verify the caller is authenticated

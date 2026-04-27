@@ -1,9 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
 interface TrackingEvent {
   status: string;
@@ -125,9 +122,9 @@ function generateMockTracking(code: string): TrackingEvent[] {
 
 serve(async (req) => {
   // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsHeaders = buildCorsHeaders(req);
+  const __pre = handlePreflight(req);
+  if (__pre) return __pre;
 
   try {
     const { trackingCode, orderNumber } = await req.json();
