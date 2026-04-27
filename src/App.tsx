@@ -34,8 +34,6 @@ const TrackingPage = lazy(() => import("./pages/TrackingPage"));
 const CategoriesPage = lazy(() => import("./pages/CategoriesPage"));
 const CustomerAreaPage = lazy(() => import("./pages/CustomerAreaPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const TestePage = lazy(() => import("./pages/TestePage"));
-const Teste2Page = lazy(() => import("./pages/Teste2Page"));
 
 // Payment Pages
 const PaymentPage = lazy(() => import("./pages/PaymentPage"));
