@@ -197,16 +197,23 @@ serve(async (req) => {
           .eq('status', 'active')
           .order('name'),
         supabase
-          .from('company_info')
-          .select('ai_external_enabled, ai_external_provider, ai_external_api_url, ai_external_api_key, ai_external_model')
+          .from('ai_credentials')
+          .select('enabled, provider, api_url, api_key, model')
           .order('updated_at', { ascending: false })
           .limit(1)
-          .single()
+          .maybeSingle()
       ]);
 
       products = (productsResult.data || []) as ProductInfo[];
       categories = (categoriesResult.data || []) as CategoryInfo[];
-      aiConfig = configResult.data as AIExternalConfig | null;
+      const c = configResult.data as { enabled: boolean | null; provider: string | null; api_url: string | null; api_key: string | null; model: string | null } | null;
+      aiConfig = c ? {
+        ai_external_enabled: c.enabled,
+        ai_external_provider: c.provider,
+        ai_external_api_url: c.api_url,
+        ai_external_api_key: c.api_key,
+        ai_external_model: c.model,
+      } : null;
     }
 
     console.log(`AI Assistant - ${products.length} products, ${categories.length} categories, ${messages.length} messages`);
