@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SiteSettingsProvider } from "@/components/providers/SiteSettingsProvider";
 import { PageViewTracker } from "@/components/PageViewTracker";
@@ -113,8 +113,8 @@ const App = () => (
                 <Route path="/produto/:productSlug" element={<ProductPage />} />
                 <Route path="/carrinho" element={<CartPage />} />
                 <Route path="/busca" element={<SearchPage />} />
-                {/* /checkout legado removido — fluxo único em /pagamento */}
-                <Route path="/checkout" element={<PaymentPage />} />
+                {/* /checkout legado → redirect permanente para /pagamento */}
+                <Route path="/checkout" element={<Navigate to="/pagamento" replace />} />
                 <Route path="/orcamento-enviado" element={<QuoteSuccessPage />} />
                 
                 {/* Payment Routes */}
