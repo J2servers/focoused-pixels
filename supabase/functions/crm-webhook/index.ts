@@ -325,9 +325,9 @@ async function handleStockList(supabase: any, filters: Record<string, unknown>) 
 
 // ===== MAIN HANDLER =====
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsHeaders = buildCorsHeaders(req);
+  const pre = handlePreflight(req);
+  if (pre) return pre;
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
