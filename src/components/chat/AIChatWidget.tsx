@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Bot, User, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { cn } from '@/lib/utils';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { toast } from 'sonner';
