@@ -113,7 +113,8 @@ const App = () => (
                 <Route path="/produto/:productSlug" element={<ProductPage />} />
                 <Route path="/carrinho" element={<CartPage />} />
                 <Route path="/busca" element={<SearchPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
+                {/* /checkout legado removido — fluxo único em /pagamento */}
+                <Route path="/checkout" element={<PaymentPage />} />
                 <Route path="/orcamento-enviado" element={<QuoteSuccessPage />} />
                 
                 {/* Payment Routes */}
