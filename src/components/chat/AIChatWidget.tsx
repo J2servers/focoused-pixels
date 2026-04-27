@@ -242,6 +242,7 @@ export function AIChatWidget() {
             <AnimatePresence>
               {showBubble && (
                 <motion.button
+                  key="luna-bubble"
                   type="button"
                   onClick={handleOpenChat}
                   initial={{ opacity: 0, y: 10, scale: 0.9 }}
