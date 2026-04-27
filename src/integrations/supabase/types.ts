@@ -115,6 +115,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_credentials: {
+        Row: {
+          api_key: string | null
+          api_url: string | null
+          enabled: boolean
+          id: string
+          model: string | null
+          provider: string | null
+          updated_at: string
+        }
+        Insert: {
+          api_key?: string | null
+          api_url?: string | null
+          enabled?: boolean
+          id?: string
+          model?: string | null
+          provider?: string | null
+          updated_at?: string
+        }
+        Update: {
+          api_key?: string | null
+          api_url?: string | null
+          enabled?: boolean
+          id?: string
+          model?: string | null
+          provider?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           created_at: string
@@ -2499,6 +2529,26 @@ export type Database = {
         Returns: boolean
       }
       is_admin_or_editor: { Args: { _user_id: string }; Returns: boolean }
+      lookup_tracking: {
+        Args: { _code: string }
+        Returns: {
+          created_at: string
+          description: string | null
+          event_date: string | null
+          id: string
+          location: string | null
+          order_id: string | null
+          raw_data: Json | null
+          status: string
+          tracking_code: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "tracking_events"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       app_role: "admin" | "editor" | "support"
