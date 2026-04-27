@@ -2,6 +2,7 @@
  * PaymentPage - Multi-step payment flow (refactored)
  * Step 1: Auth | Step 2: Details | Step 3: Payment
  */
+import { useMemo } from 'react';
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,16 @@ import { Lock, Truck, CreditCard, Check, ArrowLeft } from 'lucide-react';
 import { PaymentStepAuth } from '@/components/payment/PaymentStepAuth';
 import { PaymentStepDetails } from '@/components/payment/PaymentStepDetails';
 import { PaymentStepPayment } from '@/components/payment/PaymentStepPayment';
+import { PaymentOrderSummary } from '@/components/payment/PaymentOrderSummary';
 import { usePaymentFlow } from '@/hooks/usePaymentFlow';
+
+interface PendingPaymentItem {
+  name: string;
+  quantity: number;
+  price: number;
+  image?: string;
+  size?: string;
+}
 
 const steps = [
   { id: 1, title: 'Criar Conta', shortTitle: 'Conta', icon: Lock },
