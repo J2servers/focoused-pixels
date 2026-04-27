@@ -1,3 +1,4 @@
+import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -27,9 +28,9 @@ function hashValue(val: string): string {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  const corsHeaders = buildCorsHeaders(req);
+  const __pre = handlePreflight(req);
+  if (__pre) return __pre;
 
   const DENY = (reason?: string) => new Response(
     JSON.stringify({ allowed: false, reason: reason || undefined }),
