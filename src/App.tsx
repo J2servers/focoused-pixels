@@ -155,7 +155,7 @@ const App = () => (
                 <Route path="/admin/api" element={<AdminApiDocsPage />} />
                 <Route path="/admin/whatsapp" element={<AdminWhatsAppPage />} />
                 <Route path="/admin/templates" element={<AdminTemplatesPage />} />
-                <Route path="/admin/email-templates" element={<AdminTemplatesPage />} />
+                {/* alias /admin/email-templates removido — usar /admin/templates */}
                 <Route path="/admin/midia" element={<AdminMediaPage />} />
                 <Route path="/admin/pagina-por-que-escolher" element={<AdminWhyChooseUsPage />} />
                 <Route path="/admin/workflows" element={<AdminWorkflowsPage />} />
