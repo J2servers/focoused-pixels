@@ -772,6 +772,13 @@ serve(async (req) => {
 // ─── Utility ───
 
 function jsonResp(data: any) {
+  // CORS é re-aplicado a partir do cabeçalho compartilhado para evitar ReferenceError
+  // quando jsonResp é chamado fora do escopo da request (ex.: cron sem origin).
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-info",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+  };
   return new Response(JSON.stringify(data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 }
 
