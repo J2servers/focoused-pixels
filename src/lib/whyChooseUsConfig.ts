@@ -151,7 +151,7 @@ export const defaultWhyChooseUsConfig: WhyChooseUsConfig = {
     secondaryDescription:
       'Trabalhamos com corte CNC a laser CO2 e gravações em Fiber Laser, tecnologias entre as mais avançadas do mercado para quem quer precisão, acabamento premium e mais valor percebido no resultado final.',
     primaryCtaLabel: 'Quero criar meu produto',
-    primaryCtaHref: '/checkout',
+    primaryCtaHref: '/pagamento',
     secondaryCtaLabel: 'Ver catálogo completo',
     secondaryCtaHref: '/categorias',
     imageMain: '',
@@ -261,7 +261,7 @@ export const defaultWhyChooseUsConfig: WhyChooseUsConfig = {
       { text: 'Entrega com a expectativa certa e suporte depois da compra.' },
     ],
     primaryCtaLabel: 'Começar meu pedido',
-    primaryCtaHref: '/checkout',
+    primaryCtaHref: '/pagamento',
     secondaryCtaLabel: 'Acompanhar meus pedidos',
     secondaryCtaHref: '/minha-area',
   },

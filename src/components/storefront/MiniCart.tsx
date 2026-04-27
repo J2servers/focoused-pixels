@@ -139,7 +139,7 @@ export function MiniCart({ open, onOpenChange }: MiniCartProps) {
               <span className="text-xl font-bold">R$ {total.toFixed(2).replace('.', ',')}</span>
             </div>
             <div className="flex flex-col gap-2 w-full">
-              <Link to="/checkout" onClick={() => onOpenChange(false)}>
+              <Link to="/pagamento" onClick={() => onOpenChange(false)}>
                 <Button size="lg" className="w-full">
                   Finalizar Pedido
                   <ArrowRight className="h-4 w-4 ml-2" />
