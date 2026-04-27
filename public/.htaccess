@@ -6,7 +6,7 @@
   RewriteCond %{HTTPS} !=on
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-  # Serve correct MIME types for JS modules
+  # Serve correct MIME types
   AddType application/javascript .js .mjs
   AddType text/css .css
   AddType image/svg+xml .svg
@@ -15,34 +15,48 @@
   AddType font/woff2 .woff2
   AddType font/woff .woff
 
-  # Enable CORS for fonts
   <FilesMatch "\.(woff2?|ttf|otf|eot)$">
     Header set Access-Control-Allow-Origin "*"
   </FilesMatch>
 
-  # Cache static assets aggressively
   <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|webp)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 
-  # Don't cache HTML
   <FilesMatch "\.html$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
   </FilesMatch>
 
-  # SPA Fallback - serve index.html for any route that doesn't match a file
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^ /index.html [L,QSA]
 </IfModule>
 
-# Prevent directory listing
 Options -Indexes
 
-# Security headers
+# Security headers (Wave 3 - Frontend Hardening)
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
   Header set X-Frame-Options "SAMEORIGIN"
   Header set X-XSS-Protection "1; mode=block"
   Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(self), usb=(), magnetometer=(), gyroscope=()"
+  Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+  Header set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+  Header set Cross-Origin-Resource-Policy "same-site"
+
+  # Content Security Policy - permite Supabase, GA, GTM, FB Pixel, fonts
+  Header set Content-Security-Policy "default-src 'self'; \
+script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.lovable.app https://*.lovableproject.com; \
+style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; \
+font-src 'self' data: https://fonts.gstatic.com; \
+img-src 'self' data: blob: https: ; \
+media-src 'self' blob: https://*.supabase.co; \
+connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://connect.facebook.net https://www.facebook.com https://viacep.com.br; \
+frame-src 'self' https://www.googletagmanager.com https://www.youtube.com https://www.facebook.com; \
+object-src 'none'; \
+base-uri 'self'; \
+form-action 'self'; \
+frame-ancestors 'self'; \
+upgrade-insecure-requests"
 </IfModule>
