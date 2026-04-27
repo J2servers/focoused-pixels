@@ -103,7 +103,7 @@ const AdminSettingsPage = () => {
     catch { toast.error(`${name} falhou`); }
   };
 
-  if (l1 || l2 || l3) {
+  if (l1 || l2 || l3 || l4) {
     return (
       <AdminLayout title="Configurações">
         <div className="flex h-64 items-center justify-center">
@@ -173,7 +173,7 @@ const AdminSettingsPage = () => {
           {tab === 'email' && <SettingsEmailSection emailSettings={email} ue={ue} canMutate={canMutate} handleTestSmtp={handleTestSmtp} handleSendTest={handleSendTest} testSmtpPending={testSmtp.isPending} sendTestPending={sendTest.isPending} updateEmailPending={updateEmail.isPending} />}
           {tab === 'seguranca' && <SettingsSecuritySection settings={settings} u={u} canMutate={canMutate} profileName={profile?.full_name || ''} updatePassword={updatePassword} />}
           {tab === 'operacoes' && <SettingsOperationsSection />}
-          {tab === 'ia' && <SettingsAISection settings={settings} u={u} />}
+          {tab === 'ia' && <SettingsAISection settings={settings} u={u} aiSettings={ai} ua={ua} />}
         </div>
       </div>
     </AdminLayout>
