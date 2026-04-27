@@ -267,6 +267,7 @@ export function AIChatWidget() {
             <AnimatePresence>
               {showTeaser && (
                 <motion.div
+                  key="luna-teaser"
                   initial={{ opacity: 0, y: 10, scale: 0.8 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.8 }}
