@@ -99,12 +99,26 @@ const PaymentPage = () => {
                       }`}>
                         {step.id < currentStep ? <Check className="h-4 w-4" /> : <StepIcon className="h-4 w-4" />}
                       </div>
-                      <span className="text-xs hidden sm:block">{step.shortTitle}</span>
+                      <span className="text-[11px] sm:text-xs font-medium leading-tight text-center">
+                        {step.shortTitle}
+                      </span>
                     </div>
                   );
                 })}
               </div>
               <Progress value={progress} className="h-1.5" />
+            </div>
+
+            {/* Sticky-ish order summary — visible above step content on every step */}
+            <div className="mb-5 sticky top-2 z-10">
+              <PaymentOrderSummary
+                items={summaryItems}
+                subtotal={subtotal}
+                shippingCost={paymentState.shippingCost}
+                total={paymentState.amount}
+                installments={installmentCount}
+                installmentValue={installmentValue}
+              />
             </div>
 
             {/* Step Content */}
