@@ -329,7 +329,7 @@ export function AIChatWidget() {
               </div>
 
               {/* Mensagens */}
-              <ScrollArea className="flex-1 px-3 py-4 relative" ref={scrollRef}>
+              <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-4 relative luna-scroll">
                 <div className="space-y-4">
                   {messages.map((message, index) => (
                     <motion.div
