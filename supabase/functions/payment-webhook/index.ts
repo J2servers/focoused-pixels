@@ -371,19 +371,47 @@ serve(async (req) => {
     const url = new URL(req.url);
     const provider = url.searchParams.get("provider") || "mercadopago";
     
+    // Read raw body once for signature verification, then parse
+    const rawBody = await req.text();
     let payload: WebhookPayload;
     try {
-      payload = await req.json() as WebhookPayload;
+      payload = (rawBody ? JSON.parse(rawBody) : {}) as WebhookPayload;
     } catch {
       console.error("[Webhook] Invalid JSON body");
       return new Response(JSON.stringify({ received: true, error: "Invalid JSON" }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    
+
     console.log(`[Webhook] Provider: ${provider}, Payload:`, JSON.stringify(payload).slice(0, 500));
 
-    // Log incoming webhook
+    // ===== HMAC SIGNATURE VALIDATION (per provider) =====
+    const mpSecret = Deno.env.get("MERCADOPAGO_WEBHOOK_SECRET");
+    const stripeSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+
+    if (provider === "mercadopago" || payload.topic === "payment") {
+      const paymentIdForSig = (payload.data?.id || url.searchParams.get("id") || "").toString();
+      const ok = await validateMercadoPagoSignature(req, paymentIdForSig, mpSecret ?? null);
+      if (!ok) {
+        console.error("[Webhook MP] Invalid HMAC signature - rejecting");
+        return new Response(JSON.stringify({ received: false, error: "Invalid signature" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } else if (provider === "stripe" || payload.object === "event") {
+      const ok = await validateStripeSignature(rawBody, req.headers.get("stripe-signature"), stripeSecret ?? null);
+      if (!ok) {
+        console.error("[Webhook Stripe] Invalid HMAC signature - rejecting");
+        return new Response(JSON.stringify({ received: false, error: "Invalid signature" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // Log incoming webhook (after signature is verified)
     await supabase.from("webhook_logs").insert({
       direction: "inbound",
       endpoint: `payment-webhook?provider=${provider}`,
