@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { CompanyInfo } from '@/hooks/useCompanyInfo';
+import { AICredentials } from '@/hooks/useAICredentials';
 import { Bot, Cpu, Globe, Key, Sparkles, AlertTriangle } from 'lucide-react';
 import {
   card, cardInner, sectionGap, gridGap, inputClass, selectClass,
@@ -11,6 +12,8 @@ import {
 interface Props {
   settings: Partial<CompanyInfo>;
   u: <K extends keyof CompanyInfo>(key: K, value: CompanyInfo[K]) => void;
+  aiSettings: Partial<AICredentials>;
+  ua: <K extends keyof AICredentials>(key: K, value: AICredentials[K]) => void;
 }
 
 const AI_PROVIDERS = [
@@ -24,7 +27,7 @@ const AI_PROVIDERS = [
   { value: 'custom', label: 'Outro (Custom)' },
 ];
 
-export const SettingsAISection = ({ settings, u }: Props) => (
+export const SettingsAISection = ({ settings, u, aiSettings, ua }: Props) => (
   <div className={sectionGap}>
     {/* ── Assistente Nativa ── */}
     <div className={cn(card, cardInner, sectionGap)}>
@@ -50,13 +53,13 @@ export const SettingsAISection = ({ settings, u }: Props) => (
     <div className={cn(card, cardInner, sectionGap)}>
       <SectionHeader icon={Cpu} title="API de IA Externa (Fallback)" description="Configure um provedor externo caso a IA nativa fique indisponível." accentVar="--admin-accent-orange" />
 
-      <ToggleBlock icon={Globe} title="Usar IA externa" description="Quando ativado, substitui a IA nativa pelo provedor configurado abaixo." checked={settings.ai_external_enabled ?? false} onChange={v => u('ai_external_enabled', v)} />
+      <ToggleBlock icon={Globe} title="Usar IA externa" description="Quando ativado, substitui a IA nativa pelo provedor configurado abaixo." checked={aiSettings.enabled ?? false} onChange={v => ua('enabled', v)} />
 
-      {settings.ai_external_enabled && (
+      {aiSettings.enabled && (
         <>
           <div className={cn('grid md:grid-cols-2', gridGap)}>
             <FieldGroup label="Provedor">
-              <Select value={settings.ai_external_provider || 'openai'} onValueChange={v => u('ai_external_provider', v)}>
+              <Select value={aiSettings.provider || 'openai'} onValueChange={v => ua('provider', v)}>
                 <SelectTrigger className={selectClass}><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-card-border))] text-[hsl(var(--admin-text))]">
                   {AI_PROVIDERS.map(p => (
@@ -66,12 +69,12 @@ export const SettingsAISection = ({ settings, u }: Props) => (
               </Select>
             </FieldGroup>
             <FieldGroup label="Modelo">
-              <Input className={inputClass} value={settings.ai_external_model || ''} onChange={e => u('ai_external_model', e.target.value)} placeholder="gpt-4o, claude-3-sonnet, gemini-pro..." />
+              <Input className={inputClass} value={aiSettings.model || ''} onChange={e => ua('model', e.target.value)} placeholder="gpt-4o, claude-3-sonnet, gemini-pro..." />
             </FieldGroup>
           </div>
 
           <FieldGroup label="URL da API">
-            <Input className={inputClass} value={settings.ai_external_api_url || ''} onChange={e => u('ai_external_api_url', e.target.value)} placeholder="https://api.openai.com/v1/chat/completions" />
+            <Input className={inputClass} value={aiSettings.api_url || ''} onChange={e => ua('api_url', e.target.value)} placeholder="https://api.openai.com/v1/chat/completions" />
           </FieldGroup>
 
           <FieldGroup label="Chave de API (API Key)">
@@ -80,8 +83,8 @@ export const SettingsAISection = ({ settings, u }: Props) => (
               <Input
                 className={cn(inputClass, 'pl-10')}
                 type="password"
-                value={settings.ai_external_api_key || ''}
-                onChange={e => u('ai_external_api_key', e.target.value)}
+                value={aiSettings.api_key || ''}
+                onChange={e => ua('api_key', e.target.value)}
                 placeholder="sk-..."
               />
             </div>
