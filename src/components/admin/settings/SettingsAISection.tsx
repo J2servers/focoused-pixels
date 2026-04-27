@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils';
 import { CompanyInfo } from '@/hooks/useCompanyInfo';
 import { AICredentials } from '@/hooks/useAICredentials';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 import { Bot, Cpu, Globe, Key, Sparkles, AlertTriangle } from 'lucide-react';
 import {
   card, cardInner, sectionGap, gridGap, inputClass, selectClass,
@@ -35,18 +36,26 @@ export const SettingsAISection = ({ settings, u, aiSettings, ua }: Props) => (
 
       <ToggleBlock icon={Bot} title="Ativar assistente IA" description="Exibe o chatbot Luna no site para ajudar clientes." checked={settings.ai_assistant_enabled ?? true} onChange={v => u('ai_assistant_enabled', v)} />
 
-      <div className={cn('grid md:grid-cols-2', gridGap)}>
-        <FieldGroup label="Nome da assistente">
-          <Input className={inputClass} value={settings.ai_assistant_name || ''} onChange={e => u('ai_assistant_name', e.target.value)} placeholder="Luna" />
+      <div className={cn('grid md:grid-cols-[160px_1fr]', gridGap)}>
+        <FieldGroup label="Avatar (foto da Luna)">
+          <ImageUpload
+            value={settings.ai_assistant_avatar || ''}
+            onChange={(url) => u('ai_assistant_avatar', url || '')}
+            folder="ai-assistant"
+            aspectRatio="aspect-square"
+            placeholder="Enviar foto"
+            maxSizeMB={2}
+          />
         </FieldGroup>
-        <FieldGroup label="Avatar URL">
-          <Input className={inputClass} value={settings.ai_assistant_avatar || ''} onChange={e => u('ai_assistant_avatar', e.target.value)} placeholder="https://..." />
-        </FieldGroup>
+        <div className={cn('flex flex-col', gridGap)}>
+          <FieldGroup label="Nome da assistente">
+            <Input className={inputClass} value={settings.ai_assistant_name || ''} onChange={e => u('ai_assistant_name', e.target.value)} placeholder="Luna" />
+          </FieldGroup>
+          <FieldGroup label="Mensagem de saudação">
+            <Input className={inputClass} value={settings.ai_assistant_greeting || ''} onChange={e => u('ai_assistant_greeting', e.target.value)} placeholder="Olá! Sou a Luna..." />
+          </FieldGroup>
+        </div>
       </div>
-
-      <FieldGroup label="Mensagem de saudação">
-        <Input className={inputClass} value={settings.ai_assistant_greeting || ''} onChange={e => u('ai_assistant_greeting', e.target.value)} placeholder="Olá! Sou a Luna..." />
-      </FieldGroup>
     </div>
 
     {/* ── API Externa (Fallback) ── */}
