@@ -1,8 +1,20 @@
 /**
- * RainbowCategoryStrip - Single elegant horizontal line of categories
- * Discreto, tipografia refinada, hover sutil com underline animado
+ * RainbowCategoryStrip - Parallelogram cards with neumorphism
+ * CSS-only transitions, no framer-motion
  */
 import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
+
+const RAINBOW = [
+  '330 80% 60%',
+  '160 70% 45%',
+  '220 80% 60%',
+  '25 90% 55%',
+  '270 80% 60%',
+  '45 90% 55%',
+  '185 80% 50%',
+  '340 75% 55%',
+];
 
 interface Category {
   id: string;
@@ -15,39 +27,100 @@ export function RainbowCategoryStrip({ categories }: { categories: Category[] })
   if (categories.length === 0) return null;
 
   return (
-    <section className="border-y border-border/40 bg-background/60 backdrop-blur-sm">
+    <section className="py-12 lg:py-16">
       <div className="container mx-auto px-4">
-        <nav
-          aria-label="Categorias"
-          className="flex items-center gap-1 md:gap-2 overflow-x-auto scrollbar-none py-3 md:py-4"
-        >
-          {categories.map((cat, i) => (
-            <div key={cat.id} className="flex items-center flex-shrink-0">
-              {i > 0 && (
-                <span aria-hidden className="text-border/60 select-none px-2 md:px-3">·</span>
-              )}
-              <Link
-                to={`/categoria/${cat.slug}`}
-                className="group relative inline-flex items-center px-2 md:px-3 py-1.5 text-[13px] md:text-sm font-medium tracking-wide text-foreground/75 hover:text-foreground transition-colors whitespace-nowrap"
-                style={{ fontFamily: "'Cormorant Garamond', 'Playfair Display', Georgia, serif" }}
-              >
-                <span className="relative">
-                  {cat.name}
-                  <span
-                    aria-hidden
-                    className="absolute -bottom-1 left-0 right-0 h-px bg-gradient-to-r from-primary/0 via-primary to-primary/0 scale-x-0 group-hover:scale-x-100 origin-center transition-transform duration-300"
-                  />
-                </span>
-              </Link>
-            </div>
-          ))}
-          <Link
-            to="/categorias"
-            className="ml-auto pl-3 text-[11px] md:text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-primary transition-colors whitespace-nowrap"
-          >
-            Ver todas
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Categorias</h2>
+            <p className="text-sm text-muted-foreground mt-1">Escolha sua base e personalize em poucos passos</p>
+          </div>
+          <Link to="/categorias" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:gap-2.5 transition-all">
+            Ver todas <ArrowRight className="h-4 w-4" />
           </Link>
-        </nav>
+        </div>
+
+        <div className="flex gap-3 md:gap-4 px-2 md:px-6 overflow-x-auto md:overflow-visible scrollbar-none snap-x snap-mandatory md:snap-none pb-2">
+          {categories.map((cat, i) => {
+            const hsl = RAINBOW[i % RAINBOW.length];
+            return (
+              <div
+                key={cat.id}
+                className="flex-shrink-0 w-[140px] md:w-auto md:flex-1 min-w-0 relative z-10 cursor-pointer snap-start
+                  hover:scale-[1.18] hover:-translate-y-3.5 hover:z-30 transition-all duration-300 ease-out"
+                style={{
+                  filter: `
+                    drop-shadow(6px 6px 12px hsl(var(--neu-dark) / var(--neu-intensity)))
+                    drop-shadow(-4px -4px 10px hsl(var(--neu-light) / var(--neu-intensity)))
+                    drop-shadow(0 0 8px hsl(${hsl} / 0.15))
+                  `,
+                }}
+              >
+                <Link
+                  to={`/categoria/${cat.slug}`}
+                  className="group relative block h-[220px] md:h-[260px] lg:h-[300px] overflow-hidden rounded-lg"
+                  style={{
+                    transform: 'skewX(-10deg)',
+                    border: `2px solid hsl(${hsl} / 0.4)`,
+                  }}
+                >
+                  <div
+                    className="absolute inset-[-20%] flex items-center justify-center"
+                    style={{ transform: 'skewX(10deg)' }}
+                  >
+                    {cat.image_url ? (
+                      <img
+                        src={cat.image_url}
+                        alt={cat.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-muted flex items-center justify-center">
+                        <span className="text-5xl">📦</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[3px]"
+                    style={{
+                      background: `hsl(${hsl})`,
+                      boxShadow: `0 0 10px hsl(${hsl} / 0.7), 0 2px 16px hsl(${hsl} / 0.3)`,
+                    }}
+                  />
+
+                  <div
+                    className="absolute bottom-0 left-0 right-0 p-4"
+                    style={{ transform: 'skewX(10deg)' }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                        style={{
+                          backgroundColor: `hsl(${hsl})`,
+                          boxShadow: `0 0 8px hsl(${hsl}), 0 0 16px hsl(${hsl} / 0.4)`,
+                        }}
+                      />
+                      <h3 className="text-white font-bold text-xs md:text-sm lg:text-base leading-tight drop-shadow-lg line-clamp-1">
+                        {cat.name}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div
+                    className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      boxShadow: `inset 0 0 30px -6px hsl(${hsl} / 0.25)`,
+                    }}
+                  />
+                </Link>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
