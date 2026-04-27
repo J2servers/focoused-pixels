@@ -41,7 +41,7 @@ export const ProductCardOptimized = memo(function ProductCardOptimized({
   const navigate = useNavigate();
   const { data: companyInfo } = useCompanyInfo();
   const freeShippingMinimum = companyInfo?.free_shipping_minimum ?? 159;
-  const pixDiscountPercent = companyInfo?.pix_discount_percent ?? 5;
+  const pixDiscountPercent = 5;
   const categoryId = product.categoryId;
 
   const activePromotion = useMemo(() => {
