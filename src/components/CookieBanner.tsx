@@ -40,25 +40,33 @@ export function CookieBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-lg animate-slide-in">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground text-center sm:text-left">
-            {cookieConsentMessage}{' '}
-            <a href="/privacidade" className="text-primary hover:underline">
-              Política de Privacidade
-            </a>
-            .
-          </p>
-          <div className="flex gap-2 shrink-0">
-            <Button variant="outline" size="sm" onClick={declineCookies}>
-              Recusar
-            </Button>
-            <Button size="sm" onClick={acceptCookies}>
-              Aceitar
-            </Button>
-          </div>
-        </div>
+    <div
+      role="region"
+      aria-label="Aviso de cookies"
+      className="fixed bottom-3 left-3 right-3 sm:left-auto sm:right-4 sm:bottom-4 sm:max-w-sm z-30 rounded-2xl border border-border bg-background/95 backdrop-blur-md shadow-[0_8px_30px_hsl(var(--foreground)/0.18)] p-3.5 animate-slide-in"
+    >
+      <p className="text-xs text-muted-foreground leading-snug">
+        🍪 {cookieConsentMessage}{' '}
+        <a href="/privacidade" className="text-primary font-medium hover:underline">
+          Saiba mais
+        </a>
+      </p>
+      <div className="flex gap-2 mt-2.5">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={declineCookies}
+          className="flex-1 h-8 text-xs text-muted-foreground hover:text-foreground"
+        >
+          Recusar
+        </Button>
+        <Button
+          size="sm"
+          onClick={acceptCookies}
+          className="flex-1 h-8 text-xs font-semibold"
+        >
+          Aceitar
+        </Button>
       </div>
     </div>
   );
