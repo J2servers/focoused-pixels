@@ -355,9 +355,9 @@ async function processConfirmedOrder(
 
 // ===== MAIN HANDLER =====
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsHeaders = buildCorsHeaders(req);
+  const pre = handlePreflight(req);
+  if (pre) return pre;
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
