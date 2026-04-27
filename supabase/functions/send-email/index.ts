@@ -54,30 +54,36 @@ async function getEmailConfig() {
     .limit(1)
     .single();
 
+  const smtpUserEnv = Deno.env.get("SMTP_USER");
+  const smtpPasswordEnv = Deno.env.get("SMTP_PASSWORD");
+
   if (data) {
-    return data as EmailCredentials;
+    // Merge: secrets do servidor preenchem credenciais ausentes no DB
+    const merged = { ...data } as EmailCredentials;
+    if (!merged.smtp_username && smtpUserEnv) merged.smtp_username = smtpUserEnv;
+    if (!merged.smtp_password && smtpPasswordEnv) merged.smtp_password = smtpPasswordEnv;
+    if (!merged.business_email && smtpUserEnv) merged.business_email = smtpUserEnv;
+    return merged;
   }
 
-  if (!error) {
+  if (!error && !smtpUserEnv) {
     throw new Error("Email credentials not configured");
   }
 
-  const smtpUser = Deno.env.get("SMTP_USER");
-  const smtpPassword = Deno.env.get("SMTP_PASSWORD");
-  if (!smtpUser || !smtpPassword) {
+  if (!smtpUserEnv || !smtpPasswordEnv) {
     throw new Error("Email credentials not configured");
   }
 
   return {
     email_enabled: true,
-    business_email: smtpUser,
+    business_email: smtpUserEnv,
     sender_name: "Pincel de Luz",
     reply_to_email: null,
     smtp_host: "smtp.hostinger.com",
     smtp_port: 465,
     smtp_secure: true,
-    smtp_username: smtpUser,
-    smtp_password: smtpPassword,
+    smtp_username: smtpUserEnv,
+    smtp_password: smtpPasswordEnv,
     test_mode: false,
     test_recipient: null,
   } as EmailCredentials;
