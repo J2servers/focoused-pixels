@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { secureGet, secureSet, secureRemove, TTL } from '@/lib/secure-storage';
 
 export interface CheckoutProfileData {
   fullName: string;
@@ -14,18 +15,7 @@ export interface CheckoutProfileData {
 }
 
 function makeStorageKey(userId?: string) {
-  return userId ? `pdl_checkout_profile_${userId}` : 'pdl_checkout_profile_guest';
-}
-
-function parseStorage(value: string | null): CheckoutProfileData | null {
-  if (!value) return null;
-  try {
-    const parsed = JSON.parse(value) as CheckoutProfileData;
-    if (!parsed || !parsed.email) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
+  return userId ? `checkout_profile_${userId}` : 'checkout_profile_guest';
 }
 
 export function useCheckoutProfile(userId?: string) {
