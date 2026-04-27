@@ -191,30 +191,6 @@ const defaultCompanyInfo: Omit<CompanyInfo, 'id'> = {
   // Integrations
   whatsapp_message_template: 'Olá! Gostaria de saber mais sobre os produtos da Pincel de Luz.',
   why_choose_us_config: null,
-  ai_external_enabled: false,
-  ai_external_provider: null,
-  ai_external_api_url: null,
-  ai_external_api_key: null,
-  ai_external_model: null,
-  enable_reviews_auto_approve: false,
-  reviews_min_rating_to_show: 1,
-  // Payment flags (credentials are in payment_credentials table)
-  payment_gateway_primary: 'mercadopago',
-  mercadopago_enabled: false,
-  mercadopago_sandbox: true,
-  efi_enabled: false,
-  efi_sandbox: true,
-  pagseguro_enabled: false,
-  pagseguro_sandbox: true,
-  stripe_enabled: false,
-  stripe_sandbox: true,
-  asaas_enabled: false,
-  asaas_sandbox: true,
-  payment_methods_enabled: ['pix', 'credit_card', 'boleto'],
-  pix_discount_percent: 5,
-  boleto_extra_days: 3,
-  max_installments: 12,
-  min_installment_value: 50,
 };
 
 const sanitizeCompanyPayload = (data: Partial<CompanyInfo>) =>
