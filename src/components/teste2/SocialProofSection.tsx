@@ -8,9 +8,8 @@ export function SocialProofSection() {
     queryKey: ['approved-reviews-home'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('reviews')
+        .from('reviews_public')
         .select('*')
-        .eq('is_approved', true)
         .gte('rating', 4)
         .order('created_at', { ascending: false })
         .limit(6);

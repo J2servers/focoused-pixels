@@ -41,7 +41,7 @@ export const ProductReviews = ({ productSlug, productName }: ProductReviewsProps
   const fetchReviews = async () => {
     setIsLoading(true);
     const { data, error } = await supabase
-      .from('reviews')
+      .from('reviews_public')
       .select('*')
       .eq('product_slug', productSlug)
       .order('created_at', { ascending: false });
