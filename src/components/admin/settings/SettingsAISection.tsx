@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils';
 import { CompanyInfo } from '@/hooks/useCompanyInfo';
 import { AICredentials } from '@/hooks/useAICredentials';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 import { Bot, Cpu, Globe, Key, Sparkles, AlertTriangle } from 'lucide-react';
 import {
   card, cardInner, sectionGap, gridGap, inputClass, selectClass,
