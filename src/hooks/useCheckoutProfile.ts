@@ -24,9 +24,10 @@ export function useCheckoutProfile(userId?: string) {
   const [isLoading, setIsLoading] = useState(true);
 
   const loadLocalProfile = useCallback(() => {
-    const local = parseStorage(localStorage.getItem(storageKey));
-    setSavedProfile(local);
-    return local;
+    const local = secureGet<CheckoutProfileData>(storageKey);
+    const valid = local && typeof local.email === 'string' && local.email.includes('@') ? local : null;
+    setSavedProfile(valid);
+    return valid;
   }, [storageKey]);
 
   const loadRemoteProfile = useCallback(async () => {
