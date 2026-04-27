@@ -25,14 +25,13 @@ export function SocialProofSection() {
     queryKey: ['featured-reviews'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('reviews')
+        .from('reviews_public')
         .select('*')
-        .eq('is_approved', true)
         .gte('rating', 4)
         .order('created_at', { ascending: false })
         .limit(6);
       if (error) throw error;
-      return data as Review[];
+      return data as unknown as Review[];
     },
     staleTime: 1000 * 60 * 5,
   });
