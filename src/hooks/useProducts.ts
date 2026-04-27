@@ -91,10 +91,7 @@ export function useProducts() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('products')
-        .select(`
-          *,
-          category:categories(id, name, slug, parent_id)
-        `)
+        .select(`id, name, slug, short_description, full_description, price, promotional_price, stock, sku, status, cover_image, gallery_images, category_id, tags, is_featured, attributes, created_at, category:categories(id, name, slug, parent_id)`)
         .eq('status', 'active')
         .is('deleted_at', null)
         .order('created_at', { ascending: false });
@@ -133,10 +130,7 @@ export function useProductsByCategory(categorySlug: string | undefined) {
 
       const { data, error } = await supabase
         .from('products')
-        .select(`
-          *,
-          category:categories(id, name, slug, parent_id)
-        `)
+        .select(`id, name, slug, short_description, full_description, price, promotional_price, stock, sku, status, cover_image, gallery_images, category_id, tags, is_featured, attributes, created_at, category:categories(id, name, slug, parent_id)`)
         .in('category_id', categoryIds)
         .eq('status', 'active')
         .is('deleted_at', null)
@@ -160,10 +154,7 @@ export function useProductBySlug(slug: string | undefined) {
 
       const { data, error } = await supabase
         .from('products')
-        .select(`
-          *,
-          category:categories(id, name, slug, parent_id)
-        `)
+        .select(`id, name, slug, short_description, full_description, price, promotional_price, stock, sku, status, cover_image, gallery_images, category_id, tags, is_featured, attributes, created_at, category:categories(id, name, slug, parent_id)`)
         .eq('slug', slug)
         .eq('status', 'active')
         .is('deleted_at', null)
@@ -196,10 +187,7 @@ export function useSearchProducts(query: string) {
 
       const { data, error } = await supabase
         .from('products')
-        .select(`
-          *,
-          category:categories(id, name, slug, parent_id)
-        `)
+        .select(`id, name, slug, short_description, full_description, price, promotional_price, stock, sku, status, cover_image, gallery_images, category_id, tags, is_featured, attributes, created_at, category:categories(id, name, slug, parent_id)`)
         .eq('status', 'active')
         .is('deleted_at', null)
         .or(`name.ilike.%${sanitized}%,short_description.ilike.%${sanitized}%`)
@@ -222,10 +210,7 @@ export function useFeaturedProducts(limit = 8) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('products')
-        .select(`
-          *,
-          category:categories(id, name, slug, parent_id)
-        `)
+        .select(`id, name, slug, short_description, full_description, price, promotional_price, stock, sku, status, cover_image, gallery_images, category_id, tags, is_featured, attributes, created_at, category:categories(id, name, slug, parent_id)`)
         .eq('status', 'active')
         .eq('is_featured', true)
         .is('deleted_at', null)
