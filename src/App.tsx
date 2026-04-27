@@ -163,8 +163,6 @@ const App = () => (
                 <Route path="/admin/materiais" element={<AdminRawMaterialsPage />} />
                 <Route path="/admin/login-config" element={<AdminLoginCustomizePage />} />
                 
-                <Route path="/teste" element={<TestePage />} />
-                <Route path="/teste2" element={<Teste2Page />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
