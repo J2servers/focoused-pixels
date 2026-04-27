@@ -232,6 +232,7 @@ export function AIChatWidget() {
       <AnimatePresence>
         {!isOpen && (
           <motion.div
+            key="luna-fab"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
@@ -242,6 +243,7 @@ export function AIChatWidget() {
             <AnimatePresence>
               {showBubble && (
                 <motion.button
+                  key="luna-bubble"
                   type="button"
                   onClick={handleOpenChat}
                   initial={{ opacity: 0, y: 10, scale: 0.9 }}
@@ -266,6 +268,7 @@ export function AIChatWidget() {
             <AnimatePresence>
               {showTeaser && (
                 <motion.div
+                  key="luna-teaser"
                   initial={{ opacity: 0, y: 10, scale: 0.8 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.8 }}
@@ -306,6 +309,7 @@ export function AIChatWidget() {
               <AnimatePresence>
                 {hasUnread && (
                   <motion.span
+                    key="luna-unread"
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0, opacity: 0 }}
@@ -328,6 +332,7 @@ export function AIChatWidget() {
           <>
             {/* Overlay sutil só mobile */}
             <motion.div
+              key="luna-overlay"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -335,6 +340,7 @@ export function AIChatWidget() {
               className="fixed inset-0 z-[59] bg-black/40 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none sm:pointer-events-none"
             />
             <motion.div
+              key="luna-drawer"
               initial={{ x: '100%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: '100%', opacity: 0 }}
