@@ -67,8 +67,10 @@ export function useDashboardMetrics() {
 
       return computeMetrics(all, { now, todayStart, weekStart, monthStart, yearStart, lastMonthStart, lastMonthEnd, twelveMonthsAgo }, taxSettings);
     },
-    refetchInterval: 60000,
-    staleTime: 30000,
+    // Sem refetchInterval automático: o dashboard tem botão de refresh manual.
+    // Cada refetch dispara 19 SELECT * — custoso. Cache válido por 5 min.
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
   });
 }
 
