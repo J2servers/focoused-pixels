@@ -97,22 +97,48 @@ export function PaymentStepDetails({
     setSelectedMethod(null);
     setLastFetchedCep(cleanCep);
 
-    try {
-      const { data, error } = await supabase.functions.invoke('calculate-freight', {
-        body: {
-          destinationCep: cleanCep,
-          productPrice: amount - shippingCost,
-          weight: cartWeight,
-          freeShippingMinimum: 0,
-        },
-      });
+    // Run ViaCEP and freight in parallel — ViaCEP fills street/neighborhood/city/UF automatically.
+    const viaCepPromise = (async () => {
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+        if (!res.ok) return null;
+        const json = await res.json();
+        if (json?.erro) return null;
+        return json as { logradouro?: string; bairro?: string; localidade?: string; uf?: string };
+      } catch {
+        return null;
+      }
+    })();
 
+    try {
+      const [viaCep, freightRes] = await Promise.all([
+        viaCepPromise,
+        supabase.functions.invoke('calculate-freight', {
+          body: {
+            destinationCep: cleanCep,
+            productPrice: amount - shippingCost,
+            weight: cartWeight,
+            freeShippingMinimum: 0,
+          },
+        }),
+      ]);
+
+      if (viaCep) {
+        setCustomerForm(prev => ({
+          ...prev,
+          street: prev.street?.trim() ? prev.street : (viaCep.logradouro || prev.street),
+          neighborhood: prev.neighborhood?.trim() ? prev.neighborhood : (viaCep.bairro || prev.neighborhood),
+          city: viaCep.localidade || prev.city,
+          state: (viaCep.uf || prev.state || '').toUpperCase(),
+        }));
+      }
+
+      const { data, error } = freightRes;
       if (error || data?.error) throw new Error(data?.error || 'API error');
 
       if (data.results?.length > 0) {
         setFreightOptions(data.results);
         setDestinationInfo({ city: data.destination.city, state: data.destination.state });
-        // Auto-fill city and state from API
         setCustomerForm(prev => ({
           ...prev,
           city: data.destination.city || prev.city,
@@ -124,7 +150,6 @@ export function PaymentStepDetails({
     } catch (err) {
       console.error('Freight fetch error:', err);
       setFreightError(true);
-      // Fallback options
       setFreightOptions(FALLBACK_OPTIONS);
       setDestinationInfo(null);
     } finally {
@@ -213,7 +238,7 @@ export function PaymentStepDetails({
             <User className="h-5 w-5" />
             Dados de Entrega
           </CardTitle>
-          <CardDescription>Informe onde devemos enviar seu pedido</CardDescription>
+          <CardDescription>Comece pelo CEP — preenchemos seu endereço automaticamente</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
