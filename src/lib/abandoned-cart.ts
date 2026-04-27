@@ -1,5 +1,7 @@
+import { secureGet, secureSet, secureRemove, TTL } from '@/lib/secure-storage';
+
 export const ABANDONED_CART_TOKEN_KEY = 'pdl_abandoned_cart_token';
-export const ABANDONED_CART_CONTACT_KEY = 'pdl_abandoned_cart_contact';
+export const ABANDONED_CART_CONTACT_KEY = 'abandoned_cart_contact';
 export const ABANDONED_CONTACT_UPDATED_EVENT = 'pdl-abandoned-contact-updated';
 
 export interface AbandonedCartContact {
@@ -49,20 +51,15 @@ export function getOrCreateAbandonedCartToken(): string {
 export function getAbandonedCartContact(): AbandonedCartContact | null {
   if (!hasWindow()) return null;
 
-  const raw = localStorage.getItem(ABANDONED_CART_CONTACT_KEY);
-  if (!raw) return null;
+  const parsed = secureGet<AbandonedCartContact>(ABANDONED_CART_CONTACT_KEY);
+  if (!parsed) return null;
 
-  try {
-    const parsed = JSON.parse(raw) as AbandonedCartContact;
-    return {
-      name: safeTrim(parsed.name, 140),
-      email: normalizeEmail(parsed.email),
-      phone: normalizePhone(parsed.phone),
-      userId: safeTrim(parsed.userId, 50),
-    };
-  } catch {
-    return null;
-  }
+  return {
+    name: safeTrim(parsed.name, 140),
+    email: normalizeEmail(parsed.email),
+    phone: normalizePhone(parsed.phone),
+    userId: safeTrim(parsed.userId, 50),
+  };
 }
 
 export function saveAbandonedCartContact(contact: AbandonedCartContact): void {
@@ -78,9 +75,9 @@ export function saveAbandonedCartContact(contact: AbandonedCartContact): void {
   };
 
   if (!next.name && !next.email && !next.phone && !next.userId) {
-    localStorage.removeItem(ABANDONED_CART_CONTACT_KEY);
+    secureRemove(ABANDONED_CART_CONTACT_KEY);
   } else {
-    localStorage.setItem(ABANDONED_CART_CONTACT_KEY, JSON.stringify(next));
+    secureSet(ABANDONED_CART_CONTACT_KEY, next, TTL.ABANDONED_CART);
   }
 
   window.dispatchEvent(new CustomEvent(ABANDONED_CONTACT_UPDATED_EVENT, { detail: next }));
@@ -88,6 +85,6 @@ export function saveAbandonedCartContact(contact: AbandonedCartContact): void {
 
 export function clearAbandonedCartContact(): void {
   if (!hasWindow()) return;
-  localStorage.removeItem(ABANDONED_CART_CONTACT_KEY);
+  secureRemove(ABANDONED_CART_CONTACT_KEY);
   window.dispatchEvent(new CustomEvent(ABANDONED_CONTACT_UPDATED_EVENT, { detail: null }));
 }
