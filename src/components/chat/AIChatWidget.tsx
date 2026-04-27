@@ -21,7 +21,8 @@ interface Message {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
 const AUTO_POPUP_DELAY = 60 * 1000; // 1 min — aparece pulsando "digitando"
-const TEASER_DURATION = 8 * 1000;  // 8s mostrando "digitando" antes de abrir
+const TEASER_DURATION = 8 * 1000;  // 8s mostrando "digitando" antes de exibir balão
+const BUBBLE_VISIBLE_DURATION = 5 * 1000; // 5s mostrando balão da mensagem
 const AUTO_POPUP_MESSAGE = "Olá! 👋 Sou a Luna, consultora aqui da loja. Posso te ajudar a achar o produto ideal? Temos letreiros neon, displays, crachás e muito mais! ✨";
 const REDIRECT_REGEX = /\[REDIRECT:(\/[^\]\s]+)\]/i;
 
@@ -41,6 +42,8 @@ export function AIChatWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAutoOpened, setHasAutoOpened] = useState(false);
   const [showTeaser, setShowTeaser] = useState(false); // FAB exibe gif "digitando"
+  const [showBubble, setShowBubble] = useState(false); // Balão da mensagem acima do FAB
+  const [hasUnread, setHasUnread] = useState(false);   // Badge de notificação no ícone
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -60,7 +63,7 @@ export function AIChatWidget() {
     if (isOpen) inputRef.current?.focus();
   }, [isOpen]);
 
-  // Auto-popup com teaser "digitando" -> abre drawer
+  // Auto-popup: 1) teaser "digitando" 2) balão com mensagem por 5s 3) some e fica badge
   useEffect(() => {
     if (!aiAssistantEnabled || hasAutoOpened) return;
     if (sessionStorage.getItem('luna_chat_interacted')) {
@@ -70,16 +73,20 @@ export function AIChatWidget() {
     const teaserTimer = setTimeout(() => {
       if (isOpen || hasAutoOpened) return;
       setShowTeaser(true);
-      const openTimer = setTimeout(() => {
-        if (!isOpen) {
-          setShowTeaser(false);
-          setIsOpen(true);
-          setHasAutoOpened(true);
-          sessionStorage.setItem('luna_chat_interacted', 'true');
-          setMessages(prev => [...prev, { role: 'assistant', content: AUTO_POPUP_MESSAGE }]);
-        }
+      const bubbleTimer = setTimeout(() => {
+        if (isOpen) return;
+        setShowTeaser(false);
+        setShowBubble(true);
+        setHasUnread(true);
+        setHasAutoOpened(true);
+        // Adiciona a mensagem ao histórico para quando o usuário abrir
+        setMessages(prev => [...prev, { role: 'assistant', content: AUTO_POPUP_MESSAGE }]);
+        const hideBubbleTimer = setTimeout(() => {
+          setShowBubble(false);
+        }, BUBBLE_VISIBLE_DURATION);
+        return () => clearTimeout(hideBubbleTimer);
       }, TEASER_DURATION);
-      return () => clearTimeout(openTimer);
+      return () => clearTimeout(bubbleTimer);
     }, AUTO_POPUP_DELAY);
     return () => clearTimeout(teaserTimer);
   }, [aiAssistantEnabled, hasAutoOpened, isOpen]);
@@ -87,6 +94,8 @@ export function AIChatWidget() {
   const handleOpenChat = useCallback(() => {
     setIsOpen(true);
     setShowTeaser(false);
+    setShowBubble(false);
+    setHasUnread(false);
     sessionStorage.setItem('luna_chat_interacted', 'true');
   }, []);
 
@@ -227,16 +236,40 @@ export function AIChatWidget() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            className="fixed bottom-28 sm:bottom-24 right-4 sm:right-6 z-[60] flex items-end gap-2"
+            className="fixed bottom-28 sm:bottom-24 right-4 sm:right-6 z-[60] flex flex-col items-end gap-2"
           >
+            {/* Balão da mensagem (5s) — acima do FAB */}
+            <AnimatePresence>
+              {showBubble && (
+                <motion.button
+                  type="button"
+                  onClick={handleOpenChat}
+                  initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                  transition={{ type: 'spring', stiffness: 280, damping: 22 }}
+                  className="max-w-[260px] sm:max-w-[300px] text-left bg-gradient-to-br from-[hsl(250_30%_12%)] to-[hsl(260_28%_10%)] border border-primary/40 rounded-2xl rounded-br-sm px-4 py-3 shadow-2xl shadow-primary/40 cursor-pointer hover:scale-[1.02] transition-transform"
+                  aria-label="Abrir conversa com Luna"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[11px] font-bold text-cyan-300">{aiAssistantName}</span>
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                  </div>
+                  <p className="text-xs text-white/95 leading-snug">
+                    {AUTO_POPUP_MESSAGE}
+                  </p>
+                </motion.button>
+              )}
+            </AnimatePresence>
+
             {/* Bolha "digitando" no teaser */}
             <AnimatePresence>
               {showTeaser && (
                 <motion.div
-                  initial={{ opacity: 0, x: 20, scale: 0.8 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: 20, scale: 0.8 }}
-                  className="mb-2 mr-1 bg-background border border-primary/40 rounded-2xl rounded-br-sm px-4 py-3 shadow-2xl shadow-primary/30 flex items-center gap-2 max-w-[200px]"
+                  initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.8 }}
+                  className="bg-background border border-primary/40 rounded-2xl rounded-br-sm px-4 py-3 shadow-2xl shadow-primary/30 flex items-center gap-2"
                 >
                   <span className="text-xs text-foreground font-medium">{aiAssistantName} digitando</span>
                   <div className="flex gap-1">
@@ -269,6 +302,21 @@ export function AIChatWidget() {
                 {/* Indicador online */}
                 <span className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-green-500 border-2 border-background animate-pulse" />
               </div>
+              {/* Badge de notificação de mensagem não lida */}
+              <AnimatePresence>
+                {hasUnread && (
+                  <motion.span
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+                    className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-red-500 border-2 border-background text-white text-[11px] font-bold flex items-center justify-center shadow-lg shadow-red-500/50 animate-pulse"
+                    aria-label="1 mensagem não lida"
+                  >
+                    1
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </motion.button>
           </motion.div>
         )}
