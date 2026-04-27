@@ -23,7 +23,7 @@ const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const ProductPage = lazy(() => import("./pages/ProductPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
-const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
+
 const QuoteSuccessPage = lazy(() => import("./pages/QuoteSuccessPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const WhyChooseUsPage = lazy(() => import("./pages/WhyChooseUsPage"));
