@@ -1321,3 +1321,133 @@
   box-shadow: none !important;
   text-shadow: none !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL POLISH — Refino de polidez do sistema
+   Microinterações, transições suaves, focos, scrollbars finos
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Suavização global de fontes */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Seleção de texto com cor da marca */
+::selection {
+  background: hsl(var(--primary) / 0.35);
+  color: hsl(var(--foreground));
+}
+
+/* Transições padrão suaves para interações comuns */
+a, button, [role="button"], input, textarea, select {
+  transition:
+    background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease-out;
+}
+
+/* Ring de foco visível e elegante (acessibilidade) */
+*:focus-visible {
+  outline: 2px solid hsl(var(--primary) / 0.6);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Botões com leve pressionamento ao clicar */
+button:not(:disabled):active,
+[role="button"]:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+/* Links de navegação com underline animado */
+a:not(.no-underline-anim):not([role="button"]):hover {
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+/* Scrollbar global fina e elegante */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.25);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.5);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+/* Scrollbar dedicada do chat Luna */
+.luna-scroll::-webkit-scrollbar { width: 6px; }
+.luna-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, hsl(var(--primary) / 0.5), hsl(190 80% 50% / 0.4));
+  border-radius: 999px;
+  border: none;
+  background-clip: border-box;
+}
+.luna-scroll { scrollbar-width: thin; scrollbar-color: hsl(var(--primary) / 0.4) transparent; }
+
+/* Imagens carregam com fade suave */
+img {
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+/* Loading skeleton mais refinado */
+@keyframes shimmer-soft {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+.shimmer-soft {
+  background: linear-gradient(90deg,
+    hsl(var(--muted) / 0.4) 0%,
+    hsl(var(--muted) / 0.7) 50%,
+    hsl(var(--muted) / 0.4) 100%);
+  background-size: 1000px 100%;
+  animation: shimmer-soft 1.8s infinite linear;
+}
+
+/* Cards com lift suave no hover */
+.card-lift {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+}
+
+/* Estados disabled mais suaves */
+[disabled], .disabled {
+  cursor: not-allowed !important;
+  opacity: 0.55;
+}
+
+/* Toasts (sonner) com leve glow */
+[data-sonner-toast] {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Inputs com transição refinada de borda */
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.18);
+  border-color: hsl(var(--primary) / 0.6);
+}
+
+/* Reduz movimento para usuários sensíveis */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

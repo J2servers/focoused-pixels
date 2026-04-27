@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Bot, User, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { cn } from '@/lib/utils';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { toast } from 'sonner';
@@ -329,7 +329,7 @@ export function AIChatWidget() {
               </div>
 
               {/* Mensagens */}
-              <ScrollArea className="flex-1 px-3 py-4 relative" ref={scrollRef}>
+              <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-4 relative luna-scroll">
                 <div className="space-y-4">
                   {messages.map((message, index) => (
                     <motion.div
@@ -387,7 +387,7 @@ export function AIChatWidget() {
                     </motion.div>
                   )}
                 </div>
-              </ScrollArea>
+              </div>
 
               {/* Input */}
               <div className="relative p-3 border-t border-primary/20 bg-black/30 backdrop-blur-xl">
