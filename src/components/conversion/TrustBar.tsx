@@ -20,12 +20,15 @@ export function TrustBar() {
   return (
     <div className="bg-foreground text-background py-2.5 overflow-hidden neu-sm">
       <div className="container mx-auto px-4">
-        {/* Mobile: scrolling */}
-        <div className="block md:hidden overflow-hidden">
-          <div className="flex items-center gap-8 whitespace-nowrap animate-marquee">
+        {/* Mobile: slow scrolling, pauses on touch, larger readable font */}
+        <div className="block md:hidden overflow-hidden group">
+          <div
+            className="flex items-center gap-10 whitespace-nowrap animate-marquee group-active:[animation-play-state:paused]"
+            style={{ animationDuration: '40s' }}
+          >
             {[...items, ...items].map((item, i) => (
-              <div key={i} className="flex items-center gap-1.5 text-[11px] font-medium opacity-90">
-                {item.icon}
+              <div key={i} className="flex items-center gap-1.5 text-[12px] font-medium opacity-95">
+                <span className="text-accent">{item.icon}</span>
                 <span>{item.text}</span>
               </div>
             ))}
