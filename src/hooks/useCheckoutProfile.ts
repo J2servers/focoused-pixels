@@ -54,7 +54,7 @@ export function useCheckoutProfile(userId?: string) {
         updatedAt: row.updated_at || new Date().toISOString(),
       };
 
-      localStorage.setItem(storageKey, JSON.stringify(mapped));
+      secureSet(storageKey, mapped, TTL.CHECKOUT_PROFILE);
       setSavedProfile(mapped);
       return mapped;
     } catch {
@@ -89,7 +89,7 @@ export function useCheckoutProfile(userId?: string) {
         updatedAt: new Date().toISOString(),
       };
 
-      localStorage.setItem(storageKey, JSON.stringify(normalized));
+      secureSet(storageKey, normalized, TTL.CHECKOUT_PROFILE);
       setSavedProfile(normalized);
 
       if (userId) {
