@@ -277,6 +277,15 @@ const CartPage = () => {
       <Suspense fallback={null}>
         <AIChatWidget />
       </Suspense>
+
+      {/* Mobile sticky checkout — keeps "Finalizar compra" reachable */}
+      {items.length > 0 && (
+        <CartStickyCheckoutBar
+          total={total}
+          itemCount={itemCount}
+          onCheckout={handlePayNow}
+        />
+      )}
     </div>
   );
 };
