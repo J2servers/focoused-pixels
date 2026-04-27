@@ -140,6 +140,7 @@ const App = () => (
             <ScrollToTop />
             <PageViewTracker />
             <RuntimeTrackers />
+            <RoutePrefetcher />
             <AnalyticsInit />
             <Suspense fallback={<PageLoader />}>
               <Routes>
