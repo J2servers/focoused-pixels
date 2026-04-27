@@ -238,7 +238,7 @@ export function PaymentStepDetails({
             <User className="h-5 w-5" />
             Dados de Entrega
           </CardTitle>
-          <CardDescription>Informe onde devemos enviar seu pedido</CardDescription>
+          <CardDescription>Comece pelo CEP — preenchemos seu endereço automaticamente</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
