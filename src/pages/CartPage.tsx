@@ -11,6 +11,7 @@ import { useCart } from '@/hooks/useCart';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 import { CartCrossSell } from '@/components/cart/CartCrossSell';
+import { CartStickyCheckoutBar } from '@/components/cart/CartStickyCheckoutBar';
 import { PageSEO } from '@/components/seo/PageSEO';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
