@@ -9,6 +9,7 @@ import { Star, Truck, Shield, Clock, CreditCard, ShoppingBag, Zap, Package, Chev
 import { useProductBySlug, useCategoryBySlug } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
+import { usePaymentCredentials } from '@/hooks/usePaymentCredentials';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { discountTiers } from '@/data/store';
 import { toast } from 'sonner';

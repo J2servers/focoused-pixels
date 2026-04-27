@@ -3,7 +3,7 @@
  * Improvements: #7 PIX discount display, #8 Calculated PIX price, #9 Visual highlight
  */
 import { QrCode } from 'lucide-react';
-import { useCompanyInfo } from '@/hooks/useCompanyInfo';
+import { usePaymentCredentials } from '@/hooks/usePaymentCredentials';
 
 interface PixDiscountProps {
   price: number;
