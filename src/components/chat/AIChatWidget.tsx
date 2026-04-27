@@ -63,7 +63,7 @@ export function AIChatWidget() {
     if (isOpen) inputRef.current?.focus();
   }, [isOpen]);
 
-  // Auto-popup com teaser "digitando" -> abre drawer
+  // Auto-popup: 1) teaser "digitando" 2) balão com mensagem por 5s 3) some e fica badge
   useEffect(() => {
     if (!aiAssistantEnabled || hasAutoOpened) return;
     if (sessionStorage.getItem('luna_chat_interacted')) {
@@ -73,16 +73,20 @@ export function AIChatWidget() {
     const teaserTimer = setTimeout(() => {
       if (isOpen || hasAutoOpened) return;
       setShowTeaser(true);
-      const openTimer = setTimeout(() => {
-        if (!isOpen) {
-          setShowTeaser(false);
-          setIsOpen(true);
-          setHasAutoOpened(true);
-          sessionStorage.setItem('luna_chat_interacted', 'true');
-          setMessages(prev => [...prev, { role: 'assistant', content: AUTO_POPUP_MESSAGE }]);
-        }
+      const bubbleTimer = setTimeout(() => {
+        if (isOpen) return;
+        setShowTeaser(false);
+        setShowBubble(true);
+        setHasUnread(true);
+        setHasAutoOpened(true);
+        // Adiciona a mensagem ao histórico para quando o usuário abrir
+        setMessages(prev => [...prev, { role: 'assistant', content: AUTO_POPUP_MESSAGE }]);
+        const hideBubbleTimer = setTimeout(() => {
+          setShowBubble(false);
+        }, BUBBLE_VISIBLE_DURATION);
+        return () => clearTimeout(hideBubbleTimer);
       }, TEASER_DURATION);
-      return () => clearTimeout(openTimer);
+      return () => clearTimeout(bubbleTimer);
     }, AUTO_POPUP_DELAY);
     return () => clearTimeout(teaserTimer);
   }, [aiAssistantEnabled, hasAutoOpened, isOpen]);
@@ -90,6 +94,8 @@ export function AIChatWidget() {
   const handleOpenChat = useCallback(() => {
     setIsOpen(true);
     setShowTeaser(false);
+    setShowBubble(false);
+    setHasUnread(false);
     sessionStorage.setItem('luna_chat_interacted', 'true');
   }, []);
 
