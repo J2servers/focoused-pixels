@@ -2365,12 +2365,14 @@ export type Database = {
           category_id: string | null
           cover_image: string | null
           created_at: string | null
+          deleted_at: string | null
           full_description: string | null
           gallery_images: string[] | null
           height_cm: number | null
           id: string | null
           is_featured: boolean | null
           length_cm: number | null
+          min_stock: number | null
           name: string | null
           price: number | null
           promotional_price: number | null
@@ -2389,12 +2391,14 @@ export type Database = {
           category_id?: string | null
           cover_image?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           full_description?: string | null
           gallery_images?: string[] | null
           height_cm?: number | null
           id?: string | null
           is_featured?: boolean | null
           length_cm?: number | null
+          min_stock?: number | null
           name?: string | null
           price?: number | null
           promotional_price?: number | null
@@ -2413,12 +2417,14 @@ export type Database = {
           category_id?: string | null
           cover_image?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           full_description?: string | null
           gallery_images?: string[] | null
           height_cm?: number | null
           id?: string | null
           is_featured?: boolean | null
           length_cm?: number | null
+          min_stock?: number | null
           name?: string | null
           price?: number | null
           promotional_price?: number | null
