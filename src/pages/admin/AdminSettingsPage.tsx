@@ -5,6 +5,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { useCompanyInfoAdmin, useUpdateCompanyInfo, CompanyInfo } from '@/hooks/useCompanyInfo';
 import { usePaymentCredentials, useUpdatePaymentCredentials, PaymentCredentials } from '@/hooks/usePaymentCredentials';
 import { useEmailCredentials, useUpdateEmailCredentials, EmailCredentials } from '@/hooks/useEmailCredentials';
+import { useAICredentials, useUpdateAICredentials, AICredentials } from '@/hooks/useAICredentials';
 import { useSendTestEmail, useTestEmailConnection } from '@/hooks/useEmailGateway';
 import { useTestMercadoPago, useTestEfiBank, useTestStripe } from '@/hooks/usePaymentGateway';
 import { cn } from '@/lib/utils';
@@ -35,9 +36,11 @@ const AdminSettingsPage = () => {
   const { data: companyInfo, isLoading: l1 } = useCompanyInfoAdmin();
   const { data: paymentCreds, isLoading: l2 } = usePaymentCredentials();
   const { data: emailCreds, isLoading: l3 } = useEmailCredentials();
+  const { data: aiCreds, isLoading: l4 } = useAICredentials();
   const updateCompany = useUpdateCompanyInfo();
   const updatePayment = useUpdatePaymentCredentials();
   const updateEmail = useUpdateEmailCredentials();
+  const updateAI = useUpdateAICredentials();
   const testSmtp = useTestEmailConnection();
   const sendTest = useSendTestEmail();
   const testMP = useTestMercadoPago();
@@ -47,17 +50,20 @@ const AdminSettingsPage = () => {
   const [settings, setSettings] = useState<Partial<CompanyInfo>>({});
   const [payment, setPayment] = useState<Partial<PaymentCredentials>>({});
   const [email, setEmail] = useState<Partial<EmailCredentials>>({});
+  const [ai, setAi] = useState<Partial<AICredentials>>({});
   const [tab, setTab] = useState<SettingsTab>('geral');
 
   useEffect(() => { if (companyInfo) setSettings(companyInfo); }, [companyInfo]);
   useEffect(() => { if (paymentCreds) setPayment(paymentCreds); }, [paymentCreds]);
   useEffect(() => { if (emailCreds) setEmail(emailCreds); }, [emailCreds]);
+  useEffect(() => { if (aiCreds) setAi(aiCreds); }, [aiCreds]);
 
   const u  = <K extends keyof CompanyInfo>(k: K, v: CompanyInfo[K]) => setSettings(p => ({ ...p, [k]: v }));
   const up = <K extends keyof PaymentCredentials>(k: K, v: PaymentCredentials[K]) => setPayment(p => ({ ...p, [k]: v }));
   const ue = <K extends keyof EmailCredentials>(k: K, v: EmailCredentials[K]) => setEmail(p => ({ ...p, [k]: v }));
+  const ua = <K extends keyof AICredentials>(k: K, v: AICredentials[K]) => setAi(p => ({ ...p, [k]: v }));
 
-  const saving = updateCompany.isPending || updatePayment.isPending || updateEmail.isPending;
+  const saving = updateCompany.isPending || updatePayment.isPending || updateEmail.isPending || updateAI.isPending;
   const canMutate = canEdit();
 
   const saveAll = async () => {
@@ -66,6 +72,7 @@ const AdminSettingsPage = () => {
         updateCompany.mutateAsync({ id: companyInfo?.id || null, data: settings }),
         updatePayment.mutateAsync({ id: paymentCreds?.id || null, data: payment }),
         updateEmail.mutateAsync({ id: emailCreds?.id || null, data: email }),
+        updateAI.mutateAsync({ id: aiCreds?.id || null, data: ai }),
       ]);
       toast.success('Configurações salvas com sucesso!');
     } catch (e: unknown) { toast.error(e instanceof Error ? e.message : 'Erro ao salvar'); }
@@ -96,7 +103,7 @@ const AdminSettingsPage = () => {
     catch { toast.error(`${name} falhou`); }
   };
 
-  if (l1 || l2 || l3) {
+  if (l1 || l2 || l3 || l4) {
     return (
       <AdminLayout title="Configurações">
         <div className="flex h-64 items-center justify-center">
@@ -166,7 +173,7 @@ const AdminSettingsPage = () => {
           {tab === 'email' && <SettingsEmailSection emailSettings={email} ue={ue} canMutate={canMutate} handleTestSmtp={handleTestSmtp} handleSendTest={handleSendTest} testSmtpPending={testSmtp.isPending} sendTestPending={sendTest.isPending} updateEmailPending={updateEmail.isPending} />}
           {tab === 'seguranca' && <SettingsSecuritySection settings={settings} u={u} canMutate={canMutate} profileName={profile?.full_name || ''} updatePassword={updatePassword} />}
           {tab === 'operacoes' && <SettingsOperationsSection />}
-          {tab === 'ia' && <SettingsAISection settings={settings} u={u} />}
+          {tab === 'ia' && <SettingsAISection settings={settings} u={u} aiSettings={ai} ua={ua} />}
         </div>
       </div>
     </AdminLayout>

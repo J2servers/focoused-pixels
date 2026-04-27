@@ -9,6 +9,7 @@ import { Star, Truck, Shield, Clock, CreditCard, ShoppingBag, Zap, Package, Chev
 import { useProductBySlug, useCategoryBySlug } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
+import { usePaymentCredentials } from '@/hooks/usePaymentCredentials';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { discountTiers } from '@/data/store';
 import { toast } from 'sonner';
@@ -62,6 +63,7 @@ const ProductPage = () => {
   const { data: product, isLoading } = useProductBySlug(productSlug);
   const { data: category } = useCategoryBySlug(product?.category);
   const { data: companyInfo } = useCompanyInfo();
+  const { data: paymentCreds } = usePaymentCredentials();
   const settings = useSiteSettings();
   const { addItem: addRecentlyViewed } = useRecentlyViewed();
   const navigate = useNavigate();
@@ -154,8 +156,8 @@ const ProductPage = () => {
 
   const currentDiscount = getDiscountPercent(quantity);
   const discountedPrice = product.price * (1 - currentDiscount / 100);
-  const installments = companyInfo?.max_installments || settings.installments;
-  const minInstallmentValue = companyInfo?.min_installment_value || 50;
+  const installments = paymentCreds?.max_installments || settings.installments;
+  const minInstallmentValue = paymentCreds?.min_installment_value || 50;
   const maxInstallments = Math.min(installments, Math.floor(product.price / minInstallmentValue) || 1);
 
   const handleAddToCart = () => {
