@@ -363,14 +363,6 @@ export type Database = {
           ai_assistant_enabled: boolean | null
           ai_assistant_greeting: string | null
           ai_assistant_name: string | null
-          ai_external_api_key: string | null
-          ai_external_api_url: string | null
-          ai_external_enabled: boolean | null
-          ai_external_model: string | null
-          ai_external_provider: string | null
-          asaas_enabled: boolean | null
-          asaas_sandbox: boolean | null
-          boleto_extra_days: number | null
           business_hours: string | null
           checkout_success_message: string | null
           cnpj: string | null
@@ -380,8 +372,6 @@ export type Database = {
           copyright_text: string | null
           custom_css: string | null
           dark_mode_enabled: boolean | null
-          efi_enabled: boolean | null
-          efi_sandbox: boolean | null
           email: string | null
           enable_compare_products: boolean | null
           enable_coupon_codes: boolean | null
@@ -420,20 +410,11 @@ export type Database = {
           low_stock_threshold: number | null
           maintenance_message: string | null
           maintenance_mode: boolean | null
-          max_installments: number | null
           max_order_value: number | null
-          mercadopago_enabled: boolean | null
-          mercadopago_sandbox: boolean | null
-          min_installment_value: number | null
           min_order_value: number | null
           notification_email: string | null
           og_image: string | null
-          pagseguro_enabled: boolean | null
-          pagseguro_sandbox: boolean | null
-          payment_gateway_primary: string | null
-          payment_methods_enabled: string[] | null
           phone: string | null
-          pix_discount_percent: number | null
           primary_color: string | null
           privacy_policy: string | null
           production_time: string | null
@@ -462,8 +443,6 @@ export type Database = {
           social_youtube: string | null
           store_closed_message: string | null
           store_status: string | null
-          stripe_enabled: boolean | null
-          stripe_sandbox: boolean | null
           terms_of_service: string | null
           updated_at: string
           warranty: string | null
@@ -479,14 +458,6 @@ export type Database = {
           ai_assistant_enabled?: boolean | null
           ai_assistant_greeting?: string | null
           ai_assistant_name?: string | null
-          ai_external_api_key?: string | null
-          ai_external_api_url?: string | null
-          ai_external_enabled?: boolean | null
-          ai_external_model?: string | null
-          ai_external_provider?: string | null
-          asaas_enabled?: boolean | null
-          asaas_sandbox?: boolean | null
-          boleto_extra_days?: number | null
           business_hours?: string | null
           checkout_success_message?: string | null
           cnpj?: string | null
@@ -496,8 +467,6 @@ export type Database = {
           copyright_text?: string | null
           custom_css?: string | null
           dark_mode_enabled?: boolean | null
-          efi_enabled?: boolean | null
-          efi_sandbox?: boolean | null
           email?: string | null
           enable_compare_products?: boolean | null
           enable_coupon_codes?: boolean | null
@@ -536,20 +505,11 @@ export type Database = {
           low_stock_threshold?: number | null
           maintenance_message?: string | null
           maintenance_mode?: boolean | null
-          max_installments?: number | null
           max_order_value?: number | null
-          mercadopago_enabled?: boolean | null
-          mercadopago_sandbox?: boolean | null
-          min_installment_value?: number | null
           min_order_value?: number | null
           notification_email?: string | null
           og_image?: string | null
-          pagseguro_enabled?: boolean | null
-          pagseguro_sandbox?: boolean | null
-          payment_gateway_primary?: string | null
-          payment_methods_enabled?: string[] | null
           phone?: string | null
-          pix_discount_percent?: number | null
           primary_color?: string | null
           privacy_policy?: string | null
           production_time?: string | null
@@ -578,8 +538,6 @@ export type Database = {
           social_youtube?: string | null
           store_closed_message?: string | null
           store_status?: string | null
-          stripe_enabled?: boolean | null
-          stripe_sandbox?: boolean | null
           terms_of_service?: string | null
           updated_at?: string
           warranty?: string | null
@@ -595,14 +553,6 @@ export type Database = {
           ai_assistant_enabled?: boolean | null
           ai_assistant_greeting?: string | null
           ai_assistant_name?: string | null
-          ai_external_api_key?: string | null
-          ai_external_api_url?: string | null
-          ai_external_enabled?: boolean | null
-          ai_external_model?: string | null
-          ai_external_provider?: string | null
-          asaas_enabled?: boolean | null
-          asaas_sandbox?: boolean | null
-          boleto_extra_days?: number | null
           business_hours?: string | null
           checkout_success_message?: string | null
           cnpj?: string | null
@@ -612,8 +562,6 @@ export type Database = {
           copyright_text?: string | null
           custom_css?: string | null
           dark_mode_enabled?: boolean | null
-          efi_enabled?: boolean | null
-          efi_sandbox?: boolean | null
           email?: string | null
           enable_compare_products?: boolean | null
           enable_coupon_codes?: boolean | null
@@ -652,20 +600,11 @@ export type Database = {
           low_stock_threshold?: number | null
           maintenance_message?: string | null
           maintenance_mode?: boolean | null
-          max_installments?: number | null
           max_order_value?: number | null
-          mercadopago_enabled?: boolean | null
-          mercadopago_sandbox?: boolean | null
-          min_installment_value?: number | null
           min_order_value?: number | null
           notification_email?: string | null
           og_image?: string | null
-          pagseguro_enabled?: boolean | null
-          pagseguro_sandbox?: boolean | null
-          payment_gateway_primary?: string | null
-          payment_methods_enabled?: string[] | null
           phone?: string | null
-          pix_discount_percent?: number | null
           primary_color?: string | null
           privacy_policy?: string | null
           production_time?: string | null
@@ -694,8 +633,6 @@ export type Database = {
           social_youtube?: string | null
           store_closed_message?: string | null
           store_status?: string | null
-          stripe_enabled?: boolean | null
-          stripe_sandbox?: boolean | null
           terms_of_service?: string | null
           updated_at?: string
           warranty?: string | null
@@ -968,45 +905,6 @@ export type Database = {
           subtitle?: string | null
           theme?: string | null
           title?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      hostinger_email_credentials: {
-        Row: {
-          id: string
-          is_active: boolean
-          reply_to: string | null
-          smtp_host: string
-          smtp_password: string | null
-          smtp_port: number
-          smtp_user: string | null
-          test_email: string | null
-          test_mode: boolean
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          is_active?: boolean
-          reply_to?: string | null
-          smtp_host?: string
-          smtp_password?: string | null
-          smtp_port?: number
-          smtp_user?: string | null
-          test_email?: string | null
-          test_mode?: boolean
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          is_active?: boolean
-          reply_to?: string | null
-          smtp_host?: string
-          smtp_password?: string | null
-          smtp_port?: number
-          smtp_user?: string | null
-          test_email?: string | null
-          test_mode?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -2246,11 +2144,6 @@ export type Database = {
           ai_assistant_enabled: boolean | null
           ai_assistant_greeting: string | null
           ai_assistant_name: string | null
-          ai_external_enabled: boolean | null
-          ai_external_model: string | null
-          ai_external_provider: string | null
-          asaas_enabled: boolean | null
-          boleto_extra_days: number | null
           business_hours: string | null
           checkout_success_message: string | null
           cnpj: string | null
@@ -2260,7 +2153,6 @@ export type Database = {
           copyright_text: string | null
           custom_css: string | null
           dark_mode_enabled: boolean | null
-          efi_enabled: boolean | null
           email: string | null
           enable_compare_products: boolean | null
           enable_coupon_codes: boolean | null
@@ -2291,18 +2183,11 @@ export type Database = {
           low_stock_threshold: number | null
           maintenance_message: string | null
           maintenance_mode: boolean | null
-          max_installments: number | null
           max_order_value: number | null
-          mercadopago_enabled: boolean | null
-          min_installment_value: number | null
           min_order_value: number | null
           notification_email: string | null
           og_image: string | null
-          pagseguro_enabled: boolean | null
-          payment_gateway_primary: string | null
-          payment_methods_enabled: string[] | null
           phone: string | null
-          pix_discount_percent: number | null
           primary_color: string | null
           privacy_policy: string | null
           production_time: string | null
@@ -2331,7 +2216,6 @@ export type Database = {
           social_youtube: string | null
           store_closed_message: string | null
           store_status: string | null
-          stripe_enabled: boolean | null
           terms_of_service: string | null
           updated_at: string | null
           warranty: string | null
