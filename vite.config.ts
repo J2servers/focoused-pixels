@@ -40,9 +40,8 @@ export default defineConfig(({ mode }) => ({
           // Ícones — ~70kB sozinho
           if (id.includes('lucide-react')) return 'vendor-icons';
 
-          // Charts (recharts) — mantém junto com suas deps (d3, victory-vendor, etc.)
-          // para evitar circular deps. Não separar d3- do recharts!
-          // Deixamos cair em vendor-misc junto com tudo que depende.
+          // Charts (recharts) — só admin dashboard usa
+          if (id.includes('recharts') || id.includes('d3-')) return 'vendor-charts';
 
           // Forms / validation
           if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform')) {
