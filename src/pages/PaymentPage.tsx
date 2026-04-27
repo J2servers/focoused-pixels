@@ -65,7 +65,9 @@ const PaymentPage = () => {
   }, []);
 
   const subtotal = Math.max(0, paymentState.amount - paymentState.shippingCost);
-  const installmentValue = installments > 0 ? paymentState.amount / installments : paymentState.amount;
+  const maxInstallment = installments.length > 0 ? installments[installments.length - 1] : null;
+  const installmentCount = maxInstallment?.number ?? 1;
+  const installmentValue = maxInstallment?.value ?? paymentState.amount;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
