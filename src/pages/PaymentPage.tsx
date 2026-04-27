@@ -52,6 +52,21 @@ const PaymentPage = () => {
   const progress = (currentStep / steps.length) * 100;
   const installments = flow.calculateInstallments(paymentState.amount);
 
+  // Read cart items from session storage so we can render an itemized summary.
+  const summaryItems: PendingPaymentItem[] = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem('pending_payment');
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as { cartItems?: PendingPaymentItem[] };
+      return Array.isArray(parsed.cartItems) ? parsed.cartItems : [];
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const subtotal = Math.max(0, paymentState.amount - paymentState.shippingCost);
+  const installmentValue = installments > 0 ? paymentState.amount / installments : paymentState.amount;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <DynamicTopBar /><DynamicMainHeader /><NavigationBar />
