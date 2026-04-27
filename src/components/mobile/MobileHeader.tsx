@@ -349,7 +349,7 @@ function MobileDrawer({
 
       <div className="pt-3" style={{ borderTop: '1px solid hsl(var(--neon-primary) / 0.08)' }}>
         {[
-          { to: '/checkout', icon: Sparkles, label: 'Solicitar Orçamento' },
+          { to: '/pagamento', icon: Sparkles, label: 'Solicitar Orçamento' },
           { to: '/rastreio', icon: Package, label: 'Rastrear Pedido' },
           { to: '/sobre', icon: Info, label: 'Sobre Nós' },
           { to: '/faq', icon: HelpCircle, label: 'FAQ' },

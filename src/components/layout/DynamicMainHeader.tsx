@@ -161,7 +161,7 @@ export function DynamicMainHeader() {
             </div>
 
             {/* Quote - desktop */}
-            <Link to="/checkout" className="hidden md:block">
+            <Link to="/pagamento" className="hidden md:block">
               <motion.div whileHover={{ y: -3, scale: 1.02 }} whileTap={{ scale: 0.95 }}>
                 <div
                   className="px-5 h-11 rounded-full flex items-center gap-2 text-xs font-bold tracking-wide text-foreground cursor-pointer transition-colors hover:text-primary"
@@ -354,7 +354,7 @@ function DrawerContent({ company, categoryTree, categoriesLoading, searchQuery, 
       {/* Quick links */}
       <div className="pt-3 flex flex-col gap-1" style={{ borderTop: '1px solid hsl(var(--neon-primary) / 0.1)' }}>
         <SheetClose asChild>
-          <Link to="/checkout" className="py-2.5 px-4 rounded-full text-sm font-medium hover:text-primary transition-colors">
+          <Link to="/pagamento" className="py-2.5 px-4 rounded-full text-sm font-medium hover:text-primary transition-colors">
             Solicitar Orçamento
           </Link>
         </SheetClose>

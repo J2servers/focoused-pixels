@@ -8,6 +8,7 @@ import {
   useMercadoPago
 } from '@/hooks/usePaymentGateway';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
+import { usePaymentCredentials } from '@/hooks/usePaymentCredentials';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCheckoutProfile } from '@/hooks/useCheckoutProfile';
 import type { Json } from '@/integrations/supabase/types';
@@ -119,11 +120,12 @@ export function usePaymentFlow() {
   const createPreference = useCreateMercadoPagoPreference();
   const mercadoPago = useMercadoPago();
 
-  const pixDiscount = companyInfo?.pix_discount_percent ?? 5;
-  const maxInstallments = companyInfo?.max_installments ?? 12;
-  const minInstallmentValue = companyInfo?.min_installment_value ?? 50;
-  const boletoExtraDays = companyInfo?.boleto_extra_days ?? 3;
-  const paymentMethodsEnabled = companyInfo?.payment_methods_enabled ?? ['pix', 'credit_card', 'boleto'];
+  const { data: paymentCreds } = usePaymentCredentials();
+  const pixDiscount = paymentCreds?.pix_discount_percent ?? 5;
+  const maxInstallments = paymentCreds?.max_installments ?? 12;
+  const minInstallmentValue = paymentCreds?.min_installment_value ?? 50;
+  const boletoExtraDays = paymentCreds?.boleto_extra_days ?? 3;
+  const paymentMethodsEnabled = paymentCreds?.payment_methods_enabled ?? ['pix', 'credit_card', 'boleto'];
 
   // Auto-advance if authenticated
   useEffect(() => {

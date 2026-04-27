@@ -156,7 +156,7 @@ const WhyChooseUsPage = () => {
                 <p className="mt-3 text-sm leading-relaxed max-w-2xl" style={{ color: 'var(--wcup-text-secondary)' }}>{config.hero.secondaryDescription}</p>
 
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                  <Link to={safeHref(config.hero.primaryCtaHref, '/checkout')}>
+                  <Link to={safeHref(config.hero.primaryCtaHref, '/pagamento')}>
                     <Button
                       size="lg"
                       className="min-w-[220px] border-0 shadow-lg hover:brightness-110 hover:-translate-y-0.5 transition-all"
@@ -402,7 +402,7 @@ const WhyChooseUsPage = () => {
               </div>
 
               <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row">
-                <Link to={safeHref(config.finalCta.primaryCtaHref, '/checkout')}>
+                <Link to={safeHref(config.finalCta.primaryCtaHref, '/pagamento')}>
                   <Button
                     size="lg"
                     className="min-w-[220px] border-0 shadow-lg hover:brightness-110 hover:-translate-y-0.5 transition-all"

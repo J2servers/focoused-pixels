@@ -23,7 +23,7 @@ const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const ProductPage = lazy(() => import("./pages/ProductPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
-const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
+
 const QuoteSuccessPage = lazy(() => import("./pages/QuoteSuccessPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const WhyChooseUsPage = lazy(() => import("./pages/WhyChooseUsPage"));
@@ -34,8 +34,6 @@ const TrackingPage = lazy(() => import("./pages/TrackingPage"));
 const CategoriesPage = lazy(() => import("./pages/CategoriesPage"));
 const CustomerAreaPage = lazy(() => import("./pages/CustomerAreaPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const TestePage = lazy(() => import("./pages/TestePage"));
-const Teste2Page = lazy(() => import("./pages/Teste2Page"));
 
 // Payment Pages
 const PaymentPage = lazy(() => import("./pages/PaymentPage"));
@@ -115,7 +113,8 @@ const App = () => (
                 <Route path="/produto/:productSlug" element={<ProductPage />} />
                 <Route path="/carrinho" element={<CartPage />} />
                 <Route path="/busca" element={<SearchPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
+                {/* /checkout legado removido — fluxo único em /pagamento */}
+                <Route path="/checkout" element={<PaymentPage />} />
                 <Route path="/orcamento-enviado" element={<QuoteSuccessPage />} />
                 
                 {/* Payment Routes */}
@@ -156,7 +155,7 @@ const App = () => (
                 <Route path="/admin/api" element={<AdminApiDocsPage />} />
                 <Route path="/admin/whatsapp" element={<AdminWhatsAppPage />} />
                 <Route path="/admin/templates" element={<AdminTemplatesPage />} />
-                <Route path="/admin/email-templates" element={<AdminTemplatesPage />} />
+                {/* alias /admin/email-templates removido — usar /admin/templates */}
                 <Route path="/admin/midia" element={<AdminMediaPage />} />
                 <Route path="/admin/pagina-por-que-escolher" element={<AdminWhyChooseUsPage />} />
                 <Route path="/admin/workflows" element={<AdminWorkflowsPage />} />
@@ -164,8 +163,6 @@ const App = () => (
                 <Route path="/admin/materiais" element={<AdminRawMaterialsPage />} />
                 <Route path="/admin/login-config" element={<AdminLoginCustomizePage />} />
                 
-                <Route path="/teste" element={<TestePage />} />
-                <Route path="/teste2" element={<Teste2Page />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

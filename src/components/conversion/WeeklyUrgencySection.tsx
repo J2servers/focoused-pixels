@@ -52,7 +52,7 @@ export function WeeklyUrgencySection() {
             </div>
 
             <div className="flex gap-3 shrink-0">
-              <Link to="/checkout">
+              <Link to="/pagamento">
                 <Button size="lg" className="font-semibold">
                   Reservar minha produção
                 </Button>

@@ -238,7 +238,7 @@ const CartPage = () => {
                       Pagar Agora
                     </Button>
 
-                    <Link to="/checkout">
+                    <Link to="/pagamento">
                       <Button 
                         size="lg" 
                         variant="outline"
