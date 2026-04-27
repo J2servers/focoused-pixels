@@ -2,6 +2,7 @@
  * PaymentPage - Multi-step payment flow (refactored)
  * Step 1: Auth | Step 2: Details | Step 3: Payment
  */
+import { useMemo } from 'react';
 import { DynamicTopBar, DynamicMainHeader, DynamicFooter, NavigationBar } from '@/components/layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,16 @@ import { Lock, Truck, CreditCard, Check, ArrowLeft } from 'lucide-react';
 import { PaymentStepAuth } from '@/components/payment/PaymentStepAuth';
 import { PaymentStepDetails } from '@/components/payment/PaymentStepDetails';
 import { PaymentStepPayment } from '@/components/payment/PaymentStepPayment';
+import { PaymentOrderSummary } from '@/components/payment/PaymentOrderSummary';
 import { usePaymentFlow } from '@/hooks/usePaymentFlow';
+
+interface PendingPaymentItem {
+  name: string;
+  quantity: number;
+  price: number;
+  image?: string;
+  size?: string;
+}
 
 const steps = [
   { id: 1, title: 'Criar Conta', shortTitle: 'Conta', icon: Lock },
@@ -41,6 +51,23 @@ const PaymentPage = () => {
 
   const progress = (currentStep / steps.length) * 100;
   const installments = flow.calculateInstallments(paymentState.amount);
+
+  // Read cart items from session storage so we can render an itemized summary.
+  const summaryItems: PendingPaymentItem[] = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem('pending_payment');
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as { cartItems?: PendingPaymentItem[] };
+      return Array.isArray(parsed.cartItems) ? parsed.cartItems : [];
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const subtotal = Math.max(0, paymentState.amount - paymentState.shippingCost);
+  const maxInstallment = installments.length > 0 ? installments[installments.length - 1] : null;
+  const installmentCount = maxInstallment?.number ?? 1;
+  const installmentValue = maxInstallment?.value ?? paymentState.amount;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -72,12 +99,26 @@ const PaymentPage = () => {
                       }`}>
                         {step.id < currentStep ? <Check className="h-4 w-4" /> : <StepIcon className="h-4 w-4" />}
                       </div>
-                      <span className="text-xs hidden sm:block">{step.shortTitle}</span>
+                      <span className="text-[11px] sm:text-xs font-medium leading-tight text-center">
+                        {step.shortTitle}
+                      </span>
                     </div>
                   );
                 })}
               </div>
               <Progress value={progress} className="h-1.5" />
+            </div>
+
+            {/* Sticky-ish order summary — visible above step content on every step */}
+            <div className="mb-5 sticky top-2 z-10">
+              <PaymentOrderSummary
+                items={summaryItems}
+                subtotal={subtotal}
+                shippingCost={paymentState.shippingCost}
+                total={paymentState.amount}
+                installments={installmentCount}
+                installmentValue={installmentValue}
+              />
             </div>
 
             {/* Step Content */}
