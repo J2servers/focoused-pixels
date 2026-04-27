@@ -387,7 +387,7 @@ export function AIChatWidget() {
                     </motion.div>
                   )}
                 </div>
-              </ScrollArea>
+              </div>
 
               {/* Input */}
               <div className="relative p-3 border-t border-primary/20 bg-black/30 backdrop-blur-xl">
