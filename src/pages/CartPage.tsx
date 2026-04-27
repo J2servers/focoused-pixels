@@ -11,6 +11,7 @@ import { useCart } from '@/hooks/useCart';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 import { CartCrossSell } from '@/components/cart/CartCrossSell';
+import { CartStickyCheckoutBar } from '@/components/cart/CartStickyCheckoutBar';
 import { PageSEO } from '@/components/seo/PageSEO';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
@@ -75,7 +76,7 @@ const CartPage = () => {
       <NavigationBar />
 
       <main id="main-content" className="flex-1" role="main">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 pb-28 lg:pb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-8">Meu Carrinho</h1>
 
           {items.length === 0 ? (
@@ -276,6 +277,15 @@ const CartPage = () => {
       <Suspense fallback={null}>
         <AIChatWidget />
       </Suspense>
+
+      {/* Mobile sticky checkout — keeps "Finalizar compra" reachable */}
+      {items.length > 0 && (
+        <CartStickyCheckoutBar
+          total={total}
+          itemCount={itemCount}
+          onCheckout={handlePayNow}
+        />
+      )}
     </div>
   );
 };

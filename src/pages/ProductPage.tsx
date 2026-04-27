@@ -303,23 +303,9 @@ const ProductPage = () => {
                       <strong className="text-foreground">{formatPrice(product.price / maxInstallments)}</strong> sem juros
                     </p>
                   )}
-
-                  <PixDiscount price={discountedPrice} quantity={quantity} />
-
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <StockIndicator stock={product.inStock ? undefined : 0} />
-                    {product.freeShipping && (
-                      <div className="flex items-center gap-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold px-3 py-1.5">
-                        <Truck className="h-3.5 w-3.5" />
-                        Frete Grátis
-                      </div>
-                    )}
-                  </div>
-
-                  <UrgencyBadge productId={product.id} />
                 </Section>
 
-                {/* ── 3. Actions (Buy / Cart) ── */}
+                {/* ── 3. Actions (Buy / Cart) — moved up so CTA is visible without scrolling ── */}
                 {product.inStock ? (
                   <Section label="Ações de compra" className="space-y-3">
                     <Button onClick={handleBuyNow} size="lg" className="w-full h-13 sm:h-14 text-base sm:text-lg font-bold gap-2 rounded-xl">
@@ -334,6 +320,23 @@ const ProductPage = () => {
                 ) : (
                   <NotifyWhenAvailable productName={product.name} productId={product.id} inStock={product.inStock} />
                 )}
+
+                {/* ── 3b. Pricing extras (PIX, stock, urgency) — after CTA so they don't push it below the fold ── */}
+                <Section label="Vantagens e disponibilidade" className="space-y-3">
+                  <PixDiscount price={discountedPrice} quantity={quantity} />
+
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <StockIndicator stock={product.inStock ? undefined : 0} />
+                    {product.freeShipping && (
+                      <div className="flex items-center gap-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold px-3 py-1.5">
+                        <Truck className="h-3.5 w-3.5" />
+                        Frete Grátis
+                      </div>
+                    )}
+                  </div>
+
+                  <UrgencyBadge productId={product.id} />
+                </Section>
 
                 {/* ── 4. Trust Badges ── */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="list" aria-label="Garantias">

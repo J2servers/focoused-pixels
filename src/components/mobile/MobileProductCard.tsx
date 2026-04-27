@@ -87,17 +87,6 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
               )}
             </div>
 
-            {/* Quick Add Button */}
-            <div className="absolute bottom-1 right-1">
-              <Button
-                size="icon"
-                onClick={handleAddToCart}
-                disabled={!product.inStock}
-                className="h-6 w-6 rounded-md shadow-sm"
-              >
-                <ShoppingCart className="h-2.5 w-2.5" />
-              </Button>
-            </div>
           </div>
 
           {/* Content */}
@@ -105,7 +94,7 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
             <h3 className="font-medium text-[9px] text-foreground line-clamp-2 leading-tight min-h-[20px]">
               {product.name}
             </h3>
-            
+
             {/* Price */}
             <div className="mt-auto pt-0.5">
               <div className="h-2.5">
@@ -115,11 +104,11 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
                   </p>
                 ) : <div />}
               </div>
-              <p className="text-xs font-bold text-primary leading-tight">
+              <p className="text-sm font-extrabold text-primary leading-tight tabular-nums">
                 R$ {product.price.toFixed(2).replace('.', ',')}
               </p>
-              <p className="text-[7px] text-muted-foreground mt-0.5">
-                ou 12x de R$ {(product.price / 12).toFixed(2).replace('.', ',')}
+              <p className="text-[7px] text-muted-foreground/80 mt-0.5 leading-none">
+                em até 12x
               </p>
             </div>
 
@@ -130,6 +119,17 @@ export function MobileProductCard({ product, index = 0 }: MobileProductCardProps
                 <span className="text-[7px] font-medium">Frete Grátis</span>
               </div>
             )}
+
+            {/* Buy CTA — full width, accessible touch target */}
+            <Button
+              onClick={handleAddToCart}
+              disabled={!product.inStock}
+              aria-label={`Comprar ${product.name}`}
+              className="mt-1.5 w-full h-9 rounded-md text-[10px] font-bold gap-1 px-1 shadow-sm active:scale-[0.97] transition-transform"
+            >
+              <ShoppingCart className="h-3 w-3 shrink-0" />
+              COMPRAR
+            </Button>
           </div>
         </div>
       </Link>
