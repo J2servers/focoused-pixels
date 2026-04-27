@@ -33,6 +33,19 @@ const PaymentPage = () => {
   const flow = usePaymentFlow();
   const { currentStep, setCurrentStep, paymentState, isLoading } = flow;
 
+  // Read cart items from session storage so we can render an itemized summary.
+  // MUST be called before any early return to keep hook order stable.
+  const summaryItems: PendingPaymentItem[] = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem('pending_payment');
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as { cartItems?: PendingPaymentItem[] };
+      return Array.isArray(parsed.cartItems) ? parsed.cartItems : [];
+    } catch {
+      return [];
+    }
+  }, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
@@ -51,18 +64,6 @@ const PaymentPage = () => {
 
   const progress = (currentStep / steps.length) * 100;
   const installments = flow.calculateInstallments(paymentState.amount);
-
-  // Read cart items from session storage so we can render an itemized summary.
-  const summaryItems: PendingPaymentItem[] = useMemo(() => {
-    try {
-      const raw = sessionStorage.getItem('pending_payment');
-      if (!raw) return [];
-      const parsed = JSON.parse(raw) as { cartItems?: PendingPaymentItem[] };
-      return Array.isArray(parsed.cartItems) ? parsed.cartItems : [];
-    } catch {
-      return [];
-    }
-  }, []);
 
   const subtotal = Math.max(0, paymentState.amount - paymentState.shippingCost);
   const maxInstallment = installments.length > 0 ? installments[installments.length - 1] : null;
