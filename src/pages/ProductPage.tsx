@@ -155,8 +155,8 @@ const ProductPage = () => {
 
   const currentDiscount = getDiscountPercent(quantity);
   const discountedPrice = product.price * (1 - currentDiscount / 100);
-  const installments = companyInfo?.max_installments || settings.installments;
-  const minInstallmentValue = companyInfo?.min_installment_value || 50;
+  const installments = paymentCreds?.max_installments || settings.installments;
+  const minInstallmentValue = paymentCreds?.min_installment_value || 50;
   const maxInstallments = Math.min(installments, Math.floor(product.price / minInstallmentValue) || 1);
 
   const handleAddToCart = () => {
