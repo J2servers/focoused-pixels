@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { secureGet, secureSet, secureRemove, TTL } from '@/lib/secure-storage';
 
 export interface CheckoutProfileData {
   fullName: string;
@@ -14,18 +15,7 @@ export interface CheckoutProfileData {
 }
 
 function makeStorageKey(userId?: string) {
-  return userId ? `pdl_checkout_profile_${userId}` : 'pdl_checkout_profile_guest';
-}
-
-function parseStorage(value: string | null): CheckoutProfileData | null {
-  if (!value) return null;
-  try {
-    const parsed = JSON.parse(value) as CheckoutProfileData;
-    if (!parsed || !parsed.email) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
+  return userId ? `checkout_profile_${userId}` : 'checkout_profile_guest';
 }
 
 export function useCheckoutProfile(userId?: string) {
@@ -34,9 +24,10 @@ export function useCheckoutProfile(userId?: string) {
   const [isLoading, setIsLoading] = useState(true);
 
   const loadLocalProfile = useCallback(() => {
-    const local = parseStorage(localStorage.getItem(storageKey));
-    setSavedProfile(local);
-    return local;
+    const local = secureGet<CheckoutProfileData>(storageKey);
+    const valid = local && typeof local.email === 'string' && local.email.includes('@') ? local : null;
+    setSavedProfile(valid);
+    return valid;
   }, [storageKey]);
 
   const loadRemoteProfile = useCallback(async () => {
@@ -63,7 +54,7 @@ export function useCheckoutProfile(userId?: string) {
         updatedAt: row.updated_at || new Date().toISOString(),
       };
 
-      localStorage.setItem(storageKey, JSON.stringify(mapped));
+      secureSet(storageKey, mapped, TTL.CHECKOUT_PROFILE);
       setSavedProfile(mapped);
       return mapped;
     } catch {
@@ -98,7 +89,7 @@ export function useCheckoutProfile(userId?: string) {
         updatedAt: new Date().toISOString(),
       };
 
-      localStorage.setItem(storageKey, JSON.stringify(normalized));
+      secureSet(storageKey, normalized, TTL.CHECKOUT_PROFILE);
       setSavedProfile(normalized);
 
       if (userId) {
@@ -129,7 +120,7 @@ export function useCheckoutProfile(userId?: string) {
   );
 
   const clearProfile = useCallback(() => {
-    localStorage.removeItem(storageKey);
+    secureRemove(storageKey);
     setSavedProfile(null);
   }, [storageKey]);
 
