@@ -42,6 +42,8 @@ export function AIChatWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAutoOpened, setHasAutoOpened] = useState(false);
   const [showTeaser, setShowTeaser] = useState(false); // FAB exibe gif "digitando"
+  const [showBubble, setShowBubble] = useState(false); // Balão da mensagem acima do FAB
+  const [hasUnread, setHasUnread] = useState(false);   // Badge de notificação no ícone
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
