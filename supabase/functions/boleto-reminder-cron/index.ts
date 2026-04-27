@@ -26,22 +26,29 @@ serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Auth check: accept cron calls or admin users
-    const body = await req.json().catch(() => ({}));
-    const isCronCall = body?.source === "cron" || body?.cron_secret === "internal_cron_call";
-    
-    if (!isCronCall) {
-      const authHeader = req.headers.get("Authorization") || "";
-      const token = authHeader.replace("Bearer ", "");
-      if (token !== serviceKey) {
-        const { data: { user } } = await supabase.auth.getUser(token);
-        if (!user) {
-          return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
-            status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" }
-          });
-        }
+    // ─── AUTH GATE ───
+    // Only service-role bearer (used by pg_cron via vault) or authenticated admin users.
+    const authHeader = req.headers.get("Authorization") || "";
+    const token = authHeader.replace("Bearer ", "").trim();
+
+    let authorized = false;
+    if (token && token === serviceKey) {
+      authorized = true;
+    } else if (token) {
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) {
+        const { data: isAdmin } = await supabase.rpc("has_admin_access", { _user_id: user.id });
+        if (isAdmin) authorized = true;
       }
     }
+
+    if (!authorized) {
+      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
+    const body = await req.json().catch(() => ({}));
 
     console.log("[BoletoReminder] Starting daily boleto reminder check...");
 
