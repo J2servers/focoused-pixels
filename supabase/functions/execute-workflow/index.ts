@@ -56,6 +56,29 @@ serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
+    // ─── AUTH GATE ───
+    // Accept either: (1) service-role bearer token (cron/internal), or (2) authenticated admin user
+    const authHeader = req.headers.get("Authorization") || "";
+    const token = authHeader.replace("Bearer ", "").trim();
+
+    let authorized = false;
+    if (token && token === serviceKey) {
+      authorized = true;
+    } else if (token) {
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) {
+        const { data: isAdmin } = await supabase.rpc("has_admin_access", { _user_id: user.id });
+        if (isAdmin) authorized = true;
+      }
+    }
+
+    if (!authorized) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const body = await req.json();
     const { action } = body;
 
