@@ -55,9 +55,17 @@ export const useAuth = () => {
   }, []);
 
   useEffect(() => {
+    let lastFetchedUserId: string | null = null;
+
+    const safeFetch = (uid: string) => {
+      if (lastFetchedUserId === uid) return; // dedupe: evita 2x profile/role
+      lastFetchedUserId = uid;
+      setTimeout(() => fetchUserData(uid), 0);
+    };
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (_event, session) => {
         setState(prev => ({
           ...prev,
           session,
@@ -65,12 +73,10 @@ export const useAuth = () => {
           isLoading: false,
         }));
 
-        // Defer data fetch with setTimeout
         if (session?.user) {
-          setTimeout(() => {
-            fetchUserData(session.user.id);
-          }, 0);
+          safeFetch(session.user.id);
         } else {
+          lastFetchedUserId = null;
           setState(prev => ({
             ...prev,
             profile: null,
@@ -90,7 +96,7 @@ export const useAuth = () => {
       }));
 
       if (session?.user) {
-        fetchUserData(session.user.id);
+        safeFetch(session.user.id);
       }
     });
 
