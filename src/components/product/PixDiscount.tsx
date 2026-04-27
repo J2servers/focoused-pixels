@@ -11,8 +11,8 @@ interface PixDiscountProps {
 }
 
 export function PixDiscount({ price, quantity = 1 }: PixDiscountProps) {
-  const { data: companyInfo } = useCompanyInfo();
-  const pixPercent = companyInfo?.pix_discount_percent;
+  const { data: paymentCreds } = usePaymentCredentials();
+  const pixPercent = paymentCreds?.pix_discount_percent;
 
   if (!pixPercent || pixPercent <= 0) return null;
 
