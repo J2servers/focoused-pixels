@@ -120,7 +120,7 @@ export function useCheckoutProfile(userId?: string) {
   );
 
   const clearProfile = useCallback(() => {
-    localStorage.removeItem(storageKey);
+    secureRemove(storageKey);
     setSavedProfile(null);
   }, [storageKey]);
 
