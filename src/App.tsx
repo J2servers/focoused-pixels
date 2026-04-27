@@ -1,9 +1,9 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SiteSettingsProvider } from "@/components/providers/SiteSettingsProvider";
 import { PageViewTracker } from "@/components/PageViewTracker";
@@ -70,13 +70,34 @@ const AdminRawMaterialsPage = lazy(() => import("./pages/admin/AdminRawMaterials
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 2 * 60 * 1000, // 2 min default
-      gcTime: 10 * 60 * 1000,   // 10 min gc
+      staleTime: 5 * 60 * 1000, // 5 min default — reduz refetch em navegação
+      gcTime: 15 * 60 * 1000,   // 15 min gc — mantém cache entre páginas
       retry: 1,
       refetchOnWindowFocus: false,
+      refetchOnMount: false,    // não refaz query se ainda está fresca
+      refetchOnReconnect: false,
     },
   },
 });
+
+/**
+ * Prefetch das rotas mais navegadas no idle do browser.
+ * Isso elimina o "delay" ao trocar de página pela primeira vez.
+ */
+const prefetchRoutes = () => {
+  const idle = (cb: () => void) =>
+    'requestIdleCallback' in window
+      ? (window as any).requestIdleCallback(cb, { timeout: 3000 })
+      : setTimeout(cb, 1500);
+
+  idle(() => {
+    import('./pages/ProductPage');
+    import('./pages/CategoryPage');
+    import('./pages/CartPage');
+    import('./pages/PaymentPage');
+    import('./pages/SearchPage');
+  });
+};
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -88,7 +109,22 @@ const PageLoader = () => (
 );
 
 const RuntimeTrackers = () => {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin') || location.pathname.startsWith('/gateway-');
+  // Não rastreia carrinho em rotas admin/gateway (economia de queries e listeners)
+  if (isAdmin) return null;
+  return <AbandonedCartTrackerInner />;
+};
+
+const AbandonedCartTrackerInner = () => {
   useAbandonedCartTracker();
+  return null;
+};
+
+const RoutePrefetcher = () => {
+  useEffect(() => {
+    prefetchRoutes();
+  }, []);
   return null;
 };
 
@@ -104,6 +140,7 @@ const App = () => (
             <ScrollToTop />
             <PageViewTracker />
             <RuntimeTrackers />
+            <RoutePrefetcher />
             <AnalyticsInit />
             <Suspense fallback={<PageLoader />}>
               <Routes>
