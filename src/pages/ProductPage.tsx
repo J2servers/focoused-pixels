@@ -63,6 +63,7 @@ const ProductPage = () => {
   const { data: product, isLoading } = useProductBySlug(productSlug);
   const { data: category } = useCategoryBySlug(product?.category);
   const { data: companyInfo } = useCompanyInfo();
+  const { data: paymentCreds } = usePaymentCredentials();
   const settings = useSiteSettings();
   const { addItem: addRecentlyViewed } = useRecentlyViewed();
   const navigate = useNavigate();
