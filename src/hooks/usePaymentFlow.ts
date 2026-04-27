@@ -8,6 +8,7 @@ import {
   useMercadoPago
 } from '@/hooks/usePaymentGateway';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
+import { usePaymentCredentials } from '@/hooks/usePaymentCredentials';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCheckoutProfile } from '@/hooks/useCheckoutProfile';
 import type { Json } from '@/integrations/supabase/types';
