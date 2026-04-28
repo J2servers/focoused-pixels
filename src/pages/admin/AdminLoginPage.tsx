@@ -202,8 +202,10 @@ const IntruderModal = ({ info, onClose }: { info: IntruderInfo; onClose: () => v
         <div className="p-6 space-y-4">
           {/* Terminal output */}
           <div className="font-mono text-xs space-y-1">
-            {typedLines.map((line, i) => (
-              <div key={i} className={`${line.includes('⚠') ? 'text-red-400' : line.includes('IP DETECTADO') ? 'text-yellow-400' : 'text-[#00ff41]'} ${i === typedLines.length - 1 ? 'animate-pulse' : ''}`}>
+            {typedLines.map((line, i) => {
+              const safeLine = line ?? '';
+              return (
+              <div key={i} className={`${safeLine.includes('⚠') ? 'text-red-400' : safeLine.includes('IP DETECTADO') ? 'text-yellow-400' : 'text-[#00ff41]'} ${i === typedLines.length - 1 ? 'animate-pulse' : ''}`}>
                 {line}
                 {i === typedLines.length - 1 && !showData && <span className="animate-pulse">█</span>}
               </div>
