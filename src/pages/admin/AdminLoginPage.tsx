@@ -209,7 +209,7 @@ const IntruderModal = ({ info, onClose }: { info: IntruderInfo; onClose: () => v
                 {line}
                 {i === typedLines.length - 1 && !showData && <span className="animate-pulse">█</span>}
               </div>
-            ))}
+            );})}
           </div>
 
           {/* Data table */}
