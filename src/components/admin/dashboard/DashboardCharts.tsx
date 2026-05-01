@@ -55,7 +55,7 @@ export const MetricCard = React.forwardRef<HTMLElement, MetricCardProps>(
 
     const inner = (
       <div
-        ref={href ? undefined : ref}
+        ref={(href ? undefined : ref) as React.Ref<HTMLDivElement>}
         className={cn(
           "flex items-center gap-2 px-3 py-2.5 rounded-xl liquid-glass transition-all h-full",
           href && "hover:bg-white/[0.08] cursor-pointer"
