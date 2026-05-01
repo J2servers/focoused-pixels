@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { useAuthContext } from "@/contexts/AuthContext";
 import { SiteSettingsProvider } from "@/components/providers/SiteSettingsProvider";
 import { PageViewTracker } from "@/components/PageViewTracker";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -191,31 +192,31 @@ const App = () => (
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<NotFound />} />
                 <Route path="/gateway-x7k9m2" element={<AdminLoginPage />} />
-                <Route path="/admin" element={<AdminDashboardPage />} />
-                <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
-                <Route path="/admin/orcamentos" element={<AdminQuotesPage />} />
-                <Route path="/admin/kanban" element={<AdminKanbanPage />} />
-                <Route path="/admin/produtos" element={<AdminProductsPage />} />
-                <Route path="/admin/categorias" element={<AdminCategoriesPage />} />
-                <Route path="/admin/cupons" element={<AdminCouponsPage />} />
-                <Route path="/admin/promocoes" element={<AdminPromotionsPage />} />
-                <Route path="/admin/hero" element={<AdminHeroPage />} />
-                <Route path="/admin/avaliacoes" element={<AdminReviewsPage />} />
-                <Route path="/admin/leads" element={<AdminLeadsPage />} />
-                <Route path="/admin/empresa" element={<AdminCompanyPage />} />
-                <Route path="/admin/usuarios" element={<AdminUsersPage />} />
-                <Route path="/admin/logs" element={<AdminLogsPage />} />
-                <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
-                <Route path="/admin/api" element={<AdminApiDocsPage />} />
-                <Route path="/admin/whatsapp" element={<AdminWhatsAppPage />} />
-                <Route path="/admin/templates" element={<AdminTemplatesPage />} />
+                <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboardPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/pedidos" element={<ProtectedAdminRoute><AdminOrdersPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/orcamentos" element={<ProtectedAdminRoute><AdminQuotesPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/kanban" element={<ProtectedAdminRoute><AdminKanbanPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/produtos" element={<ProtectedAdminRoute><AdminProductsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/categorias" element={<ProtectedAdminRoute><AdminCategoriesPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/cupons" element={<ProtectedAdminRoute><AdminCouponsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/promocoes" element={<ProtectedAdminRoute><AdminPromotionsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/hero" element={<ProtectedAdminRoute><AdminHeroPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/avaliacoes" element={<ProtectedAdminRoute><AdminReviewsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/leads" element={<ProtectedAdminRoute><AdminLeadsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/empresa" element={<ProtectedAdminRoute><AdminCompanyPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/usuarios" element={<ProtectedAdminRoute requireAdmin><AdminUsersPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/logs" element={<ProtectedAdminRoute requireAdmin><AdminLogsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/configuracoes" element={<ProtectedAdminRoute><AdminSettingsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/api" element={<ProtectedAdminRoute requireAdmin><AdminApiDocsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/whatsapp" element={<ProtectedAdminRoute><AdminWhatsAppPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/templates" element={<ProtectedAdminRoute><AdminTemplatesPage /></ProtectedAdminRoute>} />
                 {/* alias /admin/email-templates removido — usar /admin/templates */}
-                <Route path="/admin/midia" element={<AdminMediaPage />} />
-                <Route path="/admin/pagina-por-que-escolher" element={<AdminWhyChooseUsPage />} />
-                <Route path="/admin/workflows" element={<AdminWorkflowsPage />} />
-                <Route path="/admin/caixa" element={<AdminCashFlowPage />} />
-                <Route path="/admin/materiais" element={<AdminRawMaterialsPage />} />
-                <Route path="/admin/login-config" element={<AdminLoginCustomizePage />} />
+                <Route path="/admin/midia" element={<ProtectedAdminRoute><AdminMediaPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/pagina-por-que-escolher" element={<ProtectedAdminRoute><AdminWhyChooseUsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/workflows" element={<ProtectedAdminRoute><AdminWorkflowsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/caixa" element={<ProtectedAdminRoute><AdminCashFlowPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/materiais" element={<ProtectedAdminRoute><AdminRawMaterialsPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/login-config" element={<ProtectedAdminRoute requireAdmin><AdminLoginCustomizePage /></ProtectedAdminRoute>} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
@@ -228,4 +229,3 @@ const App = () => (
 );
 
 export default App;
-const AdminLoginCustomizePage = lazy(() => import("./pages/admin/AdminLoginCustomizePage"));
