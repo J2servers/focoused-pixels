@@ -275,8 +275,7 @@ const loginSchema = z.object({
   password: z
     .string()
     .min(6, 'Mínimo 6 caracteres')
-    .max(128, 'Senha muito longa')
-    .refine((v) => !DANGEROUS_PATTERNS.test(v), 'Caracteres não permitidos'),
+    .max(128, 'Senha muito longa'),
 });
 type LoginFormData = z.infer<typeof loginSchema>;
 
@@ -380,6 +379,12 @@ const AdminLoginPage = () => {
 
   // Initialize security state
   useEffect(() => {
+    // One-time reset: clear stale failures from previous bug (password regex blocking valid chars)
+    const RESET_KEY = '__x9f2_reset_v2';
+    if (!sessionStorage.getItem(RESET_KEY)) {
+      sessionStorage.removeItem(SEC_KEY);
+      sessionStorage.setItem(RESET_KEY, '1');
+    }
     const d = getSecData();
     if (d.b) { setBanned(true); return; }
     if (d.l && Date.now() < d.l) {
@@ -598,9 +603,9 @@ const AdminLoginPage = () => {
     const email = sanitize(raw.email);
     const password = raw.password.slice(0, 128);
 
-    // Final regex validation (defense in depth)
-    if (!SAFE_EMAIL.test(email) || DANGEROUS_PATTERNS.test(password)) {
-      toast.error('Entrada inválida.');
+    // Final regex validation (defense in depth) — only on email
+    if (!SAFE_EMAIL.test(email)) {
+      toast.error('Email inválido.');
       return;
     }
 
@@ -800,14 +805,8 @@ const AdminLoginPage = () => {
                       data-lpignore="true"
                       data-form-type="other"
                       className="w-full h-[52px] pl-12 pr-16 rounded-xl bg-white text-[#1a1408] placeholder:text-[#1a1408]/40 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#e8a817]/50 transition-all border-0"
-                      onPaste={(e) => {
-                        const text = e.clipboardData.getData('text');
-                        if (DANGEROUS_PATTERNS.test(text)) {
-                          e.preventDefault();
-                          toast.error('Conteúdo bloqueado.');
-                        }
-                      }}
                     />
+                    {/* password paste allowed — passwords legitimately contain special chars */}
                     <button
                       type="button"
                       onClick={() => setShowPw(!showPw)}

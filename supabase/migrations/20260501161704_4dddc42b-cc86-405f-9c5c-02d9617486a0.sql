@@ -1,0 +1,1 @@
+DELETE FROM public.login_attempts WHERE created_at > now() - interval '1 day' AND success = false; DELETE FROM public.ip_blocklist WHERE permanent = false;
