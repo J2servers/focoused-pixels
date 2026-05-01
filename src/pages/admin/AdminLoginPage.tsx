@@ -799,14 +799,8 @@ const AdminLoginPage = () => {
                       data-lpignore="true"
                       data-form-type="other"
                       className="w-full h-[52px] pl-12 pr-16 rounded-xl bg-white text-[#1a1408] placeholder:text-[#1a1408]/40 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#e8a817]/50 transition-all border-0"
-                      onPaste={(e) => {
-                        const text = e.clipboardData.getData('text');
-                        if (DANGEROUS_PATTERNS.test(text)) {
-                          e.preventDefault();
-                          toast.error('Conteúdo bloqueado.');
-                        }
-                      }}
                     />
+                    {/* password paste allowed — passwords legitimately contain special chars */}
                     <button
                       type="button"
                       onClick={() => setShowPw(!showPw)}
