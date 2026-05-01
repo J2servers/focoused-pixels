@@ -275,8 +275,7 @@ const loginSchema = z.object({
   password: z
     .string()
     .min(6, 'Mínimo 6 caracteres')
-    .max(128, 'Senha muito longa')
-    .refine((v) => !DANGEROUS_PATTERNS.test(v), 'Caracteres não permitidos'),
+    .max(128, 'Senha muito longa'),
 });
 type LoginFormData = z.infer<typeof loginSchema>;
 
