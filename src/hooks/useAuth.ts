@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -34,6 +34,7 @@ const pickHighestRole = (roles: { role: AppRole }[] | null): AppRole | null => {
 };
 
 export const useAuth = () => {
+  const loadedUserIdRef = useRef<string | null>(null);
   const [state, setState] = useState<AuthState>({
     user: null,
     session: null,
@@ -57,6 +58,7 @@ export const useAuth = () => {
       ]);
 
       const role = pickHighestRole((roleRows ?? []) as { role: AppRole }[]);
+      loadedUserIdRef.current = userId;
 
       setState(prev => ({
         ...prev,
@@ -66,6 +68,7 @@ export const useAuth = () => {
       }));
     } catch (error) {
       console.error('Error fetching user data:', error);
+      loadedUserIdRef.current = null;
       setState(prev => ({
         ...prev,
         profile: null,
@@ -79,6 +82,7 @@ export const useAuth = () => {
     let lastFetchedUserId: string | null = null;
 
     const safeFetch = (uid: string) => {
+      if (loadedUserIdRef.current === uid) return;
       if (lastFetchedUserId === uid) return; // dedupe: evita 2x profile/role
       lastFetchedUserId = uid;
       setTimeout(() => fetchUserData(uid), 0);
@@ -91,13 +95,14 @@ export const useAuth = () => {
           ...prev,
           session,
           user: session?.user ?? null,
-          isLoading: !!session?.user,
+          isLoading: !!session?.user && loadedUserIdRef.current !== session.user.id,
         }));
 
         if (session?.user) {
           safeFetch(session.user.id);
         } else {
           lastFetchedUserId = null;
+          loadedUserIdRef.current = null;
           setState(prev => ({
             ...prev,
             profile: null,
@@ -114,7 +119,7 @@ export const useAuth = () => {
         ...prev,
         session,
         user: session?.user ?? null,
-        isLoading: !!session?.user,
+        isLoading: !!session?.user && loadedUserIdRef.current !== session.user.id,
       }));
 
       if (session?.user) {
