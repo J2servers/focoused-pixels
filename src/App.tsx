@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, type ReactNode } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -66,6 +66,7 @@ const AdminWhyChooseUsPage = lazy(() => import("./pages/admin/AdminWhyChooseUsPa
 const AdminWorkflowsPage = lazy(() => import("./pages/admin/AdminWorkflowsPage"));
 const AdminCashFlowPage = lazy(() => import("./pages/admin/AdminCashFlowPage"));
 const AdminRawMaterialsPage = lazy(() => import("./pages/admin/AdminRawMaterialsPage"));
+const AdminLoginCustomizePage = lazy(() => import("./pages/admin/AdminLoginCustomizePage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -126,6 +127,22 @@ const RoutePrefetcher = () => {
     prefetchRoutes();
   }, []);
   return null;
+};
+
+const ProtectedAdminRoute = ({
+  children,
+  requireAdmin = false,
+}: {
+  children: ReactNode;
+  requireAdmin?: boolean;
+}) => {
+  const { user, role, isLoading, canEdit, isAdmin } = useAuthContext();
+
+  if (isLoading) return <PageLoader />;
+  if (!user || !role || !canEdit()) return <Navigate to="/gateway-x7k9m2" replace />;
+  if (requireAdmin && !isAdmin()) return <Navigate to="/admin" replace />;
+
+  return <>{children}</>;
 };
 
 const App = () => (
