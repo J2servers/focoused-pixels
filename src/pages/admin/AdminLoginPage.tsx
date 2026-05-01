@@ -597,9 +597,9 @@ const AdminLoginPage = () => {
     const email = sanitize(raw.email);
     const password = raw.password.slice(0, 128);
 
-    // Final regex validation (defense in depth)
-    if (!SAFE_EMAIL.test(email) || DANGEROUS_PATTERNS.test(password)) {
-      toast.error('Entrada inválida.');
+    // Final regex validation (defense in depth) — only on email
+    if (!SAFE_EMAIL.test(email)) {
+      toast.error('Email inválido.');
       return;
     }
 
