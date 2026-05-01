@@ -1,0 +1,27 @@
+# ============================================================
+# Pincel de Luz — Stack para VPS Hostinger via Docker
+# Uso:
+#   1) cp .env.example .env  (preencha as variáveis)
+#   2) docker compose up -d --build
+#   3) Acesse http://SEU_IP:8080  (configure proxy/SSL no host)
+# ============================================================
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
+        VITE_SUPABASE_PROJECT_ID: ${VITE_SUPABASE_PROJECT_ID}
+    image: pinceldeluz/web:latest
+    container_name: pinceldeluz-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

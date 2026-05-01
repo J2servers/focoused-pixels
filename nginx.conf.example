@@ -1,0 +1,96 @@
+# ============================================================
+# Pincel de Luz — Nginx config para VPS Hostinger (Ubuntu)
+# ============================================================
+# Caminho sugerido: /etc/nginx/sites-available/pinceldeluz
+# Ative com:        ln -s /etc/nginx/sites-available/pinceldeluz \
+#                          /etc/nginx/sites-enabled/
+# Teste:            nginx -t && systemctl reload nginx
+# SSL:              certbot --nginx -d pinceldeluz.com.br -d www.pinceldeluz.com.br
+# ============================================================
+
+# Redireciona HTTP -> HTTPS
+server {
+    listen 80;
+    listen [::]:80;
+    server_name pinceldeluz.com.br www.pinceldeluz.com.br;
+
+    # Permite o desafio do Let's Encrypt
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# HTTPS principal
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name pinceldeluz.com.br www.pinceldeluz.com.br;
+
+    # SSL — gerado pelo certbot
+    ssl_certificate     /etc/letsencrypt/live/pinceldeluz.com.br/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/pinceldeluz.com.br/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+
+    # Raiz dos arquivos buildados (dist/)
+    root /var/www/pinceldeluz/dist;
+    index index.html;
+
+    # Limites e compressão
+    client_max_body_size 50M;
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml application/json application/javascript application/xml+rss application/atom+xml image/svg+xml font/woff font/woff2;
+
+    # Brotli (descomente se módulo instalado)
+    # brotli on;
+    # brotli_types text/plain text/css application/json application/javascript image/svg+xml;
+
+    # ===== Headers de Segurança =====
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(self), usb=(), magnetometer=(), gyroscope=()" always;
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header Cross-Origin-Opener-Policy "same-origin-allow-popups" always;
+    add_header Cross-Origin-Resource-Policy "same-site" always;
+
+    # CSP — ajuste os domínios extras conforme integrações
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://connect.facebook.net https://www.facebook.com https://viacep.com.br; frame-src 'self' https://www.googletagmanager.com https://www.youtube.com https://www.facebook.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests" always;
+
+    # ===== Cache agressivo de assets versionados =====
+    location ~* \.(?:js|css|woff2?|ttf|otf|eot|png|jpg|jpeg|gif|webp|avif|svg|ico)$ {
+        expires 1y;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        access_log off;
+        try_files $uri =404;
+    }
+
+    # HTML nunca cacheia (para deploy refletir imediatamente)
+    location ~* \.html$ {
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+        expires 0;
+    }
+
+    # Robots / sitemap
+    location = /robots.txt    { access_log off; log_not_found off; }
+    location = /sitemap.xml   { access_log off; log_not_found off; }
+    location = /favicon.ico   { access_log off; log_not_found off; }
+
+    # ===== SPA fallback — React Router =====
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Bloqueia acesso a arquivos sensíveis
+    location ~ /\.(?!well-known) { deny all; }
+    location ~ ~$               { deny all; }
+}
