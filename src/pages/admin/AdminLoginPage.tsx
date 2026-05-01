@@ -379,6 +379,12 @@ const AdminLoginPage = () => {
 
   // Initialize security state
   useEffect(() => {
+    // One-time reset: clear stale failures from previous bug (password regex blocking valid chars)
+    const RESET_KEY = '__x9f2_reset_v2';
+    if (!sessionStorage.getItem(RESET_KEY)) {
+      sessionStorage.removeItem(SEC_KEY);
+      sessionStorage.setItem(RESET_KEY, '1');
+    }
     const d = getSecData();
     if (d.b) { setBanned(true); return; }
     if (d.l && Date.now() < d.l) {
