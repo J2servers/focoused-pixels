@@ -95,7 +95,7 @@ export const useAuth = () => {
           ...prev,
           session,
           user: session?.user ?? null,
-          isLoading: !!session?.user && loadedUserIdRef.current !== session.user.id,
+          isLoading: session?.user ? loadedUserIdRef.current !== session.user.id : false,
         }));
 
         if (session?.user) {
@@ -119,7 +119,7 @@ export const useAuth = () => {
         ...prev,
         session,
         user: session?.user ?? null,
-        isLoading: !!session?.user && loadedUserIdRef.current !== session.user.id,
+        isLoading: session?.user ? loadedUserIdRef.current !== session.user.id : false,
       }));
 
       if (session?.user) {
