@@ -45,7 +45,7 @@ interface MetricCardProps {
   trend?: number | null;
 }
 
-export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
+export const MetricCard = React.forwardRef<HTMLElement, MetricCardProps>(
   ({ label, value, icon: Icon, color, href, format = 'number', trend }, ref) => {
     const fmt = typeof value === 'string' ? value :
       format === 'currency' ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` :
