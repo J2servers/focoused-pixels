@@ -92,20 +92,15 @@ export const SAMPLE_VALUES: Record<string, string> = {
 export const replaceVariables = (text: string) =>
   TEMPLATE_VARIABLES.reduce((acc, v) => acc.split(v.key).join(SAMPLE_VALUES[v.key] || v.key), text);
 
-export const sanitizePreviewHtml = (html: string) => {
-  if (typeof window === 'undefined') return html;
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  doc.querySelectorAll('script, iframe, object, embed, form, meta, base').forEach(n => n.remove());
-  doc.querySelectorAll('*').forEach(el => {
-    [...el.attributes].forEach(attr => {
-      const name = attr.name.toLowerCase();
-      const value = attr.value.trim().toLowerCase();
-      if (name.startsWith('on')) el.removeAttribute(attr.name);
-      if ((name === 'href' || name === 'src') && value.startsWith('javascript:')) el.removeAttribute(attr.name);
-    });
+import DOMPurify from 'dompurify';
+
+export const sanitizePreviewHtml = (html: string): string => {
+  if (typeof window === 'undefined') return '';
+  return DOMPurify.sanitize(html, {
+    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'meta', 'base', 'style'],
+    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
+    ALLOW_DATA_ATTR: false,
   });
-  return doc.body.innerHTML;
 };
 
 export const detectVariables = (text: string): string[] => {
