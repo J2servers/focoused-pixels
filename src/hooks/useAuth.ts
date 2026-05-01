@@ -19,6 +19,20 @@ interface AuthState {
   isLoading: boolean;
 }
 
+const ROLE_PRIORITY: Record<AppRole, number> = {
+  admin: 3,
+  editor: 2,
+  support: 1,
+};
+
+const pickHighestRole = (roles: { role: AppRole }[] | null): AppRole | null => {
+  if (!roles?.length) return null;
+  return roles.reduce<AppRole | null>((best, item) => {
+    if (!best) return item.role;
+    return ROLE_PRIORITY[item.role] > ROLE_PRIORITY[best] ? item.role : best;
+  }, null);
+};
+
 export const useAuth = () => {
   const [state, setState] = useState<AuthState>({
     user: null,
@@ -30,27 +44,34 @@ export const useAuth = () => {
 
   const fetchUserData = useCallback(async (userId: string) => {
     try {
-      // Fetch profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+      const [{ data: profile }, { data: roleRows }] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle(),
+        supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId),
+      ]);
 
-      // Fetch role
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
+      const role = pickHighestRole((roleRows ?? []) as { role: AppRole }[]);
 
       setState(prev => ({
         ...prev,
         profile: profile || null,
-        role: (roleData?.role as AppRole) || null,
+        role,
+        isLoading: false,
       }));
     } catch (error) {
       console.error('Error fetching user data:', error);
+      setState(prev => ({
+        ...prev,
+        profile: null,
+        role: null,
+        isLoading: false,
+      }));
     }
   }, []);
 
@@ -70,7 +91,7 @@ export const useAuth = () => {
           ...prev,
           session,
           user: session?.user ?? null,
-          isLoading: false,
+          isLoading: !!session?.user,
         }));
 
         if (session?.user) {
@@ -81,6 +102,7 @@ export const useAuth = () => {
             ...prev,
             profile: null,
             role: null,
+            isLoading: false,
           }));
         }
       }
@@ -92,11 +114,13 @@ export const useAuth = () => {
         ...prev,
         session,
         user: session?.user ?? null,
-        isLoading: false,
+        isLoading: !!session?.user,
       }));
 
       if (session?.user) {
         safeFetch(session.user.id);
+      } else {
+        setState(prev => ({ ...prev, isLoading: false }));
       }
     });
 
@@ -162,13 +186,7 @@ export const useAuth = () => {
   const hasRole = (requiredRole: AppRole): boolean => {
     if (!state.role) return false;
     
-    const roleHierarchy: Record<AppRole, number> = {
-      admin: 3,
-      editor: 2,
-      support: 1,
-    };
-
-    return roleHierarchy[state.role] >= roleHierarchy[requiredRole];
+    return ROLE_PRIORITY[state.role] >= ROLE_PRIORITY[requiredRole];
   };
 
   const canEdit = (): boolean => hasRole('editor');
