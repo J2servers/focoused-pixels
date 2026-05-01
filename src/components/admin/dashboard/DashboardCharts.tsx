@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import {
   ResponsiveContainer, PieChart, Pie, Cell, Tooltip,
@@ -45,35 +45,41 @@ interface MetricCardProps {
   trend?: number | null;
 }
 
-export function MetricCard({ label, value, icon: Icon, color, href, format = 'number', trend }: MetricCardProps) {
-  const fmt = typeof value === 'string' ? value :
-    format === 'currency' ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` :
-    format === 'percent' ? `${value.toFixed(1)}%` :
-    format === 'days' ? `${value.toFixed(1)}d` :
-    value.toLocaleString('pt-BR');
+export const MetricCard = React.forwardRef<HTMLElement, MetricCardProps>(
+  ({ label, value, icon: Icon, color, href, format = 'number', trend }, ref) => {
+    const fmt = typeof value === 'string' ? value :
+      format === 'currency' ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` :
+      format === 'percent' ? `${value.toFixed(1)}%` :
+      format === 'days' ? `${value.toFixed(1)}d` :
+      value.toLocaleString('pt-BR');
 
-  const inner = (
-    <div className={cn(
-      "flex items-center gap-2 px-3 py-2.5 rounded-xl liquid-glass transition-all h-full",
-      href && "hover:bg-white/[0.08] cursor-pointer"
-    )}>
-      <div className={cn("p-1.5 rounded-lg shrink-0", color)}>
-        <Icon className="h-3.5 w-3.5 text-white" />
+    const inner = (
+      <div
+        ref={(href ? undefined : ref) as React.Ref<HTMLDivElement>}
+        className={cn(
+          "flex items-center gap-2 px-3 py-2.5 rounded-xl liquid-glass transition-all h-full",
+          href && "hover:bg-white/[0.08] cursor-pointer"
+        )}
+      >
+        <div className={cn("p-1.5 rounded-lg shrink-0", color)}>
+          <Icon className="h-3.5 w-3.5 text-white" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold text-white truncate leading-tight">{fmt}</p>
+          <p className="text-[10px] text-white/50 truncate leading-tight">{label}</p>
+        </div>
+        {trend !== undefined && trend !== null && (
+          <span className={cn("text-[10px] font-bold shrink-0", trend >= 0 ? "text-emerald-400" : "text-red-400")}>
+            {trend >= 0 ? '↑' : '↓'}{Math.abs(trend).toFixed(0)}%
+          </span>
+        )}
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-xs font-bold text-white truncate leading-tight">{fmt}</p>
-        <p className="text-[10px] text-white/50 truncate leading-tight">{label}</p>
-      </div>
-      {trend !== undefined && trend !== null && (
-        <span className={cn("text-[10px] font-bold shrink-0", trend >= 0 ? "text-emerald-400" : "text-red-400")}>
-          {trend >= 0 ? '↑' : '↓'}{Math.abs(trend).toFixed(0)}%
-        </span>
-      )}
-    </div>
-  );
-  if (href) return <Link to={href} className="h-full">{inner}</Link>;
-  return inner;
-}
+    );
+    if (href) return <Link ref={ref as React.Ref<HTMLAnchorElement>} to={href} className="h-full">{inner}</Link>;
+    return inner;
+  }
+);
+MetricCard.displayName = 'MetricCard';
 
 interface HeroKPIProps {
   label: string;
