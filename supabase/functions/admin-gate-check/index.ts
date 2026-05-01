@@ -147,14 +147,13 @@ Deno.serve(async (req: Request) => {
       return DENY();
     }
 
-    // 4. CHECK ROLE
-    const { data: roleData, error: roleError } = await supabase
+    // 4. CHECK ROLE (user may have multiple roles - check if ANY is allowed)
+    const { data: roleRows, error: roleError } = await supabase
       .from('user_roles')
       .select('role')
-      .eq('user_id', user.id)
-      .single();
+      .eq('user_id', user.id);
 
-    if (roleError || !roleData) {
+    if (roleError || !roleRows || roleRows.length === 0) {
       await supabase.from('login_attempts').insert({
         ip_hash: ipHash,
         email_hash: emailHash,
@@ -166,7 +165,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const allowedRoles = ['admin', 'editor'];
-    const isAllowed = allowedRoles.includes(roleData.role);
+    const isAllowed = roleRows.some((r: { role: string }) => allowedRoles.includes(r.role));
 
     // Log attempt
     await supabase.from('login_attempts').insert({
