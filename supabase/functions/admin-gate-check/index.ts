@@ -165,7 +165,7 @@ Deno.serve(async (req: Request) => {
       return DENY();
     }
 
-    const allowedRoles = ['admin', 'editor', 'support'];
+    const allowedRoles = ['admin', 'editor'];
     const isAllowed = allowedRoles.includes(roleData.role);
 
     // Log attempt

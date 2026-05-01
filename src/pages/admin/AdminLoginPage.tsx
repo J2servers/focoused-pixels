@@ -335,7 +335,7 @@ const getFingerprint = (): string => {
 // ─── Component ───
 const AdminLoginPage = () => {
   const navigate = useNavigate();
-  const { user, role, isLoading, signIn } = useAuthContext();
+  const { user, role, isLoading, signIn, canEdit } = useAuthContext();
   const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [locked, setLocked] = useState(false);
@@ -415,8 +415,8 @@ const AdminLoginPage = () => {
 
   // Auto-redirect if already authenticated
   useEffect(() => {
-    if (!isLoading && user && role) navigate('/admin');
-  }, [user, role, isLoading, navigate]);
+    if (!isLoading && user && role && canEdit()) navigate('/admin');
+  }, [user, role, isLoading, navigate, canEdit]);
 
   const record = useCallback((ok: boolean) => {
     const d = getSecData();
