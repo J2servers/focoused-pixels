@@ -6,7 +6,7 @@
 |---|---|---|
 | 🔒 Secrets no frontend | ✅ LIMPO | 0 |
 | 🔑 Fallback de role | ✅ LIMPO | 0 |
-| 📏 Arquivos acima do limite | ⚠️ 57 violações | 12 críticos · 13 high · 32 medium |
+| 📏 Arquivos acima do limite | ⚠️ 57 violações | 11 críticos (era 12) · 13 high · 33 medium |
 | 🔤 Uso de `any` | ⚠️ 124 ocorrências | concentradas em hooks e edge functions |
 | 🏗️ Arquitetura | ⚠️ 17 problemas | queries diretas em UI |
 | 🛡️ RLS fraca em migrations | ⚠️ 25 patterns | 9 em tabelas sensíveis (histórico) |
@@ -72,10 +72,10 @@ Componentes chamando `supabase.from(...)` diretamente em vez de via hook/service
 
 ## 📋 Plano de Remediação (Ordenado por Risco)
 
-### Onda 1 — Hooks críticos (em andamento)
+### Onda 1 — Hooks críticos
 - [x] Atualizar relatório com números reais
-- [ ] `usePaymentFlow.ts` (538L) → quebrar em `usePaymentState`, `usePaymentInstallments`, `usePaymentSubmit`
-- [ ] `useDashboardMetrics.ts` (470L) → já existe `useDashboardMetricsHelpers.ts`; finalizar extração
+- [x] `usePaymentFlow.ts` 538L → 289L (decomposto em `payment/types.ts`, `payment/useOrderCreator.ts`, `payment/usePaymentMethods.ts`); saiu da lista crítica
+- [ ] `useDashboardMetrics.ts` (470L) → finalizar extração via `useDashboardMetricsHelpers.ts` existente
 
 ### Onda 2 — Pages admin críticas
 - [ ] `AdminLoginPage.tsx` (862L) → extrair painel de honeypot, deterrent matrix, form
