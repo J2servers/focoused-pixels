@@ -1,14 +1,14 @@
 import { useCallback } from 'react';
 import type { IntruderInfo } from './IntruderModal';
 
-interface NavigatorWithExtras extends Navigator {
+type NavigatorWithExtras = Navigator & {
   deviceMemory?: number;
   connection?: { effectiveType?: string; downlink?: number };
   userAgentData?: { platform?: string };
   webdriver?: boolean;
   pdfViewerEnabled?: boolean;
   getBattery?: () => Promise<{ level: number; charging: boolean }>;
-}
+};
 
 export const useCollectIntruderInfo = (fingerprint: string, attempts: number) => {
   return useCallback((): IntruderInfo => {
