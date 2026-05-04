@@ -9,15 +9,19 @@ import { Button } from '@/components/ui/button';
 import { Trash2, Minus, Plus, MessageCircle, ShoppingBag, FileText, CreditCard } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { useCartTotals } from '@/hooks/useCartTotals';
 
 import { CartCrossSell } from '@/components/cart/CartCrossSell';
 import { CartStickyCheckoutBar } from '@/components/cart/CartStickyCheckoutBar';
+import { FreeShippingBar } from '@/components/cart/FreeShippingBar';
 import { PageSEO } from '@/components/seo/PageSEO';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
+import { formatCurrency } from '@/lib/format';
 
 const CartPage = () => {
   const { items, removeItem, updateQuantity, total, clearCart, itemCount } = useCart();
   const siteSettings = useSiteSettings();
+  const totals = useCartTotals();
   const navigate = useNavigate();
 
   const handleCheckoutWhatsApp = () => {
@@ -65,8 +69,7 @@ const CartPage = () => {
     navigate('/pagamento');
   };
 
-  const freeShippingRemaining = siteSettings.freeShippingMinimum - total;
-  const hasFreeShipping = total >= siteSettings.freeShippingMinimum;
+  const hasFreeShipping = totals.freeShippingApplied || totals.freeShippingRemaining === 0 && totals.freeShippingMinimum > 0;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -96,28 +99,8 @@ const CartPage = () => {
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Cart Items */}
               <div className="lg:col-span-2 space-y-4">
-                {/* Free Shipping Progress */}
-                {!hasFreeShipping && (
-                  <div className="rounded-2xl neu-concave p-5 mb-6">
-                    <p className="text-sm">
-                      Faltam <strong>R$ {freeShippingRemaining.toFixed(2)}</strong> para você ganhar{' '}
-                      <span className="text-primary font-semibold">Frete Grátis!</span>
-                    </p>
-                    <div className="mt-2 h-2 rounded-full overflow-hidden neu-pressed">
-                      <div 
-                        className="h-full bg-primary transition-all duration-300 rounded-full"
-                        style={{ width: `${Math.min((total / siteSettings.freeShippingMinimum) * 100, 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {hasFreeShipping && (
-                  <div className="rounded-2xl neu-flat p-5 mb-6 flex items-center gap-2 text-success">
-                    <span className="text-lg">🎉</span>
-                    <p className="font-medium">Parabéns! Você ganhou Frete Grátis!</p>
-                  </div>
-                )}
+                {/* Free Shipping Progress (centralized) */}
+                <FreeShippingBar className="mb-6" />
 
                 {/* Items List */}
                 {items.map((item) => (
@@ -205,8 +188,14 @@ const CartPage = () => {
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Subtotal ({itemCount} itens)</span>
-                      <span>R$ {total.toFixed(2)}</span>
+                      <span>{formatCurrency(totals.subtotal)}</span>
                     </div>
+                    {totals.progressiveDiscount > 0 && (
+                      <div className="flex justify-between text-success">
+                        <span>Desconto progressivo</span>
+                        <span>- {formatCurrency(totals.progressiveDiscount)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Frete</span>
                       <span className={hasFreeShipping ? 'text-success font-medium' : ''}>
@@ -220,12 +209,12 @@ const CartPage = () => {
                   <div className="flex justify-between items-center mb-6">
                     <span className="font-bold text-lg">Total</span>
                     <span className="font-bold text-xl text-primary">
-                      R$ {total.toFixed(2)}
+                      {formatCurrency(totals.total)}
                     </span>
                   </div>
 
                   <p className="text-xs text-muted-foreground mb-4 text-center">
-                    ou em até {siteSettings.installments}x de R$ {(total / siteSettings.installments).toFixed(2)} sem juros
+                    ou em até {siteSettings.installments}x de {formatCurrency(totals.total / siteSettings.installments)} sem juros
                   </p>
 
                   <div className="space-y-3">
