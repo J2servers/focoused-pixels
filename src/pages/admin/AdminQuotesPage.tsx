@@ -8,14 +8,18 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { useAdminQuotes, useUpdateQuoteStatus, type Quote } from '@/hooks/useAdminQuotes';
+import { useAdminQuotes, useUpdateQuoteStatus, useDeleteQuote, type Quote } from '@/hooks/useAdminQuotes';
 import { useCreateOrderFromQuote } from '@/hooks/useOrders';
-import { Eye, FileText, ArrowRightCircle, Clock, CheckCircle, XCircle, TrendingUp, DollarSign, BarChart3, Package, User, Mail, Phone, Building2 } from 'lucide-react';
+import { Eye, FileText, ArrowRightCircle, Clock, CheckCircle, XCircle, TrendingUp, DollarSign, BarChart3, Package, User, Mail, Phone, Building2, Trash2 } from 'lucide-react';
 import { format, subDays, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
@@ -31,10 +35,19 @@ const AdminQuotesPage = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data: quotes = [], isLoading } = useAdminQuotes();
   const updateStatus = useUpdateQuoteStatus();
+  const deleteQuote = useDeleteQuote();
   const createOrderFromQuote = useCreateOrderFromQuote();
+
+  const handleDeleteQuote = async () => {
+    if (!deleteId) return;
+    await deleteQuote.mutateAsync(deleteId);
+    if (selectedQuote?.id === deleteId) setSelectedQuote(null);
+    setDeleteId(null);
+  };
 
   const pendingCount = useMemo(() => quotes.filter(q => q.status === 'pending').length, [quotes]);
   const approvedCount = useMemo(() => quotes.filter(q => q.status === 'approved').length, [quotes]);
@@ -126,7 +139,7 @@ const AdminQuotesPage = () => {
       },
     },
     {
-      key: 'id', header: '', className: 'w-28',
+      key: 'id', header: '', className: 'w-36',
       render: (q) => (
         <div className="flex justify-end gap-1">
           <Button className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => setSelectedQuote(q)}>
@@ -138,6 +151,13 @@ const AdminQuotesPage = () => {
               <ArrowRightCircle className="h-3 w-3 mr-1" />Converter
             </Button>
           )}
+          <Button
+            className="admin-btn admin-btn-delete admin-btn-icon !min-h-0 !p-1 h-9 w-9"
+            onClick={() => setDeleteId(q.id)}
+            title="Excluir orçamento"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       ),
     },
@@ -317,7 +337,15 @@ const AdminQuotesPage = () => {
             </ScrollArea>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:justify-between">
+            {selectedQuote && (
+              <Button
+                className="admin-btn admin-btn-delete"
+                onClick={() => setDeleteId(selectedQuote.id)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />Excluir
+              </Button>
+            )}
             {selectedQuote?.status === 'approved' && (
               <Button onClick={() => handleConvertToOrder(selectedQuote.id)} disabled={createOrderFromQuote.isPending}
                 className="admin-btn admin-btn-save">
@@ -327,6 +355,25 @@ const AdminQuotesPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent className="liquid-glass">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Excluir Orçamento</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
+              Tem certeza? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-white/[0.08] bg-transparent text-white hover:bg-white/[0.06]">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteQuote} className="admin-btn admin-btn-delete">
+              <Trash2 className="h-4 w-4 mr-1" />Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };

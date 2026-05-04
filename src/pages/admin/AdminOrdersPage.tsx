@@ -14,16 +14,21 @@ import {
   useOrders,
   useUpdateOrder,
   useUpdateProductionStatus,
+  useDeleteOrder,
   PRODUCTION_STATUS_LABELS,
   PRODUCTION_STATUS_COLORS,
   type ProductionStatus,
   type Order,
 } from '@/hooks/useOrders';
 import { ExportButtons } from '@/components/admin/ExportButtons';
-import { Eye, Clock, CheckCircle, DollarSign, AlertTriangle } from 'lucide-react';
+import { Eye, Clock, CheckCircle, DollarSign, AlertTriangle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendente', color: 'bg-yellow-500' },
@@ -62,13 +67,22 @@ const AdminOrdersPage = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data: orders = [], isLoading } = useOrders();
   const updateOrder = useUpdateOrder();
   const updateProductionStatus = useUpdateProductionStatus();
+  const deleteOrder = useDeleteOrder();
 
   const paidOrders = useMemo(() => orders.filter(isCompletedSale), [orders]);
   const awaitingOrders = useMemo(() => orders.filter(isAwaitingPayment), [orders]);
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await deleteOrder.mutateAsync(deleteId);
+    setDeleteId(null);
+    if (selectedOrder?.id === deleteId) setSelectedOrder(null);
+  };
 
   const applyFilters = (list: Order[]) =>
     list.filter((o) => {
@@ -139,11 +153,20 @@ const AdminOrdersPage = () => {
       render: (o) => <span className="text-sm text-white/50">{format(new Date(o.created_at), 'dd/MM/yy HH:mm', { locale: ptBR })}</span>,
     },
     {
-      key: 'actions', header: '', className: 'w-12',
+      key: 'actions', header: '', className: 'w-24',
       render: (o) => (
-        <Button className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => setSelectedOrder(o)}>
-          <Eye className="h-4 w-4" />
-        </Button>
+        <div className="flex justify-end gap-1">
+          <Button className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => setSelectedOrder(o)}>
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            className="admin-btn admin-btn-delete admin-btn-icon !min-h-0 !p-1 h-9 w-9"
+            onClick={() => setDeleteId(o.id)}
+            title="Excluir pedido"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       ),
     },
   ];
@@ -313,8 +336,40 @@ const AdminOrdersPage = () => {
               </div>
             </ScrollArea>
           )}
+
+          {selectedOrder && (
+            <div className="flex justify-end pt-4 border-t border-white/[0.08]">
+              <Button
+                className="admin-btn admin-btn-delete"
+                onClick={() => setDeleteId(selectedOrder.id)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Excluir Pedido
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent className="liquid-glass">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Excluir Pedido</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
+              Tem certeza? Esta ação removerá o pedido e seus itens permanentemente e não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-white/[0.08] bg-transparent text-white hover:bg-white/[0.06]">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="admin-btn admin-btn-delete">
+              <Trash2 className="h-4 w-4 mr-1" />
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };

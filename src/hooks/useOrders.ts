@@ -166,6 +166,27 @@ export function useUpdateProductionStatus() {
   });
 }
 
+export function useDeleteOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      // Best-effort cascade: remove related order_items first
+      await supabase.from('order_items').delete().eq('order_id', id);
+      const { error } = await supabase.from('orders').delete().eq('id', id);
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      toast.success('Pedido excluído!');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Erro ao excluir pedido');
+    },
+  });
+}
+
 export function useCreateOrderFromQuote() {
   const queryClient = useQueryClient();
 
