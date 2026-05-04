@@ -2697,6 +2697,15 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      record_login_attempt: {
+        Args: {
+          _email_hash: string
+          _ip_hash: string
+          _success: boolean
+          _user_agent_hash: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "editor" | "support"
