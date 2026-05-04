@@ -144,7 +144,7 @@ export function useWorkflowBuilder() {
   }, [setNodes, setEdges]);
 
   const loadPreset = useCallback((preset: PresetDef) => {
-    const steps = preset.steps.map((s: StepData) => ({
+    const steps: WorkflowStep[] = preset.steps.map((s: StepData) => ({
       ...s, id: uid(), template_id: '',
       channel: s.type === 'send_email' ? 'email' : s.type === 'send_whatsapp' ? 'whatsapp' : undefined,
       delay_minutes: s.delay_value ? delayToMinutes(s.delay_value, s.delay_unit || 'minutes') : undefined,
