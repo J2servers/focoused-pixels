@@ -35,10 +35,19 @@ const AdminQuotesPage = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data: quotes = [], isLoading } = useAdminQuotes();
   const updateStatus = useUpdateQuoteStatus();
+  const deleteQuote = useDeleteQuote();
   const createOrderFromQuote = useCreateOrderFromQuote();
+
+  const handleDeleteQuote = async () => {
+    if (!deleteId) return;
+    await deleteQuote.mutateAsync(deleteId);
+    if (selectedQuote?.id === deleteId) setSelectedQuote(null);
+    setDeleteId(null);
+  };
 
   const pendingCount = useMemo(() => quotes.filter(q => q.status === 'pending').length, [quotes]);
   const approvedCount = useMemo(() => quotes.filter(q => q.status === 'approved').length, [quotes]);
