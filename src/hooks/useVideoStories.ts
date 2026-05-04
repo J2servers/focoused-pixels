@@ -1,23 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
-export interface VideoStory {
-  id: string;
-  title: string | null;
-  description: string | null;
-  video_url: string;
-  thumbnail_url: string | null;
-  display_order: number;
-  status: string;
-  views_count: number;
-  likes_count: number;
-  duration_seconds: number | null;
-  tags: string[] | null;
-  cta_text: string | null;
-  cta_link: string | null;
-  created_at: string;
-  updated_at: string;
-}
+type VideoStoryRow = Database['public']['Tables']['video_stories']['Row'];
+type VideoStoryInsert = Database['public']['Tables']['video_stories']['Insert'];
+type VideoStoryUpdate = Database['public']['Tables']['video_stories']['Update'];
+
+export type VideoStory = VideoStoryRow;
 
 export function useVideoStories() {
   return useQuery({
@@ -51,10 +40,10 @@ export function useAllVideoStories() {
 export function useCreateVideoStory() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (story: Partial<VideoStory>) => {
+    mutationFn: async (story: VideoStoryInsert) => {
       const { data, error } = await supabase
         .from('video_stories')
-        .insert(story as Parameters<typeof supabase.from<'video_stories'>>[0] extends never ? never : VideoStory)
+        .insert(story)
         .select()
         .single();
       if (error) throw error;
@@ -67,10 +56,10 @@ export function useCreateVideoStory() {
 export function useUpdateVideoStory() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<VideoStory> & { id: string }) => {
+    mutationFn: async ({ id, ...updates }: VideoStoryUpdate & { id: string }) => {
       const { data, error } = await supabase
         .from('video_stories')
-        .update(updates as any)
+        .update(updates)
         .eq('id', id)
         .select()
         .single();
@@ -98,14 +87,17 @@ export function useDeleteVideoStory() {
 export function useIncrementVideoView() {
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.rpc('increment_video_view' as any, { video_id: id });
-      if (error) {
-        // Fallback: direct update
-        await supabase
-          .from('video_stories')
-          .update({ views_count: supabase.rpc as any } as any)
-          .eq('id', id);
-      }
+      // Best-effort fetch + increment fallback (no RPC dependency)
+      const { data } = await supabase
+        .from('video_stories')
+        .select('views_count')
+        .eq('id', id)
+        .maybeSingle();
+      const current = data?.views_count ?? 0;
+      await supabase
+        .from('video_stories')
+        .update({ views_count: current + 1 })
+        .eq('id', id);
     },
   });
 }
