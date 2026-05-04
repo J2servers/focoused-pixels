@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ReactFlow, Controls, MiniMap, Background, BackgroundVariant,
   Panel, ReactFlowProvider,
@@ -14,7 +14,7 @@ import {
   TestTube2, Maximize2, Map, Settings,
 } from 'lucide-react';
 
-import WorkflowSidebar from './WorkflowSidebar';
+import WorkflowSidebar, { type SidebarTab } from './WorkflowSidebar';
 import WorkflowNodeConfig from './WorkflowNodeConfig';
 import { useWorkflowBuilder } from './builder/useWorkflowBuilder';
 import { ToolbarBtn, ToolbarDivider } from './builder/ToolbarPrimitives';
@@ -27,19 +27,23 @@ import { NODE_TYPES } from './builder/nodeTypes';
 
 function WorkflowBuilderInner() {
   const b = useWorkflowBuilder();
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>('nodes');
   const nodeTypes = useMemo(() => NODE_TYPES, []);
 
   const handleTest = async () => {
     const ok = await b.handleTest();
-    if (ok) b.wf.loadExecutions(b.currentWorkflow!.id!);
+    if (ok && b.currentWorkflow?.id) {
+      b.wf.loadExecutions(b.currentWorkflow.id);
+      setSidebarTab('history');
+    }
   };
 
   return (
     <TooltipProvider>
       <div className="flex rounded-2xl border border-white/[0.06] bg-[hsl(var(--admin-card))] overflow-hidden shadow-2xl shadow-black/20" style={{ height: 'calc(100vh - 180px)', minHeight: 600 }}>
         <WorkflowSidebar
-          tab={'nodes'}
-          onTabChange={() => {}}
+          tab={sidebarTab}
+          onTabChange={setSidebarTab}
           onAddNode={b.addNode}
           onNewWorkflow={b.newWorkflow}
           onLoadPreset={b.loadPreset}
