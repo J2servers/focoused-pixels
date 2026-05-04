@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { sanitizeCEP } from '@/lib/sanitize';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { FALLBACK_FREIGHT_OPTIONS, FreightOption, CustomerFormData } from './types';
 
@@ -85,7 +86,7 @@ export function useFreightCalculator({
         throw new Error('No results');
       }
     } catch (err) {
-      console.error('Freight fetch error:', err);
+      logger.error('freight', 'Freight fetch error:', err);
       setFreightError(true);
       setFreightOptions(FALLBACK_FREIGHT_OPTIONS);
       setDestinationInfo(null);

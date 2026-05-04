@@ -17,6 +17,7 @@ import {
   type BoletoData,
   type UploadedFile,
 } from '@/hooks/payment/types';
+import { buildInstallments } from '@/lib/installments';
 
 export type { PaymentState, CustomerForm, PixData, BoletoData };
 export { formatCurrency, BOLETO_FLOW_TEMPLATE } from '@/hooks/payment/types';
@@ -141,14 +142,11 @@ export function usePaymentFlow() {
   }, []);
 
   const calculateInstallments = useCallback((amount: number) => {
-    const result: Array<{ number: number; value: number; total: number }> = [];
-    for (let i = 1; i <= maxInstallments; i++) {
-      const installmentValue = amount / i;
-      if (installmentValue >= minInstallmentValue) {
-        result.push({ number: i, value: installmentValue, total: amount });
-      }
-    }
-    return result;
+    return buildInstallments(amount, {
+      maxInstallments,
+      minPerInstallment: minInstallmentValue,
+      maxNoInterest: maxInstallments,
+    }).map((i) => ({ number: i.number, value: i.value, total: i.total }));
   }, [maxInstallments, minInstallmentValue]);
 
   const applySavedCheckoutProfile = useCallback(() => {
