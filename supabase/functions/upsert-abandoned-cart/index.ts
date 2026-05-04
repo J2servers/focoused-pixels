@@ -85,7 +85,27 @@ serve(async (req) => {
 
     const hasCart = items.length > 0 && cartTotal > 0;
 
-    // Map to actual table columns: session_id, user_name, user_email, user_phone, cart_items, cart_total, last_activity_at, recovered, reminder_sent, coupon_code
+    // Browser metadata enrichment (LGPD-safe + advanced)
+    const browserRaw = (body.browser && typeof body.browser === "object") ? body.browser as Record<string, unknown> : {};
+    const browserMeta = {
+      userAgent: sanitizeText(browserRaw.userAgent, 500),
+      language: sanitizeText(browserRaw.language, 20),
+      languages: Array.isArray(browserRaw.languages) ? browserRaw.languages.slice(0, 8).map(l => sanitizeText(l, 20)).filter(Boolean) : [],
+      timezone: sanitizeText(browserRaw.timezone, 60),
+      timezoneOffset: typeof browserRaw.timezoneOffset === "number" ? browserRaw.timezoneOffset : null,
+      screen: browserRaw.screen ?? null,
+      viewport: browserRaw.viewport ?? null,
+      platform: sanitizeText(browserRaw.platform, 60),
+      vendor: sanitizeText(browserRaw.vendor, 60),
+      hardwareConcurrency: typeof browserRaw.hardwareConcurrency === "number" ? browserRaw.hardwareConcurrency : null,
+      deviceMemory: typeof browserRaw.deviceMemory === "number" ? browserRaw.deviceMemory : null,
+      connection: browserRaw.connection ?? null,
+      referrer: sanitizeText(browserRaw.referrer, 500),
+      utm: browserRaw.utm ?? null,
+      sourcePath: sanitizeText(body.sourcePath, 500),
+      capturedAt: new Date().toISOString(),
+    };
+
     const payload: Record<string, unknown> = {
       session_id: sessionId,
       user_name: sanitizeText(customer.name, 140),
@@ -94,6 +114,7 @@ serve(async (req) => {
       cart_items: items,
       cart_total: cartTotal,
       last_activity_at: new Date().toISOString(),
+      browser_metadata: browserMeta,
     };
 
     if (!hasCart) {
