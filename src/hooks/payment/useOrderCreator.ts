@@ -50,17 +50,8 @@ export function useOrderCreator({ customerForm, customText, uploadedFiles }: Use
   const createOrderInDB = useCallback(async (state: PaymentState): Promise<string | null> => {
     if (UUID_REGEX.test(state.orderId)) return state.orderId;
 
-    let cartItemsForKey: Array<{ id: string; quantity: number }> = [];
-    try {
-      const storedPayment = sessionStorage.getItem('pending_payment');
-      if (storedPayment) {
-        const parsed = JSON.parse(storedPayment) as { cartItems?: Array<{ id?: string; quantity?: number }> };
-        cartItemsForKey = (parsed.cartItems || []).map((i) => ({
-          id: i.id || '',
-          quantity: i.quantity || 1,
-        }));
-      }
-    } catch { /* empty */ }
+    const pending = readPendingPayment();
+    const cartItemsForKey = pendingCartItemKeys(pending?.cartItems ?? []);
 
     const idemKey = generateIdempotencyKey(state.customerEmail, cartItemsForKey, state.amount);
     const existingEntry = getIdempotencyEntry(idemKey);
@@ -73,27 +64,12 @@ export function useOrderCreator({ customerForm, customText, uploadedFiles }: Use
 
     const orderId = crypto.randomUUID();
     const orderNumber = generateOrderNumber();
-    let cartItems: unknown[] = [];
-    try {
-      const storedPayment = sessionStorage.getItem('pending_payment');
-      if (storedPayment) {
-        const parsed = JSON.parse(storedPayment) as { cartItems?: unknown[] };
-        cartItems = parsed.cartItems || [{ description: state.description, amount: state.amount }];
-      }
-    } catch {
-      cartItems = [{ description: state.description, amount: state.amount }];
-    }
+    const cartItems: unknown[] = pending?.cartItems?.length
+      ? pending.cartItems
+      : [{ description: state.description, amount: state.amount }];
 
     const prodNotes = buildProductionNotes(customText, uploadedFiles);
-
-    let shippingInfo: { method?: string; cost?: number; cep?: string; city?: string; state?: string } = {};
-    try {
-      const storedPayment = sessionStorage.getItem('pending_payment');
-      if (storedPayment) {
-        const parsed = JSON.parse(storedPayment) as { shipping?: typeof shippingInfo };
-        shippingInfo = parsed.shipping || {};
-      }
-    } catch { /* empty */ }
+    const shippingInfo = pending?.shipping ?? {};
 
     const snap = sanitizeCustomerSnapshot({
       customerName: state.customerName,
