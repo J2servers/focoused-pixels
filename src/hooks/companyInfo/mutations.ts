@@ -13,10 +13,10 @@ const updateCompany = async (id: string, payload: Partial<CompanyInfo>) => {
   return error;
 };
 
-const insertCompany = async (payload: Partial<CompanyInfo>) => {
+const insertCompany = async (payload: Partial<CompanyInfo> & { company_name: string }) => {
   const { error } = await supabase
     .from('company_info')
-    .insert([payload as CompanyPayload]);
+    .insert([payload as CompanyPayload & { company_name: string }]);
   return error;
 };
 
@@ -41,15 +41,18 @@ export function useUpdateCompanyInfo() {
         throw error;
       }
 
-      const insertData: Partial<CompanyInfo> = {
-        company_name: (sanitized.company_name as string) || 'Pincel de Luz Personalizados',
+      const insertData = {
         ...sanitized,
+        company_name: (sanitized.company_name as string) || 'Pincel de Luz Personalizados',
       };
       const error = await insertCompany(insertData);
       if (!error) return;
 
       if (isMissingColumnError(error)) {
-        const retry = stripOptionalCompanyColumns(insertData);
+        const retry = {
+          ...stripOptionalCompanyColumns(insertData),
+          company_name: insertData.company_name,
+        };
         const retryError = await insertCompany(retry);
         if (!retryError) return;
       }
