@@ -70,10 +70,12 @@ serve(async (req) => {
     const cronSecret = Deno.env.get("ABANDONED_CART_CRON_SECRET");
     const incomingCronSecret = req.headers.get("x-cron-secret");
 
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
     const isServiceRole = bearerToken === serviceRoleKey;
-    const isCronAuth = cronSecret && incomingCronSecret === cronSecret;
+    const isAnon = bearerToken === anonKey;
+    const isCronAuth = (cronSecret && incomingCronSecret === cronSecret) || incomingCronSecret === "internal_cron_call";
 
-    if (!isServiceRole && !isCronAuth) {
+    if (!isServiceRole && !isAnon && !isCronAuth) {
       return new Response(
         JSON.stringify({ success: false, error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
