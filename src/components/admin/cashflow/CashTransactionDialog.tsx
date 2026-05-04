@@ -19,8 +19,8 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingUp, TrendingDown, Calendar } from 'lucide-react';
-import {
 import { logger } from '@/lib/logger';
+import {
   CashTransaction,
   CashTransactionInput,
   ENTRY_CATEGORIES,
