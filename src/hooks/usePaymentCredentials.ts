@@ -74,7 +74,7 @@ export function usePaymentCredentials() {
         .single();
 
       if (error) {
-        console.error('Error fetching payment credentials:', error);
+        logger.error('paymentCredentials', 'Error fetching payment credentials:', error);
         return { id: '', updated_at: new Date().toISOString(), ...defaultPaymentCredentials } as PaymentCredentials;
       }
 

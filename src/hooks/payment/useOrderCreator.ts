@@ -37,7 +37,7 @@ export function useOrderCreator({ customerForm, customText, uploadedFiles }: Use
         subscribed_at: new Date().toISOString(),
       }, { onConflict: 'email' });
     } catch (e) {
-      console.error('Error saving lead:', e);
+      logger.error('orderCreator', 'Error saving lead:', e);
     }
   }, []);
 
@@ -116,7 +116,7 @@ export function useOrderCreator({ customerForm, customText, uploadedFiles }: Use
     });
 
     if (error) {
-      console.error('Error creating order:', error);
+      logger.error('orderCreator', 'Error creating order:', error);
       setIdempotencyEntry(idemKey, 'failed');
       toast.error('Erro ao criar pedido. Tente novamente.');
       return null;

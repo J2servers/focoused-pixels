@@ -46,7 +46,7 @@ export function usePixPolling({
           setTimeout(() => navigate('/pagamento/sucesso'), SUCCESS_REDIRECT_DELAY_MS);
         }
       } catch (err) {
-        console.error('Error checking status:', err);
+        logger.error('pixPolling', 'Error checking status:', err);
       }
     };
 

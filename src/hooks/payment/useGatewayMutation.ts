@@ -21,7 +21,7 @@ export function useGatewayMutation<TRequest>(
       return data;
     },
     onError: (error: Error) => {
-      console.error(`${errorLabel} error:`, error);
+      logger.error('gateway', `${errorLabel} error:`, error);
       toast.error(error.message || `Erro no ${errorLabel}`);
     },
   });
