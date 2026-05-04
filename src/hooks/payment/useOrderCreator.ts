@@ -22,6 +22,7 @@ import {
   generateOrderNumber,
   sanitizeCustomerSnapshot,
 } from '@/lib/order';
+import { readPendingPayment, pendingCartItemKeys, clearPendingPayment } from '@/lib/pendingPayment';
 import { sanitizePhone } from '@/lib/sanitize';
 
 interface UseOrderCreatorArgs {
