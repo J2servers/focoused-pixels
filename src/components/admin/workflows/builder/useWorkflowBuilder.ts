@@ -25,7 +25,7 @@ const delayToMinutes = (value: number, unit: string) => {
   return value;
 };
 
-type StepData = { id?: string; type?: string; delay_value?: number; delay_unit?: string; [k: string]: unknown };
+type StepData = WorkflowStep;
 
 export function useWorkflowBuilder() {
   const { fitView } = useReactFlow();
