@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("payment-webhook");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
@@ -117,7 +119,7 @@ async function sendWhatsAppNotification(
 
     const cleanPhone = sanitizePhone(order.customer_phone);
     if (!cleanPhone) {
-      console.log("[Notification] Invalid customer phone, skipping WhatsApp");
+      log.info("[Notification] Invalid customer phone, skipping WhatsApp");
       return { sent: false };
     }
 
@@ -154,7 +156,7 @@ async function sendWhatsAppNotification(
     });
 
     const whatsappResult = await whatsappResponse.json();
-    console.log("[Notification] WhatsApp result:", JSON.stringify(whatsappResult));
+    log.info("[Notification] WhatsApp result:", JSON.stringify(whatsappResult));
 
     const sent = whatsappResult?.success === true;
     const { data: existingOrder } = await supabase
@@ -176,7 +178,7 @@ async function sendWhatsAppNotification(
 
     return { sent };
   } catch (e) {
-    console.error("[Notification] WhatsApp error:", e);
+    log.error("[Notification] WhatsApp error:", e);
     return { sent: false };
   }
 }
@@ -195,7 +197,7 @@ async function sendEmailNotification(
 ): Promise<{ sent: boolean }> {
   try {
     if (!order.customer_email || !order.customer_email.includes("@")) {
-      console.log("[Notification] Invalid email, skipping");
+      log.info("[Notification] Invalid email, skipping");
       return { sent: false };
     }
 
@@ -245,7 +247,7 @@ async function sendEmailNotification(
     });
 
     const emailResult = await emailResponse.json();
-    console.log("[Notification] Customer email result:", emailResult);
+    log.info("[Notification] Customer email result:", emailResult);
 
     await supabase.from("webhook_logs").insert({
       direction: "outbound",
@@ -278,7 +280,7 @@ async function sendEmailNotification(
 
     return { sent: true };
   } catch (e) {
-    console.error("[Notification] Email error:", e);
+    log.error("[Notification] Email error:", e);
     return { sent: false };
   }
 }
@@ -307,10 +309,10 @@ async function processConfirmedOrder(
         is_subscribed: true,
         subscribed_at: new Date().toISOString(),
       }, { onConflict: "email" });
-      console.log(`[Webhook] Lead saved: ${order.customer_email}`);
+      log.info(`[Webhook] Lead saved: ${order.customer_email}`);
     }
   } catch (e) {
-    console.error("[Webhook] Lead save error (non-critical):", e);
+    log.error("[Webhook] Lead save error (non-critical):", e);
   }
 
   // Send notifications in parallel
@@ -319,7 +321,7 @@ async function processConfirmedOrder(
     sendEmailNotification(supabase, order),
   ]);
 
-  console.log(`[Webhook] Notifications for ${order.order_number}: WhatsApp=${
+  log.info(`[Webhook] Notifications for ${order.order_number}: WhatsApp=${
     whatsResult.status === "fulfilled" ? whatsResult.value.sent : "error"
   }, Email=${
     emailResult.status === "fulfilled" ? emailResult.value.sent : "error"
@@ -347,9 +349,9 @@ async function processConfirmedOrder(
         },
       }),
     });
-    console.log(`[Webhook] Workflow trigger sent for payment_confirmed: ${order.order_number}`);
+    log.info(`[Webhook] Workflow trigger sent for payment_confirmed: ${order.order_number}`);
   } catch (e) {
-    console.error("[Webhook] Workflow trigger error (non-blocking):", e);
+    log.error("[Webhook] Workflow trigger error (non-blocking):", e);
   }
 }
 
@@ -373,14 +375,14 @@ serve(async (req) => {
     try {
       payload = (rawBody ? JSON.parse(rawBody) : {}) as WebhookPayload;
     } catch {
-      console.error("[Webhook] Invalid JSON body");
+      log.error("[Webhook] Invalid JSON body");
       return new Response(JSON.stringify({ received: true, error: "Invalid JSON" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    console.log(`[Webhook] Provider: ${provider}, Payload:`, JSON.stringify(payload).slice(0, 500));
+    log.info(`[Webhook] Provider: ${provider}, Payload:`, JSON.stringify(payload).slice(0, 500));
 
     // ===== HMAC SIGNATURE VALIDATION (per provider) =====
     const mpSecret = Deno.env.get("MERCADOPAGO_WEBHOOK_SECRET");
@@ -390,7 +392,7 @@ serve(async (req) => {
       const paymentIdForSig = (payload.data?.id || url.searchParams.get("id") || "").toString();
       const ok = await validateMercadoPagoSignature(req, paymentIdForSig, mpSecret ?? null);
       if (!ok) {
-        console.error("[Webhook MP] Invalid HMAC signature - rejecting");
+        log.error("[Webhook MP] Invalid HMAC signature - rejecting");
         return new Response(JSON.stringify({ received: false, error: "Invalid signature" }), {
           status: 401,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -399,7 +401,7 @@ serve(async (req) => {
     } else if (provider === "stripe" || payload.object === "event") {
       const ok = await validateStripeSignature(rawBody, req.headers.get("stripe-signature"), stripeSecret ?? null);
       if (!ok) {
-        console.error("[Webhook Stripe] Invalid HMAC signature - rejecting");
+        log.error("[Webhook Stripe] Invalid HMAC signature - rejecting");
         return new Response(JSON.stringify({ received: false, error: "Invalid signature" }), {
           status: 401,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -422,7 +424,7 @@ serve(async (req) => {
       const paymentId = payload.data?.id || url.searchParams.get("id");
       
       if (!paymentId) {
-        console.log("[Webhook MP] No payment ID found");
+        log.info("[Webhook MP] No payment ID found");
         return new Response(JSON.stringify({ received: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -436,7 +438,7 @@ serve(async (req) => {
         .single();
 
       if (!config?.mercadopago_access_token) {
-        console.error("[Webhook MP] No access token configured");
+        log.error("[Webhook MP] No access token configured");
         return new Response(JSON.stringify({ received: true, error: "No token" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -447,17 +449,17 @@ serve(async (req) => {
       });
 
       if (!response.ok) {
-        console.error(`[Webhook MP] Failed to fetch payment: ${response.status}`);
+        log.error(`[Webhook MP] Failed to fetch payment: ${response.status}`);
         return new Response(JSON.stringify({ received: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
       const paymentData = await response.json();
-      console.log(`[Webhook MP] Payment ${paymentId} status: ${paymentData.status}`);
+      log.info(`[Webhook MP] Payment ${paymentId} status: ${paymentData.status}`);
 
       if (!paymentData.external_reference) {
-        console.log("[Webhook MP] No external_reference");
+        log.info("[Webhook MP] No external_reference");
         return new Response(JSON.stringify({ received: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -489,9 +491,9 @@ serve(async (req) => {
         .single();
 
       if (result.error) {
-        console.error(`[Webhook MP] Error updating order:`, result.error);
+        log.error(`[Webhook MP] Error updating order:`, result.error);
       } else {
-        console.log(`[Webhook MP] Order ${extRef} updated to ${newStatus}`);
+        log.info(`[Webhook MP] Order ${extRef} updated to ${newStatus}`);
         
         if (newStatus === "paid" && result.data) {
           await processConfirmedOrder(supabase, result.data);
@@ -510,7 +512,7 @@ serve(async (req) => {
       for (const pix of pixPayments) {
         if (!pix.txid) continue;
         
-        console.log(`[Webhook EFI] PIX received: ${pix.txid}, value: ${pix.valor}`);
+        log.info(`[Webhook EFI] PIX received: ${pix.txid}, value: ${pix.valor}`);
         
         const updateData = { 
           payment_status: "paid",
@@ -535,7 +537,7 @@ serve(async (req) => {
         if (result?.data) {
           await processConfirmedOrder(supabase, result.data);
         } else {
-          console.error(`[Webhook EFI] Order not found for txid: ${pix.txid}`);
+          log.error(`[Webhook EFI] Order not found for txid: ${pix.txid}`);
         }
       }
 
@@ -549,7 +551,7 @@ serve(async (req) => {
       const eventType = payload.type;
       
       if (eventType === "checkout.session.completed" || eventType === "payment_intent.succeeded") {
-        console.log(`[Webhook Stripe] Event: ${eventType}`);
+        log.info(`[Webhook Stripe] Event: ${eventType}`);
         
         const orderId = (payload.data as { object?: { metadata?: { order_id?: string } } })?.object?.metadata?.order_id;
         if (orderId) {
@@ -565,7 +567,7 @@ serve(async (req) => {
             .select("order_number, customer_name, customer_email, customer_phone, total, items, payment_method")
             .single();
             
-          console.log(`[Webhook Stripe] Order ${orderId} marked as paid`);
+          log.info(`[Webhook Stripe] Order ${orderId} marked as paid`);
           
           if (result.data) {
             await processConfirmedOrder(supabase, result.data);
@@ -578,13 +580,13 @@ serve(async (req) => {
       });
     }
 
-    console.log("[Webhook] Unknown provider or payload format");
+    log.info("[Webhook] Unknown provider or payload format");
     return new Response(JSON.stringify({ received: true, message: "Unknown provider" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
   } catch (error) {
-    console.error("[Webhook] Error:", error);
+    log.error("[Webhook] Error:", error);
     return new Response(JSON.stringify({ received: true, error: "Processing error" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

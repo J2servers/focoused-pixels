@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("payment-stripe");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 
@@ -80,7 +82,7 @@ serve(async (req) => {
       items 
     } = await req.json() as PaymentRequest;
 
-    console.log(`[Stripe] Action: ${action}, OrderId: ${orderId}`);
+    log.info(`[Stripe] Action: ${action}, OrderId: ${orderId}`);
 
     const config = await getPaymentConfig(supabase);
     const stripe = new Stripe(config.secretKey, {
@@ -104,7 +106,7 @@ serve(async (req) => {
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       } catch (error) {
-        console.error("[Stripe] Test failed:", error);
+        log.error("[Stripe] Test failed:", error);
         return new Response(
           JSON.stringify({ 
             success: false, 
@@ -144,7 +146,7 @@ serve(async (req) => {
         },
       });
 
-      console.log("[Stripe] Checkout session created:", session.id);
+      log.info("[Stripe] Checkout session created:", session.id);
 
       return new Response(
         JSON.stringify({
@@ -189,7 +191,7 @@ serve(async (req) => {
         },
       });
 
-      console.log("[Stripe] Payment intent created:", paymentIntent.id);
+      log.info("[Stripe] Payment intent created:", paymentIntent.id);
 
       return new Response(
         JSON.stringify({
@@ -222,7 +224,7 @@ serve(async (req) => {
 
     throw new Error("Invalid action");
   } catch (error) {
-    console.error("[Stripe] Error:", error);
+    log.error("[Stripe] Error:", error);
     return new Response(
       JSON.stringify({ 
         success: false, 

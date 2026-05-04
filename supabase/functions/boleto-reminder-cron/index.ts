@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("boleto-reminder-cron");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
@@ -50,7 +52,7 @@ serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
 
-    console.log("[BoletoReminder] Starting daily boleto reminder check...");
+    log.info("[BoletoReminder] Starting daily boleto reminder check...");
 
     // Get boleto config
     const { data: payConfig } = await supabase
@@ -72,14 +74,14 @@ serve(async (req) => {
     if (ordersError) throw ordersError;
 
     if (!pendingOrders || pendingOrders.length === 0) {
-      console.log("[BoletoReminder] No pending boleto orders found");
+      log.info("[BoletoReminder] No pending boleto orders found");
       return new Response(
         JSON.stringify({ success: true, processed: 0, message: "No pending boletos" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`[BoletoReminder] Found ${pendingOrders.length} pending boleto orders`);
+    log.info(`[BoletoReminder] Found ${pendingOrders.length} pending boleto orders`);
 
     const now = new Date();
     const todayStr = now.toISOString().slice(0, 10); // YYYY-MM-DD
@@ -119,7 +121,7 @@ serve(async (req) => {
           .limit(1);
 
         if (todayLogs && todayLogs.length > 0) {
-          console.log(`[BoletoReminder] Already sent reminder for ${order.order_number} today, skipping`);
+          log.info(`[BoletoReminder] Already sent reminder for ${order.order_number} today, skipping`);
           skipped++;
           continue;
         }
@@ -141,7 +143,7 @@ serve(async (req) => {
 
         if (isExpired) {
           // Send "boleto expired" notification
-          console.log(`[BoletoReminder] Boleto expired for ${order.order_number}`);
+          log.info(`[BoletoReminder] Boleto expired for ${order.order_number}`);
 
           const whatsMsg = findWhatsTemplate("Boleto vencido");
           const emailMsg = findEmailTemplate("Boleto vencido");
@@ -163,7 +165,7 @@ serve(async (req) => {
           expired_notified++;
         } else {
           // Send reminder
-          console.log(`[BoletoReminder] Sending reminder for ${order.order_number}`);
+          log.info(`[BoletoReminder] Sending reminder for ${order.order_number}`);
 
           const whatsMsg = findWhatsTemplate("Lembrete de boleto");
           const emailMsg = findEmailTemplate("Lembrete de boleto");
@@ -191,19 +193,19 @@ serve(async (req) => {
         });
 
       } catch (e) {
-        console.error(`[BoletoReminder] Error processing ${order.order_number}:`, e);
+        log.error(`[BoletoReminder] Error processing ${order.order_number}:`, e);
       }
     }
 
     const summary = { success: true, processed: pendingOrders.length, reminders_sent, expired_notified, skipped };
-    console.log("[BoletoReminder] Done:", summary);
+    log.info("[BoletoReminder] Done:", summary);
 
     return new Response(JSON.stringify(summary), {
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
 
   } catch (error) {
-    console.error("[BoletoReminder] Fatal error:", error);
+    log.error("[BoletoReminder] Fatal error:", error);
     return new Response(
       JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -238,7 +240,7 @@ async function sendWhatsApp(supabaseUrl: string, serviceKey: string, phone: stri
       }),
     });
   } catch (e) {
-    console.error("[BoletoReminder] WhatsApp send error:", e);
+    log.error("[BoletoReminder] WhatsApp send error:", e);
   }
 }
 
@@ -250,6 +252,6 @@ async function sendEmail(supabaseUrl: string, serviceKey: string, to: string, su
       body: JSON.stringify({ to, subject, html, from_name: "Pincel de Luz" }),
     });
   } catch (e) {
-    console.error("[BoletoReminder] Email send error:", e);
+    log.error("[BoletoReminder] Email send error:", e);
   }
 }

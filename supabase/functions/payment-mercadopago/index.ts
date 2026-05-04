@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("payment-mercadopago");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
@@ -128,7 +130,7 @@ serve(async (req) => {
   // Rate limit by IP
   const clientIp = req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for") || "unknown";
   if (!checkRateLimit(clientIp)) {
-    console.warn(`[MercadoPago] Rate limited: ${clientIp}`);
+    log.warn(`[MercadoPago] Rate limited: ${clientIp}`);
     return new Response(
       JSON.stringify({ success: false, error: "Muitas requisições. Tente novamente em 1 minuto." }),
       { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -147,14 +149,14 @@ serve(async (req) => {
       payerZipCode, payerStreetName, payerStreetNumber, payerNeighborhood, payerCity, payerState
     } = requestData;
 
-    console.log(`[MercadoPago] Action: ${action}, OrderId: ${orderId}`);
+    log.info(`[MercadoPago] Action: ${action}, OrderId: ${orderId}`);
 
     // Idempotency check for payment creation actions
     if (orderId && ["create_pix", "create_boleto", "create_card_payment"].includes(action)) {
       const idemKey = `${action}-${orderId}`;
       const cached = idempotencyCache.get(idemKey);
       if (cached && Date.now() - cached.timestamp < IDEM_TTL_MS) {
-        console.log(`[MercadoPago] Idempotency hit: ${idemKey}`);
+        log.info(`[MercadoPago] Idempotency hit: ${idemKey}`);
         return new Response(cached.response, {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -176,7 +178,7 @@ serve(async (req) => {
           body: JSON.stringify(payload),
         });
       } catch (e) {
-        console.error("[MercadoPago] Notification error (non-blocking):", e);
+        log.error("[MercadoPago] Notification error (non-blocking):", e);
       }
     };
 
@@ -205,7 +207,7 @@ serve(async (req) => {
         );
       } else {
         const errorData = await testResponse.text();
-        console.error("[MercadoPago] Test failed:", errorData);
+        log.error("[MercadoPago] Test failed:", errorData);
         return new Response(
           JSON.stringify({ success: false, message: "Falha na conexão: credenciais inválidas" }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -316,11 +318,11 @@ serve(async (req) => {
       const data = await response.json();
       
       if (!response.ok) {
-        console.error("[MercadoPago] Create preference error:", data);
+        log.error("[MercadoPago] Create preference error:", data);
         throw new Error(data.message || "Failed to create preference");
       }
 
-      console.log("[MercadoPago] Preference created:", data.id);
+      log.info("[MercadoPago] Preference created:", data.id);
 
       return new Response(
         JSON.stringify({
@@ -372,11 +374,11 @@ serve(async (req) => {
       const data = await response.json();
       
       if (!response.ok) {
-        console.error("[MercadoPago] Create PIX error:", data);
+        log.error("[MercadoPago] Create PIX error:", data);
         throw new Error(data.message || data.cause?.[0]?.description || "Failed to create PIX payment");
       }
 
-      console.log("[MercadoPago] PIX created:", data.id);
+      log.info("[MercadoPago] PIX created:", data.id);
 
       // Notify customer (fire-and-forget)
       notifyCustomer({
@@ -463,11 +465,11 @@ serve(async (req) => {
       const data = await response.json();
       
       if (!response.ok) {
-        console.error("[MercadoPago] Create Boleto error:", data);
+        log.error("[MercadoPago] Create Boleto error:", data);
         throw new Error(data.message || data.cause?.[0]?.description || "Failed to create Boleto");
       }
 
-      console.log("[MercadoPago] Boleto created:", data.id);
+      log.info("[MercadoPago] Boleto created:", data.id);
 
       // Notify customer via centralized function (fire-and-forget)
       notifyCustomer({
@@ -535,11 +537,11 @@ serve(async (req) => {
       const data = await response.json();
       
       if (!response.ok) {
-        console.error("[MercadoPago] Create Card payment error:", data);
+        log.error("[MercadoPago] Create Card payment error:", data);
         throw new Error(data.message || data.cause?.[0]?.description || "Failed to process card payment");
       }
 
-      console.log("[MercadoPago] Card payment created:", data.id, "Status:", data.status);
+      log.info("[MercadoPago] Card payment created:", data.id, "Status:", data.status);
 
       // Notify customer (fire-and-forget)
       if (data.status === "approved") {
@@ -594,7 +596,7 @@ serve(async (req) => {
       const data = await response.json();
       
       if (!response.ok) {
-        console.error("[MercadoPago] Check status error:", data);
+        log.error("[MercadoPago] Check status error:", data);
         throw new Error(data.message || "Failed to check payment status");
       }
 
@@ -615,7 +617,7 @@ serve(async (req) => {
 
     throw new Error("Invalid action");
   } catch (error) {
-    console.error("[MercadoPago] Error:", error);
+    log.error("[MercadoPago] Error:", error);
     return new Response(
       JSON.stringify({ 
         success: false, 

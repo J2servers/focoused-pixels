@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("recover-abandoned-carts");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
@@ -186,7 +188,7 @@ serve(async (req) => {
               summary.emailSent += 1;
               sentAny = true;
             }
-          } catch (e) { console.error("[recover] email error:", e); }
+          } catch (e) { log.error("[recover] email error:", e); }
         }
 
         const phone = normalizePhone(session.user_phone);
@@ -207,7 +209,7 @@ serve(async (req) => {
               summary.whatsappSent += 1;
               sentAny = true;
             }
-          } catch (e) { console.error("[recover] whatsapp error:", e); }
+          } catch (e) { log.error("[recover] whatsapp error:", e); }
         }
 
         await supabase.from("abandoned_cart_reminders").insert({
@@ -232,7 +234,7 @@ serve(async (req) => {
         if (sentAny) summary.remindersSent += 1;
         else summary.failed += 1;
       } catch (error) {
-        console.error("[recover] failed session", session.id, error);
+        log.error("[recover] failed session", session.id, error);
         summary.failed += 1;
       }
     }
@@ -242,7 +244,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
-    console.error("[recover-abandoned-carts] error:", error);
+    log.error("[recover-abandoned-carts] error:", error);
     return new Response(
       JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unexpected error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
