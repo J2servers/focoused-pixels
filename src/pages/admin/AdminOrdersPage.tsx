@@ -155,13 +155,16 @@ const AdminOrdersPage = () => {
     {
       key: 'actions', header: '', className: 'w-24',
       render: (o) => (
-        <div className="flex justify-end gap-1">
-          <Button className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => setSelectedOrder(o)}>
+        <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+          <Button
+            className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9"
+            onClick={(e) => { e.stopPropagation(); setSelectedOrder(o); }}
+          >
             <Eye className="h-4 w-4" />
           </Button>
           <Button
             className="admin-btn admin-btn-delete admin-btn-icon !min-h-0 !p-1 h-9 w-9"
-            onClick={() => setDeleteId(o.id)}
+            onClick={(e) => { e.stopPropagation(); setDeleteId(o.id); }}
             title="Excluir pedido"
           >
             <Trash2 className="h-4 w-4" />
