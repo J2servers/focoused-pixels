@@ -84,9 +84,7 @@ export function useOrderCreator({ customerForm, customText, uploadedFiles }: Use
       cartItems = [{ description: state.description, amount: state.amount }];
     }
 
-    const prodNotes: string[] = [];
-    if (customText.trim()) prodNotes.push(`📝 Texto: ${customText.trim()}`);
-    if (uploadedFiles.length > 0) prodNotes.push(`📎 Arquivos: ${uploadedFiles.map(f => f.name).join(', ')}`);
+    const prodNotes = buildProductionNotes(customText, uploadedFiles);
 
     let shippingInfo: { method?: string; cost?: number; cep?: string; city?: string; state?: string } = {};
     try {
@@ -97,12 +95,18 @@ export function useOrderCreator({ customerForm, customText, uploadedFiles }: Use
       }
     } catch { /* empty */ }
 
+    const snap = sanitizeCustomerSnapshot({
+      customerName: state.customerName,
+      customerEmail: state.customerEmail,
+      customerPhone: state.customerPhone,
+    });
+
     const { error } = await supabase.from('orders').insert({
       id: orderId,
       order_number: orderNumber,
-      customer_name: state.customerName.trim(),
-      customer_email: sanitizeEmail(state.customerEmail),
-      customer_phone: sanitizePhone(state.customerPhone) || state.customerPhone || '',
+      customer_name: snap.customerName,
+      customer_email: snap.customerEmail,
+      customer_phone: snap.customerPhone,
       items: cartItems as unknown as Json,
       subtotal: state.amount - state.shippingCost,
       total: state.amount,
@@ -111,14 +115,13 @@ export function useOrderCreator({ customerForm, customText, uploadedFiles }: Use
       shipping_cep: shippingInfo.cep || customerForm.cep?.trim() || null,
       shipping_city: shippingInfo.city || customerForm.city?.trim() || null,
       shipping_state: shippingInfo.state || customerForm.state?.trim() || null,
-      shipping_address: [customerForm.street, customerForm.number, customerForm.complement, customerForm.neighborhood]
-        .filter(Boolean).join(', ') || null,
+      shipping_address: buildShippingAddressLine(customerForm),
       order_status: 'pending',
       payment_status: 'pending',
       production_status: 'pending',
       custom_text: customText.trim() || null,
       customer_files: uploadedFiles.length > 0 ? uploadedFiles.map(f => f.url) : [],
-      production_notes: prodNotes.length > 0 ? prodNotes.join('\n') : null,
+      production_notes: prodNotes,
     });
 
     if (error) {
