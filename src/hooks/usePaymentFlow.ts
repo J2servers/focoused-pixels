@@ -17,6 +17,7 @@ import {
   type BoletoData,
   type UploadedFile,
 } from '@/hooks/payment/types';
+import { buildInstallments } from '@/lib/installments';
 
 export type { PaymentState, CustomerForm, PixData, BoletoData };
 export { formatCurrency, BOLETO_FLOW_TEMPLATE } from '@/hooks/payment/types';
@@ -141,11 +142,6 @@ export function usePaymentFlow() {
   }, []);
 
   const calculateInstallments = useCallback((amount: number) => {
-    // Centralized rule (lib/installments). Returns same shape as before for
-    // backwards compatibility with PaymentPage / PaymentStepPayment.
-    // Lazy import keeps the hook tree-shake friendly.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { buildInstallments } = require('@/lib/installments') as typeof import('@/lib/installments');
     return buildInstallments(amount, {
       maxInstallments,
       minPerInstallment: minInstallmentValue,
