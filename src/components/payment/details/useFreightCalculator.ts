@@ -86,7 +86,7 @@ export function useFreightCalculator({
         throw new Error('No results');
       }
     } catch (err) {
-      console.error('Freight fetch error:', err);
+      logger.error('freight', 'Freight fetch error:', err);
       setFreightError(true);
       setFreightOptions(FALLBACK_FREIGHT_OPTIONS);
       setDestinationInfo(null);
