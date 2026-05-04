@@ -3,6 +3,7 @@
  * Improvements: #43 Save last CEP, #44 Auto-fill saved CEP, #45 Delivery date estimate
  */
 import { useState, useEffect } from 'react';
+import { sanitizeCEP } from '@/lib/sanitize';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Truck, Loader2, MapPin, Check } from 'lucide-react';

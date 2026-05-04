@@ -10,6 +10,7 @@
 import { useState } from 'react';
 import { ChevronDown, Lock, ShieldCheck, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/lib/format';
 
 interface CartItem {
   name: string;
@@ -29,7 +30,7 @@ interface PaymentOrderSummaryProps {
   className?: string;
 }
 
-const formatBRL = (n: number) => `R$ ${n.toFixed(2).replace('.', ',')}`;
+const formatBRL = formatCurrency;
 
 export function PaymentOrderSummary({
   items,

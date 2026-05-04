@@ -95,7 +95,7 @@ export function useFreightCalculator({
   }, [amount, shippingCost, lastFetchedCep, setCustomerForm, cartWeight]);
 
   useEffect(() => {
-    const cleanCep = customerForm.sanitizeCEP(cep);
+    const cleanCep = sanitizeCEP(customerForm.cep);
     if (cleanCep.length === 8 && cleanCep !== lastFetchedCep) {
       const timer = setTimeout(() => fetchFreight(customerForm.cep), 500);
       return () => clearTimeout(timer);
