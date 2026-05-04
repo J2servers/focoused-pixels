@@ -16,6 +16,7 @@ import { CartStickyCheckoutBar } from '@/components/cart/CartStickyCheckoutBar';
 import { FreeShippingBar } from '@/components/cart/FreeShippingBar';
 import { PageSEO } from '@/components/seo/PageSEO';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
+import { renderCartCheckoutMessage } from '@/lib/whatsapp-templates';
 import { formatCurrency } from '@/lib/format';
 
 const CartPage = () => {
@@ -26,26 +27,13 @@ const CartPage = () => {
 
   const handleCheckoutWhatsApp = () => {
     if (items.length === 0) return;
-
-    const itemsList = items
-      .map(item => `- ${item.name}${item.size ? ` (${item.size})` : ''} | Qtd: ${item.quantity} | R$ ${(item.price * item.quantity).toFixed(2)}`)
-      .join('\n');
-
-    const message = [
-      'Olá! Quero finalizar meu carrinho na Pincel de Luz.',
-      '',
-      'Resumo do carrinho:',
-      itemsList,
-      '',
-      `Total parcial: R$ ${total.toFixed(2)}`,
-      `Quantidade de itens: ${itemCount}`,
-      '',
-      'Pode me ajudar com o fechamento e prazo de produção?',
-    ].join('\n');
-
+    const message = renderCartCheckoutMessage({
+      items: items.map(i => ({ name: i.name, size: i.size, quantity: i.quantity, price: i.price })),
+      total,
+      itemCount,
+    });
     const whatsappLink = buildWhatsAppUrl(siteSettings.whatsapp, message);
     if (!whatsappLink) return;
-
     window.open(whatsappLink, '_blank');
   };
 
