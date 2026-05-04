@@ -166,9 +166,9 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
               )}
 
               {/* #7 Low stock warning */}
-              {product.inStock && (product as any).stock != null && (product as any).stock <= 10 && (
+              {product.inStock && product.stock != null && product.stock <= 10 && (
                 <div className="flex items-center gap-2 mt-2 text-destructive text-xs font-semibold animate-pulse">
-                  🔥 Apenas {(product as any).stock} unidades restantes!
+                  🔥 Apenas {product.stock} unidades restantes!
                 </div>
               )}
 

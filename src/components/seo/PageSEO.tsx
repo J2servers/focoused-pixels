@@ -70,7 +70,16 @@ export function WebSiteSchema() {
 }
 
 /** JSON-LD LocalBusiness schema */
-export function LocalBusinessSchema({ company }: { company: any }) {
+interface CompanyForSchema {
+  company_name?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  address?: string | null;
+  social_instagram?: string | null;
+  social_facebook?: string | null;
+}
+
+export function LocalBusinessSchema({ company }: { company: CompanyForSchema | null | undefined }) {
   if (!company) return null;
   const schema = {
     '@context': 'https://schema.org',

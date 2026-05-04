@@ -72,7 +72,7 @@ function CategoryPanel({ category, parentCategories, canEdit, onSave, isSaving, 
     setForm(buildForm(category || undefined));
   }
 
-  const set = (k: string, v: any) => setForm(prev => ({ ...prev, [k]: v }));
+  const set = (k: string, v: unknown) => setForm(prev => ({ ...prev, [k]: v }));
   const isChild = !!form.parent_id;
 
   const handleSave = async () => {

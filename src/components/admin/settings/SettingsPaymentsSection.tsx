@@ -14,10 +14,10 @@ interface Props {
   payment: Partial<PaymentCredentials>;
   up: <K extends keyof PaymentCredentials>(key: K, value: PaymentCredentials[K]) => void;
   canMutate: boolean;
-  testMP: { isPending: boolean; isSuccess: boolean; mutateAsync: () => Promise<any> };
-  testEFI: { isPending: boolean; isSuccess: boolean; mutateAsync: () => Promise<any> };
-  testStripe: { isPending: boolean; isSuccess: boolean; mutateAsync: () => Promise<any> };
-  runTest: (name: string, fn: () => Promise<any>) => void;
+  testMP: { isPending: boolean; isSuccess: boolean; mutateAsync: () => Promise<unknown> };
+  testEFI: { isPending: boolean; isSuccess: boolean; mutateAsync: () => Promise<unknown> };
+  testStripe: { isPending: boolean; isSuccess: boolean; mutateAsync: () => Promise<unknown> };
+  runTest: (name: string, fn: () => Promise<unknown>) => void;
 }
 
 const METHOD_LABELS: Record<string, string> = { pix: 'PIX', credit_card: 'Cartão de Crédito', boleto: 'Boleto Bancário' };

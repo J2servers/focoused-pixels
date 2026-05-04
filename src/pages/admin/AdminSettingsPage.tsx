@@ -98,8 +98,8 @@ const AdminSettingsPage = () => {
     } catch (e: unknown) { toast.error(e instanceof Error ? e.message : 'Falha ao enviar'); }
   };
 
-  const runTest = async (name: string, fn: () => Promise<any>) => {
-    try { const r = await fn(); if (r?.success) toast.success(`${name} OK`); else toast.error(`${name} falhou`); }
+  const runTest = async (name: string, fn: () => Promise<{ success?: boolean } | unknown>) => {
+    try { const r = await fn() as { success?: boolean }; if (r?.success) toast.success(`${name} OK`); else toast.error(`${name} falhou`); }
     catch { toast.error(`${name} falhou`); }
   };
 
