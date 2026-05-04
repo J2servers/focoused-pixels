@@ -54,7 +54,7 @@ export function useCreateVideoStory() {
     mutationFn: async (story: Partial<VideoStory>) => {
       const { data, error } = await supabase
         .from('video_stories')
-        .insert(story as any)
+        .insert(story as Parameters<typeof supabase.from<'video_stories'>>[0] extends never ? never : VideoStory)
         .select()
         .single();
       if (error) throw error;
