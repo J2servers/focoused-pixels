@@ -1,4 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("admin-gate-check");
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
@@ -59,7 +61,7 @@ Deno.serve(async (req: Request) => {
 
     if (blocked) {
       if (blocked.permanent) {
-        console.log(`[SECURITY] Permanently blocked IP attempted access: ${ipHash}`);
+        log.info(`[SECURITY] Permanently blocked IP attempted access: ${ipHash}`);
         return DENY('blocked');
       }
       if (blocked.blocked_until && new Date(blocked.blocked_until) > new Date()) {
@@ -99,7 +101,7 @@ Deno.serve(async (req: Request) => {
         reason: 'brute_force_permanent',
         permanent: true,
       }, { onConflict: 'ip_hash' });
-      console.log(`[SECURITY] IP permanently banned: ${ipHash}`);
+      log.info(`[SECURITY] IP permanently banned: ${ipHash}`);
       return DENY('blocked');
     }
 
@@ -129,7 +131,7 @@ Deno.serve(async (req: Request) => {
     // 3. CHECK USER EXISTS + HAS ADMIN ROLE
     const { data: users, error: userError } = await supabase.auth.admin.listUsers();
     if (userError) {
-      console.error('Auth lookup error:', userError);
+      log.error('Auth lookup error:', userError);
       return DENY();
     }
 
@@ -185,7 +187,7 @@ Deno.serve(async (req: Request) => {
     );
 
   } catch (error) {
-    console.error('Gate check error:', error);
+    log.error('Gate check error:', error);
     return DENY();
   }
 })

@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("abandoned-cart-insights");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
@@ -168,7 +170,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
-    console.error("[abandoned-cart-insights] error:", error);
+    log.error("[abandoned-cart-insights] error:", error);
     return new Response(
       JSON.stringify({
         success: false,

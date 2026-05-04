@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("crm-webhook");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
@@ -83,7 +85,7 @@ async function logWebhook(
       error_message: errorMessage || null,
     });
   } catch (e) {
-    console.error("[Webhook Log Error]", e);
+    log.error("[Webhook Log Error]", e);
   }
 }
 
@@ -350,7 +352,7 @@ serve(async (req) => {
     const body = await req.json() as WebhookRequest;
     const { event, data, timestamp } = body;
 
-    console.log(`[CRM Webhook] Event: ${event}, Timestamp: ${timestamp || "none"}`);
+    log.info(`[CRM Webhook] Event: ${event}, Timestamp: ${timestamp || "none"}`);
 
     let result: Record<string, unknown>;
 
@@ -387,7 +389,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("[CRM Webhook] Error:", error);
+    log.error("[CRM Webhook] Error:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     const errorResp = { success: false, error: errorMessage };
 

@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("send-email");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer";
 
@@ -220,7 +222,7 @@ serve(async (req) => {
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("[SendEmail] Error:", message);
+    log.error("[SendEmail] Error:", message);
     return new Response(
       JSON.stringify({ success: false, error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },

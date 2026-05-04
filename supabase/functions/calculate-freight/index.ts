@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("calculate-freight");
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
@@ -163,7 +165,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Freight calculation error:', error);
+    log.error('Freight calculation error:', error);
     return new Response(JSON.stringify({ error: 'Erro ao calcular frete' }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
