@@ -337,7 +337,15 @@ const AdminQuotesPage = () => {
             </ScrollArea>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:justify-between">
+            {selectedQuote && (
+              <Button
+                className="admin-btn admin-btn-delete"
+                onClick={() => setDeleteId(selectedQuote.id)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />Excluir
+              </Button>
+            )}
             {selectedQuote?.status === 'approved' && (
               <Button onClick={() => handleConvertToOrder(selectedQuote.id)} disabled={createOrderFromQuote.isPending}
                 className="admin-btn admin-btn-save">
@@ -347,6 +355,25 @@ const AdminQuotesPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent className="liquid-glass">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Excluir Orçamento</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
+              Tem certeza? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-white/[0.08] bg-transparent text-white hover:bg-white/[0.06]">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteQuote} className="admin-btn admin-btn-delete">
+              <Trash2 className="h-4 w-4 mr-1" />Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };
