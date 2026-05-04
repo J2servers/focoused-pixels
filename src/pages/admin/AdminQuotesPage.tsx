@@ -139,7 +139,7 @@ const AdminQuotesPage = () => {
       },
     },
     {
-      key: 'id', header: '', className: 'w-28',
+      key: 'id', header: '', className: 'w-36',
       render: (q) => (
         <div className="flex justify-end gap-1">
           <Button className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => setSelectedQuote(q)}>
@@ -151,6 +151,13 @@ const AdminQuotesPage = () => {
               <ArrowRightCircle className="h-3 w-3 mr-1" />Converter
             </Button>
           )}
+          <Button
+            className="admin-btn admin-btn-delete admin-btn-icon !min-h-0 !p-1 h-9 w-9"
+            onClick={() => setDeleteId(q.id)}
+            title="Excluir orçamento"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       ),
     },
