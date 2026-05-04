@@ -5,6 +5,7 @@
  */
 import { CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/format';
 
 interface CartStickyCheckoutBarProps {
   total: number;
@@ -31,7 +32,7 @@ export function CartStickyCheckoutBar({
             Total ({itemCount} {itemCount === 1 ? 'item' : 'itens'})
           </p>
           <p className="text-base font-extrabold text-primary tabular-nums leading-tight">
-            R$ {total.toFixed(2).replace('.', ',')}
+            {formatCurrency(total)}
           </p>
         </div>
         <Button
