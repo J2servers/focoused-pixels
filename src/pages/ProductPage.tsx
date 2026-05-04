@@ -21,6 +21,7 @@ import { StickyBuyBar } from '@/components/product/StickyBuyBar';
 import { ProductJsonLd } from '@/components/product/ProductJsonLd';
 import { ProductSectionTabs } from '@/components/product/ProductSectionTabs';
 import { DeliveryEstimate } from '@/components/product/DeliveryEstimate';
+import { FreeShippingBar } from '@/components/cart/FreeShippingBar';
 
 import { ProductPageSkeleton, ProductNotFound } from './product/ProductPageStates';
 import { ProductBreadcrumb } from './product/ProductBreadcrumb';
@@ -99,6 +100,7 @@ const ProductPage = () => {
               />
               <Section label="Entrega" className="space-y-4">
                 <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">Entrega</h2>
+                <FreeShippingBar />
                 <FreightCalculator productPrice={product.price * state.quantity} onFreightSelect={state.setSelectedFreight} />
                 {state.selectedFreight && (
                   <DeliveryEstimate freightDays={state.selectedFreight.days} productionDays={productionTime} />
