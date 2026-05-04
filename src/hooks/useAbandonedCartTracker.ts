@@ -106,6 +106,7 @@ export function useAbandonedCartTracker() {
         itemCount,
         total: Number(total.toFixed(2)),
         sourcePath: window.location.pathname,
+        browser: captureBrowserMetadata(),
         customer: {
           userId: user?.id,
           name: contact?.name || userFullName,
