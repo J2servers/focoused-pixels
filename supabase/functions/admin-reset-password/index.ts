@@ -1,4 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("admin-reset-password");
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
@@ -93,7 +95,7 @@ Deno.serve(async (req: Request) => {
     })
 
     if (updateError) {
-      console.error('Password reset error:', updateError)
+      log.error('Password reset error:', updateError)
       return new Response(
         JSON.stringify({ error: 'Erro ao redefinir senha' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
@@ -106,7 +108,7 @@ Deno.serve(async (req: Request) => {
     )
 
   } catch (error) {
-    console.error('Admin reset password error:', error)
+    log.error('Admin reset password error:', error)
     return new Response(
       JSON.stringify({ error: 'Erro interno' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }

@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("whatsapp-evolution");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
@@ -77,7 +79,7 @@ serve(async (req) => {
       // ===== CREATE INSTANCE =====
       case "create": {
         const name = instanceName || "pinceldeluz1";
-        console.log(`[Evolution] Creating instance: ${name}`);
+        log.info(`[Evolution] Creating instance: ${name}`);
 
         const resp = await fetch(`${baseUrl}/instance/create`, {
           method: "POST",
@@ -96,14 +98,14 @@ serve(async (req) => {
           .update({ status: "connecting", updated_at: new Date().toISOString() })
           .eq("instance_name", name);
 
-        console.log(`[Evolution] Create result:`, JSON.stringify(result).slice(0, 300));
+        log.info(`[Evolution] Create result:`, JSON.stringify(result).slice(0, 300));
         break;
       }
 
       // ===== CONNECT (GET QR CODE) =====
       case "connect": {
         const name = instanceName || "pinceldeluz1";
-        console.log(`[Evolution] Connecting instance: ${name}`);
+        log.info(`[Evolution] Connecting instance: ${name}`);
 
         const resp = await fetch(`${baseUrl}/instance/connect/${name}`, {
           method: "GET",
@@ -115,14 +117,14 @@ serve(async (req) => {
           .update({ status: "connecting", updated_at: new Date().toISOString() })
           .eq("instance_name", name);
 
-        console.log(`[Evolution] Connect result status:`, resp.status);
+        log.info(`[Evolution] Connect result status:`, resp.status);
         break;
       }
 
       // ===== CHECK STATUS =====
       case "status": {
         const name = instanceName || "pinceldeluz1";
-        console.log(`[Evolution] Checking status: ${name}`);
+        log.info(`[Evolution] Checking status: ${name}`);
 
         const resp = await fetch(`${baseUrl}/instance/connectionState/${name}`, {
           method: "GET",
@@ -147,13 +149,13 @@ serve(async (req) => {
           .update(updateData)
           .eq("instance_name", name);
 
-        console.log(`[Evolution] Status: ${dbStatus}`);
+        log.info(`[Evolution] Status: ${dbStatus}`);
         break;
       }
 
       // ===== FETCH INSTANCES =====
       case "fetch": {
-        console.log(`[Evolution] Fetching all instances`);
+        log.info(`[Evolution] Fetching all instances`);
         const resp = await fetch(`${baseUrl}/instance/fetchInstances`, {
           method: "GET",
           headers,
@@ -224,7 +226,7 @@ serve(async (req) => {
         let lastError = "";
 
         for (const inst of instances) {
-          console.log(`[Evolution] Trying instance: ${inst.instance_name} (priority ${inst.priority})`);
+          log.info(`[Evolution] Trying instance: ${inst.instance_name} (priority ${inst.priority})`);
           
           const sendResult = await attemptSend(baseUrl, headers, inst.instance_name, cleanNumber, text);
 
@@ -246,7 +248,7 @@ serve(async (req) => {
             break;
           } else {
             lastError = sendResult.error || "Unknown error";
-            console.log(`[Evolution] Instance ${inst.instance_name} failed: ${lastError}, trying next...`);
+            log.info(`[Evolution] Instance ${inst.instance_name} failed: ${lastError}, trying next...`);
           }
         }
 
@@ -262,7 +264,7 @@ serve(async (req) => {
       // ===== LOGOUT / DISCONNECT =====
       case "logout": {
         const name = instanceName || "pinceldeluz1";
-        console.log(`[Evolution] Logging out: ${name}`);
+        log.info(`[Evolution] Logging out: ${name}`);
 
         const resp = await fetch(`${baseUrl}/instance/logout/${name}`, {
           method: "DELETE",
@@ -279,7 +281,7 @@ serve(async (req) => {
       // ===== DELETE INSTANCE =====
       case "delete": {
         const name = instanceName || "pinceldeluz1";
-        console.log(`[Evolution] Deleting instance: ${name}`);
+        log.info(`[Evolution] Deleting instance: ${name}`);
 
         const resp = await fetch(`${baseUrl}/instance/delete/${name}`, {
           method: "DELETE",
@@ -306,7 +308,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error("[Evolution] Error:", error);
+    log.error("[Evolution] Error:", error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

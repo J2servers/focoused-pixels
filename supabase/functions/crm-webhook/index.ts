@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("crm-webhook");
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
 // ===== TYPES =====
@@ -48,85 +50,11 @@ interface WebhookRequest {
   timestamp?: string;
 }
 
-// ===== HELPERS =====
-function generateOrderNumber(): string {
-  const now = new Date();
-  const y = now.getFullYear().toString().slice(-2);
-  const m = (now.getMonth() + 1).toString().padStart(2, '0');
-  const d = now.getDate().toString().padStart(2, '0');
-  const rand = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-  return `PL${y}${m}${d}-${rand}`;
-}
-
-async function logWebhook(
-  supabase: any,
-  direction: string,
-  endpoint: string,
-  eventType: string,
-  requestBody: unknown,
-  responseBody: unknown,
-  statusCode: number,
-  source: string,
-  processed: boolean,
-  errorMessage?: string
-) {
-  try {
-    await supabase.from("webhook_logs").insert({
-      direction,
-      endpoint,
-      event_type: eventType,
-      request_body: requestBody as Record<string, unknown>,
-      response_body: responseBody as Record<string, unknown>,
-      status_code: statusCode,
-      source,
-      processed,
-      error_message: errorMessage || null,
-    });
-  } catch (e) {
-    console.error("[Webhook Log Error]", e);
-  }
-}
-
-async function validateApiKey(supabase: any, apiKey: string): Promise<boolean> {
-  if (!apiKey || apiKey.length < 8) return false;
-  
-  const prefix = apiKey.substring(0, 8);
-  
-  // Find key by prefix
-  const { data, error } = await supabase
-    .from("api_keys")
-    .select("id, key_hash, is_active, expires_at, permissions")
-    .eq("key_prefix", prefix)
-    .eq("is_active", true)
-    .limit(1);
-
-  if (error || !data || data.length === 0) return false;
-
-  const keyRecord = data[0];
-  
-  // Verify hash matches
-  const encoder = new TextEncoder();
-  const hashBuffer = await crypto.subtle.digest("SHA-256", encoder.encode(apiKey));
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const computedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  
-  if (computedHash !== keyRecord.key_hash) return false;
-  
-  // Check expiration
-  if (keyRecord.expires_at && new Date(keyRecord.expires_at) < new Date()) return false;
-
-  // Update last_used_at
-  await supabase
-    .from("api_keys")
-    .update({ last_used_at: new Date().toISOString() })
-    .eq("id", keyRecord.id);
-
-  return true;
-}
+import { generateOrderNumber, logWebhook, validateApiKey } from "../_shared/webhook/crm.ts";
 
 // ===== EVENT HANDLERS =====
 
-async function handleProductSync(supabase: any, data: ProductPayload) {
+async function handleProductSync(supabase: SupabaseClient, data: ProductPayload) {
   const slug = data.name.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -186,7 +114,7 @@ async function handleProductSync(supabase: any, data: ProductPayload) {
   }
 }
 
-async function handleSaleCreated(supabase: any, data: SalePayload) {
+async function handleSaleCreated(supabase: SupabaseClient, data: SalePayload) {
   const orderNumber = generateOrderNumber();
   
   // Create order
@@ -250,7 +178,7 @@ async function handleSaleCreated(supabase: any, data: SalePayload) {
   return { action: "order_created", order_id: order.id, order_number: orderNumber };
 }
 
-async function handleStockUpdate(supabase: any, data: StockUpdatePayload) {
+async function handleStockUpdate(supabase: SupabaseClient, data: StockUpdatePayload) {
   let query = supabase.from("products").select("id, name, stock").is("deleted_at", null);
   
   if (data.product_id) query = query.eq("id", data.product_id);
@@ -266,7 +194,7 @@ async function handleStockUpdate(supabase: any, data: StockUpdatePayload) {
   return { action: "stock_updated", product_id: product.id, old_stock: product.stock, new_stock: data.new_stock };
 }
 
-async function handleProductsList(supabase: any, filters: Record<string, unknown>) {
+async function handleProductsList(supabase: SupabaseClient, filters: Record<string, unknown>) {
   let query = supabase
     .from("products")
     .select("id, name, slug, sku, price, promotional_price, stock, min_stock, cost_material, cost_labor, cost_shipping, status, cover_image, category_id, created_at, updated_at")
@@ -283,7 +211,7 @@ async function handleProductsList(supabase: any, filters: Record<string, unknown
   return { products: data, total: data?.length || 0 };
 }
 
-async function handleOrdersList(supabase: any, filters: Record<string, unknown>) {
+async function handleOrdersList(supabase: SupabaseClient, filters: Record<string, unknown>) {
   let query = supabase
     .from("orders")
     .select("id, order_number, customer_name, customer_email, total, order_status, payment_status, payment_method, created_at, updated_at")
@@ -299,7 +227,7 @@ async function handleOrdersList(supabase: any, filters: Record<string, unknown>)
   return { orders: data, total: data?.length || 0 };
 }
 
-async function handleStockList(supabase: any, filters: Record<string, unknown>) {
+async function handleStockList(supabase: SupabaseClient, filters: Record<string, unknown>) {
   let query = supabase
     .from("products")
     .select("id, name, sku, slug, stock, min_stock, price, status")
@@ -331,7 +259,7 @@ serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, supabaseServiceKey) as any;
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   try {
     // Validate API key
@@ -350,7 +278,7 @@ serve(async (req) => {
     const body = await req.json() as WebhookRequest;
     const { event, data, timestamp } = body;
 
-    console.log(`[CRM Webhook] Event: ${event}, Timestamp: ${timestamp || "none"}`);
+    log.info(`[CRM Webhook] Event: ${event}, Timestamp: ${timestamp || "none"}`);
 
     let result: Record<string, unknown>;
 
@@ -387,7 +315,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("[CRM Webhook] Error:", error);
+    log.error("[CRM Webhook] Error:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     const errorResp = { success: false, error: errorMessage };
 

@@ -1,18 +1,10 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Package, ShoppingCart, Users, Tag, FileText, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { supabase } from '@/integrations/supabase/client';
-
-interface SearchResult {
-  id: string;
-  title: string;
-  subtitle: string;
-  type: 'product' | 'order' | 'lead' | 'category' | 'quote';
-  link: string;
-}
+import { useUniversalSearch, type UniversalSearchResult } from '@/hooks/admin/useUniversalSearch';
 
 const TYPE_CONFIG = {
   product: { icon: Package, label: 'Produto', color: 'text-blue-400' },
@@ -24,55 +16,19 @@ const TYPE_CONFIG = {
 
 export const UniversalSearch = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) => {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
-
-  const search = useCallback(async (q: string) => {
-    if (q.length < 2) { setResults([]); return; }
-    setIsSearching(true);
-
-    const term = `%${q}%`;
-    const allResults: SearchResult[] = [];
-
-    const [products, orders, leads, categories, quotes] = await Promise.all([
-      supabase.from('products').select('id, name, slug, sku').ilike('name', term).limit(5),
-      supabase.from('orders').select('id, order_number, customer_name, customer_email').or(`order_number.ilike.${term},customer_name.ilike.${term},customer_email.ilike.${term}`).limit(5),
-      supabase.from('leads').select('id, name, email').or(`name.ilike.${term},email.ilike.${term}`).limit(5),
-      supabase.from('categories').select('id, name, slug').ilike('name', term).limit(5),
-      supabase.from('quotes').select('id, customer_name, customer_email').or(`customer_name.ilike.${term},customer_email.ilike.${term}`).limit(5),
-    ]);
-
-    products.data?.forEach(p => allResults.push({
-      id: p.id, title: p.name, subtitle: p.sku || p.slug, type: 'product', link: '/admin/produtos'
-    }));
-    orders.data?.forEach(o => allResults.push({
-      id: o.id, title: `Venda ${o.order_number}`, subtitle: o.customer_name, type: 'order', link: '/admin/pedidos'
-    }));
-    leads.data?.forEach(l => allResults.push({
-      id: l.id, title: l.name, subtitle: l.email, type: 'lead', link: '/admin/leads'
-    }));
-    categories.data?.forEach(c => allResults.push({
-      id: c.id, title: c.name, subtitle: c.slug, type: 'category', link: '/admin/categorias'
-    }));
-    quotes.data?.forEach(q => allResults.push({
-      id: q.id, title: q.customer_name, subtitle: q.customer_email, type: 'quote', link: '/admin/orcamentos'
-    }));
-
-    setResults(allResults);
-    setIsSearching(false);
-  }, []);
+  const { results, isSearching, search, reset } = useUniversalSearch();
 
   useEffect(() => {
-    const timer = setTimeout(() => { if (query) search(query); else setResults([]); }, 300);
+    const timer = setTimeout(() => { if (query) search(query); else reset(); }, 300);
     return () => clearTimeout(timer);
-  }, [query, search]);
+  }, [query, search, reset]);
 
   useEffect(() => {
-    if (!open) { setQuery(''); setResults([]); }
-  }, [open]);
+    if (!open) { setQuery(''); reset(); }
+  }, [open, reset]);
 
-  const handleSelect = (result: SearchResult) => {
+  const handleSelect = (result: UniversalSearchResult) => {
     navigate(result.link);
     onOpenChange(false);
   };

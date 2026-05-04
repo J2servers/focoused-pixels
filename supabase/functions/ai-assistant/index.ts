@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("ai-assistant");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
@@ -216,7 +218,7 @@ serve(async (req) => {
       } : null;
     }
 
-    console.log(`AI Assistant - ${products.length} products, ${categories.length} categories, ${messages.length} messages`);
+    log.info(`AI Assistant - ${products.length} products, ${categories.length} categories, ${messages.length} messages`);
 
     const SYSTEM_PROMPT = buildSystemPrompt(products, categories);
 
@@ -237,7 +239,7 @@ serve(async (req) => {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       };
-      console.log(`AI Assistant - External provider: ${provider}, model: ${model}`);
+      log.info(`AI Assistant - External provider: ${provider}, model: ${model}`);
     } else {
       if (!LOVABLE_API_KEY) {
         throw new Error("LOVABLE_API_KEY is not configured");
@@ -249,7 +251,7 @@ serve(async (req) => {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       };
-      console.log("AI Assistant - Native Lovable AI");
+      log.info("AI Assistant - Native Lovable AI");
     }
 
     const requestBody = JSON.stringify({
@@ -270,7 +272,7 @@ serve(async (req) => {
     if (!response.ok) {
       // If external fails, try fallback to native
       if (useExternal && LOVABLE_API_KEY) {
-        console.warn("External AI failed, falling back to native Lovable AI");
+        log.warn("External AI failed, falling back to native Lovable AI");
         const fallbackResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -307,7 +309,7 @@ serve(async (req) => {
         );
       }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      log.error("AI gateway error:", response.status, errorText);
       return new Response(
         JSON.stringify({ error: "Erro ao processar sua mensagem." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -319,7 +321,7 @@ serve(async (req) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro desconhecido";
-    console.error("AI Assistant error:", message);
+    log.error("AI Assistant error:", message);
     
     // Return 400 for validation errors
     const isValidation = message.includes("must be") || message.includes("cannot be") || message.includes("invalid");

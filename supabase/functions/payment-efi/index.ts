@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("payment-efi");
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
@@ -24,7 +26,7 @@ interface EfiConfig {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function getPaymentConfig(supabaseClient: any): Promise<EfiConfig> {
+async function getPaymentConfig(supabaseClient: SupabaseClient): Promise<EfiConfig> {
   const { data, error } = await supabaseClient
     .from("payment_credentials")
     .select("efi_enabled, efi_client_id, efi_client_secret, efi_sandbox, efi_pix_key")
@@ -73,7 +75,7 @@ async function getAccessToken(config: EfiConfig): Promise<string> {
 
   if (!response.ok) {
     const error = await response.text();
-    console.error("[EFI] Auth error:", error);
+    log.error("[EFI] Auth error:", error);
     throw new Error("Failed to authenticate with EFI Bank");
   }
 
@@ -94,7 +96,7 @@ serve(async (req) => {
     const { action, orderId, amount, description, payerName, payerCpf, payerEmail, txid, expireSeconds } = 
       await req.json() as PaymentRequest;
 
-    console.log(`[EFI] Action: ${action}, OrderId: ${orderId}`);
+    log.info(`[EFI] Action: ${action}, OrderId: ${orderId}`);
 
     const config = await getPaymentConfig(supabase);
     const baseUrl = config.sandbox 
@@ -114,7 +116,7 @@ serve(async (req) => {
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       } catch (error) {
-        console.error("[EFI] Test failed:", error);
+        log.error("[EFI] Test failed:", error);
         return new Response(
           JSON.stringify({ 
             success: false, 
@@ -165,7 +167,7 @@ serve(async (req) => {
       const data = await response.json();
       
       if (!response.ok) {
-        console.error("[EFI] Create PIX error:", data);
+        log.error("[EFI] Create PIX error:", data);
         throw new Error(data.mensagem || data.message || "Failed to create PIX");
       }
 
@@ -178,7 +180,7 @@ serve(async (req) => {
 
       const qrData = await qrResponse.json();
 
-      console.log("[EFI] PIX created:", data.txid);
+      log.info("[EFI] PIX created:", data.txid);
 
       return new Response(
         JSON.stringify({
@@ -208,7 +210,7 @@ serve(async (req) => {
       const data = await response.json();
       
       if (!response.ok) {
-        console.error("[EFI] Check status error:", data);
+        log.error("[EFI] Check status error:", data);
         throw new Error(data.mensagem || "Failed to check status");
       }
 
@@ -282,7 +284,7 @@ serve(async (req) => {
       const data = await response.json();
       
       if (!response.ok) {
-        console.error("[EFI] Create boleto error:", data);
+        log.error("[EFI] Create boleto error:", data);
         throw new Error(data.message || "Failed to create boleto");
       }
 
@@ -302,7 +304,7 @@ serve(async (req) => {
 
     throw new Error("Invalid action");
   } catch (error) {
-    console.error("[EFI] Error:", error);
+    log.error("[EFI] Error:", error);
     return new Response(
       JSON.stringify({ 
         success: false, 

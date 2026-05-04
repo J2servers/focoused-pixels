@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("track-correios");
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
@@ -22,7 +24,7 @@ interface TrackingResult {
 // The official Correios API requires a contract and authentication
 // This implementation uses a mock service that simulates realistic tracking data
 async function fetchTrackingFromCorreios(trackingCode: string): Promise<TrackingResult> {
-  console.log(`Fetching tracking for code: ${trackingCode}`);
+  log.info(`Fetching tracking for code: ${trackingCode}`);
   
   // Validate tracking code format (Correios format: 2 letters + 9 digits + 2 letters)
   const correiosPattern = /^[A-Z]{2}\d{9}[A-Z]{2}$/i;
@@ -50,10 +52,10 @@ async function fetchTrackingFromCorreios(trackingCode: string): Promise<Tracking
 
     if (response.ok) {
       const data = await response.json();
-      console.log('LinkTrack response:', JSON.stringify(data));
+      log.info('LinkTrack response:', JSON.stringify(data));
       
       if (data.eventos && data.eventos.length > 0) {
-        const events: TrackingEvent[] = data.eventos.map((evento: any) => ({
+        const events: TrackingEvent[] = data.eventos.map((evento: { descricao?: string; dtHrCriado?: string; unidade?: { tipo?: string; endereco?: { cidade?: string; uf?: string } } }) => ({
           status: evento.status || 'Em trânsito',
           description: evento.subStatus?.[0] || evento.status || 'Atualização',
           location: `${evento.local || ''} ${evento.cidade || ''} - ${evento.uf || ''}`.trim() || 'Não informado',
@@ -74,7 +76,7 @@ async function fetchTrackingFromCorreios(trackingCode: string): Promise<Tracking
       }
     }
   } catch (error) {
-    console.error('Error fetching from LinkTrack:', error);
+    log.error('Error fetching from LinkTrack:', error);
   }
 
   // If external API fails, return a helpful message
@@ -129,7 +131,7 @@ serve(async (req) => {
   try {
     const { trackingCode, orderNumber } = await req.json();
     
-    console.log('Received request:', { trackingCode, orderNumber });
+    log.info('Received request:', { trackingCode, orderNumber });
 
     if (!trackingCode && !orderNumber) {
       return new Response(
@@ -149,7 +151,7 @@ serve(async (req) => {
 
     const result = await fetchTrackingFromCorreios(codeToTrack.toUpperCase().trim());
     
-    console.log('Tracking result:', JSON.stringify(result));
+    log.info('Tracking result:', JSON.stringify(result));
 
     return new Response(
       JSON.stringify(result),
@@ -159,7 +161,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error processing tracking request:', error);
+    log.error('Error processing tracking request:', error);
     
     return new Response(
       JSON.stringify({ 

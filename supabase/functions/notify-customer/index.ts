@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("notify-customer");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
@@ -136,7 +138,7 @@ serve(async (req) => {
     const data = await req.json() as NotifyRequest;
     const { event, customer, order } = data;
 
-    console.log(`[Notify] Event: ${event}, Customer: ${customer.name}, Order: ${order.orderId}`);
+    log.info(`[Notify] Event: ${event}, Customer: ${customer.name}, Order: ${order.orderId}`);
 
     if (!event || !customer || !order) {
       throw new Error("Missing required fields: event, customer, order");
@@ -199,7 +201,7 @@ serve(async (req) => {
           templateVars.delivery_estimate = orderData.shipping_method === "express" ? "3-5 dias úteis" : "7-12 dias úteis";
         }
       } catch (e) {
-        console.warn("[Notify] Could not fetch order shipping data:", e);
+        log.warn("[Notify] Could not fetch order shipping data:", e);
       }
     }
 
@@ -238,7 +240,7 @@ serve(async (req) => {
 
       if (waTpl?.message_text) {
         whatsappMessage = replaceVars(waTpl.message_text, templateVars);
-        console.log(`[Notify] WhatsApp template loaded: ${tplName}`);
+        log.info(`[Notify] WhatsApp template loaded: ${tplName}`);
         break;
       }
     }
@@ -246,7 +248,7 @@ serve(async (req) => {
     // Fallback to hardcoded if no DB template
     if (!whatsappMessage) {
       whatsappMessage = buildFallbackWhatsApp(data);
-      console.log(`[Notify] Using fallback WhatsApp message for ${event}`);
+      log.info(`[Notify] Using fallback WhatsApp message for ${event}`);
     }
 
     // ─── Send WhatsApp ───
@@ -267,9 +269,9 @@ serve(async (req) => {
         });
         const result = await resp.json();
         whatsappSent = result?.success === true;
-        console.log(`[Notify] WhatsApp: ${whatsappSent ? "sent" : "failed"}`);
+        log.info(`[Notify] WhatsApp: ${whatsappSent ? "sent" : "failed"}`);
       } catch (e) {
-        console.error("[Notify] WhatsApp error:", e);
+        log.error("[Notify] WhatsApp error:", e);
       }
     }
 
@@ -289,9 +291,9 @@ serve(async (req) => {
         });
         const result = await resp.json();
         emailSent = result?.success === true;
-        console.log(`[Notify] Email: ${emailSent ? "sent" : "failed"}`);
+        log.info(`[Notify] Email: ${emailSent ? "sent" : "failed"}`);
       } catch (e) {
-        console.error("[Notify] Email error:", e);
+        log.error("[Notify] Email error:", e);
       }
     }
 
@@ -323,9 +325,9 @@ serve(async (req) => {
           },
         }),
       });
-      console.log(`[Notify] Workflow trigger sent for event: ${event}`);
+      log.info(`[Notify] Workflow trigger sent for event: ${event}`);
     } catch (e) {
-      console.error("[Notify] Workflow trigger error (non-blocking):", e);
+      log.error("[Notify] Workflow trigger error (non-blocking):", e);
     }
 
     return new Response(
@@ -333,7 +335,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("[Notify] Error:", error);
+    log.error("[Notify] Error:", error);
     return new Response(
       JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error" }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -7,6 +7,7 @@ import { OrderSummary } from './details/OrderSummary';
 import { useFreightCalculator } from './details/useFreightCalculator';
 import { useFileUpload } from './details/useFileUpload';
 import { CustomerFormData, FreightOption, UploadedFile } from './details/types';
+import { isValidCpf } from '@/lib/cpf';
 
 interface PaymentStepDetailsProps {
   customerForm: CustomerFormData;
@@ -49,6 +50,7 @@ export function PaymentStepDetails({
   const isValid =
     customerForm.name.trim() &&
     customerForm.phone.trim() &&
+    isValidCpf(customerForm.cpf) &&
     customerForm.street.trim() &&
     cleanCepLen === 8 &&
     customerForm.city.trim() &&

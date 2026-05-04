@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createLogger } from "../_shared/logger.ts";
+const log = createLogger("upsert-abandoned-cart");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
@@ -129,7 +131,7 @@ serve(async (req) => {
       .upsert(payload, { onConflict: "session_id" });
 
     if (error) {
-      console.error("[upsert-abandoned-cart] error:", error);
+      log.error("[upsert-abandoned-cart] error:", error);
       return new Response(JSON.stringify({ success: false, error: error.message }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
@@ -137,7 +139,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({ success: true, sessionId, status: hasCart ? "active" : "ignored" }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (error) {
-    console.error("[upsert-abandoned-cart] error:", error);
+    log.error("[upsert-abandoned-cart] error:", error);
     return new Response(JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unexpected error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
