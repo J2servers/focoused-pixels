@@ -88,17 +88,17 @@ serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
-    const reminderHours = Math.max(1, Number(companyInfo?.abandoned_cart_reminder_hours ?? 2));
     const companyName = companyInfo?.company_name || "Pincel de Luz";
-    const cutoffIso = new Date(Date.now() - reminderHours * 60 * 60 * 1000).toISOString();
+    // Cadência: 1º lembrete após 2h, 2º após 12h. Máximo 2 lembretes.
+    const cutoff2h = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
 
     const { data: sessions, error: sessionsError } = await supabase
       .from("abandoned_cart_sessions")
-      .select("id, session_id, user_name, user_email, user_phone, cart_total, cart_items, reminder_sent, coupon_code")
+      .select("id, session_id, user_name, user_email, user_phone, cart_total, cart_items, reminder_sent, coupon_code, reminder_count, last_reminder_at")
       .eq("recovered", false)
-      .eq("reminder_sent", false)
+      .lt("reminder_count", 2)
       .gt("cart_total", 0)
-      .lte("last_activity_at", cutoffIso)
+      .lte("last_activity_at", cutoff2h)
       .or("user_email.not.is.null,user_phone.not.is.null")
       .order("last_activity_at", { ascending: true })
       .limit(100);
