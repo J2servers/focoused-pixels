@@ -13,7 +13,7 @@ interface Metrics {
   whatsTotal: number;
   totalSends: number;
   coveredCount: number;
-  uncoveredEvents: unknown[];
+  uncoveredEvents: readonly unknown[];
 }
 
 interface Props {
