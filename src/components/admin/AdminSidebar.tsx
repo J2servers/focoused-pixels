@@ -4,7 +4,7 @@ import {
   Settings, Star, LogOut, ChevronLeft, ChevronRight, Sparkles, UserPlus,
   ShoppingCart, Tag, Kanban, Menu, Mail, MessageSquare, Users, ScrollText,
   ImageIcon, Workflow, Code2, ChevronDown, Store, Megaphone,
-  Shield, BarChart3, Zap, Wallet, Boxes,
+  Shield, BarChart3, Zap, Wallet, Boxes, Activity,
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -45,6 +45,7 @@ const MENU_GROUPS: MenuGroup[] = [
     { title: 'Templates', url: '/admin/templates', icon: Mail },
     { title: 'WhatsApp', url: '/admin/whatsapp', icon: MessageSquare },
     { title: 'Workflows', url: '/admin/workflows', icon: Workflow },
+    { title: 'Automações & Crons', url: '/admin/automacoes', icon: Activity, adminOnly: true },
   ]},
   { label: 'Conteúdo', icon: Store, color: 'text-orange-400', items: [
     { title: 'Empresa', url: '/admin/empresa', icon: Building2 },
