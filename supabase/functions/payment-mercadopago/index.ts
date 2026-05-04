@@ -1,9 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createLogger } from "../_shared/logger.ts";
 const log = createLogger("payment-mercadopago");
-import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
+import { getMercadoPagoConfig, type MercadoPagoConfig } from "../_shared/mp/config.ts";
+import { createRateLimiter, IdempotencyCache } from "../_shared/mp/limits.ts";
 
 interface PaymentRequest {
   action: 
@@ -46,81 +48,14 @@ interface PaymentRequest {
   bin?: string;
 }
 
-interface MercadoPagoConfig {
-  accessToken: string;
-  sandbox: boolean;
-  publicKey: string | null;
-  pixDiscountPercent: number;
-  maxInstallments: number;
-  minInstallmentValue: number;
-  boletoExtraDays: number;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function getPaymentConfig(supabaseClient: SupabaseClient): Promise<MercadoPagoConfig> {
-  const { data, error } = await supabaseClient
-    .from("payment_credentials")
-    .select(`
-      mercadopago_enabled, 
-      mercadopago_public_key, 
-      mercadopago_access_token, 
-      mercadopago_sandbox,
-      pix_discount_percent,
-      max_installments,
-      min_installment_value,
-      boleto_extra_days
-    `)
-    .order('updated_at', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (error) throw new Error("Failed to get payment config: " + error.message);
-  
-  const config = data as {
-    mercadopago_enabled: boolean | null;
-    mercadopago_public_key: string | null;
-    mercadopago_access_token: string | null;
-    mercadopago_sandbox: boolean | null;
-    pix_discount_percent: number | null;
-    max_installments: number | null;
-    min_installment_value: number | null;
-    boleto_extra_days: number | null;
-  } | null;
-
-  if (!config?.mercadopago_enabled) throw new Error("Mercado Pago is not enabled");
-  if (!config?.mercadopago_access_token) throw new Error("Mercado Pago access token not configured");
-
-  return {
-    accessToken: config.mercadopago_access_token,
-    sandbox: config.mercadopago_sandbox ?? true,
-    publicKey: config.mercadopago_public_key,
-    pixDiscountPercent: config.pix_discount_percent ?? 5,
-    maxInstallments: config.max_installments ?? 12,
-    minInstallmentValue: config.min_installment_value ?? 50,
-    boletoExtraDays: config.boleto_extra_days ?? 3,
-  };
-}
-
-// Simple in-memory rate limiter (per edge function instance)
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 10; // max 10 payment requests per IP per minute
+const rateLimiter = createRateLimiter({ windowMs: 60_000, max: 10 });
+const idempotencyCache = new IdempotencyCache();
+const getPaymentConfig = getMercadoPagoConfig;
+type _MPConfigUsed = MercadoPagoConfig;
 
 function checkRateLimit(identifier: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(identifier);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(identifier, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false;
-  entry.count++;
-  return true;
+  return rateLimiter.check(identifier);
 }
-
-// Idempotency cache (per instance, short-lived)
-const idempotencyCache = new Map<string, { response: string; timestamp: number }>();
-const IDEM_TTL_MS = 5 * 60 * 1000; // 5 min
 
 serve(async (req) => {
   const corsHeaders = buildCorsHeaders(req);
