@@ -3,8 +3,9 @@
  * Improvements: #19 Delivery date display, #20 Production + transit calc, #21 Visual timeline
  */
 import { Calendar, Package, Truck } from 'lucide-react';
-import { format, addBusinessDays, addDays } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { estimateDeliveryWindow } from '@/lib/delivery';
 
 interface DeliveryEstimateProps {
   freightDays?: string;
@@ -14,18 +15,7 @@ interface DeliveryEstimateProps {
 export function DeliveryEstimate({ freightDays, productionDays = '4 a 10 dias úteis' }: DeliveryEstimateProps) {
   if (!freightDays) return null;
 
-  // Parse days from strings like "3 a 5 dias úteis" or "5 dias úteis"
-  const parseDays = (str: string): { min: number; max: number } => {
-    const nums = str.match(/\d+/g)?.map(Number) || [5];
-    return { min: nums[0], max: nums[nums.length - 1] };
-  };
-
-  const prod = parseDays(productionDays);
-  const transit = parseDays(freightDays);
-
-  const today = new Date();
-  const minDate = addBusinessDays(today, prod.min + transit.min);
-  const maxDate = addBusinessDays(today, prod.max + transit.max);
+  const { minDate, maxDate } = estimateDeliveryWindow(productionDays, freightDays);
 
   return (
     <div className="rounded-xl border border-border bg-muted/30 p-3.5 space-y-2.5">
