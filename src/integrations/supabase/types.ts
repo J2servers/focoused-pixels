@@ -66,14 +66,17 @@ export type Database = {
       }
       abandoned_cart_sessions: {
         Row: {
+          browser_metadata: Json
           cart_items: Json
           cart_total: number
           coupon_code: string | null
           created_at: string
           id: string
           last_activity_at: string
+          last_reminder_at: string | null
           recovered: boolean
           recovered_at: string | null
+          reminder_count: number
           reminder_sent: boolean
           reminder_sent_at: string | null
           session_id: string
@@ -82,14 +85,17 @@ export type Database = {
           user_phone: string | null
         }
         Insert: {
+          browser_metadata?: Json
           cart_items?: Json
           cart_total?: number
           coupon_code?: string | null
           created_at?: string
           id?: string
           last_activity_at?: string
+          last_reminder_at?: string | null
           recovered?: boolean
           recovered_at?: string | null
+          reminder_count?: number
           reminder_sent?: boolean
           reminder_sent_at?: string | null
           session_id: string
@@ -98,14 +104,17 @@ export type Database = {
           user_phone?: string | null
         }
         Update: {
+          browser_metadata?: Json
           cart_items?: Json
           cart_total?: number
           coupon_code?: string | null
           created_at?: string
           id?: string
           last_activity_at?: string
+          last_reminder_at?: string | null
           recovered?: boolean
           recovered_at?: string | null
+          reminder_count?: number
           reminder_sent?: boolean
           reminder_sent_at?: string | null
           session_id?: string
@@ -1205,6 +1214,7 @@ export type Database = {
       }
       leads: {
         Row: {
+          browser_metadata: Json
           created_at: string
           email: string
           id: string
@@ -1218,6 +1228,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          browser_metadata?: Json
           created_at?: string
           email: string
           id?: string
@@ -1231,6 +1242,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          browser_metadata?: Json
           created_at?: string
           email?: string
           id?: string
@@ -1269,6 +1281,48 @@ export type Database = {
           ip_hash?: string
           success?: boolean
           user_agent_hash?: string | null
+        }
+        Relationships: []
+      }
+      notification_failures: {
+        Row: {
+          attempts: number
+          channel: string
+          created_at: string
+          event_name: string
+          id: string
+          last_error: string | null
+          next_retry_at: string
+          payload: Json
+          recipient: string | null
+          resolved: boolean
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          channel: string
+          created_at?: string
+          event_name: string
+          id?: string
+          last_error?: string | null
+          next_retry_at?: string
+          payload?: Json
+          recipient?: string | null
+          resolved?: boolean
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          created_at?: string
+          event_name?: string
+          id?: string
+          last_error?: string | null
+          next_retry_at?: string
+          payload?: Json
+          recipient?: string | null
+          resolved?: boolean
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1350,10 +1404,12 @@ export type Database = {
           discount: number | null
           id: string
           items: Json
+          last_payment_reminder_at: string | null
           notes: string | null
           order_number: string
           order_status: string | null
           payment_method: string | null
+          payment_reminder_count: number
           payment_status: string | null
           production_completed_at: string | null
           production_notes: string | null
@@ -1382,10 +1438,12 @@ export type Database = {
           discount?: number | null
           id?: string
           items?: Json
+          last_payment_reminder_at?: string | null
           notes?: string | null
           order_number: string
           order_status?: string | null
           payment_method?: string | null
+          payment_reminder_count?: number
           payment_status?: string | null
           production_completed_at?: string | null
           production_notes?: string | null
@@ -1414,10 +1472,12 @@ export type Database = {
           discount?: number | null
           id?: string
           items?: Json
+          last_payment_reminder_at?: string | null
           notes?: string | null
           order_number?: string
           order_status?: string | null
           payment_method?: string | null
+          payment_reminder_count?: number
           payment_status?: string | null
           production_completed_at?: string | null
           production_notes?: string | null
@@ -2065,6 +2125,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_cron_runs: {
+        Row: {
+          error: string | null
+          finished_at: string | null
+          id: string
+          job_name: string
+          metrics: Json
+          started_at: string
+          status: string
+        }
+        Insert: {
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          job_name: string
+          metrics?: Json
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          job_name?: string
+          metrics?: Json
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
       }
       tracking_events: {
         Row: {
