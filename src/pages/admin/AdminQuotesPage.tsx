@@ -8,14 +8,18 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { useAdminQuotes, useUpdateQuoteStatus, type Quote } from '@/hooks/useAdminQuotes';
+import { useAdminQuotes, useUpdateQuoteStatus, useDeleteQuote, type Quote } from '@/hooks/useAdminQuotes';
 import { useCreateOrderFromQuote } from '@/hooks/useOrders';
-import { Eye, FileText, ArrowRightCircle, Clock, CheckCircle, XCircle, TrendingUp, DollarSign, BarChart3, Package, User, Mail, Phone, Building2 } from 'lucide-react';
+import { Eye, FileText, ArrowRightCircle, Clock, CheckCircle, XCircle, TrendingUp, DollarSign, BarChart3, Package, User, Mail, Phone, Building2, Trash2 } from 'lucide-react';
 import { format, subDays, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
