@@ -1,0 +1,95 @@
+export interface CompanyInfo {
+  id: string;
+  company_name: string;
+  cnpj: string | null;
+  address: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  business_hours: string | null;
+  social_instagram: string | null;
+  social_facebook: string | null;
+  social_tiktok: string | null;
+  social_youtube: string | null;
+  social_linkedin: string | null;
+  social_pinterest: string | null;
+  copyright_text: string | null;
+  privacy_policy: string | null;
+  terms_of_service: string | null;
+  returns_policy: string | null;
+  footer_logo: string | null;
+  header_logo: string | null;
+  footer_logo_height: number | null;
+  header_logo_height: number | null;
+  header_logo_mobile_height: number | null;
+  free_shipping_minimum: number | null;
+  free_shipping_message: string | null;
+  installments: number | null;
+  production_time: string | null;
+  warranty: string | null;
+  // SEO & Metadata
+  seo_title: string | null;
+  seo_description: string | null;
+  seo_keywords: string | null;
+  og_image: string | null;
+  favicon_url: string | null;
+  // Appearance
+  primary_color: string | null;
+  secondary_color: string | null;
+  accent_color: string | null;
+  dark_mode_enabled: boolean | null;
+  custom_css: string | null;
+  // Layout & UX
+  products_per_page: number | null;
+  show_product_ratings: boolean | null;
+  show_product_stock: boolean | null;
+  enable_wishlist: boolean | null;
+  enable_compare_products: boolean | null;
+  show_recently_viewed: boolean | null;
+  // Checkout & Cart
+  min_order_value: number | null;
+  max_order_value: number | null;
+  abandoned_cart_reminder_hours: number | null;
+  enable_guest_checkout: boolean | null;
+  require_phone_on_checkout: boolean | null;
+  checkout_success_message: string | null;
+  // Notifications & Alerts
+  low_stock_threshold: number | null;
+  enable_stock_alerts: boolean | null;
+  enable_order_notifications: boolean | null;
+  notification_email: string | null;
+  // AI Assistant
+  ai_assistant_enabled: boolean | null;
+  ai_assistant_name: string | null;
+  ai_assistant_greeting: string | null;
+  ai_assistant_avatar: string | null;
+  // Discounts & Promotions
+  quantity_discount_10: number | null;
+  quantity_discount_20: number | null;
+  quantity_discount_50: number | null;
+  quantity_discount_100: number | null;
+  enable_coupon_codes: boolean | null;
+  // Shipping
+  shipping_origin_cep: string | null;
+  shipping_calculation_method: string | null;
+  fixed_shipping_value: number | null;
+  express_shipping_multiplier: number | null;
+  // Maintenance & Status
+  maintenance_mode: boolean | null;
+  maintenance_message: string | null;
+  store_status: string | null;
+  store_closed_message: string | null;
+  // Legal & Compliance
+  cookie_consent_enabled: boolean | null;
+  cookie_consent_message: string | null;
+  lgpd_contact_email: string | null;
+  // Analytics & Tracking
+  google_analytics_id: string | null;
+  facebook_pixel_id: string | null;
+  google_tag_manager_id: string | null;
+  // Integrations
+  whatsapp_message_template: string | null;
+  why_choose_us_config: Record<string, unknown> | null;
+  enable_reviews_auto_approve: boolean | null;
+  reviews_min_rating_to_show: number | null;
+}
