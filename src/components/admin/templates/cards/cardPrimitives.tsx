@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Zap } from 'lucide-react';
-import { SYSTEM_EVENTS } from './TemplateConstants';
+import { SYSTEM_EVENTS } from '../TemplateConstants';
 
 export const nodeBase = "group relative rounded-2xl border-2 transition-all duration-200 overflow-hidden";
 export const actionBtn = "h-8 w-8 rounded-lg bg-transparent text-[hsl(var(--admin-text-muted))] hover:text-white hover:bg-white/10 transition-colors";
