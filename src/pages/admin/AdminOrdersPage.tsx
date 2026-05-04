@@ -67,13 +67,22 @@ const AdminOrdersPage = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data: orders = [], isLoading } = useOrders();
   const updateOrder = useUpdateOrder();
   const updateProductionStatus = useUpdateProductionStatus();
+  const deleteOrder = useDeleteOrder();
 
   const paidOrders = useMemo(() => orders.filter(isCompletedSale), [orders]);
   const awaitingOrders = useMemo(() => orders.filter(isAwaitingPayment), [orders]);
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await deleteOrder.mutateAsync(deleteId);
+    setDeleteId(null);
+    if (selectedOrder?.id === deleteId) setSelectedOrder(null);
+  };
 
   const applyFilters = (list: Order[]) =>
     list.filter((o) => {
