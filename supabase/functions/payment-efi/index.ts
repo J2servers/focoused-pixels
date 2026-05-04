@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createLogger } from "../_shared/logger.ts";
 const log = createLogger("payment-efi");
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
@@ -26,7 +26,7 @@ interface EfiConfig {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function getPaymentConfig(supabaseClient: any): Promise<EfiConfig> {
+async function getPaymentConfig(supabaseClient: SupabaseClient): Promise<EfiConfig> {
   const { data, error } = await supabaseClient
     .from("payment_credentials")
     .select("efi_enabled, efi_client_id, efi_client_secret, efi_sandbox, efi_pix_key")

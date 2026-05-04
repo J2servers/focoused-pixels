@@ -224,7 +224,7 @@ function replaceVars(template: string, vars: Record<string, string>): string {
   return result;
 }
 
-async function sendWhatsApp(supabaseUrl: string, serviceKey: string, phone: string, text: string, order: any) {
+async function sendWhatsApp(supabaseUrl: string, serviceKey: string, phone: string, text: string, order: Record<string, unknown>) {
   const digits = phone.replace(/\D/g, "");
   const cleanPhone = digits.startsWith("55") ? digits : `55${digits}`;
   try {

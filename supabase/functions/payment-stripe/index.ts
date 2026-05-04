@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createLogger } from "../_shared/logger.ts";
 const log = createLogger("payment-stripe");
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
@@ -31,7 +31,7 @@ interface StripeConfig {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function getPaymentConfig(supabaseClient: any): Promise<StripeConfig> {
+async function getPaymentConfig(supabaseClient: SupabaseClient): Promise<StripeConfig> {
   const { data, error } = await supabaseClient
     .from("payment_credentials")
     .select("stripe_enabled, stripe_public_key, stripe_secret_key, stripe_sandbox")

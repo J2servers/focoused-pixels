@@ -55,7 +55,7 @@ async function fetchTrackingFromCorreios(trackingCode: string): Promise<Tracking
       log.info('LinkTrack response:', JSON.stringify(data));
       
       if (data.eventos && data.eventos.length > 0) {
-        const events: TrackingEvent[] = data.eventos.map((evento: any) => ({
+        const events: TrackingEvent[] = data.eventos.map((evento: { descricao?: string; dtHrCriado?: string; unidade?: { tipo?: string; endereco?: { cidade?: string; uf?: string } } }) => ({
           status: evento.status || 'Em trânsito',
           description: evento.subStatus?.[0] || evento.status || 'Atualização',
           location: `${evento.local || ''} ${evento.cidade || ''} - ${evento.uf || ''}`.trim() || 'Não informado',

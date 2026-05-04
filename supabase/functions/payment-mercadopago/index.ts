@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createLogger } from "../_shared/logger.ts";
 const log = createLogger("payment-mercadopago");
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
 
@@ -57,7 +57,7 @@ interface MercadoPagoConfig {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function getPaymentConfig(supabaseClient: any): Promise<MercadoPagoConfig> {
+async function getPaymentConfig(supabaseClient: SupabaseClient): Promise<MercadoPagoConfig> {
   const { data, error } = await supabaseClient
     .from("payment_credentials")
     .select(`
