@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ImageUpload } from '@/components/admin/ImageUpload';
 import { VideoUpload } from '@/components/admin/VideoUpload';
 import { Plus, Trash2, Edit, Video, GripVertical, Eye, ArrowUp, ArrowDown } from 'lucide-react';
-import { useAllVideoStories, useCreateVideoStory, useUpdateVideoStory, useDeleteVideoStory } from '@/hooks/useVideoStories';
+import { useAllVideoStories, useCreateVideoStory, useUpdateVideoStory, useDeleteVideoStory, type VideoStory } from '@/hooks/useVideoStories';
 import { toast } from 'sonner';
 
 interface StoryForm {
@@ -48,7 +48,7 @@ export function VideoStoriesManager() {
     setDialogOpen(true);
   };
 
-  const openEdit = (story: any) => {
+  const openEdit = (story: VideoStory) => {
     setEditingId(story.id);
     setForm({
       title: story.title || '',
@@ -82,15 +82,15 @@ export function VideoStoriesManager() {
 
     try {
       if (editingId) {
-        await updateMutation.mutateAsync({ id: editingId, ...payload } as any);
+        await updateMutation.mutateAsync({ id: editingId, ...payload });
         toast.success('Vídeo atualizado!');
       } else {
-        await createMutation.mutateAsync(payload as any);
+        await createMutation.mutateAsync(payload);
         toast.success('Vídeo adicionado!');
       }
       setDialogOpen(false);
-    } catch (e: any) {
-      toast.error(e.message || 'Erro ao salvar');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Erro ao salvar');
     }
   };
 
@@ -99,14 +99,14 @@ export function VideoStoriesManager() {
     try {
       await deleteMutation.mutateAsync(id);
       toast.success('Vídeo removido!');
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Erro');
     }
   };
 
-  const handleToggleStatus = async (story: any) => {
+  const handleToggleStatus = async (story: VideoStory) => {
     const newStatus = story.status === 'active' ? 'inactive' : 'active';
-    await updateMutation.mutateAsync({ id: story.id, status: newStatus } as any);
+    await updateMutation.mutateAsync({ id: story.id, status: newStatus });
     toast.success(newStatus === 'active' ? 'Vídeo ativado' : 'Vídeo desativado');
   };
 
@@ -114,9 +114,9 @@ export function VideoStoriesManager() {
     const idx = stories.findIndex(s => s.id === id);
     const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
     if (swapIdx < 0 || swapIdx >= stories.length) return;
-    
-    await updateMutation.mutateAsync({ id: stories[idx].id, display_order: swapIdx } as any);
-    await updateMutation.mutateAsync({ id: stories[swapIdx].id, display_order: idx } as any);
+
+    await updateMutation.mutateAsync({ id: stories[idx].id, display_order: swapIdx });
+    await updateMutation.mutateAsync({ id: stories[swapIdx].id, display_order: idx });
   };
 
   return (
