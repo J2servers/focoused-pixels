@@ -119,6 +119,9 @@ serve(async (req) => {
 
     for (const session of targets) {
       try {
+        // Cadência: 2º lembrete só 10h após o primeiro
+        const sinceLast = session.last_reminder_at ? Date.now() - new Date(session.last_reminder_at).getTime() : Infinity;
+        if (session.reminder_count >= 1 && sinceLast < 10 * 60 * 60 * 1000) { summary.skipped++; continue; }
         let couponCode = session.coupon_code;
         const discountValue = 10;
         if (!couponCode) {
@@ -216,6 +219,8 @@ serve(async (req) => {
         await supabase.from("abandoned_cart_sessions").update({
           reminder_sent: true,
           reminder_sent_at: new Date().toISOString(),
+          last_reminder_at: new Date().toISOString(),
+          reminder_count: (session.reminder_count ?? 0) + 1,
           coupon_code: couponCode,
         }).eq("id", session.id);
 
