@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User } from 'lucide-react';
 import { CustomerFormData } from './types';
+import { formatCpf, isValidCpf, cpfDigits } from '@/lib/cpf';
 
 interface Props {
   customerForm: CustomerFormData;
