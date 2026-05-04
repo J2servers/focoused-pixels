@@ -11,13 +11,18 @@ import {
   cleanupIdempotencyEntries,
 } from '@/lib/idempotency';
 import {
-  generateOrderNumber,
-  sanitizePhone,
   UUID_REGEX,
   type CustomerForm,
   type PaymentState,
   type UploadedFile,
 } from './types';
+import {
+  buildShippingAddressLine,
+  buildProductionNotes,
+  generateOrderNumber,
+  sanitizeCustomerSnapshot,
+} from '@/lib/order';
+import { sanitizePhone } from '@/lib/sanitize';
 
 interface UseOrderCreatorArgs {
   customerForm: CustomerForm;
