@@ -1,13 +1,12 @@
 /**
  * NotifyWhenAvailable - Email signup for out-of-stock products
- * Improvements: #22 Back-in-stock notification, #23 Lead capture, #24 Auto-save to leads table
  */
 import { useState } from 'react';
 import { Bell, Loader2, CheckCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useNotifyWhenAvailable } from '@/hooks/products/useNotifyWhenAvailable';
 
 interface NotifyWhenAvailableProps {
   productName: string;
@@ -18,31 +17,19 @@ interface NotifyWhenAvailableProps {
 export function NotifyWhenAvailable({ productName, productId, inStock }: NotifyWhenAvailableProps) {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { loading, subscribe } = useNotifyWhenAvailable();
 
   if (inStock) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-
-    setLoading(true);
-    try {
-      await supabase.from('leads').upsert(
-        {
-          email,
-          name: email.split('@')[0],
-          source: 'back_in_stock',
-          tags: [`notify:${productId}`],
-        },
-        { onConflict: 'email' }
-      );
+    const ok = await subscribe(email, productId);
+    if (ok) {
       setSubmitted(true);
       toast.success('Você será notificado quando o produto voltar!');
-    } catch {
+    } else {
       toast.error('Erro ao cadastrar. Tente novamente.');
-    } finally {
-      setLoading(false);
     }
   };
 
