@@ -13,6 +13,8 @@ interface AbandonedSession {
   cart_items: unknown;
   reminder_sent: boolean;
   coupon_code: string | null;
+  reminder_count: number;
+  last_reminder_at: string | null;
 }
 
 function normalizePhone(phone: string | null): string | null {
