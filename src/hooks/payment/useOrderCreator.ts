@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { sanitizeEmail } from '@/lib/sanitize';
+import { sanitizeEmail, sanitizePhone } from '@/lib/sanitize';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,7 +23,7 @@ import {
   sanitizeCustomerSnapshot,
 } from '@/lib/order';
 import { readPendingPayment, pendingCartItemKeys, clearPendingPayment } from '@/lib/pendingPayment';
-import { sanitizePhone } from '@/lib/sanitize';
+
 
 interface UseOrderCreatorArgs {
   customerForm: CustomerForm;
@@ -109,7 +109,7 @@ export function useOrderCreator({ customerForm, customText, uploadedFiles }: Use
     }
     setIdempotencyEntry(idemKey, 'completed', orderId);
     cleanupIdempotencyEntries();
-    sessionStorage.removeItem('pending_payment');
+    clearPendingPayment();
     await saveCustomerAsLead(state.customerName, state.customerEmail, state.customerPhone);
     return orderId;
   }, [customText, uploadedFiles, customerForm, saveCustomerAsLead]);
