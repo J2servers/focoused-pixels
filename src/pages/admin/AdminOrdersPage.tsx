@@ -153,11 +153,20 @@ const AdminOrdersPage = () => {
       render: (o) => <span className="text-sm text-white/50">{format(new Date(o.created_at), 'dd/MM/yy HH:mm', { locale: ptBR })}</span>,
     },
     {
-      key: 'actions', header: '', className: 'w-12',
+      key: 'actions', header: '', className: 'w-24',
       render: (o) => (
-        <Button className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => setSelectedOrder(o)}>
-          <Eye className="h-4 w-4" />
-        </Button>
+        <div className="flex justify-end gap-1">
+          <Button className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9" onClick={() => setSelectedOrder(o)}>
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            className="admin-btn admin-btn-delete admin-btn-icon !min-h-0 !p-1 h-9 w-9"
+            onClick={() => setDeleteId(o.id)}
+            title="Excluir pedido"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       ),
     },
   ];
