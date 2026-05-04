@@ -8,6 +8,7 @@ import {
   useWorkflows, stepsToFlow, flowToSteps, validateWorkflow,
   type WorkflowMeta, type PresetDef, type ValidationIssue,
 } from '@/hooks/useWorkflows';
+import type { WorkflowStep } from '@/hooks/workflows/types';
 
 const uid = () => crypto.randomUUID().slice(0, 8);
 
