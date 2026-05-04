@@ -14,16 +14,21 @@ import {
   useOrders,
   useUpdateOrder,
   useUpdateProductionStatus,
+  useDeleteOrder,
   PRODUCTION_STATUS_LABELS,
   PRODUCTION_STATUS_COLORS,
   type ProductionStatus,
   type Order,
 } from '@/hooks/useOrders';
 import { ExportButtons } from '@/components/admin/ExportButtons';
-import { Eye, Clock, CheckCircle, DollarSign, AlertTriangle } from 'lucide-react';
+import { Eye, Clock, CheckCircle, DollarSign, AlertTriangle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendente', color: 'bg-yellow-500' },
