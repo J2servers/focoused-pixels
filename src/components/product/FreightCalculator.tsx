@@ -10,6 +10,7 @@ import { Truck, Loader2, MapPin, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
+import { logger } from '@/lib/logger';
 
 interface FreightResult {
   method: string;
@@ -97,7 +98,7 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
         });
       }
     } catch (err) {
-      console.error('Freight error:', err);
+      logger.error('freight', 'Freight error:', err);
       toast.error('Erro ao calcular frete. Tente novamente.');
     } finally {
       setIsLoading(false);

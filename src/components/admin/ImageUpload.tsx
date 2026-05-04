@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Upload, X, Loader2, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 export { MultiImageUpload } from './MultiImageUpload';
 
@@ -54,7 +55,7 @@ export function ImageUpload({
       toast.success('Imagem enviada com sucesso!');
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao enviar imagem';
-      console.error('Upload error:', message);
+      logger.error('imageUpload', 'Upload error:', message);
       toast.error(message);
     } finally {
       setIsUploading(false);

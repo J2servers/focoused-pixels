@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ChatMessage, CHAT_URL, REDIRECT_REGEX } from './types';
+import { logger } from '@/lib/logger';
 
 export function useChatStream(initialMessages: ChatMessage[] = []) {
   const navigate = useNavigate();
@@ -82,7 +83,7 @@ export function useChatStream(initialMessages: ChatMessage[] = []) {
         });
       }
     } catch (e) {
-      console.error('Chat error:', e);
+      logger.error('lunaChat', 'Chat error:', e);
       setMessages(prev => [
         ...prev.slice(0, -1),
         { role: 'assistant', content: 'Desculpe, ocorreu um erro. Tente novamente ou fale conosco no WhatsApp 💬' },

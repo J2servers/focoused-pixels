@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { ReviewStars } from './ReviewStars';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const reviewSchema = z.object({
   customer_name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').max(100),
@@ -84,7 +85,7 @@ export const ReviewForm = ({ productSlug, onSuccess, onCancel }: ReviewFormProps
         .upload(filePath, file);
 
       if (error) {
-        console.error('Error uploading image:', error);
+        logger.error('reviewForm', 'upload image error:', error);
         continue;
       }
 
@@ -124,7 +125,7 @@ export const ReviewForm = ({ productSlug, onSuccess, onCancel }: ReviewFormProps
       toast.success('Avaliação enviada com sucesso! Ela será publicada após revisão.');
       onSuccess();
     } catch (error) {
-      console.error('Error submitting review:', error);
+      logger.error('reviewForm', 'submit review error:', error);
       toast.error('Erro ao enviar avaliação. Tente novamente.');
     } finally {
       setIsSubmitting(false);

@@ -8,6 +8,7 @@ import { ReviewForm } from './ReviewForm';
 import { ReviewStars } from './ReviewStars';
 import { supabase } from '@/integrations/supabase/client';
 import { FadeInView } from '@/components/animations';
+import { logger } from '@/lib/logger';
 
 interface Review {
   id: string;
@@ -47,7 +48,7 @@ export const ProductReviews = ({ productSlug, productName }: ProductReviewsProps
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching reviews:', error);
+      logger.error('productReviews', 'fetch reviews error:', error);
     } else {
       setReviews(data || []);
     }

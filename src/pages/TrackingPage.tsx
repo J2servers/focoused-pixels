@@ -12,6 +12,7 @@ import { TrackingResult } from './tracking/trackingHelpers';
 import { TrackingSearchCard } from './tracking/TrackingSearchCard';
 import { TrackingResultCard } from './tracking/TrackingResultCard';
 import { TrackingInfoCards } from './tracking/TrackingInfoCards';
+import { logger } from '@/lib/logger';
 
 export default function TrackingPage() {
   const siteSettings = useSiteSettings();
@@ -45,7 +46,7 @@ export default function TrackingPage() {
         if (data.events?.length === 0) toast.info('Nenhum evento de rastreio encontrado ainda');
       }
     } catch (err) {
-      console.error('Tracking error:', err);
+      logger.error('tracking', 'Tracking error:', err);
       toast.error('Erro ao consultar rastreio. Tente novamente.');
     } finally {
       setLoading(false);
