@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { sanitizeCEP } from '@/lib/sanitize';
 import { logger } from '@/lib/logger';
+import { fetchViaCep } from '@/lib/freight';
 import { supabase } from '@/integrations/supabase/client';
 import { FALLBACK_FREIGHT_OPTIONS, FreightOption, CustomerFormData } from './types';
 
@@ -36,21 +37,9 @@ export function useFreightCalculator({
     setSelectedMethod(null);
     setLastFetchedCep(cleanCep);
 
-    const viaCepPromise = (async () => {
-      try {
-        const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
-        if (!res.ok) return null;
-        const json = await res.json();
-        if (json?.erro) return null;
-        return json as { logradouro?: string; bairro?: string; localidade?: string; uf?: string };
-      } catch {
-        return null;
-      }
-    })();
-
     try {
       const [viaCep, freightRes] = await Promise.all([
-        viaCepPromise,
+        fetchViaCep(cleanCep),
         supabase.functions.invoke('calculate-freight', {
           body: {
             destinationCep: cleanCep,
@@ -64,10 +53,10 @@ export function useFreightCalculator({
       if (viaCep) {
         setCustomerForm(prev => ({
           ...prev,
-          street: prev.street?.trim() ? prev.street : (viaCep.logradouro || prev.street),
-          neighborhood: prev.neighborhood?.trim() ? prev.neighborhood : (viaCep.bairro || prev.neighborhood),
-          city: viaCep.localidade || prev.city,
-          state: (viaCep.uf || prev.state || '').toUpperCase(),
+          street: prev.street?.trim() ? prev.street : (viaCep.street || prev.street),
+          neighborhood: prev.neighborhood?.trim() ? prev.neighborhood : (viaCep.neighborhood || prev.neighborhood),
+          city: viaCep.city || prev.city,
+          state: viaCep.state || prev.state,
         }));
       }
 

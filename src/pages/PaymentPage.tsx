@@ -14,6 +14,7 @@ import { PaymentStepDetails } from '@/components/payment/PaymentStepDetails';
 import { PaymentStepPayment } from '@/components/payment/PaymentStepPayment';
 import { PaymentOrderSummary } from '@/components/payment/PaymentOrderSummary';
 import { usePaymentFlow } from '@/hooks/usePaymentFlow';
+import { readPendingCartItems } from '@/lib/pendingPayment';
 
 interface PendingPaymentItem {
   name: string;
@@ -33,18 +34,11 @@ const PaymentPage = () => {
   const flow = usePaymentFlow();
   const { currentStep, setCurrentStep, paymentState, isLoading } = flow;
 
-  // Read cart items from session storage so we can render an itemized summary.
   // MUST be called before any early return to keep hook order stable.
-  const summaryItems: PendingPaymentItem[] = useMemo(() => {
-    try {
-      const raw = sessionStorage.getItem('pending_payment');
-      if (!raw) return [];
-      const parsed = JSON.parse(raw) as { cartItems?: PendingPaymentItem[] };
-      return Array.isArray(parsed.cartItems) ? parsed.cartItems : [];
-    } catch {
-      return [];
-    }
-  }, []);
+  const summaryItems: PendingPaymentItem[] = useMemo(
+    () => readPendingCartItems() as PendingPaymentItem[],
+    [],
+  );
 
   if (isLoading) {
     return (
