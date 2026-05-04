@@ -42,14 +42,15 @@ export function buildProductionNotes(
 }
 
 /**
- * order_number with format PDL-YYYYMMDD-RAND4.
+ * order_number with format PLYYMMDD-XXXXXX (timestamp-based, base36).
+ * Matches the legacy format already in production.
  */
-export function generateOrderNumber(date: Date = new Date()): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  const rand = Math.floor(1000 + Math.random() * 9000);
-  return `PDL-${y}${m}${d}-${rand}`;
+export function generateOrderNumber(date: Date = new Date(), uniqueSeed: number = Date.now()): string {
+  const yy = date.getFullYear().toString().slice(-2);
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const unique = uniqueSeed.toString(36).toUpperCase().slice(-6);
+  return `PL${yy}${mm}${dd}-${unique}`;
 }
 
 export interface CustomerSnapshot {

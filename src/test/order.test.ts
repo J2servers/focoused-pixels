@@ -30,9 +30,9 @@ describe('order builders', () => {
       .toBe('📝 Texto: x\n📎 Arquivos: a.png, b.png');
   });
 
-  it('generateOrderNumber matches PDL-YYYYMMDD-NNNN pattern', () => {
-    const n = generateOrderNumber(new Date('2026-05-04T12:00:00Z'));
-    expect(n).toMatch(/^PDL-2026050[34]-\d{4}$/);
+  it('generateOrderNumber matches PLYYMMDD-XXXXXX pattern', () => {
+    const n = generateOrderNumber(new Date('2026-05-04T12:00:00Z'), 1234567890);
+    expect(n).toMatch(/^PL2605[34]\d-[0-9A-Z]{1,6}$/);
   });
 
   it('sanitizeCustomerSnapshot trims/lowercases/prefixes', () => {
