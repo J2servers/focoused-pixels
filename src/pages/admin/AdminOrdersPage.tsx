@@ -1,27 +1,15 @@
 import { useMemo, useState } from 'react';
-import { AdminLayout } from '@/components/admin';
-import { AdminSummaryCard } from '@/components/admin';
-import { DataTable, Column } from '@/components/admin/DataTable';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { AdminLayout, AdminSummaryCard } from '@/components/admin';
+import { DataTable } from '@/components/admin/DataTable';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import {
-  useOrders,
-  useUpdateOrder,
-  useUpdateProductionStatus,
-  useDeleteOrder,
-  PRODUCTION_STATUS_LABELS,
-  PRODUCTION_STATUS_COLORS,
-  type ProductionStatus,
+  useOrders, useUpdateOrder, useUpdateProductionStatus, useDeleteOrder,
   type Order,
 } from '@/hooks/useOrders';
 import { ExportButtons } from '@/components/admin/ExportButtons';
-import { Eye, Clock, CheckCircle, DollarSign, AlertTriangle, Trash2 } from 'lucide-react';
+import { Clock, CheckCircle, DollarSign, AlertTriangle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AdminPageGuide } from '@/components/admin/AdminPageGuide';
@@ -29,34 +17,10 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { ORDER_STATUS_CONFIG, PAYMENT_STATUS_CONFIG, EXPORT_COLUMNS, fmtCurrency } from './orders/constants';
+import { buildOrderColumns } from './orders/columns';
+import { OrderDetailDialog } from './orders/OrderDetailDialog';
 
-const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  pending: { label: 'Pendente', color: 'bg-yellow-500' },
-  confirmed: { label: 'Confirmado', color: 'bg-blue-500' },
-  processing: { label: 'Em processamento', color: 'bg-purple-500' },
-  shipped: { label: 'Enviado', color: 'bg-teal-500' },
-  delivered: { label: 'Entregue', color: 'bg-green-500' },
-  cancelled: { label: 'Cancelado', color: 'bg-red-500' },
-};
-
-const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  pending: { label: 'Aguardando', color: 'bg-yellow-500' },
-  paid: { label: 'Pago', color: 'bg-green-500' },
-  failed: { label: 'Falhou', color: 'bg-red-500' },
-  refunded: { label: 'Reembolsado', color: 'bg-gray-500' },
-};
-
-const EXPORT_COLUMNS = [
-  { key: 'order_number', header: 'Numero Pedido' },
-  { key: 'customer_name', header: 'Cliente' },
-  { key: 'customer_email', header: 'Email' },
-  { key: 'total_fmt', header: 'Total' },
-  { key: 'order_status_label', header: 'Status' },
-  { key: 'payment_status_label', header: 'Pagamento' },
-  { key: 'created_at_fmt', header: 'Data' },
-];
-
-const fmtCurrency = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`;
 const isCompletedSale = (o: Order) => o.payment_status === 'paid' && o.order_status !== 'cancelled';
 const isAwaitingPayment = (o: Order) => o.payment_status === 'pending' && o.order_status !== 'cancelled';
 const sumOrders = (list: Order[]) => list.reduce((s, o) => s + (o.total || 0), 0);
@@ -84,19 +48,16 @@ const AdminOrdersPage = () => {
     if (selectedOrder?.id === deleteId) setSelectedOrder(null);
   };
 
-  const applyFilters = (list: Order[]) =>
-    list.filter((o) => {
+  const filteredOrders = useMemo(() => {
+    const list = viewMode === 'paid' ? paidOrders : awaitingOrders;
+    return list.filter((o) => {
       const matchesStatus = statusFilter === 'all' || o.order_status === statusFilter;
       let matchesDate = true;
       if (dateFrom) matchesDate = matchesDate && o.created_at >= `${dateFrom}T00:00:00`;
       if (dateTo) matchesDate = matchesDate && o.created_at <= `${dateTo}T23:59:59`;
       return matchesStatus && matchesDate;
     });
-
-  const filteredOrders = useMemo(
-    () => applyFilters(viewMode === 'paid' ? paidOrders : awaitingOrders),
-    [paidOrders, awaitingOrders, viewMode, statusFilter, dateFrom, dateTo]
-  );
+  }, [paidOrders, awaitingOrders, viewMode, statusFilter, dateFrom, dateTo]);
 
   const paidRevenue = useMemo(() => sumOrders(paidOrders), [paidOrders]);
   const awaitingRevenue = useMemo(() => sumOrders(awaitingOrders), [awaitingOrders]);
@@ -109,70 +70,7 @@ const AdminOrdersPage = () => {
     created_at_fmt: format(new Date(o.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR }),
   }));
 
-  const columns: Column<Order>[] = [
-    {
-      key: 'order_number', header: 'Pedido', sortable: true,
-      render: (o) => <span className="font-mono font-semibold text-purple-400">{o.order_number}</span>,
-    },
-    {
-      key: 'customer_name', header: 'Cliente', sortable: true,
-      render: (o) => (
-        <div>
-          <p className="font-medium text-white">{o.customer_name}</p>
-          <p className="text-xs text-white/40">{o.customer_email}</p>
-        </div>
-      ),
-    },
-    {
-      key: 'total', header: 'Total', sortable: true,
-      render: (o) => <span className="font-semibold text-white">{fmtCurrency(o.total)}</span>,
-    },
-    {
-      key: 'order_status', header: 'Status',
-      render: (o) => {
-        const cfg = ORDER_STATUS_CONFIG[o.order_status] || ORDER_STATUS_CONFIG.pending;
-        return <Badge className={`${cfg.color} text-white`}>{cfg.label}</Badge>;
-      },
-    },
-    {
-      key: 'payment_status', header: 'Pagamento',
-      render: (o) => {
-        const cfg = PAYMENT_STATUS_CONFIG[o.payment_status] || PAYMENT_STATUS_CONFIG.pending;
-        return <Badge className={`${cfg.color} text-white`}>{cfg.label}</Badge>;
-      },
-    },
-    {
-      key: 'production_status', header: 'Produção',
-      render: (o) => {
-        const ps = o.production_status as ProductionStatus;
-        return <Badge className={`${PRODUCTION_STATUS_COLORS[ps]} text-white`}>{PRODUCTION_STATUS_LABELS[ps]}</Badge>;
-      },
-    },
-    {
-      key: 'created_at', header: 'Data', sortable: true,
-      render: (o) => <span className="text-sm text-white/50">{format(new Date(o.created_at), 'dd/MM/yy HH:mm', { locale: ptBR })}</span>,
-    },
-    {
-      key: 'actions', header: '', className: 'w-24',
-      render: (o) => (
-        <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button
-            className="admin-btn admin-btn-view admin-btn-icon !min-h-0 !p-1 h-9 w-9"
-            onClick={(e) => { e.stopPropagation(); setSelectedOrder(o); }}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button
-            className="admin-btn admin-btn-delete admin-btn-icon !min-h-0 !p-1 h-9 w-9"
-            onClick={(e) => { e.stopPropagation(); setDeleteId(o.id); }}
-            title="Excluir pedido"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  const columns = buildOrderColumns({ onView: setSelectedOrder, onDelete: setDeleteId });
 
   const filterContent = (
     <div className="flex gap-2 flex-wrap">
@@ -242,117 +140,13 @@ const AdminOrdersPage = () => {
         </Tabs>
       </div>
 
-      {/* Order Detail Dialog */}
-      <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] liquid-glass border-white/[0.1] text-white">
-          <DialogHeader>
-            <DialogTitle className="text-white">Venda {selectedOrder?.order_number}</DialogTitle>
-          </DialogHeader>
-
-          {selectedOrder && (
-            <ScrollArea className="max-h-[60vh]">
-              <div className="space-y-6 p-1">
-                <div>
-                  <h4 className="font-semibold mb-2 text-white">Cliente</h4>
-                  <div className="liquid-glass-lighter rounded-lg p-4 space-y-1 text-white/70">
-                    <p><strong className="text-white">Nome:</strong> {selectedOrder.customer_name}</p>
-                    <p><strong className="text-white">Email:</strong> {selectedOrder.customer_email}</p>
-                    <p><strong className="text-white">Telefone:</strong> {selectedOrder.customer_phone}</p>
-                    {(selectedOrder as any).shipping_address && <p><strong className="text-white">Endereço:</strong> {(selectedOrder as any).shipping_address}</p>}
-                    {(selectedOrder as any).shipping_cep && <p><strong className="text-white">CEP:</strong> {(selectedOrder as any).shipping_cep}</p>}
-                    {(selectedOrder as any).shipping_city && <p><strong className="text-white">Cidade:</strong> {(selectedOrder as any).shipping_city} - {(selectedOrder as any).shipping_state}</p>}
-                  </div>
-                </div>
-
-                <Separator className="bg-white/[0.08]" />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium block mb-2 text-white/60">Status da venda</label>
-                    <Select
-                      value={selectedOrder.order_status}
-                      onValueChange={(v) => updateOrder.mutateAsync({ id: selectedOrder.id, order_status: v })}
-                    >
-                      <SelectTrigger className="liquid-input text-white"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(ORDER_STATUS_CONFIG).map(([key, { label }]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium block mb-2 text-white/60">Status de produção</label>
-                    <Select
-                      value={selectedOrder.production_status}
-                      onValueChange={(v) => updateProductionStatus.mutateAsync({ id: selectedOrder.id, status: v as ProductionStatus })}
-                    >
-                      <SelectTrigger className="liquid-input text-white"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(PRODUCTION_STATUS_LABELS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <Separator className="bg-white/[0.08]" />
-
-                <div>
-                  <h4 className="font-semibold mb-2 text-white">Resumo</h4>
-                  <div className="liquid-glass-lighter rounded-lg p-4 space-y-2 text-white/70">
-                    <div className="flex justify-between"><span>Subtotal:</span><span>{fmtCurrency(selectedOrder.subtotal)}</span></div>
-                    {selectedOrder.shipping_cost != null && selectedOrder.shipping_cost > 0 && (
-                      <div className="flex justify-between"><span>Frete:</span><span>{fmtCurrency(selectedOrder.shipping_cost)}</span></div>
-                    )}
-                    {selectedOrder.discount != null && selectedOrder.discount > 0 && (
-                      <div className="flex justify-between text-green-400"><span>Desconto:</span><span>- {fmtCurrency(selectedOrder.discount)}</span></div>
-                    )}
-                    <Separator className="bg-white/[0.08]" />
-                    <div className="flex justify-between font-bold text-lg text-white"><span>Total:</span><span>{fmtCurrency(selectedOrder.total)}</span></div>
-                  </div>
-                </div>
-
-                {selectedOrder.tracking_code && (
-                  <>
-                    <Separator className="bg-white/[0.08]" />
-                    <div>
-                      <h4 className="font-semibold mb-2 text-white">Rastreio</h4>
-                      <div className="liquid-glass-lighter rounded-lg p-4 text-white/70">
-                        <p><strong className="text-white">Código:</strong> {selectedOrder.tracking_code}</p>
-                        <p><strong className="text-white">Transportadora:</strong> {selectedOrder.shipping_company || 'Correios'}</p>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {selectedOrder.notes && (
-                  <>
-                    <Separator className="bg-white/[0.08]" />
-                    <div>
-                      <h4 className="font-semibold mb-2 text-white">Observações</h4>
-                      <p className="text-white/60">{selectedOrder.notes}</p>
-                    </div>
-                  </>
-                )}
-              </div>
-            </ScrollArea>
-          )}
-
-          {selectedOrder && (
-            <div className="flex justify-end pt-4 border-t border-white/[0.08]">
-              <Button
-                className="admin-btn admin-btn-delete"
-                onClick={() => setDeleteId(selectedOrder.id)}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Excluir Pedido
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <OrderDetailDialog
+        order={selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+        onUpdateOrder={(id, data) => updateOrder.mutateAsync({ id, ...data })}
+        onUpdateProduction={(id, status) => updateProductionStatus.mutateAsync({ id, status })}
+        onDelete={setDeleteId}
+      />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent className="bg-[hsl(250_25%_12%)] border border-white/10 text-white">
