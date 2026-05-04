@@ -51,37 +51,7 @@ export function useValidateCoupon() {
       }
 
       const coupon = data as Coupon;
-      const now = new Date();
-
-      // Check date validity
-      if (coupon.start_date && new Date(coupon.start_date) > now) {
-        throw new Error('Cupom ainda não está ativo');
-      }
-      if (coupon.end_date && new Date(coupon.end_date) < now) {
-        throw new Error('Cupom expirado');
-      }
-
-      // Check usage limit
-      if (coupon.usage_limit && coupon.usage_count >= coupon.usage_limit) {
-        throw new Error('Cupom esgotado');
-      }
-
-      // Check minimum order value
-      if (coupon.min_order_value && orderValue < coupon.min_order_value) {
-        throw new Error(`Valor mínimo: R$ ${coupon.min_order_value.toFixed(2)}`);
-      }
-
-      // Calculate discount
-      let discount = 0;
-      if (coupon.type === 'percentage') {
-        discount = (orderValue * coupon.value) / 100;
-        if (coupon.max_discount && discount > coupon.max_discount) {
-          discount = coupon.max_discount;
-        }
-      } else {
-        discount = coupon.value;
-      }
-
+      const discount = calculateCouponDiscount(coupon, orderValue);
       return { coupon, discount };
     },
   });
