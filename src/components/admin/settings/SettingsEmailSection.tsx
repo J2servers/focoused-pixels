@@ -57,7 +57,7 @@ export const SettingsEmailSection = ({ emailSettings, ue, canMutate, handleTestS
                 className={inputClass}
                 type={f.t || 'text'}
                 value={String(emailSettings[f.k] || '')}
-                onChange={e => ue(f.k, f.t === 'number' ? Number(e.target.value) as any : e.target.value)}
+                onChange={e => ue(f.k, (f.t === 'number' ? Number(e.target.value) : e.target.value) as EmailCredentials[typeof f.k])}
                 placeholder={f.p}
               />
             </FieldGroup>

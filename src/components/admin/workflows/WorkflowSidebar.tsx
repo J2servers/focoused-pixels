@@ -8,6 +8,7 @@ import { SavedTab } from './sidebar/SavedTab';
 import { HistoryTab } from './sidebar/HistoryTab';
 import type { SidebarTab } from './sidebar/constants';
 import type { WorkflowMeta, WorkflowExecution, PresetDef } from '@/hooks/useWorkflows';
+import type { WorkflowStep } from '@/hooks/workflows/types';
 
 export type { SidebarTab };
 
@@ -17,11 +18,11 @@ interface Props {
   onAddNode: (type: string) => void;
   onNewWorkflow: (triggerEvent: string) => void;
   onLoadPreset: (preset: PresetDef) => void;
-  onLoadWorkflow: (wf: WorkflowMeta & { steps: any[] }) => void;
+  onLoadWorkflow: (wf: WorkflowMeta & { steps: WorkflowStep[] }) => void;
   onDeleteWorkflow: (id: string) => void;
   onToggleActive: (id: string, active: boolean) => void;
   onLoadExecutions: (workflowId?: string) => void;
-  workflows: (WorkflowMeta & { steps: any[] })[];
+  workflows: (WorkflowMeta & { steps: WorkflowStep[] })[];
   executions: WorkflowExecution[];
   currentWorkflowId?: string;
   loading: boolean;

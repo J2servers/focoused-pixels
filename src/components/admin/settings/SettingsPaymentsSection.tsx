@@ -160,18 +160,18 @@ export const SettingsPaymentsSection = ({ payment, up, canMutate, testMP, testEF
 
               <p className="text-sm text-[hsl(var(--admin-text-muted))]">{gw.description}</p>
 
-              <ToggleBlock title={`Ativar ${gw.label}`} description="Disponibiliza no checkout." checked={enabled} onChange={v => up(gw.enabledKey, v as any)} />
+              <ToggleBlock title={`Ativar ${gw.label}`} description="Disponibiliza no checkout." checked={enabled} onChange={v => up(gw.enabledKey, v as PaymentCredentials[typeof gw.enabledKey])} />
 
               <div className={cn('grid md:grid-cols-2', gridGap)}>
                 {gw.fields.map(f => (
                   <FieldGroup key={String(f.key)} label={f.label} className={f.span2 ? 'md:col-span-2' : ''}>
-                    <Input className={inputClass} type={f.type || 'text'} value={String(payment[f.key] || '')} onChange={e => up(f.key, e.target.value as any)} placeholder={f.placeholder} />
+                    <Input className={inputClass} type={f.type || 'text'} value={String(payment[f.key] || '')} onChange={e => up(f.key, e.target.value as PaymentCredentials[typeof f.key])} placeholder={f.placeholder} />
                   </FieldGroup>
                 ))}
               </div>
 
               {gw.sandboxKey && (
-                <ToggleBlock title="Modo sandbox" description="Ambiente de homologação e testes." checked={sandbox} onChange={v => up(gw.sandboxKey!, v as any)} />
+                <ToggleBlock title="Modo sandbox" description="Ambiente de homologação e testes." checked={sandbox} onChange={v => up(gw.sandboxKey!, v as PaymentCredentials[NonNullable<typeof gw.sandboxKey>])} />
               )}
 
               {test && (
