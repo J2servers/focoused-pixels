@@ -141,14 +141,16 @@ export function usePaymentFlow() {
   }, []);
 
   const calculateInstallments = useCallback((amount: number) => {
-    const result: Array<{ number: number; value: number; total: number }> = [];
-    for (let i = 1; i <= maxInstallments; i++) {
-      const installmentValue = amount / i;
-      if (installmentValue >= minInstallmentValue) {
-        result.push({ number: i, value: installmentValue, total: amount });
-      }
-    }
-    return result;
+    // Centralized rule (lib/installments). Returns same shape as before for
+    // backwards compatibility with PaymentPage / PaymentStepPayment.
+    // Lazy import keeps the hook tree-shake friendly.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { buildInstallments } = require('@/lib/installments') as typeof import('@/lib/installments');
+    return buildInstallments(amount, {
+      maxInstallments,
+      minPerInstallment: minInstallmentValue,
+      maxNoInterest: maxInstallments,
+    }).map((i) => ({ number: i.number, value: i.value, total: i.total }));
   }, [maxInstallments, minInstallmentValue]);
 
   const applySavedCheckoutProfile = useCallback(() => {
