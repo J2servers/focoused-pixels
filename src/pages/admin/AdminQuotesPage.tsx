@@ -357,15 +357,15 @@ const AdminQuotesPage = () => {
       </Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent className="liquid-glass">
+        <AlertDialogContent className="bg-[hsl(250_25%_12%)] border border-white/10 text-white">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">Excluir Orçamento</AlertDialogTitle>
-            <AlertDialogDescription className="text-white/50">
+            <AlertDialogDescription className="text-white/80">
               Tem certeza? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-white/[0.08] bg-transparent text-white hover:bg-white/[0.06]">
+            <AlertDialogCancel className="border-white/20 bg-white/10 text-white hover:bg-white/20">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteQuote} className="admin-btn admin-btn-delete">
