@@ -336,8 +336,40 @@ const AdminOrdersPage = () => {
               </div>
             </ScrollArea>
           )}
+
+          {selectedOrder && (
+            <div className="flex justify-end pt-4 border-t border-white/[0.08]">
+              <Button
+                className="admin-btn admin-btn-delete"
+                onClick={() => setDeleteId(selectedOrder.id)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Excluir Pedido
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent className="liquid-glass">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Excluir Pedido</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
+              Tem certeza? Esta ação removerá o pedido e seus itens permanentemente e não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-white/[0.08] bg-transparent text-white hover:bg-white/[0.06]">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="admin-btn admin-btn-delete">
+              <Trash2 className="h-4 w-4 mr-1" />
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };
