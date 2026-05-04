@@ -90,9 +90,9 @@ serve(async (req) => {
     if (orderId && ["create_pix", "create_boleto", "create_card_payment"].includes(action)) {
       const idemKey = `${action}-${orderId}`;
       const cached = idempotencyCache.get(idemKey);
-      if (cached && Date.now() - cached.timestamp < IDEM_TTL_MS) {
+      if (cached) {
         log.info(`[MercadoPago] Idempotency hit: ${idemKey}`);
-        return new Response(cached.response, {
+        return new Response(cached, {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
