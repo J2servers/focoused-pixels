@@ -43,3 +43,18 @@ export function useUpdateQuoteStatus() {
     onError: (e: Error) => toast.error(e.message),
   });
 }
+
+export function useDeleteQuote() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('quotes').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-quotes'] });
+      toast.success('Orçamento excluído!');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
