@@ -41,7 +41,7 @@ export function DataTable<T>({
   data, columns, isLoading = false, searchable = true,
   searchPlaceholder = 'Buscar...', selectable = false,
   selectedItems = [], onSelectionChange,
-  getItemId = (item: any) => item.id, onRowClick,
+  getItemId = (item: T) => (item as { id: string }).id, onRowClick,
   emptyMessage = 'Nenhum registro encontrado',
   actions, filterContent, pageSize = 10, showAllRows = false,
 }: DataTableProps<T>) {
@@ -51,12 +51,14 @@ export function DataTable<T>({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const filteredData = search
-    ? data.filter(item => Object.values(item as any).some(value => String(value).toLowerCase().includes(search.toLowerCase())))
+    ? data.filter(item => Object.values(item as Record<string, unknown>).some(value => String(value).toLowerCase().includes(search.toLowerCase())))
     : data;
 
   const sortedData = sortColumn
     ? [...filteredData].sort((a, b) => {
-        const comparison = String((a as any)[sortColumn]).localeCompare(String((b as any)[sortColumn]));
+        const av = (a as Record<string, unknown>)[sortColumn];
+        const bv = (b as Record<string, unknown>)[sortColumn];
+        const comparison = String(av).localeCompare(String(bv));
         return sortDirection === 'asc' ? comparison : -comparison;
       })
     : filteredData;
@@ -170,7 +172,7 @@ export function DataTable<T>({
                     )}
                     {columns.map(column => (
                       <TableCell key={column.key} className={cn('py-3.5 text-white/90', column.className)}>
-                        {column.render ? column.render(item) : (item as any)[column.key]}
+                        {column.render ? column.render(item) : String((item as Record<string, unknown>)[column.key] ?? '')}
                       </TableCell>
                     ))}
                   </TableRow>
