@@ -21,6 +21,43 @@ function sanitizeSnapshotItems(items: CartItem[]) {
   }));
 }
 
+function captureBrowserMetadata() {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return {};
+  try {
+    const nav = navigator as Navigator & {
+      deviceMemory?: number;
+      connection?: { effectiveType?: string; downlink?: number; rtt?: number; saveData?: boolean };
+    };
+    const params = new URLSearchParams(window.location.search);
+    const utm: Record<string, string> = {};
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(k => {
+      const v = params.get(k);
+      if (v) utm[k] = v.slice(0, 100);
+    });
+    return {
+      userAgent: nav.userAgent,
+      language: nav.language,
+      languages: Array.isArray(nav.languages) ? nav.languages.slice(0, 8) : [],
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timezoneOffset: new Date().getTimezoneOffset(),
+      screen: { width: screen.width, height: screen.height, pixelRatio: window.devicePixelRatio },
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      platform: nav.platform,
+      vendor: nav.vendor,
+      hardwareConcurrency: nav.hardwareConcurrency,
+      deviceMemory: nav.deviceMemory ?? null,
+      connection: nav.connection ? {
+        effectiveType: nav.connection.effectiveType,
+        downlink: nav.connection.downlink,
+        rtt: nav.connection.rtt,
+        saveData: nav.connection.saveData,
+      } : null,
+      referrer: document.referrer,
+      utm: Object.keys(utm).length ? utm : null,
+    };
+  } catch { return {}; }
+}
+
 export function useAbandonedCartTracker() {
   const { items, itemCount, total } = useCart();
   const { user } = useAuthContext();
