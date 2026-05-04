@@ -94,7 +94,7 @@ const Index = () => {
   const parentCategories = useMemo(() => categories.filter(c => !c.parent_id), [categories]);
 
   const categoryProductsMap = useMemo(() => {
-    const map = new Map<string, any[]>();
+    const map = new Map<string, typeof products>();
     for (const cat of parentCategories) {
       const childIds = categories.filter(c => c.parent_id === cat.id).map(c => c.id);
       const allCategoryIds = new Set([cat.id, ...childIds]);

@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Search, Settings2, Loader2, Copy, Trash2 } from 'lucide-react';
-import { TRIGGER_EVENTS, timeAgo, type WorkflowMeta } from '@/hooks/useWorkflows';
+import { TRIGGER_EVENTS, timeAgo, type WorkflowMeta, type WorkflowStep } from '@/hooks/useWorkflows';
 
 interface Props {
-  workflows: (WorkflowMeta & { steps: any[] })[];
+  workflows: (WorkflowMeta & { steps: WorkflowStep[] })[];
   currentWorkflowId?: string;
   loading: boolean;
-  onLoadWorkflow: (wf: WorkflowMeta & { steps: any[] }) => void;
+  onLoadWorkflow: (wf: WorkflowMeta & { steps: WorkflowStep[] }) => void;
   onDeleteWorkflow: (id: string) => void;
   onToggleActive: (id: string, active: boolean) => void;
 }

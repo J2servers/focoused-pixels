@@ -64,8 +64,8 @@ export function VideoUpload({ value, onChange, folder = 'video-stories', maxSize
       setProgress(100);
       onChange(urlData.publicUrl);
       toast.success('Vídeo enviado com sucesso!');
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao enviar vídeo');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao enviar vídeo');
     } finally {
       setUploading(false);
       setProgress(0);

@@ -87,10 +87,10 @@ const queryClient = new QueryClient({
  * Isso elimina o "delay" ao trocar de página pela primeira vez.
  */
 const prefetchRoutes = () => {
-  const idle = (cb: () => void) =>
-    'requestIdleCallback' in window
-      ? (window as any).requestIdleCallback(cb, { timeout: 3000 })
-      : setTimeout(cb, 1500);
+  const idle = (cb: () => void) => {
+    const w = window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number };
+    return w.requestIdleCallback ? w.requestIdleCallback(cb, { timeout: 3000 }) : setTimeout(cb, 1500);
+  };
 
   idle(() => {
     import('./pages/ProductPage');
