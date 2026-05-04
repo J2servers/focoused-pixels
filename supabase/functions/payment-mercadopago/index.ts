@@ -344,7 +344,7 @@ serve(async (req) => {
 
       // Cache for idempotency
       if (orderId) {
-        idempotencyCache.set(`create_pix-${orderId}`, { response: pixResponseBody, timestamp: Date.now() });
+        idempotencyCache.set(`create_pix-${orderId}`, pixResponseBody);
       }
 
       return new Response(pixResponseBody, {
