@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import {
@@ -70,7 +71,7 @@ export function usePaymentMethods({
       toast.success('PIX gerado com sucesso!');
     } catch (error) {
       paymentCircuitBreaker.recordFailure();
-      console.error('Error generating PIX:', error);
+      logger.error('paymentMethods', 'Error generating PIX:', error);
     } finally {
       setIsProcessing(false);
     }
@@ -111,7 +112,7 @@ export function usePaymentMethods({
       });
       toast.success('Boleto gerado com sucesso!');
     } catch (error) {
-      console.error('Error generating boleto:', error);
+      logger.error('paymentMethods', 'Error generating boleto:', error);
     } finally {
       setIsProcessing(false);
     }
@@ -132,7 +133,7 @@ export function usePaymentMethods({
       });
       if (result.initPoint) window.location.href = result.initPoint;
     } catch (error) {
-      console.error('Error creating checkout:', error);
+      logger.error('paymentMethods', 'Error creating checkout:', error);
     } finally {
       setIsProcessing(false);
     }

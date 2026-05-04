@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -73,7 +74,7 @@ export function usePaymentCredentials() {
         .single();
 
       if (error) {
-        console.error('Error fetching payment credentials:', error);
+        logger.error('paymentCredentials', 'Error fetching payment credentials:', error);
         return { id: '', updated_at: new Date().toISOString(), ...defaultPaymentCredentials } as PaymentCredentials;
       }
 

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -55,7 +56,7 @@ export function useEmailCredentials() {
       if (error) {
         const relationMissing = error.code === 'PGRST205' || error.message?.includes('email_credentials');
         if (!relationMissing) {
-          console.error('Error fetching email credentials:', error);
+          logger.error('emailCredentials', 'Error fetching email credentials:', error);
         }
         return buildDefaultCredentials();
       }

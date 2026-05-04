@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -93,7 +94,7 @@ export function usePaymentLoader(): LoaderResult {
           });
           setFromExistingOrder(true);
         } catch (err) {
-          console.error('Error loading order:', err);
+          logger.error('paymentLoader', 'Error loading order:', err);
           toast.error('Erro ao carregar pedido');
           navigate('/');
         } finally {

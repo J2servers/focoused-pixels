@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { defaultCompanyInfo } from './defaults';
@@ -35,7 +36,7 @@ export function useCompanyInfo() {
         .limit(1)
         .single();
 
-      if (error) console.error('Error fetching company info:', error);
+      if (error) logger.error('companyInfo', 'Error fetching company info:', error);
       if (data) return buildCompanyInfo(data as Record<string, unknown>);
 
       return { id: '', ...defaultCompanyInfo } as CompanyInfo;

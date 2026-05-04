@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -45,7 +46,7 @@ export function usePixPolling({
           setTimeout(() => navigate('/pagamento/sucesso'), SUCCESS_REDIRECT_DELAY_MS);
         }
       } catch (err) {
-        console.error('Error checking status:', err);
+        logger.error('pixPolling', 'Error checking status:', err);
       }
     };
 

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -31,7 +32,7 @@ export function useAICredentials() {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching AI credentials:', error);
+        logger.error('aiCredentials', 'Error fetching AI credentials:', error);
         return { id: '', updated_at: new Date().toISOString(), ...defaults } as AICredentials;
       }
 

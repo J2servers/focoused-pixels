@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,7 +28,7 @@ export function useAuthSession() {
       loadedUserIdRef.current = userId;
       setState(prev => ({ ...prev, profile: profile || null, role, isLoading: false }));
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      logger.error('authSession', 'Error fetching user data:', error);
       loadedUserIdRef.current = null;
       setState(prev => ({ ...prev, profile: null, role: null, isLoading: false }));
     }

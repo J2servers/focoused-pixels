@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -26,7 +27,7 @@ export function useCreateCashTransaction() {
       toast.success('Transação registrada com sucesso!');
     },
     onError: (error) => {
-      console.error('Erro ao criar transação:', error);
+      logger.error('cashFlow', 'Erro ao criar transação:', error);
       toast.error('Erro ao registrar transação');
     },
   });
@@ -50,7 +51,7 @@ export function useUpdateCashTransaction() {
       toast.success('Transação atualizada com sucesso!');
     },
     onError: (error) => {
-      console.error('Erro ao atualizar transação:', error);
+      logger.error('cashFlow', 'Erro ao atualizar transação:', error);
       toast.error('Erro ao atualizar transação');
     },
   });
@@ -68,7 +69,7 @@ export function useDeleteCashTransaction() {
       toast.success('Transação excluída com sucesso!');
     },
     onError: (error) => {
-      console.error('Erro ao excluir transação:', error);
+      logger.error('cashFlow', 'Erro ao excluir transação:', error);
       toast.error('Erro ao excluir transação');
     },
   });
