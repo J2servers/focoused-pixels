@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import type { Node, Edge } from '@xyflow/react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { flowToSteps } from './flowConverters';
 import { validateWorkflow } from './validation';
 import type { TemplateLite, ValidationIssue, WorkflowMeta } from './types';
@@ -42,7 +43,7 @@ export function useWorkflowsMutations({
       description: meta.description || null,
       trigger_event: triggerEvent,
       trigger_delay_minutes: meta.trigger_delay_minutes,
-      steps,
+      steps: steps as unknown as Json,
       is_active: meta.is_active,
     };
 
