@@ -48,7 +48,7 @@ export function PaymentStepAuth({ onAuthenticated, isAuthenticated, userEmail }:
     e.preventDefault();
     if (isLoading) return;
 
-    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedEmail = sanitizeEmail(email);
     if (!trimmedEmail || !password) {
       toast.error('Preencha e-mail e senha');
       return;

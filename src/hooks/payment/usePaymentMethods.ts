@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { sanitizeCPF, isValidCPF } from '@/lib/sanitize';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import {
@@ -80,7 +81,7 @@ export function usePaymentMethods({
   const handleGenerateBoleto = useCallback(async () => {
     if (!paymentState || isProcessing) return;
     if (!guardAction('generate_boleto', 'boleto_generation')) return;
-    if (!paymentState.customerCpf || paymentState.customerCpf.replace(/\D/g, '').length < 11) {
+    if (!paymentState.customerCpf || !isValidCPF(paymentState.customerCpf)) {
       toast.error('CPF válido é obrigatório para boleto');
       return;
     }
@@ -95,7 +96,7 @@ export function usePaymentMethods({
         description: paymentState.description,
         payerEmail: paymentState.customerEmail,
         payerName: paymentState.customerName,
-        payerCpf: paymentState.customerCpf.replace(/\D/g, ''),
+        payerCpf: sanitizeCPF(paymentState.customerCpf),
         payerZipCode: customerForm.cep,
         payerStreetName: customerForm.street,
         payerStreetNumber: customerForm.number || 'S/N',
