@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { sanitizeEmail, sanitizeCPF } from '@/lib/sanitize';
 import { toast } from 'sonner';
 import { useCompanyInfo } from '@/hooks/useCompanyInfo';
 import { usePaymentCredentials } from '@/hooks/usePaymentCredentials';
@@ -102,7 +103,7 @@ export function usePaymentFlow() {
     setIsProcessing(true);
     try {
       const name = customerForm.name.trim();
-      const email = user?.email || customerForm.email.trim().toLowerCase();
+      const email = user?.email || sanitizeEmail(customerForm.email);
       const phone = customerForm.phone.trim();
       if (!name || !phone) { toast.error('Nome e telefone são obrigatórios'); return; }
       if (!customerForm.street.trim() || !customerForm.cep.trim()) {
@@ -113,7 +114,7 @@ export function usePaymentFlow() {
         ...paymentState,
         customerName: name,
         customerEmail: email,
-        customerCpf: customerForm.cpf.replace(/\D/g, ''),
+        customerCpf: sanitizeCPF(customerForm.cpf),
         customerPhone: phone,
       };
       const dbOrderId = await createOrderInDB(updatedState);

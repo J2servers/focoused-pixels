@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { sanitizeCEP } from '@/lib/sanitize';
 import { supabase } from '@/integrations/supabase/client';
 import { FALLBACK_FREIGHT_OPTIONS, FreightOption, CustomerFormData } from './types';
 
@@ -25,7 +26,7 @@ export function useFreightCalculator({
   const [lastFetchedCep, setLastFetchedCep] = useState('');
 
   const fetchFreight = useCallback(async (cep: string) => {
-    const cleanCep = cep.replace(/\D/g, '');
+    const cleanCep = sanitizeCEP(cep);
     if (cleanCep.length !== 8 || cleanCep === lastFetchedCep) return;
 
     setFreightLoading(true);
@@ -94,7 +95,7 @@ export function useFreightCalculator({
   }, [amount, shippingCost, lastFetchedCep, setCustomerForm, cartWeight]);
 
   useEffect(() => {
-    const cleanCep = customerForm.cep.replace(/\D/g, '');
+    const cleanCep = customerForm.sanitizeCEP(cep);
     if (cleanCep.length === 8 && cleanCep !== lastFetchedCep) {
       const timer = setTimeout(() => fetchFreight(customerForm.cep), 500);
       return () => clearTimeout(timer);

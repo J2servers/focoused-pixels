@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { sanitizeEmail } from '@/lib/sanitize';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,7 +30,7 @@ export function useOrderCreator({ customerForm, customText, uploadedFiles }: Use
     try {
       await supabase.from('leads').upsert({
         name: name.trim(),
-        email: email.trim().toLowerCase(),
+        email: sanitizeEmail(email),
         phone: sanitizePhone(phone),
         source: 'checkout',
         tags: ['cliente', 'pagamento'],
@@ -95,7 +96,7 @@ export function useOrderCreator({ customerForm, customText, uploadedFiles }: Use
       id: orderId,
       order_number: orderNumber,
       customer_name: state.customerName.trim(),
-      customer_email: state.customerEmail.trim().toLowerCase(),
+      customer_email: sanitizeEmail(state.customerEmail),
       customer_phone: sanitizePhone(state.customerPhone) || state.customerPhone || '',
       items: cartItems as unknown as Json,
       subtotal: state.amount - state.shippingCost,

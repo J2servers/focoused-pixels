@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { sanitizeEmail } from '@/lib/sanitize';
 import { supabase } from '@/integrations/supabase/client';
 import { secureGet, secureSet, secureRemove, TTL } from '@/lib/secure-storage';
 
@@ -78,7 +79,7 @@ export function useCheckoutProfile(userId?: string) {
     async (profile: CheckoutProfileData) => {
       const normalized: CheckoutProfileData = {
         fullName: profile.fullName?.trim() || '',
-        email: profile.email?.trim().toLowerCase() || '',
+        email: sanitizeEmail(profile.email),
         phone: profile.phone?.trim() || '',
         address: profile.address?.trim() || '',
         cep: profile.cep?.trim() || '',

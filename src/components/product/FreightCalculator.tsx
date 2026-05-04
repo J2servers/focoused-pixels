@@ -50,14 +50,14 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
 
   // #44 Auto-calculate if we have a saved CEP
   useEffect(() => {
-    const savedCep = cep.replace(/\D/g, '');
+    const savedCep = sanitizeCEP(cep);
     if (savedCep.length === 8) {
       calculateFreight();
     }
   }, []); // Only on mount
 
   const calculateFreight = async () => {
-    const cleanCep = cep.replace(/\D/g, '');
+    const cleanCep = sanitizeCEP(cep);
     if (cleanCep.length < 8) return;
 
     setIsLoading(true);
@@ -109,7 +109,7 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
       method: r.method,
       price: r.price,
       days: r.days,
-      cep: cep.replace(/\D/g, ''),
+      cep: sanitizeCEP(cep),
       city: destination?.city || '',
       state: destination?.state || '',
     });
@@ -128,7 +128,7 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
             placeholder="Digite seu CEP"
             value={cep}
             onChange={(e) => {
-              const v = e.target.value.replace(/\D/g, '').slice(0, 8);
+              const v = sanitizeCEP(e.target.value);
               setCep(v.length > 5 ? `${v.slice(0, 5)}-${v.slice(5)}` : v);
             }}
             className="pl-9 h-9 text-sm"
@@ -141,7 +141,7 @@ export function FreightCalculator({ productPrice, onFreightSelect }: FreightCalc
         <Button
           size="sm"
           onClick={calculateFreight}
-          disabled={cep.replace(/\D/g, '').length < 8 || isLoading}
+          disabled={sanitizeCEP(cep).length < 8 || isLoading}
           className="h-9"
         >
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Calcular'}
