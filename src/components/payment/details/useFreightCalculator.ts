@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { sanitizeCEP } from '@/lib/sanitize';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { FALLBACK_FREIGHT_OPTIONS, FreightOption, CustomerFormData } from './types';
 
