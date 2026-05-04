@@ -17,6 +17,7 @@ import { FreeShippingBar } from '@/components/cart/FreeShippingBar';
 import { PageSEO } from '@/components/seo/PageSEO';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { renderCartCheckoutMessage } from '@/lib/whatsapp-templates';
+import { writePendingPayment } from '@/lib/pendingPayment';
 import { formatCurrency } from '@/lib/format';
 
 const CartPage = () => {
