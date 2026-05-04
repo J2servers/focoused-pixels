@@ -39,9 +39,18 @@ export function AddressFormCard({ customerForm, setCustomerForm }: Props) {
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="det-cpf">CPF (para boleto)</Label>
-            <Input id="det-cpf" placeholder="000.000.000-00" value={customerForm.cpf}
-              onChange={(e) => upd('cpf', e.target.value)} maxLength={14} />
+            <Label htmlFor="det-cpf">CPF *</Label>
+            <Input
+              id="det-cpf"
+              placeholder="000.000.000-00"
+              value={customerForm.cpf}
+              onChange={(e) => upd('cpf', formatCpf(e.target.value))}
+              maxLength={14}
+              aria-invalid={cpfDigits(customerForm.cpf).length === 11 && !isValidCpf(customerForm.cpf)}
+            />
+            {cpfDigits(customerForm.cpf).length === 11 && !isValidCpf(customerForm.cpf) && (
+              <p className="text-xs text-destructive">CPF inválido</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="det-cep">CEP *</Label>
