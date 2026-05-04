@@ -1,11 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RefreshCw, Loader2, Activity as ActivityIcon } from 'lucide-react';
-import { timeAgo, type WorkflowMeta, type WorkflowExecution } from '@/hooks/useWorkflows';
+import { timeAgo, type WorkflowMeta, type WorkflowExecution, type WorkflowStep } from '@/hooks/useWorkflows';
+
+interface StepResult {
+  status?: string;
+  channel?: string;
+  type?: string;
+}
 
 interface Props {
   executions: WorkflowExecution[];
-  workflows: (WorkflowMeta & { steps: any[] })[];
+  workflows: (WorkflowMeta & { steps: WorkflowStep[] })[];
   loading: boolean;
   currentWorkflowId?: string;
   onReload: (workflowId?: string) => void;
@@ -50,9 +56,9 @@ export function HistoryTab({ executions, workflows, loading, currentWorkflowId, 
             </div>
             <p className="text-[10px] text-white/30">Passo {exec.current_step_index + 1} • {timeAgo(exec.started_at)}</p>
             {exec.error_message && <p className="text-[10px] text-red-400 truncate">⚠ {exec.error_message}</p>}
-            {exec.step_results && (exec.step_results as any[]).length > 0 && (
+            {exec.step_results && (exec.step_results as StepResult[]).length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {(exec.step_results as any[]).slice(-3).map((r: any, i: number) => (
+                {(exec.step_results as StepResult[]).slice(-3).map((r, i) => (
                   <Badge key={i} variant="outline" className={`text-[8px] h-[18px] ${r.status === 'sent' || r.status === 'success' ? 'text-emerald-400 border-emerald-500/20' : r.status === 'failed' ? 'text-red-400 border-red-500/20' : 'text-yellow-400 border-yellow-500/20'}`}>
                     {r.channel || r.type}: {r.status}
                   </Badge>
