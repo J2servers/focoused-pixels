@@ -14,6 +14,7 @@ import { useEffect, ReactNode } from 'react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { MaintenancePage } from '@/pages/MaintenancePage';
 import { useLocation } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 
 interface SiteSettingsProviderProps {
   children: ReactNode;
@@ -184,7 +185,7 @@ export function SiteSettingsProvider({ children }: SiteSettingsProviderProps) {
     if (!settings.googleAnalyticsId || settings.isLoading) return;
     const gaId = settings.googleAnalyticsId.trim();
     if (!isValidGAId(gaId)) {
-      console.warn('[Analytics] Invalid GA ID format, skipping');
+      logger.warn('analytics', 'Invalid GA ID format, skipping');
       return;
     }
     if (document.querySelector(`script[src*="googletagmanager.com/gtag"]`)) return;
@@ -205,7 +206,7 @@ export function SiteSettingsProvider({ children }: SiteSettingsProviderProps) {
     if (!settings.googleTagManagerId || settings.isLoading) return;
     const gtmId = settings.googleTagManagerId.trim();
     if (!isValidGTMId(gtmId)) {
-      console.warn('[Analytics] Invalid GTM ID format, skipping');
+      logger.warn('analytics', 'Invalid GTM ID format, skipping');
       return;
     }
     if (document.querySelector(`script[src*="googletagmanager.com/gtm"]`)) return;
@@ -220,7 +221,7 @@ export function SiteSettingsProvider({ children }: SiteSettingsProviderProps) {
     if (!settings.facebookPixelId || settings.isLoading) return;
     const pixelId = settings.facebookPixelId.trim();
     if (!isValidPixelId(pixelId)) {
-      console.warn('[Analytics] Invalid Facebook Pixel ID format, skipping');
+      logger.warn('analytics', 'Invalid Facebook Pixel ID format, skipping');
       return;
     }
     if (window.fbq) return;

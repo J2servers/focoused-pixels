@@ -20,6 +20,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingUp, TrendingDown, Calendar } from 'lucide-react';
 import {
+import { logger } from '@/lib/logger';
   CashTransaction,
   CashTransactionInput,
   ENTRY_CATEGORIES,
@@ -99,7 +100,7 @@ export function CashTransactionDialog({
       }
       onOpenChange(false);
     } catch (error) {
-      console.error('Erro ao salvar transação:', error);
+      logger.error('cashflow', 'Erro ao salvar transação:', error);
     }
   };
 

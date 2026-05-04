@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface MultiImageUploadProps {
   value: string[];
@@ -47,7 +48,7 @@ export function MultiImageUpload({
         const { data } = supabase.storage.from('admin-uploads').getPublicUrl(fileName);
         newUrls.push(data.publicUrl);
       } catch (error: unknown) {
-        console.error('Upload error:', error);
+        logger.error('multiImageUpload', 'Upload error:', error);
         toast.error(`Erro ao enviar ${file.name}`);
       }
     }

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MessageSquare, RefreshCw, Search, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 interface WhatsAppMessage {
   id: string;
@@ -49,7 +50,7 @@ const WhatsAppMessageLog = () => {
       if (error) throw error;
       setMessages((data as WhatsAppMessage[]) || []);
     } catch (e) {
-      console.error('Error fetching messages:', e);
+      logger.error('whatsappLog', 'Error fetching messages:', e);
     } finally {
       setLoading(false);
     }
