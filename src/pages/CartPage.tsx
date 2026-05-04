@@ -39,7 +39,7 @@ const CartPage = () => {
   };
 
   const handlePayNow = () => {
-    const paymentData = {
+    writePendingPayment({
       orderId: `cart-${Date.now()}`,
       amount: total,
       customerName: '',
@@ -53,8 +53,7 @@ const CartPage = () => {
         price: item.price,
         size: item.size,
       })),
-    };
-    sessionStorage.setItem('pending_payment', JSON.stringify(paymentData));
+    });
     navigate('/pagamento');
   };
 
