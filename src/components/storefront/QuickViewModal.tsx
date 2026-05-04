@@ -26,6 +26,7 @@ interface Product {
   freeShipping?: boolean;
   badge?: string;
   discount?: number;
+  stock?: number;
 }
 
 interface QuickViewModalProps {

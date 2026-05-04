@@ -77,6 +77,7 @@ interface CompanyForSchema {
   address?: string | null;
   social_instagram?: string | null;
   social_facebook?: string | null;
+  social_youtube?: string | null;
 }
 
 export function LocalBusinessSchema({ company }: { company: CompanyForSchema | null | undefined }) {
