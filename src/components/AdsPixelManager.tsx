@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface PixelConfig {
   platform: string;
   pixel_id: string | null;
+  account_id?: string | null;
   measurement_id: string | null;
   conversion_id: string | null;
   conversion_label: string | null;
