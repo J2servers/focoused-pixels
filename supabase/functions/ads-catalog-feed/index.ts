@@ -99,7 +99,8 @@ Deno.serve(async (req) => {
 
   const { data, error } = await sb
     .from('products')
-    .select('id, slug, name, description, short_description, price, promotional_price, stock, main_image, images, sku, brand, category:categories(name)')
+    .select('id, slug, name, full_description, short_description, price, promotional_price, stock, cover_image, gallery_images, sku, category:categories(name)')
+    .eq('status', 'active')
     .limit(5000);
 
   if (error) {
@@ -110,11 +111,11 @@ Deno.serve(async (req) => {
 
   const products: Product[] = (data || []).map((p: Record<string, unknown>) => ({
     id: p.id as string, slug: p.slug as string, name: p.name as string,
-    description: p.description as string | null, short_description: p.short_description as string | null,
+    description: p.full_description as string | null, short_description: p.short_description as string | null,
     price: Number(p.price), promotional_price: p.promotional_price ? Number(p.promotional_price) : null,
-    stock: p.stock as number | null, main_image: p.main_image as string | null,
-    images: p.images as string[] | null, sku: p.sku as string | null,
-    brand: p.brand as string | null,
+    stock: p.stock as number | null, main_image: p.cover_image as string | null,
+    images: p.gallery_images as string[] | null, sku: p.sku as string | null,
+    brand: null,
     category_name: (p.category as { name?: string } | null)?.name || null,
   }));
 
