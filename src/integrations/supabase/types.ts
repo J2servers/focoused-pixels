@@ -2848,6 +2848,7 @@ export type Database = {
     Views: {
       ads_pixels_public: {
         Row: {
+          account_id: string | null
           config: Json | null
           conversion_id: string | null
           conversion_label: string | null
@@ -2858,6 +2859,7 @@ export type Database = {
           platform: Database["public"]["Enums"]["ads_platform"] | null
         }
         Insert: {
+          account_id?: string | null
           config?: Json | null
           conversion_id?: string | null
           conversion_label?: string | null
@@ -2868,6 +2870,7 @@ export type Database = {
           platform?: Database["public"]["Enums"]["ads_platform"] | null
         }
         Update: {
+          account_id?: string | null
           config?: Json | null
           conversion_id?: string | null
           conversion_label?: string | null
