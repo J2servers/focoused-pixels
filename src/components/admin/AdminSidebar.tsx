@@ -4,7 +4,7 @@ import {
   Settings, Star, LogOut, ChevronLeft, ChevronRight, Sparkles, UserPlus,
   ShoppingCart, Tag, Kanban, Menu, Mail, MessageSquare, Users, ScrollText,
   ImageIcon, Workflow, Code2, ChevronDown, Store, Megaphone,
-  Shield, BarChart3, Zap, Wallet, Boxes, Activity,
+  Shield, BarChart3, Zap, Wallet, Boxes, Activity, Search,
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
