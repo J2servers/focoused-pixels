@@ -124,6 +124,165 @@ export type Database = {
         }
         Relationships: []
       }
+      ads_events_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event_id: string | null
+          event_name: string
+          http_status: number | null
+          id: string
+          order_id: string | null
+          platform: Database["public"]["Enums"]["ads_platform"]
+          request_payload: Json | null
+          response: Json | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event_id?: string | null
+          event_name: string
+          http_status?: number | null
+          id?: string
+          order_id?: string | null
+          platform: Database["public"]["Enums"]["ads_platform"]
+          request_payload?: Json | null
+          response?: Json | null
+          status: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event_id?: string | null
+          event_name?: string
+          http_status?: number | null
+          id?: string
+          order_id?: string | null
+          platform?: Database["public"]["Enums"]["ads_platform"]
+          request_payload?: Json | null
+          response?: Json | null
+          status?: string
+        }
+        Relationships: []
+      }
+      ads_integrations: {
+        Row: {
+          account_id: string | null
+          api_token_secret_name: string | null
+          capi_enabled: boolean
+          capi_token_secret_name: string | null
+          catalog_sync_enabled: boolean
+          config: Json
+          conversion_id: string | null
+          conversion_label: string | null
+          created_at: string
+          display_name: string
+          domain_verification_id: string | null
+          enabled: boolean
+          id: string
+          last_catalog_sync_at: string | null
+          last_metrics_sync_at: string | null
+          measurement_id: string | null
+          metrics_sync_enabled: boolean
+          pixel_enabled: boolean
+          pixel_id: string | null
+          platform: Database["public"]["Enums"]["ads_platform"]
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          api_token_secret_name?: string | null
+          capi_enabled?: boolean
+          capi_token_secret_name?: string | null
+          catalog_sync_enabled?: boolean
+          config?: Json
+          conversion_id?: string | null
+          conversion_label?: string | null
+          created_at?: string
+          display_name: string
+          domain_verification_id?: string | null
+          enabled?: boolean
+          id?: string
+          last_catalog_sync_at?: string | null
+          last_metrics_sync_at?: string | null
+          measurement_id?: string | null
+          metrics_sync_enabled?: boolean
+          pixel_enabled?: boolean
+          pixel_id?: string | null
+          platform: Database["public"]["Enums"]["ads_platform"]
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          api_token_secret_name?: string | null
+          capi_enabled?: boolean
+          capi_token_secret_name?: string | null
+          catalog_sync_enabled?: boolean
+          config?: Json
+          conversion_id?: string | null
+          conversion_label?: string | null
+          created_at?: string
+          display_name?: string
+          domain_verification_id?: string | null
+          enabled?: boolean
+          id?: string
+          last_catalog_sync_at?: string | null
+          last_metrics_sync_at?: string | null
+          measurement_id?: string | null
+          metrics_sync_enabled?: boolean
+          pixel_enabled?: boolean
+          pixel_id?: string | null
+          platform?: Database["public"]["Enums"]["ads_platform"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ads_metrics: {
+        Row: {
+          campaign_id: string | null
+          campaign_name: string | null
+          clicks: number
+          conversion_value: number
+          conversions: number
+          created_at: string
+          id: string
+          impressions: number
+          metric_date: string
+          platform: Database["public"]["Enums"]["ads_platform"]
+          raw: Json | null
+          spend: number
+        }
+        Insert: {
+          campaign_id?: string | null
+          campaign_name?: string | null
+          clicks?: number
+          conversion_value?: number
+          conversions?: number
+          created_at?: string
+          id?: string
+          impressions?: number
+          metric_date: string
+          platform: Database["public"]["Enums"]["ads_platform"]
+          raw?: Json | null
+          spend?: number
+        }
+        Update: {
+          campaign_id?: string | null
+          campaign_name?: string | null
+          clicks?: number
+          conversion_value?: number
+          conversions?: number
+          created_at?: string
+          id?: string
+          impressions?: number
+          metric_date?: string
+          platform?: Database["public"]["Enums"]["ads_platform"]
+          raw?: Json | null
+          spend?: number
+        }
+        Relationships: []
+      }
       ai_credentials: {
         Row: {
           api_key: string | null
@@ -2687,6 +2846,42 @@ export type Database = {
       }
     }
     Views: {
+      ads_pixels_public: {
+        Row: {
+          account_id: string | null
+          config: Json | null
+          conversion_id: string | null
+          conversion_label: string | null
+          display_name: string | null
+          domain_verification_id: string | null
+          measurement_id: string | null
+          pixel_id: string | null
+          platform: Database["public"]["Enums"]["ads_platform"] | null
+        }
+        Insert: {
+          account_id?: string | null
+          config?: Json | null
+          conversion_id?: string | null
+          conversion_label?: string | null
+          display_name?: string | null
+          domain_verification_id?: string | null
+          measurement_id?: string | null
+          pixel_id?: string | null
+          platform?: Database["public"]["Enums"]["ads_platform"] | null
+        }
+        Update: {
+          account_id?: string | null
+          config?: Json | null
+          conversion_id?: string | null
+          conversion_label?: string | null
+          display_name?: string | null
+          domain_verification_id?: string | null
+          measurement_id?: string | null
+          pixel_id?: string | null
+          platform?: Database["public"]["Enums"]["ads_platform"] | null
+        }
+        Relationships: []
+      }
       coupons_public: {
         Row: {
           code: string | null
@@ -2907,6 +3102,18 @@ export type Database = {
       }
     }
     Enums: {
+      ads_platform:
+        | "meta"
+        | "google_ads"
+        | "ga4"
+        | "tiktok"
+        | "kwai"
+        | "pinterest"
+        | "awin"
+        | "hotmart"
+        | "eduzz"
+        | "shopee_ads"
+        | "mercado_livre_ads"
       app_role: "admin" | "editor" | "support"
     }
     CompositeTypes: {
@@ -3035,6 +3242,19 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      ads_platform: [
+        "meta",
+        "google_ads",
+        "ga4",
+        "tiktok",
+        "kwai",
+        "pinterest",
+        "awin",
+        "hotmart",
+        "eduzz",
+        "shopee_ads",
+        "mercado_livre_ads",
+      ],
       app_role: ["admin", "editor", "support"],
     },
   },
