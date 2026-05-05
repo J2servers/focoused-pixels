@@ -66,18 +66,18 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Auth: accept service role key via Authorization header OR legacy x-cron-secret
+    // Auth: ONLY service-role bearer OR a private CRON_SECRET header.
+    // The public anon key and hardcoded literals are explicitly rejected.
     const authHeader = req.headers.get("Authorization");
     const bearerToken = authHeader?.replace("Bearer ", "").trim();
-    const cronSecret = Deno.env.get("ABANDONED_CART_CRON_SECRET");
-    const incomingCronSecret = req.headers.get("x-cron-secret");
+    const cronSecret =
+      Deno.env.get("CRON_SECRET") ?? Deno.env.get("ABANDONED_CART_CRON_SECRET") ?? "";
+    const incomingCronSecret = req.headers.get("x-cron-secret") ?? "";
 
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-    const isServiceRole = bearerToken === serviceRoleKey;
-    const isAnon = bearerToken === anonKey;
-    const isCronAuth = (cronSecret && incomingCronSecret === cronSecret) || incomingCronSecret === "internal_cron_call";
+    const isServiceRole = !!bearerToken && bearerToken === serviceRoleKey;
+    const isCronAuth = !!cronSecret && incomingCronSecret === cronSecret;
 
-    if (!isServiceRole && !isAnon && !isCronAuth) {
+    if (!isServiceRole && !isCronAuth) {
       return new Response(
         JSON.stringify({ success: false, error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },

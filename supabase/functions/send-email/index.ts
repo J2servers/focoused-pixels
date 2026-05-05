@@ -5,6 +5,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
+import { authorizeAdminOrService } from "../_shared/edge-auth.ts";
 
 interface EmailRequest {
   action?: "send" | "test_connection" | "send_test_email";
@@ -154,6 +155,14 @@ serve(async (req) => {
   const corsHeaders = buildCorsHeaders(req);
   const __pre = handlePreflight(req);
   if (__pre) return __pre;
+
+  const authCtx = await authorizeAdminOrService(req);
+  if (!authCtx.ok) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Unauthorized" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
 
   try {
     const request = await req.json() as EmailRequest;

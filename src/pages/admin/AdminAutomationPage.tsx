@@ -74,7 +74,6 @@ export default function AdminAutomationPage() {
     try {
       const { data, error } = await supabase.functions.invoke(name, {
         body: {},
-        headers: { 'x-cron-secret': 'internal_cron_call' },
       });
       if (error) throw error;
       toast.success(`Executado: ${name}`, { description: JSON.stringify(data?.metrics ?? data) });

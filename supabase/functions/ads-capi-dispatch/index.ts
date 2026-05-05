@@ -2,6 +2,8 @@
 // Meta, TikTok, Pinterest, Kwai e GA4 Measurement Protocol.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
+import { authorizeAdminOrService } from '../_shared/edge-auth.ts';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -159,6 +161,28 @@ Deno.serve(async (req) => {
     }
 
     const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
+    // Authorization: service-role / admin user OR (for browser checkout flow) the
+    // event must reference a real order_id that exists in the database. This
+    // prevents anonymous attackers from injecting arbitrary fake conversions.
+    const authCtx = await authorizeAdminOrService(req);
+    if (!authCtx.ok) {
+      if (!payload.order_id) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      const { data: order } = await sb.from('orders')
+        .select('id, total, customer_email')
+        .eq('id', payload.order_id)
+        .maybeSingle();
+      if (!order) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      // Force value/currency to the trusted DB value to prevent inflation attacks.
+      payload.value = Number(order.total ?? payload.value ?? 0);
+    }
+
     const { data: integrations } = await sb.from('ads_integrations')
       .select('platform, pixel_id, account_id, measurement_id, capi_token_secret_name, config')
       .eq('enabled', true).eq('capi_enabled', true);
