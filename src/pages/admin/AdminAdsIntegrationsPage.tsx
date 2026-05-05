@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Megaphone, Save, Loader2, KeyRound } from 'lucide-react';
-import AdminLayout from '@/components/admin/AdminLayout';
+import { AdminLayout } from '@/components/admin/AdminLayout';
 
 type Platform =
   | 'meta' | 'google_ads' | 'ga4' | 'tiktok' | 'kwai' | 'pinterest'

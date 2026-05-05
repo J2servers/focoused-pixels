@@ -71,6 +71,7 @@ const AdminCashFlowPage = lazy(() => import("./pages/admin/AdminCashFlowPage"));
 const AdminRawMaterialsPage = lazy(() => import("./pages/admin/AdminRawMaterialsPage"));
 const AdminLoginCustomizePage = lazy(() => import("./pages/admin/AdminLoginCustomizePage"));
 const AdminSeoAuditPage = lazy(() => import("./pages/admin/AdminSeoAuditPage"));
+const AdminAdsIntegrationsPage = lazy(() => import("./pages/admin/AdminAdsIntegrationsPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -224,6 +225,7 @@ const App = () => (
                 <Route path="/admin/materiais" element={<ProtectedAdminRoute><AdminRawMaterialsPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/login-config" element={<ProtectedAdminRoute requireAdmin><AdminLoginCustomizePage /></ProtectedAdminRoute>} />
                 <Route path="/admin/seo-audit" element={<ProtectedAdminRoute requireAdmin><AdminSeoAuditPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/ads" element={<ProtectedAdminRoute requireAdmin><AdminAdsIntegrationsPage /></ProtectedAdminRoute>} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>

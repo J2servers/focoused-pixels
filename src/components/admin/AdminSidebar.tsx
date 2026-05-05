@@ -40,6 +40,7 @@ const MENU_GROUPS: MenuGroup[] = [
     { title: 'Banner Hero', url: '/admin/hero', icon: Image },
     { title: 'Leads', url: '/admin/leads', icon: UserPlus },
     { title: 'Avaliações', url: '/admin/avaliacoes', icon: Star },
+    { title: 'Tráfego Pago (Pixels & CAPI)', url: '/admin/ads', icon: Megaphone, adminOnly: true },
   ]},
   { label: 'Comunicação', icon: MessageSquare, color: 'text-green-400', items: [
     { title: 'Templates', url: '/admin/templates', icon: Mail },
