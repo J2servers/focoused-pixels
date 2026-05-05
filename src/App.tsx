@@ -216,6 +216,7 @@ const App = () => (
                 <Route path="/admin/pagina-por-que-escolher" element={<ProtectedAdminRoute><AdminWhyChooseUsPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/workflows" element={<ProtectedAdminRoute><AdminWorkflowsPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/automacoes" element={<ProtectedAdminRoute requireAdmin><AdminAutomationPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/monitoramento" element={<ProtectedAdminRoute requireAdmin><AdminMonitoringPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/caixa" element={<ProtectedAdminRoute><AdminCashFlowPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/materiais" element={<ProtectedAdminRoute><AdminRawMaterialsPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/login-config" element={<ProtectedAdminRoute requireAdmin><AdminLoginCustomizePage /></ProtectedAdminRoute>} />
