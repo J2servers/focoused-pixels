@@ -80,7 +80,7 @@ async function flushMetrics(): Promise<void> {
         url: window.location.pathname,
         user_agent: navigator.userAgent.slice(0, 500),
         device_type: deviceType(),
-        context: m.context ?? {},
+        context: (m.context ?? {}) as never,
       })),
     );
   } catch {
