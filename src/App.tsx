@@ -69,6 +69,7 @@ const AdminMonitoringPage = lazy(() => import("./pages/admin/AdminMonitoringPage
 const AdminCashFlowPage = lazy(() => import("./pages/admin/AdminCashFlowPage"));
 const AdminRawMaterialsPage = lazy(() => import("./pages/admin/AdminRawMaterialsPage"));
 const AdminLoginCustomizePage = lazy(() => import("./pages/admin/AdminLoginCustomizePage"));
+const AdminSeoAuditPage = lazy(() => import("./pages/admin/AdminSeoAuditPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
