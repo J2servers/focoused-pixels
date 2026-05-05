@@ -240,7 +240,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, reminderHours, cutoffIso, summary }),
+      JSON.stringify({ success: true, cutoffIso: cutoff2h, summary }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {

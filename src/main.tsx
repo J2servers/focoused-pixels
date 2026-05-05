@@ -2,6 +2,8 @@ import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
+import { initMonitoring } from "./lib/monitoring";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // One-time PII migration: purge legacy plaintext localStorage keys (Wave 4)
 try {
@@ -13,8 +15,12 @@ try {
   }
 } catch { /* ignore */ }
 
+initMonitoring();
+
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </HelmetProvider>
 );

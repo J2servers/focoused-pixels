@@ -65,6 +65,7 @@ const AdminMediaPage = lazy(() => import("./pages/admin/AdminMediaPage"));
 const AdminWhyChooseUsPage = lazy(() => import("./pages/admin/AdminWhyChooseUsPage"));
 const AdminWorkflowsPage = lazy(() => import("./pages/admin/AdminWorkflowsPage"));
 const AdminAutomationPage = lazy(() => import("./pages/admin/AdminAutomationPage"));
+const AdminMonitoringPage = lazy(() => import("./pages/admin/AdminMonitoringPage"));
 const AdminCashFlowPage = lazy(() => import("./pages/admin/AdminCashFlowPage"));
 const AdminRawMaterialsPage = lazy(() => import("./pages/admin/AdminRawMaterialsPage"));
 const AdminLoginCustomizePage = lazy(() => import("./pages/admin/AdminLoginCustomizePage"));
@@ -215,6 +216,7 @@ const App = () => (
                 <Route path="/admin/pagina-por-que-escolher" element={<ProtectedAdminRoute><AdminWhyChooseUsPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/workflows" element={<ProtectedAdminRoute><AdminWorkflowsPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/automacoes" element={<ProtectedAdminRoute requireAdmin><AdminAutomationPage /></ProtectedAdminRoute>} />
+                <Route path="/admin/monitoramento" element={<ProtectedAdminRoute requireAdmin><AdminMonitoringPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/caixa" element={<ProtectedAdminRoute><AdminCashFlowPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/materiais" element={<ProtectedAdminRoute><AdminRawMaterialsPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/login-config" element={<ProtectedAdminRoute requireAdmin><AdminLoginCustomizePage /></ProtectedAdminRoute>} />
