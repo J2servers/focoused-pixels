@@ -128,34 +128,14 @@ Deno.serve(async (req: Request) => {
       return DENY();
     }
 
-    // 3. CHECK USER EXISTS + HAS ADMIN ROLE
-    const { data: users, error: userError } = await supabase.auth.admin.listUsers();
-    if (userError) {
-      log.error('Auth lookup error:', userError);
-      return DENY();
-    }
+    // 3. CHECK USER EXISTS + HAS ADMIN/EDITOR ROLE (direct SQL — não paginado)
+    const { data: hasAccess, error: rpcError } = await supabase.rpc(
+      'check_admin_email_access',
+      { _email: parsed.data.email }
+    );
 
-    const user = users.users.find(u => u.email === parsed.data.email);
-    if (!user) {
-      // Log failed attempt - user doesn't exist
-      await supabase.from('login_attempts').insert({
-        ip_hash: ipHash,
-        email_hash: emailHash,
-        success: false,
-        user_agent_hash: userAgentHash,
-      });
-      // Constant-time delay to prevent timing attacks
-      await new Promise(r => setTimeout(r, 200 + Math.random() * 300));
-      return DENY();
-    }
-
-    // 4. CHECK ROLE (user may have multiple roles - check if ANY is allowed)
-    const { data: roleRows, error: roleError } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
-
-    if (roleError || !roleRows || roleRows.length === 0) {
+    if (rpcError) {
+      log.error('Admin access check error:', rpcError);
       await supabase.from('login_attempts').insert({
         ip_hash: ipHash,
         email_hash: emailHash,
@@ -166,8 +146,7 @@ Deno.serve(async (req: Request) => {
       return DENY();
     }
 
-    const allowedRoles = ['admin', 'editor'];
-    const isAllowed = roleRows.some((r: { role: string }) => allowedRoles.includes(r.role));
+    const isAllowed = hasAccess === true;
 
     // Log attempt
     await supabase.from('login_attempts').insert({
