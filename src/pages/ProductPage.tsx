@@ -58,7 +58,7 @@ const ProductPage = () => {
 
   const seo = buildProductSeo({
     name: product.name,
-    shortDescription: product.shortDescription,
+    shortDescription: product.description,
     fullDescription: product.description,
     price: product.price,
     promotionalPrice: product.originalPrice && product.originalPrice > product.price ? product.price : null,
