@@ -42,7 +42,6 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/
-Disallow: /gateway-x7k9m2
 Disallow: /carrinho
 Disallow: /checkout
 Disallow: /pagamento
