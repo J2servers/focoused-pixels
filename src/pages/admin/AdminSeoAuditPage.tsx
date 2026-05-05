@@ -111,9 +111,21 @@ export default function AdminSeoAuditPage() {
               </Button>
             ))}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button onClick={load} disabled={loading} className={cn(BTN.view, 'gap-2')}>
               <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} /> Atualizar
+            </Button>
+            <Button
+              onClick={async () => {
+                toast.info('Regenerando sitemap...');
+                const { data, error } = await supabase.functions.invoke('sitemap-generator');
+                if (error) { toast.error(`Falha: ${error.message}`); return; }
+                const r = data as { url_count?: number; product_count?: number; category_count?: number };
+                toast.success(`Sitemap regenerado: ${r.url_count} URLs (${r.product_count} produtos, ${r.category_count} categorias)`);
+              }}
+              className={cn(BTN.view, 'gap-2')}
+            >
+              <RefreshCw className="w-4 h-4" /> Regenerar Sitemap
             </Button>
             <Button onClick={runAudit} disabled={running} className={cn(BTN.create, 'gap-2')}>
               <Search className={cn('w-4 h-4', running && 'animate-pulse')} />
