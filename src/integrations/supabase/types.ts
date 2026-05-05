@@ -812,7 +812,6 @@ export type Database = {
       }
       company_info_public: {
         Row: {
-          abandoned_cart_reminder_hours: number | null
           accent_color: string | null
           address: string | null
           ai_assistant_avatar: string | null
@@ -832,14 +831,10 @@ export type Database = {
           enable_compare_products: boolean | null
           enable_coupon_codes: boolean | null
           enable_guest_checkout: boolean | null
-          enable_order_notifications: boolean | null
           enable_reviews_auto_approve: boolean | null
-          enable_stock_alerts: boolean | null
           enable_wishlist: boolean | null
-          express_shipping_multiplier: number | null
           facebook_pixel_id: string | null
           favicon_url: string | null
-          fixed_shipping_value: number | null
           footer_logo: string | null
           footer_logo_height: number | null
           free_shipping_message: string | null
@@ -851,16 +846,11 @@ export type Database = {
           header_logo_mobile_height: number | null
           id: string
           installments: number | null
-          lgpd_contact_email: string | null
           logo_header_size: number | null
           logo_mobile_size: number | null
           logo_sidebar_size: number | null
-          low_stock_threshold: number | null
           maintenance_message: string | null
           maintenance_mode: boolean | null
-          max_order_value: number | null
-          min_order_value: number | null
-          notification_email: string | null
           og_image: string | null
           phone: string | null
           primary_color: string | null
@@ -878,8 +868,6 @@ export type Database = {
           seo_description: string | null
           seo_keywords: string | null
           seo_title: string | null
-          shipping_calculation_method: string | null
-          shipping_origin_cep: string | null
           show_product_ratings: boolean | null
           show_product_stock: boolean | null
           show_recently_viewed: boolean | null
@@ -899,7 +887,6 @@ export type Database = {
           why_choose_us_config: Json | null
         }
         Insert: {
-          abandoned_cart_reminder_hours?: number | null
           accent_color?: string | null
           address?: string | null
           ai_assistant_avatar?: string | null
@@ -919,14 +906,10 @@ export type Database = {
           enable_compare_products?: boolean | null
           enable_coupon_codes?: boolean | null
           enable_guest_checkout?: boolean | null
-          enable_order_notifications?: boolean | null
           enable_reviews_auto_approve?: boolean | null
-          enable_stock_alerts?: boolean | null
           enable_wishlist?: boolean | null
-          express_shipping_multiplier?: number | null
           facebook_pixel_id?: string | null
           favicon_url?: string | null
-          fixed_shipping_value?: number | null
           footer_logo?: string | null
           footer_logo_height?: number | null
           free_shipping_message?: string | null
@@ -938,16 +921,11 @@ export type Database = {
           header_logo_mobile_height?: number | null
           id: string
           installments?: number | null
-          lgpd_contact_email?: string | null
           logo_header_size?: number | null
           logo_mobile_size?: number | null
           logo_sidebar_size?: number | null
-          low_stock_threshold?: number | null
           maintenance_message?: string | null
           maintenance_mode?: boolean | null
-          max_order_value?: number | null
-          min_order_value?: number | null
-          notification_email?: string | null
           og_image?: string | null
           phone?: string | null
           primary_color?: string | null
@@ -965,8 +943,6 @@ export type Database = {
           seo_description?: string | null
           seo_keywords?: string | null
           seo_title?: string | null
-          shipping_calculation_method?: string | null
-          shipping_origin_cep?: string | null
           show_product_ratings?: boolean | null
           show_product_stock?: boolean | null
           show_recently_viewed?: boolean | null
@@ -986,7 +962,6 @@ export type Database = {
           why_choose_us_config?: Json | null
         }
         Update: {
-          abandoned_cart_reminder_hours?: number | null
           accent_color?: string | null
           address?: string | null
           ai_assistant_avatar?: string | null
@@ -1006,14 +981,10 @@ export type Database = {
           enable_compare_products?: boolean | null
           enable_coupon_codes?: boolean | null
           enable_guest_checkout?: boolean | null
-          enable_order_notifications?: boolean | null
           enable_reviews_auto_approve?: boolean | null
-          enable_stock_alerts?: boolean | null
           enable_wishlist?: boolean | null
-          express_shipping_multiplier?: number | null
           facebook_pixel_id?: string | null
           favicon_url?: string | null
-          fixed_shipping_value?: number | null
           footer_logo?: string | null
           footer_logo_height?: number | null
           free_shipping_message?: string | null
@@ -1025,16 +996,11 @@ export type Database = {
           header_logo_mobile_height?: number | null
           id?: string
           installments?: number | null
-          lgpd_contact_email?: string | null
           logo_header_size?: number | null
           logo_mobile_size?: number | null
           logo_sidebar_size?: number | null
-          low_stock_threshold?: number | null
           maintenance_message?: string | null
           maintenance_mode?: boolean | null
-          max_order_value?: number | null
-          min_order_value?: number | null
-          notification_email?: string | null
           og_image?: string | null
           phone?: string | null
           primary_color?: string | null
@@ -1052,8 +1018,6 @@ export type Database = {
           seo_description?: string | null
           seo_keywords?: string | null
           seo_title?: string | null
-          shipping_calculation_method?: string | null
-          shipping_origin_cep?: string | null
           show_product_ratings?: boolean | null
           show_product_stock?: boolean | null
           show_recently_viewed?: boolean | null
