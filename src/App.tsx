@@ -221,6 +221,7 @@ const App = () => (
                 <Route path="/admin/caixa" element={<ProtectedAdminRoute><AdminCashFlowPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/materiais" element={<ProtectedAdminRoute><AdminRawMaterialsPage /></ProtectedAdminRoute>} />
                 <Route path="/admin/login-config" element={<ProtectedAdminRoute requireAdmin><AdminLoginCustomizePage /></ProtectedAdminRoute>} />
+                <Route path="/admin/seo-audit" element={<ProtectedAdminRoute requireAdmin><AdminSeoAuditPage /></ProtectedAdminRoute>} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
