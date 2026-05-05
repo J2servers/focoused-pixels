@@ -25,7 +25,7 @@ export function useCapiPurchaseEvent(paymentIdOrOrderNumber: string | null) {
 
         if (!order) return;
 
-        const items = Array.isArray(order.items) ? order.items : [];
+        const items = (Array.isArray(order.items) ? order.items : []) as unknown[];
         const contents = items
           .filter((it): it is Record<string, unknown> => typeof it === 'object' && it !== null)
           .map((it) => ({
