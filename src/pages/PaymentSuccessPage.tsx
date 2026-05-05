@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle2, Home, Package, MessageCircle } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
+import { useCapiPurchaseEvent } from '@/hooks/ads/useCapiPurchaseEvent';
 
 const PaymentSuccessPage = () => {
   const { checkoutSuccessMessage, whatsapp } = useSiteSettings();
   const [searchParams] = useSearchParams();
   
-  const paymentId = searchParams.get('payment_id');
+  const paymentId = searchParams.get('payment_id') || searchParams.get('order');
+  useCapiPurchaseEvent(paymentId);
 
   useEffect(() => {
     // Simple celebration animation
