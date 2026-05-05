@@ -11,9 +11,10 @@ export function getServiceClient(): SupabaseClient {
  * Accepts only:
  *  - service-role key bearer token
  *  - x-cron-secret header matching the CRON_SECRET env var
+ *  - bearer token of an authenticated user with admin/editor role
  * Anon key and any hardcoded literals are rejected.
  */
-export function isCronAuthorized(req: Request): boolean {
+export async function isCronAuthorized(req: Request): Promise<boolean> {
   const auth = req.headers.get("Authorization") ?? "";
   const bearer = auth.replace("Bearer ", "").trim();
   const serviceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
@@ -22,6 +23,18 @@ export function isCronAuthorized(req: Request): boolean {
   const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
   const incoming = req.headers.get("x-cron-secret") ?? "";
   if (cronSecret && incoming && incoming === cronSecret) return true;
+
+  // Accept admin user JWT
+  if (bearer) {
+    try {
+      const sb = getServiceClient();
+      const { data, error } = await sb.auth.getUser(bearer);
+      if (!error && data?.user) {
+        const { data: isAdmin } = await sb.rpc("has_admin_access", { _user_id: data.user.id });
+        if (isAdmin === true) return true;
+      }
+    } catch { /* ignore */ }
+  }
 
   return false;
 }
