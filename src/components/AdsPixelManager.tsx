@@ -80,7 +80,7 @@ function injectTikTok(pixelId: string): void {
 function injectPinterest(pixelId: string): void {
   if (window.pintrk) return;
   /* eslint-disable */
-  !function (e: any, t: string) { if (!e.pintrk) { e.pintrk = function () { e.pintrk.queue.push(Array.prototype.slice.call(arguments)); }; const n = e.pintrk; n.queue = []; n.version = '3.0'; const r = document.createElement('script'); r.async = !0; r.src = t; const i = document.getElementsByTagName('script')[0]; i.parentNode?.insertBefore(r, i); } }(window, 'https://s.pinimg.com/ct/core.js');
+  (function (e: any, t: string) { if (!e.pintrk) { e.pintrk = function () { e.pintrk.queue.push(Array.prototype.slice.call(arguments)); }; const n = e.pintrk; n.queue = []; n.version = '3.0'; const r = document.createElement('script'); r.async = !0; r.src = t; const i = document.getElementsByTagName('script')[0]; i.parentNode?.insertBefore(r, i); } })(window, 'https://s.pinimg.com/ct/core.js');
   /* eslint-enable */
   window.pintrk?.('load', pixelId);
   window.pintrk?.('page');
@@ -89,12 +89,12 @@ function injectPinterest(pixelId: string): void {
 function injectKwai(pixelId: string): void {
   if (window.kwaiq) return;
   /* eslint-disable */
-  !function (f: any, b: Document, e: string, v: string) {
+  (function (f: any, b: Document, e: string, v: string) {
     if (f.kwaiq) return; const n: any = f.kwaiq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
     n.push = n; n.loaded = !0; n.version = '1.0'; n.queue = [];
     const t = b.createElement(e) as HTMLScriptElement; t.async = !0; t.src = v;
     const s = b.getElementsByTagName(e)[0]; s.parentNode?.insertBefore(t, s);
-  }(window, document, 'script', 'https://s1.kwai.net/kos/s101/nlav11187/pixel/events.js');
+  })(window, document, 'script', 'https://s1.kwai.net/kos/s101/nlav11187/pixel/events.js');
   /* eslint-enable */
   window.kwaiq?.('init', pixelId);
   window.kwaiq?.('track', 'PageView');
