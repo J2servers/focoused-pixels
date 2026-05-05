@@ -2,6 +2,8 @@
 // Meta, TikTok, Pinterest, Kwai e GA4 Measurement Protocol.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
+import { authorizeAdminOrService } from '../_shared/edge-auth.ts';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',

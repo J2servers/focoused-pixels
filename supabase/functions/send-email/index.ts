@@ -156,6 +156,14 @@ serve(async (req) => {
   const __pre = handlePreflight(req);
   if (__pre) return __pre;
 
+  const authCtx = await authorizeAdminOrService(req);
+  if (!authCtx.ok) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Unauthorized" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
   try {
     const request = await req.json() as EmailRequest;
     const action = request.action ?? "send";
