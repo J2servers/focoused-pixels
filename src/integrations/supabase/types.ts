@@ -2078,6 +2078,45 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_audit_reports: {
+        Row: {
+          created_at: string
+          critical_count: number
+          duration_ms: number | null
+          id: string
+          info_count: number
+          issues: Json
+          summary: Json
+          total_issues: number
+          triggered_by: string | null
+          warning_count: number
+        }
+        Insert: {
+          created_at?: string
+          critical_count?: number
+          duration_ms?: number | null
+          id?: string
+          info_count?: number
+          issues?: Json
+          summary?: Json
+          total_issues?: number
+          triggered_by?: string | null
+          warning_count?: number
+        }
+        Update: {
+          created_at?: string
+          critical_count?: number
+          duration_ms?: number | null
+          id?: string
+          info_count?: number
+          issues?: Json
+          summary?: Json
+          total_issues?: number
+          triggered_by?: string | null
+          warning_count?: number
+        }
+        Relationships: []
+      }
       stock_movements: {
         Row: {
           created_at: string
