@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAbandonedCartTracker } from "@/hooks/useAbandonedCartTracker";
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import { AnalyticsInit } from "@/components/analytics/EventTracker";
+import AdsPixelManager from "@/components/AdsPixelManager";
 
 // Eager-load homepage for fast FCP
 import Index from "./pages/Index";
@@ -162,6 +163,7 @@ const App = () => (
             <RuntimeTrackers />
             <RoutePrefetcher />
             <AnalyticsInit />
+            <AdsPixelManager />
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<Index />} />
