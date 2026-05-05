@@ -1,0 +1,90 @@
+name: Deploy Production
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  release:
+    types: [published]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - id: check
+        run: |
+          bun run lint
+          bun run typecheck
+          bun run test
+          echo "ok=true" >> $GITHUB_OUTPUT
+
+  deploy:
+    needs: guard
+    if: needs.guard.outputs.ok == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Build (production)
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+        run: bun run build
+
+      - name: Deploy Edge Functions (production)
+        if: ${{ secrets.SUPABASE_ACCESS_TOKEN != '' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+        run: |
+          npx supabase@latest functions deploy --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Apply database migrations
+        if: ${{ secrets.SUPABASE_DB_PASSWORD != '' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_REF: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+        run: |
+          npx supabase@latest link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+          npx supabase@latest db push --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Deploy frontend to Hostinger (production via FTP)
+        if: ${{ secrets.PRODUCTION_FTP_HOST != '' }}
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.PRODUCTION_FTP_HOST }}
+          username: ${{ secrets.PRODUCTION_FTP_USER }}
+          password: ${{ secrets.PRODUCTION_FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: ${{ vars.PRODUCTION_FTP_DIR || '/public_html/' }}
+
+      - name: Production smoke test
+        if: ${{ vars.PRODUCTION_URL != '' }}
+        run: |
+          for i in 1 2 3 4 5; do
+            curl -sf "${{ vars.PRODUCTION_URL }}" > /dev/null && exit 0
+            sleep 5
+          done
+          echo "Production smoke test failed" && exit 1
+
+      - name: Notify on failure
+        if: failure()
+        run: echo "::error::Production deploy failed for commit ${{ github.sha }}"
