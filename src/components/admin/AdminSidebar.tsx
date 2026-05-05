@@ -56,6 +56,7 @@ const MENU_GROUPS: MenuGroup[] = [
     { title: 'Usuários', url: '/admin/usuarios', icon: Users, adminOnly: true },
     { title: 'Tela de Login', url: '/admin/login-config', icon: Shield, adminOnly: true },
     { title: 'Logs', url: '/admin/logs', icon: ScrollText, adminOnly: true },
+    { title: 'Monitoramento', url: '/admin/monitoramento', icon: Activity, adminOnly: true },
     { title: 'API', url: '/admin/api', icon: Code2, adminOnly: true },
     { title: 'Configurações', url: '/admin/configuracoes', icon: Settings },
   ]},
