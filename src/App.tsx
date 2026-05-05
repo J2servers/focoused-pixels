@@ -65,6 +65,7 @@ const AdminMediaPage = lazy(() => import("./pages/admin/AdminMediaPage"));
 const AdminWhyChooseUsPage = lazy(() => import("./pages/admin/AdminWhyChooseUsPage"));
 const AdminWorkflowsPage = lazy(() => import("./pages/admin/AdminWorkflowsPage"));
 const AdminAutomationPage = lazy(() => import("./pages/admin/AdminAutomationPage"));
+const AdminMonitoringPage = lazy(() => import("./pages/admin/AdminMonitoringPage"));
 const AdminCashFlowPage = lazy(() => import("./pages/admin/AdminCashFlowPage"));
 const AdminRawMaterialsPage = lazy(() => import("./pages/admin/AdminRawMaterialsPage"));
 const AdminLoginCustomizePage = lazy(() => import("./pages/admin/AdminLoginCustomizePage"));
