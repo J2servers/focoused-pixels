@@ -17,6 +17,7 @@ import { CategoryBanner, SubcategoryChips, ActiveFilterTags } from './category/C
 import { CategoryToolbar, SortOption } from './category/CategoryToolbar';
 import { ProductsGrid } from './category/ProductsGrid';
 import { SuggestedCategories } from './category/SuggestedCategories';
+import { buildCategorySeo } from '@/lib/seo/contentGenerators';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -154,11 +155,23 @@ const CategoryPage = () => {
     );
   }
 
-  const SEO = category && (
+  const seo = category ? buildCategorySeo({
+    name: category.name,
+    description: category.description,
+    productCount: filteredProducts.length,
+    minPrice: priceRange.min,
+    maxPrice: priceRange.max,
+  }) : null;
+
+  const SEO = category && seo && (
     <Helmet>
-      <title>{category.name} | Produtos Personalizados</title>
-      <meta name="description" content={category.description || `Confira todos os produtos da categoria ${category.name}`} />
-      {!isMobile && <link rel="canonical" href={`${window.location.origin}/categoria/${subcategorySlug || categorySlug}`} />}
+      <title>{seo.title}</title>
+      <meta name="description" content={seo.description} />
+      <meta property="og:title" content={seo.title} />
+      <meta property="og:description" content={seo.description} />
+      <meta property="og:type" content="website" />
+      {category.image_url && <meta property="og:image" content={category.image_url} />}
+      <link rel="canonical" href={`${window.location.origin}/categoria/${subcategorySlug || categorySlug}${parentCategory ? '' : ''}`} />
     </Helmet>
   );
 

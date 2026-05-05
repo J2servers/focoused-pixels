@@ -19,6 +19,8 @@ import { FreightCalculator } from '@/components/product/FreightCalculator';
 import { RecentlyViewedBar } from '@/components/product/RecentlyViewedBar';
 import { StickyBuyBar } from '@/components/product/StickyBuyBar';
 import { ProductJsonLd } from '@/components/product/ProductJsonLd';
+import { PageSEO } from '@/components/seo/PageSEO';
+import { buildProductSeo } from '@/lib/seo/contentGenerators';
 import { ProductSectionTabs } from '@/components/product/ProductSectionTabs';
 import { DeliveryEstimate } from '@/components/product/DeliveryEstimate';
 import { FreeShippingBar } from '@/components/cart/FreeShippingBar';
@@ -56,6 +58,25 @@ const ProductPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+  const seo = buildProductSeo({
+    name: product.name,
+    shortDescription: product.shortDescription,
+    fullDescription: product.description,
+    price: product.price,
+    promotionalPrice: product.originalPrice && product.originalPrice > product.price ? product.price : null,
+    categoryName: category?.name,
+    inStock: product.inStock,
+  });
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <PageSEO
+        title={seo.title}
+        description={seo.description}
+        path={`/produto/${product.slug}`}
+        image={product.image}
+        type="product"
+      />
       <ProductJsonLd product={product} category={category ? { name: category.name, slug: category.slug } : null} url={productUrl} />
       <TrustBar />
       <DynamicMainHeader />
