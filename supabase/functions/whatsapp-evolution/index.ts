@@ -4,6 +4,7 @@ const log = createLogger("whatsapp-evolution");
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
+import { authorizeAdminOrService } from "../_shared/edge-auth.ts";
 
 /** Sanitize phone number to 55XXXXXXXXXXX format */
 function sanitizePhone(phone: string): string {
@@ -27,6 +28,14 @@ serve(async (req) => {
   const corsHeaders = buildCorsHeaders(req);
   const __pre = handlePreflight(req);
   if (__pre) return __pre;
+
+  const authCtx = await authorizeAdminOrService(req);
+  if (!authCtx.ok) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Unauthorized" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
 
   try {
     const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");

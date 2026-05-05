@@ -5,6 +5,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer";
 
 import { buildCorsHeaders, handlePreflight } from "../_shared/cors.ts";
+import { authorizeAdminOrService } from "../_shared/edge-auth.ts";
 
 interface EmailRequest {
   action?: "send" | "test_connection" | "send_test_email";
