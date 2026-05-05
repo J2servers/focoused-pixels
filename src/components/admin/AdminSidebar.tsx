@@ -4,7 +4,7 @@ import {
   Settings, Star, LogOut, ChevronLeft, ChevronRight, Sparkles, UserPlus,
   ShoppingCart, Tag, Kanban, Menu, Mail, MessageSquare, Users, ScrollText,
   ImageIcon, Workflow, Code2, ChevronDown, Store, Megaphone,
-  Shield, BarChart3, Zap, Wallet, Boxes, Activity,
+  Shield, BarChart3, Zap, Wallet, Boxes, Activity, Search,
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -57,6 +57,7 @@ const MENU_GROUPS: MenuGroup[] = [
     { title: 'Tela de Login', url: '/admin/login-config', icon: Shield, adminOnly: true },
     { title: 'Logs', url: '/admin/logs', icon: ScrollText, adminOnly: true },
     { title: 'Monitoramento', url: '/admin/monitoramento', icon: Activity, adminOnly: true },
+    { title: 'Auditoria SEO', url: '/admin/seo-audit', icon: Search, adminOnly: true },
     { title: 'API', url: '/admin/api', icon: Code2, adminOnly: true },
     { title: 'Configurações', url: '/admin/configuracoes', icon: Settings },
   ]},
