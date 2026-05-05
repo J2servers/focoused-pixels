@@ -2117,6 +2117,33 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_cache: {
+        Row: {
+          cache_key: string
+          category_count: number
+          content: string
+          generated_at: string
+          product_count: number
+          url_count: number
+        }
+        Insert: {
+          cache_key: string
+          category_count?: number
+          content: string
+          generated_at?: string
+          product_count?: number
+          url_count?: number
+        }
+        Update: {
+          cache_key?: string
+          category_count?: number
+          content?: string
+          generated_at?: string
+          product_count?: number
+          url_count?: number
+        }
+        Relationships: []
+      }
       stock_movements: {
         Row: {
           created_at: string
