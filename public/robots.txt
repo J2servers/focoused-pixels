@@ -1,8 +1,45 @@
+# robots.txt — Pincel de Luz Personalizados
+# https://focoused-pixels.lovable.app
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /gateway-x7k9m2
+Disallow: /carrinho
+Disallow: /checkout
+Disallow: /pagamento
+Disallow: /pagamento/
+Disallow: /minha-conta
+Disallow: /login
+Disallow: /cadastro
+Disallow: /*?*utm_
+Disallow: /*?*fbclid
+Disallow: /*?*gclid
+
+# Bots de IA generativa — bloqueados (conteúdo proprietário)
+User-agent: GPTBot
+Disallow: /
+User-agent: CCBot
+Disallow: /
+User-agent: ClaudeBot
+Disallow: /
+User-agent: anthropic-ai
+Disallow: /
+User-agent: Google-Extended
+Disallow: /
+
+# Search engines principais
 User-agent: Googlebot
 Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /pagamento
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /checkout
 
 User-agent: Twitterbot
 Allow: /
@@ -10,5 +47,4 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+Sitemap: https://focoused-pixels.lovable.app/sitemap.xml
