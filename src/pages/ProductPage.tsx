@@ -56,8 +56,6 @@ const ProductPage = () => {
   const maxInstallments = Math.min(installments, Math.floor(product.price / minInstallmentValue) || 1);
   const productionTime = companyInfo?.production_time || settings.productionTime;
 
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
   const seo = buildProductSeo({
     name: product.name,
     shortDescription: product.shortDescription,
