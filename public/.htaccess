@@ -4,7 +4,14 @@
 
   # Force HTTPS
   RewriteCond %{HTTPS} !=on
+  # Force HTTPS
+  RewriteCond %{HTTPS} !=on
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Dinâmico: sitemap.xml e robots.txt servidos pela edge function (regenerados semanalmente)
+  RewriteRule ^sitemap\.xml$ https://uhjamkueajhzsvcefgtp.supabase.co/functions/v1/sitemap-generator?file=sitemap.xml [L,R=302]
+  RewriteRule ^robots\.txt$ https://uhjamkueajhzsvcefgtp.supabase.co/functions/v1/sitemap-generator?file=robots.txt [L,R=302]
+
 
   # Serve correct MIME types
   AddType application/javascript .js .mjs
