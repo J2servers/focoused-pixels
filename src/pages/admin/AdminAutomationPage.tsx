@@ -8,6 +8,7 @@ import { BTN } from '@/components/admin/AdminButtonStyles';
 import { RefreshCw, Activity, AlertTriangle, CheckCircle2, PlayCircle, Zap, Clock, Bell } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { AlertSettingsCard } from '@/components/admin/automation/AlertSettingsCard';
 
 interface CronRun {
   id: string;
@@ -115,6 +116,8 @@ export default function AdminAutomationPage() {
             <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} /> Atualizar
           </Button>
         </div>
+
+        <AlertSettingsCard />
 
         <section className="rounded-xl liquid-glass p-5 space-y-4">
           <div className="flex items-center gap-2">

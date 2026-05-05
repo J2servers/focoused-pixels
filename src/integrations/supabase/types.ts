@@ -2126,6 +2126,45 @@ export type Database = {
           },
         ]
       }
+      system_alert_settings: {
+        Row: {
+          cooldown_minutes: number
+          created_at: string
+          cron_failure_enabled: boolean
+          id: string
+          last_cron_alert_at: string | null
+          last_pending_alert_at: string | null
+          pending_notification_enabled: boolean
+          pending_threshold_minutes: number
+          recipient_email: string | null
+          updated_at: string
+        }
+        Insert: {
+          cooldown_minutes?: number
+          created_at?: string
+          cron_failure_enabled?: boolean
+          id?: string
+          last_cron_alert_at?: string | null
+          last_pending_alert_at?: string | null
+          pending_notification_enabled?: boolean
+          pending_threshold_minutes?: number
+          recipient_email?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cooldown_minutes?: number
+          created_at?: string
+          cron_failure_enabled?: boolean
+          id?: string
+          last_cron_alert_at?: string | null
+          last_pending_alert_at?: string | null
+          pending_notification_enabled?: boolean
+          pending_threshold_minutes?: number
+          recipient_email?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       system_cron_runs: {
         Row: {
           error: string | null
