@@ -140,7 +140,7 @@ export function AlertSettingsCard() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button onClick={save} disabled={saving} className={cn(BTN.add, 'min-h-[48px]')}>
+        <Button onClick={save} disabled={saving} className={cn(BTN.create, 'min-h-[48px]')}>
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Salvar configurações'}
         </Button>
         <Button onClick={sendTest} disabled={testing} variant="outline" className="min-h-[48px]">
