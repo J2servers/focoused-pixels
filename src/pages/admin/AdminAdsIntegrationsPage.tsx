@@ -94,7 +94,7 @@ export default function AdminAdsIntegrationsPage() {
   };
 
   return (
-    <AdminLayout title="Tráfego Pago" subtitle="Pixels, CAPI, métricas e catálogos">
+    <AdminLayout title="Tráfego Pago">
       <div className="space-y-6 p-4 md:p-6">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30">
