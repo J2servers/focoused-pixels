@@ -24,7 +24,7 @@ function formatBRL(v: number): string {
 serve(async (req) => {
   const corsHeaders = buildCorsHeaders(req);
   const pre = handlePreflight(req); if (pre) return pre;
-  if (!isCronAuthorized(req)) {
+  if (!(await isCronAuthorized(req))) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

@@ -6,7 +6,7 @@ import { auditRun, isCronAuthorized } from "../_shared/cron-auth.ts";
 serve(async (req) => {
   const cors = buildCorsHeaders(req);
   const pre = handlePreflight(req); if (pre) return pre;
-  if (!isCronAuthorized(req)) return new Response("Unauthorized", { status: 401, headers: cors });
+  if (!(await isCronAuthorized(req))) return new Response("Unauthorized", { status: 401, headers: cors });
 
   const result = await auditRun("cron-retry-failed", async (sb) => {
     const { data: failures } = await sb.from("notification_failures")
