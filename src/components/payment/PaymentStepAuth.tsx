@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 import { LogIn, UserPlus, Loader2, Eye, EyeOff, ShieldCheck, Package, History } from 'lucide-react';
 
 interface PaymentStepAuthProps {
