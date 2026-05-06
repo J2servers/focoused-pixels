@@ -96,7 +96,7 @@ const CartPage = () => {
                     key={`${item.id}-${item.size || ''}`}
                     className="flex gap-4 rounded-2xl neu-flat p-5"
                   >
-                    <Link to={`/produto/${item.slug || item.id}`} className="flex-shrink-0">
+                    <Link to={`/produto/${item.id}`} className="flex-shrink-0">
                       <div className="rounded-xl neu-pressed p-1">
                         <img 
                           src={item.image} 
@@ -107,7 +107,7 @@ const CartPage = () => {
                     </Link>
                     <div className="flex-1 min-w-0">
                       <Link 
-                        to={`/produto/${item.slug || item.id}`}
+                        to={`/produto/${item.id}`}
                         className="font-semibold hover:text-primary transition-colors line-clamp-2"
                       >
                         {item.name}

@@ -1,10 +1,11 @@
-import { forwardRef, ButtonHTMLAttributes, ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { forwardRef, ReactNode, MouseEventHandler } from 'react';
+import { motion, HTMLMotionProps } from 'framer-motion';
 
-interface FloatingIconBtnProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
+type FloatingIconBtnProps = Omit<HTMLMotionProps<'button'>, 'children'> & {
   children: ReactNode;
   ariaLabel?: string;
-}
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+};
 
 export const FloatingIconBtn = forwardRef<HTMLButtonElement, FloatingIconBtnProps>(
   ({ children, ariaLabel, onClick, ...rest }, ref) => {
