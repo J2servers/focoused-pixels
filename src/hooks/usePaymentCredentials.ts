@@ -71,10 +71,13 @@ export function usePaymentCredentials() {
         .select('*')
         .order('updated_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        logger.error('paymentCredentials', 'Error fetching payment credentials:', error);
+        logger.warn('paymentCredentials', 'Could not load payment credentials, using defaults:', error.message);
+      }
+
+      if (!data) {
         return { id: '', updated_at: new Date().toISOString(), ...defaultPaymentCredentials } as PaymentCredentials;
       }
 

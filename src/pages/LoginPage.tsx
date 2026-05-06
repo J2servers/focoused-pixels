@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { AnimatePresence } from 'framer-motion';
+
 import { Loader2, User, ShoppingBag, Mail } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -39,7 +39,12 @@ const LoginPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [formMode, setFormMode] = useState<'login' | 'signup' | 'reset'>('login');
+  const [searchParams] = useSearchParams();
+  const initialMode = (() => {
+    const m = searchParams.get('mode');
+    return m === 'signup' || m === 'reset' ? m : 'login';
+  })();
+  const [formMode, setFormMode] = useState<'login' | 'signup' | 'reset'>(initialMode);
 
   const loginForm = useForm<LoginFormData>({ resolver: zodResolver(loginSchema), defaultValues: { email: '', password: '' } });
   const signupForm = useForm<SignupFormData>({ resolver: zodResolver(signupSchema), defaultValues: { fullName: '', email: '', password: '', confirmPassword: '', acceptTerms: false } });
@@ -113,43 +118,41 @@ const LoginPage = () => {
         </div>
         <div className="flex-1 flex items-center justify-center p-6 sm:p-8">
           <div className="w-full max-w-md">
-            <AnimatePresence mode="wait">
-              <Card className="border-0 shadow-xl shadow-primary/5">
-                <CardHeader className="text-center space-y-2 pb-4">
-                  <div className="lg:hidden mx-auto mb-2">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/30">
-                      {formMode === 'login' && <User className="h-7 w-7 text-primary-foreground" />}
-                      {formMode === 'signup' && <ShoppingBag className="h-7 w-7 text-primary-foreground" />}
-                      {formMode === 'reset' && <Mail className="h-7 w-7 text-primary-foreground" />}
-                    </div>
+            <Card className="border-0 shadow-xl shadow-primary/5">
+              <CardHeader className="text-center space-y-2 pb-4">
+                <div className="lg:hidden mx-auto mb-2">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/30">
+                    {formMode === 'login' && <User className="h-7 w-7 text-primary-foreground" />}
+                    {formMode === 'signup' && <ShoppingBag className="h-7 w-7 text-primary-foreground" />}
+                    {formMode === 'reset' && <Mail className="h-7 w-7 text-primary-foreground" />}
                   </div>
-                  <CardTitle className="text-2xl font-bold">
-                    {formMode === 'login' && 'Entrar na sua conta'}
-                    {formMode === 'signup' && 'Criar sua conta'}
-                    {formMode === 'reset' && 'Recuperar senha'}
-                  </CardTitle>
-                  <CardDescription>
-                    {formMode === 'login' && 'Bem-vindo de volta!'}
-                    {formMode === 'signup' && 'Preencha os dados para começar.'}
-                    {formMode === 'reset' && 'Digite seu email para recuperar.'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <LoginFormPanel
-                    formMode={formMode} switchMode={switchMode}
-                    loginForm={loginForm} signupForm={signupForm} resetForm={resetForm}
-                    onLogin={onLogin} onSignup={onSignup} onReset={onReset}
-                    onGoogleLogin={handleGoogleLogin}
-                    isSubmitting={isSubmitting} isGoogleLoading={isGoogleLoading}
-                    showPassword={showPassword} setShowPassword={setShowPassword}
-                    showConfirmPassword={showConfirmPassword} setShowConfirmPassword={setShowConfirmPassword}
-                  />
-                </CardContent>
-              </Card>
-              <div className="mt-6 text-center text-sm text-muted-foreground">
-                <Link to="/" className="hover:text-primary transition-colors">← Voltar para a loja</Link>
-              </div>
-            </AnimatePresence>
+                </div>
+                <CardTitle className="text-2xl font-bold">
+                  {formMode === 'login' && 'Entrar na sua conta'}
+                  {formMode === 'signup' && 'Criar sua conta'}
+                  {formMode === 'reset' && 'Recuperar senha'}
+                </CardTitle>
+                <CardDescription>
+                  {formMode === 'login' && 'Bem-vindo de volta!'}
+                  {formMode === 'signup' && 'Preencha os dados para começar.'}
+                  {formMode === 'reset' && 'Digite seu email para recuperar.'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <LoginFormPanel
+                  formMode={formMode} switchMode={switchMode}
+                  loginForm={loginForm} signupForm={signupForm} resetForm={resetForm}
+                  onLogin={onLogin} onSignup={onSignup} onReset={onReset}
+                  onGoogleLogin={handleGoogleLogin}
+                  isSubmitting={isSubmitting} isGoogleLoading={isGoogleLoading}
+                  showPassword={showPassword} setShowPassword={setShowPassword}
+                  showConfirmPassword={showConfirmPassword} setShowConfirmPassword={setShowConfirmPassword}
+                />
+              </CardContent>
+            </Card>
+            <div className="mt-6 text-center text-sm text-muted-foreground">
+              <Link to="/" className="hover:text-primary transition-colors">← Voltar para a loja</Link>
+            </div>
           </div>
         </div>
       </div>
