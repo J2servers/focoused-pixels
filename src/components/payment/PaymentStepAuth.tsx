@@ -128,13 +128,19 @@ export function PaymentStepAuth({ onAuthenticated, isAuthenticated, userEmail }:
   };
 
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/pagamento`,
-      },
-    });
-    if (error) toast.error('Erro ao conectar com Google');
+    try {
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: `${window.location.origin}/pagamento`,
+      });
+      if (result.error) {
+        toast.error('Erro ao conectar com Google');
+        return;
+      }
+      if (result.redirected) return;
+      onAuthenticated();
+    } catch {
+      toast.error('Erro ao conectar com Google');
+    }
   };
 
   return (
