@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 import { LogIn, UserPlus, Loader2, Eye, EyeOff, ShieldCheck, Package, History } from 'lucide-react';
 
 interface PaymentStepAuthProps {
@@ -127,13 +128,19 @@ export function PaymentStepAuth({ onAuthenticated, isAuthenticated, userEmail }:
   };
 
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/pagamento`,
-      },
-    });
-    if (error) toast.error('Erro ao conectar com Google');
+    try {
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: `${window.location.origin}/pagamento`,
+      });
+      if (result.error) {
+        toast.error('Erro ao conectar com Google');
+        return;
+      }
+      if (result.redirected) return;
+      onAuthenticated();
+    } catch {
+      toast.error('Erro ao conectar com Google');
+    }
   };
 
   return (
