@@ -57,7 +57,7 @@ const AdminLoginPage = () => {
       .from('login_page_settings' as never)
       .select('*')
       .limit(1)
-      .single()
+      .maybeSingle()
       .then(({ data }) => {
         if (data) setLoginSettings(data as LoginSettings);
       });

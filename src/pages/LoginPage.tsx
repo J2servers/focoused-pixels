@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -39,7 +39,12 @@ const LoginPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [formMode, setFormMode] = useState<'login' | 'signup' | 'reset'>('login');
+  const [searchParams] = useSearchParams();
+  const initialMode = (() => {
+    const m = searchParams.get('mode');
+    return m === 'signup' || m === 'reset' ? m : 'login';
+  })();
+  const [formMode, setFormMode] = useState<'login' | 'signup' | 'reset'>(initialMode);
 
   const loginForm = useForm<LoginFormData>({ resolver: zodResolver(loginSchema), defaultValues: { email: '', password: '' } });
   const signupForm = useForm<SignupFormData>({ resolver: zodResolver(signupSchema), defaultValues: { fullName: '', email: '', password: '', confirmPassword: '', acceptTerms: false } });
