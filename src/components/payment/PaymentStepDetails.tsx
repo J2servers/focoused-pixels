@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, Truck } from 'lucide-react';
 import { AddressFormCard } from './details/AddressFormCard';
@@ -8,6 +9,7 @@ import { useFreightCalculator } from './details/useFreightCalculator';
 import { useFileUpload } from './details/useFileUpload';
 import { CustomerFormData, FreightOption, UploadedFile } from './details/types';
 import { isValidCpf } from '@/lib/cpf';
+import { captureLead } from '@/lib/leadCapture';
 
 interface PaymentStepDetailsProps {
   customerForm: CustomerFormData;
