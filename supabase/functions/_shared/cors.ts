@@ -6,6 +6,8 @@ const DEFAULT_ALLOWED = [
   "https://focoused-pixels.lovable.app",
   "https://id-preview--56f7641d-9f03-4582-9895-63f996c0d8f6.lovable.app",
   "https://lovable.app",
+  "https://pinceldeluz.store",
+  "https://www.pinceldeluz.store",
   "http://localhost:5173",
   "http://localhost:3000",
   "http://localhost:8080",
