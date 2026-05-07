@@ -64,7 +64,14 @@ export function PaymentStepAuth({ onAuthenticated, isAuthenticated, userEmail }:
 
     setIsLoading(true);
 
-    try {
+    // Captura imediata: garante lead mesmo se signup falhar
+    void captureLead({
+      name: fullName,
+      email: trimmedEmail,
+      source: 'checkout_auth',
+      tags: ['checkout', mode === 'register' ? 'signup_attempt' : 'login_attempt'],
+    });
+
       if (mode === 'register') {
         if (!fullName.trim()) {
           toast.error('Informe seu nome completo');
