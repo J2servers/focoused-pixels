@@ -6,7 +6,9 @@ import {
   ABANDONED_CONTACT_UPDATED_EVENT,
   getAbandonedCartContact,
   getOrCreateAbandonedCartToken,
+  saveAbandonedCartContact,
 } from '@/lib/abandoned-cart';
+import { captureLead } from '@/lib/leadCapture';
 
 const SYNC_DEBOUNCE_MS = 1200;
 
