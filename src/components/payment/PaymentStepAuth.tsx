@@ -72,6 +72,7 @@ export function PaymentStepAuth({ onAuthenticated, isAuthenticated, userEmail }:
       tags: ['checkout', mode === 'register' ? 'signup_attempt' : 'login_attempt'],
     });
 
+    try {
       if (mode === 'register') {
         if (!fullName.trim()) {
           toast.error('Informe seu nome completo');
