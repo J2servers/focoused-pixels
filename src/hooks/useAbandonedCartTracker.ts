@@ -123,7 +123,7 @@ export function useAbandonedCartTracker() {
       });
 
       if (error) {
-        disabledRef.current = true;
+        // Não desabilita permanentemente: tenta de novo na próxima mudança
         return;
       }
 
