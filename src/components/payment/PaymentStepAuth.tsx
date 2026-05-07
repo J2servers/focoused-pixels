@@ -137,6 +137,8 @@ export function PaymentStepAuth({ onAuthenticated, isAuthenticated, userEmail }:
   };
 
   const handleGoogleLogin = async () => {
+    // Captura email parcial se já preenchido
+    if (email) void captureLead({ email, name: fullName, source: 'checkout_google', tags: ['checkout', 'google_oauth'] });
     try {
       const result = await lovable.auth.signInWithOAuth('google', {
         redirect_uri: `${window.location.origin}/pagamento`,
