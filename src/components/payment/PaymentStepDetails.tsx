@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, Truck } from 'lucide-react';
 import { AddressFormCard } from './details/AddressFormCard';
@@ -8,6 +9,7 @@ import { useFreightCalculator } from './details/useFreightCalculator';
 import { useFileUpload } from './details/useFileUpload';
 import { CustomerFormData, FreightOption, UploadedFile } from './details/types';
 import { isValidCpf } from '@/lib/cpf';
+import { captureLead } from '@/lib/leadCapture';
 
 interface PaymentStepDetailsProps {
   customerForm: CustomerFormData;
@@ -35,6 +37,18 @@ export function PaymentStepDetails({
   } = useFreightCalculator({ customerForm, setCustomerForm, amount, shippingCost, cartWeight });
 
   const { isUploading, handleFileUpload, removeFile } = useFileUpload(setUploadedFiles);
+
+  // Captura de lead resiliente: a cada mudança em nome/email/phone, persiste após 800ms
+  useEffect(() => {
+    const name = customerForm.name?.trim();
+    const email = customerForm.email?.trim();
+    const phone = customerForm.phone?.trim();
+    if (!name && !email && !phone) return;
+    const t = setTimeout(() => {
+      void captureLead({ name, email, phone, source: 'checkout_details', tags: ['checkout', 'details_form'] });
+    }, 800);
+    return () => clearTimeout(t);
+  }, [customerForm.name, customerForm.email, customerForm.phone]);
 
   const handleSelectFreight = (option: FreightOption) => {
     setSelectedMethod(option.method);

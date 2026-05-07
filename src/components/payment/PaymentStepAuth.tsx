@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
+import { captureLead } from '@/lib/leadCapture';
 import { LogIn, UserPlus, Loader2, Eye, EyeOff, ShieldCheck, Package, History } from 'lucide-react';
 
 interface PaymentStepAuthProps {
@@ -62,6 +63,14 @@ export function PaymentStepAuth({ onAuthenticated, isAuthenticated, userEmail }:
     }
 
     setIsLoading(true);
+
+    // Captura imediata: garante lead mesmo se signup falhar
+    void captureLead({
+      name: fullName,
+      email: trimmedEmail,
+      source: 'checkout_auth',
+      tags: ['checkout', mode === 'register' ? 'signup_attempt' : 'login_attempt'],
+    });
 
     try {
       if (mode === 'register') {
@@ -128,6 +137,8 @@ export function PaymentStepAuth({ onAuthenticated, isAuthenticated, userEmail }:
   };
 
   const handleGoogleLogin = async () => {
+    // Captura email parcial se já preenchido
+    if (email) void captureLead({ email, name: fullName, source: 'checkout_google', tags: ['checkout', 'google_oauth'] });
     try {
       const result = await lovable.auth.signInWithOAuth('google', {
         redirect_uri: `${window.location.origin}/pagamento`,

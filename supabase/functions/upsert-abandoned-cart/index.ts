@@ -108,23 +108,29 @@ serve(async (req) => {
       capturedAt: new Date().toISOString(),
     };
 
+    const newName = sanitizeText(customer.name, 140);
+    const newEmail = normalizeEmail(customer.email);
+    const newPhone = normalizePhone(customer.phone);
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
+
+    // Busca registro existente para preservar contato (nunca sobrescrever com null)
+    const { data: existing } = await supabase
+      .from("abandoned_cart_sessions")
+      .select("user_name, user_email, user_phone")
+      .eq("session_id", sessionId)
+      .maybeSingle();
+
     const payload: Record<string, unknown> = {
       session_id: sessionId,
-      user_name: sanitizeText(customer.name, 140),
-      user_email: normalizeEmail(customer.email),
-      user_phone: normalizePhone(customer.phone),
-      cart_items: items,
-      cart_total: cartTotal,
+      user_name: newName ?? existing?.user_name ?? null,
+      user_email: newEmail ?? existing?.user_email ?? null,
+      user_phone: newPhone ?? existing?.user_phone ?? null,
+      cart_items: hasCart ? items : [],
+      cart_total: hasCart ? cartTotal : 0,
       last_activity_at: new Date().toISOString(),
       browser_metadata: browserMeta,
     };
-
-    if (!hasCart) {
-      payload.cart_total = 0;
-      payload.cart_items = [];
-    }
-
-    const supabase = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
 
     const { error } = await supabase
       .from("abandoned_cart_sessions")

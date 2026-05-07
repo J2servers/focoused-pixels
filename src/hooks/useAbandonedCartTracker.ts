@@ -6,7 +6,9 @@ import {
   ABANDONED_CONTACT_UPDATED_EVENT,
   getAbandonedCartContact,
   getOrCreateAbandonedCartToken,
+  saveAbandonedCartContact,
 } from '@/lib/abandoned-cart';
+import { captureLead } from '@/lib/leadCapture';
 
 const SYNC_DEBOUNCE_MS = 1200;
 
@@ -76,6 +78,13 @@ export function useAbandonedCartTracker() {
     cartTokenRef.current = getOrCreateAbandonedCartToken();
   }, []);
 
+  // Sincroniza dados do user logado com contato do carrinho + cria lead
+  useEffect(() => {
+    if (!user?.email) return;
+    saveAbandonedCartContact({ name: userFullName, email: user.email, userId: user.id });
+    void captureLead({ name: userFullName, email: user.email, source: 'session', tags: ['logged_in'] });
+  }, [user?.id, user?.email, userFullName]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -123,7 +132,7 @@ export function useAbandonedCartTracker() {
       });
 
       if (error) {
-        disabledRef.current = true;
+        // Não desabilita permanentemente: tenta de novo na próxima mudança
         return;
       }
 
