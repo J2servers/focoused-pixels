@@ -14,6 +14,20 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
+    const msg = error?.message || '';
+    if (/Failed to fetch dynamically imported module|Importing a module script failed|ChunkLoadError|error loading dynamically imported module/i.test(msg)) {
+      try {
+        const KEY = '__pdl_chunk_reloaded_at';
+        const last = Number(sessionStorage.getItem(KEY) || 0);
+        if (Date.now() - last > 30_000) {
+          sessionStorage.setItem(KEY, String(Date.now()));
+          const url = new URL(window.location.href);
+          url.searchParams.set('_r', Date.now().toString(36));
+          window.location.replace(url.toString());
+          return;
+        }
+      } catch { /* ignore */ }
+    }
     reportError(error, {
       level: 'fatal',
       source: 'frontend',
