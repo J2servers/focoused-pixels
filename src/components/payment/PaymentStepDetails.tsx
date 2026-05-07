@@ -38,6 +38,18 @@ export function PaymentStepDetails({
 
   const { isUploading, handleFileUpload, removeFile } = useFileUpload(setUploadedFiles);
 
+  // Captura de lead resiliente: a cada mudança em nome/email/phone, persiste após 800ms
+  useEffect(() => {
+    const name = customerForm.name?.trim();
+    const email = customerForm.email?.trim();
+    const phone = customerForm.phone?.trim();
+    if (!name && !email && !phone) return;
+    const t = setTimeout(() => {
+      void captureLead({ name, email, phone, source: 'checkout_details', tags: ['checkout', 'details_form'] });
+    }, 800);
+    return () => clearTimeout(t);
+  }, [customerForm.name, customerForm.email, customerForm.phone]);
+
   const handleSelectFreight = (option: FreightOption) => {
     setSelectedMethod(option.method);
     onShippingChange(
