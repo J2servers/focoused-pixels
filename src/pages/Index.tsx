@@ -192,10 +192,6 @@ const Index = () => {
       <main id="main-content" className="flex-1" role="main">
         <HeroConversion />
 
-        {!categoriesLoading && (
-          <RainbowCategoryStrip categories={parentCategories} />
-        )}
-
         <BestSellersSection onAddToCart={handleOpenMiniCart} />
         <SectionDivider />
         <WeeklyUrgencySection />
